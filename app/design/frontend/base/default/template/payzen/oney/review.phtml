@@ -1,0 +1,59 @@
+<?php
+/**
+ * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+$optionDetails = $this->getOptionDetails();
+
+$date = time();
+?>
+
+<table class="payzen_oney_review" id="payzen_oney_review_<?php echo $optionDetails->getOptionCode(); ?>" <?php if (!$this->getFirst()) {?> style="display: none;" <?php }?>>
+    <thead>
+        <tr>
+            <th><?php echo Mage::helper('payzen')->__('Your order total :'); ?> <?php echo $optionDetails->getOrderTotal(); ?></th>
+            <th><?php echo Mage::helper('payzen')->__('Debit dates'); ?></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td><?php echo Mage::helper('payzen')->__('Contribution :'); ?> <?php echo $optionDetails->getFirstPayment(); ?></td>
+            <td><strong><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></strong></td>
+        </tr>
+        <tr>
+            <td><?php echo Mage::helper('payzen')->__('Followed by %s payments', $optionDetails->getCount()); ?></td>
+            <td></td>
+        </tr>
+        <?php
+        for ($i=1; $i <= $optionDetails->getCount(); $i++) {
+            $date = strtotime('+30 days', $date);
+        ?>
+        <tr>
+            <td>&nbsp;- <?php echo Mage::helper('payzen')->__('Payment %s :', $i); ?> <?php echo $optionDetails->getMonthlyPayment(); ?></td>
+            <td><strong><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></strong></td>
+        </tr>
+        <?php
+        }
+        ?>
+        <tr>
+            <td colspan="2"><?php echo Mage::helper('payzen')->__('Total cost of credit :'); ?> <?php echo $optionDetails->getFundingFees(); ?></td>
+        </tr>
+        <!-- <tr>
+            <td colspan="2" class="small"><?php echo Mage::helper('payzen')->__('Funding of %s with a fixed APR of %s %%.', $optionDetails->getFundingTotal(), $optionDetails->getTaeg()); ?></td>
+        </tr> -->
+    </tbody>
+</table>

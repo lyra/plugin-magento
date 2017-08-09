@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_system_config_edit>
+        <reference name="head">
+            <action method="addItem"><type>skin_css</type><name>payzen.css</name></action>
+        </reference>
+    </adminhtml_system_config_edit>
+
+    <adminhtml_sales_order_create_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_css</type><name>payzen.css</name></action>
+        </reference>
+    </adminhtml_sales_order_create_index>
+
+    <adminhtml_payzen_payment_form>
+        <reference name="content">
+            <block type="payzen/adminhtml_redirect" name="payzen_redirect" template="payzen/redirect.phtml" />
+        </reference>
+    </adminhtml_payzen_payment_form>
+</layout>

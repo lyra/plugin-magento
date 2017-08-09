@@ -1,0 +1,1916 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<config>
+    <sections>
+        <payment>
+            <groups>
+                <payzen translate="label">
+                    <label>PayZen</label>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+
+                    <fields>
+                        <!-- =============== module information (version, contact, ...) ================= -->
+                        <module_information translate="label">
+                            <label>MODULE INFORMATION</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_information>
+
+                        <developed_by translate="label">
+                            <label>Developed by</label>
+                            <comment><![CDATA[<a href="http://www.lyra-network.com" target="_blank">www.lyra-network.com</a>]]></comment>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_label</frontend_model>
+                            <config_path>payment/payzen/developed_by</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </developed_by>
+
+                        <contact_email translate="label">
+                            <label>Contact us</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_label</frontend_model>
+                            <config_path>payment/payzen/contact_email</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </contact_email>
+
+                        <module_version translate="label">
+                            <label>Module version</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_label</frontend_model>
+                            <config_path>payment/payzen/module_version</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_version>
+
+                        <gateway_version translate="label">
+                            <label>Platform version</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_label</frontend_model>
+                            <config_path>payment/payzen/gateway_version</config_path>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </gateway_version>
+
+                        <init_module translate="label,button_label,comment">
+                            <label>Reset the module</label>
+                            <comment>Click this button to remove all previous versions settings and/or reset the current module settings.</comment>
+                            <button_label>Reset</button_label>
+                            <button_url><![CDATA[adminhtml/payzen_config/reset]]></button_url>
+                            <frontend_model>payzen/field_initButton</frontend_model>
+                            <sort_order>16</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </init_module>
+
+                        <enable_logs translate="label,comment">
+                            <label>Logs</label>
+                            <comment>Enable / disable module logs.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen/enable_logs</config_path>
+                            <sort_order>17</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable_logs>
+
+                        <!-- ================================== gateway access ================================== -->
+                        <gateway_access translate="label">
+                            <label>PAYMENT PLATFORM ACCESS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </gateway_access>
+
+                        <site_id translate="label,comment">
+                            <label>Store identifier</label>
+                            <comment>The identifier provided by PayZen.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/site_id</config_path>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id>
+
+                        <key_test translate="label,comment">
+                            <label>Certificate in test mode</label>
+                            <comment>Certificate provided by PayZen for test mode (available in your store Back Office).</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/key_test</config_path>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </key_test>
+
+                        <key_prod translate="label,comment">
+                            <label>Certificate in production mode</label>
+                            <comment>Certificate provided by PayZen (available in your store Back Office after enabling production mode).</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/key_prod</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </key_prod>
+
+                        <ctx_mode translate="label,comment">
+                            <label>Mode</label>
+                            <comment>The context mode of this module.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_ctxModes</source_model>
+                            <config_path>payment/payzen/ctx_mode</config_path>
+                            <sort_order>24</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </ctx_mode>
+
+                        <platform_url translate="label,comment">
+                            <label>Payment page URL</label>
+                            <comment>Link to the payment page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/platform_url</config_path>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </platform_url>
+
+                        <check_url translate="label,comment">
+                            <label>Notification URL to copy into your PayZen Back Office</label>
+                            <comment><![CDATA[<span style='color: red;'>In multistore mode, notification URL is the same for all the stores.</span>]]></comment>
+                            <frontend_type>label</frontend_type>
+                            <config_path>payment/payzen/check_url</config_path>
+                            <backend_model>payzen/field_checkUrl</backend_model>
+                            <sort_order>26</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </check_url>
+
+                        <!-- ================================== payment page ================================== -->
+                        <payment_page translate="label">
+                            <label>PAYMENT PAGE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page>
+
+                        <language translate="label,comment">
+                            <label>Default Language</label>
+                            <comment>Default language on the payment page.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_languages</source_model>
+                            <config_path>payment/payzen/language</config_path>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </language>
+
+                        <available_languages translate="label,comment">
+                            <label>Available languages</label>
+                            <comment>Languages available on the payment page. If you do not select any, all the supported languages will be available.</comment>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <source_model>payzen/source_languages</source_model>
+                            <backend_model>payzen/field_availableLanguages</backend_model>
+                            <config_path>payment/payzen/available_languages</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </available_languages>
+
+                        <capture_delay translate="label,comment">
+                            <label>Capture delay</label>
+                            <comment>The number of days before the bank capture (adjustable in your PayZen Back Office).</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/capture_delay</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </capture_delay>
+
+                        <validation_mode translate="label,comment">
+                            <label>Validation mode</label>
+                            <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_validationModes</source_model>
+                            <config_path>payment/payzen/validation_mode</config_path>
+                            <sort_order>34</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validation_mode>
+
+
+                        <!-- ================================ payment page customize ================================== -->
+                        <payment_page_customize translate="label">
+                            <label>PAYMENT PAGE CUSTOMIZE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page_customize>
+
+                        <theme_config translate="label,comment">
+                            <label>Theme configuration</label>
+                            <comment>The theme configuration to customize the payment page (logo, css).</comment>
+                            <frontend_type>text</frontend_type>
+                            <backend_model>payzen/field_themeConfig</backend_model>
+                            <config_path>payment/payzen/theme_config</config_path>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </theme_config>
+
+                        <shop_name translate="label,comment">
+                            <label>Shop name</label>
+                            <comment>Shop name to display on the payment page. Leave blank to use platform configuration.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/shop_name</config_path>
+                            <sort_order>42</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </shop_name>
+
+                        <shop_url translate="label,comment">
+                            <label>Shop URL</label>
+                            <comment>Shop URL to display on the payment page. Leave blank to use platform configuration.</comment>
+                            <frontend_type>text</frontend_type>
+                            <backend_model>payzen/field_shopUrl</backend_model>
+                            <config_path>payment/payzen/shop_url</config_path>
+                            <sort_order>43</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </shop_url>
+
+
+                        <!--  ================================== 3DS enabling ================================== -->
+                        <selective_3ds translate="label">
+                            <label>SELECTIVE 3DS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </selective_3ds>
+
+                        <custgroup_threeds_min_amount translate="label,comment">
+                            <label>Restrict 3-DS by customer group</label>
+                            <comment>Needs subscription to Selective 3-D Secure option.</comment>
+                            <frontend_model>payzen/field_standard_threedsCustgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_standard/custgroup_threeds_min_amount</config_path>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_threeds_min_amount>
+
+                        <!-- ================================== return options ================================== -->
+                        <return_options translate="label">
+                            <label>RETURN TO SHOP</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </return_options>
+
+                        <redirect_enabled translate="label,comment">
+                            <label>Automatic redirection</label>
+                            <comment>If enabled, the buyer is automatically redirected to your site at the end of the payment.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen/redirect_enabled</config_path>
+                            <sort_order>61</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </redirect_enabled>
+
+                        <redirect_success_timeout translate="label,comment">
+                            <label>Redirection timeout on success</label>
+                            <comment>Time in seconds (0-300) before the buyer is automatically redirected to your website after a successful payment.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/redirect_success_timeout</config_path>
+                            <sort_order>62</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <redirect_enabled>1</redirect_enabled>
+                            </depends>
+                        </redirect_success_timeout>
+
+                        <redirect_success_message translate="label,comment">
+                            <label>Redirection message on success</label>
+                            <comment>Message displayed on the payment page prior to redirection after a successful payment.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/redirect_success_message</config_path>
+                            <sort_order>63</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <redirect_enabled>1</redirect_enabled>
+                            </depends>
+                        </redirect_success_message>
+
+                        <redirect_error_timeout translate="label,comment">
+                            <label>Redirection timeout on failure</label>
+                            <comment>Time in seconds (0-300) before the buyer is automatically redirected to your website after a declined payment.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/redirect_error_timeout</config_path>
+                            <sort_order>64</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <redirect_enabled>1</redirect_enabled>
+                            </depends>
+                        </redirect_error_timeout>
+
+                        <redirect_error_message translate="label,comment">
+                            <label>Redirection message on failure</label>
+                            <comment>Message displayed on the payment page prior to redirection after a declined payment.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/redirect_error_message</config_path>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <redirect_enabled>1</redirect_enabled>
+                            </depends>
+                        </redirect_error_message>
+
+                        <return_mode translate="label,comment">
+                            <label>Return mode</label>
+                            <comment>Method that will be used for transmitting the payment result from the payment page to your shop.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_returnModes</source_model>
+                            <config_path>payment/payzen/return_mode</config_path>
+                            <sort_order>66</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </return_mode>
+
+                        <registered_order_status translate="label,comment">
+                            <label>Registered orders status</label>
+                            <comment>Status of orders when payment is successfull.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_order_status_newprocessing</source_model>
+                            <config_path>payment/payzen/registered_order_status</config_path>
+                            <sort_order>68</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </registered_order_status>
+
+                        <capture_auto translate="label,comment">
+                            <label>Invoice creation</label>
+                            <comment>Automatically create invoice when payment is successfull.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen/capture_auto</config_path>
+                            <sort_order>69</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <registered_order_status>processing</registered_order_status>
+                            </depends>
+                        </capture_auto>
+
+                        <!-- ================ options used by risk assessment module and/or FacilyPay Oney payment ============== -->
+                        <additional_options translate="label,comment">
+                            <label>ADDITIONAL OPTIONS</label>
+                            <comment>Configure this section if you use advanced risk assessment module or if you have a FacilyPay Oney contract.</comment>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </additional_options>
+
+                        <common_category translate="label,comment">
+                            <label>Category mapping</label>
+                            <comment>Use the same category for all products.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_categories</source_model>
+                            <config_path>payment/payzen/common_category</config_path>
+                            <sort_order>71</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </common_category>
+
+                        <category_mapping translate="comment">
+                            <comment><![CDATA[Match each product category with a PayZen category.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
+                            <frontend_model>payzen/field_categoryMapping</frontend_model>
+                            <backend_model>payzen/field_categoryMapping</backend_model>
+                            <config_path>payment/payzen/category_mapping</config_path>
+                            <sort_order>72</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <common_category>CUSTOM_MAPPING</common_category>
+                            </depends>
+                        </category_mapping>
+
+                        <ship_options translate="label,comment">
+                            <label>Shipping options</label>
+                            <comment><![CDATA[Define the PayZen information about the used shipping methods.<br /><b>Name: </b>The name of the shipping method (use 55 alphanumeric characters, accentuated characters and these special characters: space, slash, hyphen, apostrophe).<br /><b>Type: </b>The carrier type.<br /><b>Rapidity: </b>Select the delivery rapidity.<br /><b>Delay: </b>Select the delivery delay if speed is &laquo;Priority&raquo;.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
+                            <frontend_model>payzen/field_shipOptions</frontend_model>
+                            <backend_model>payzen/field_shipOptions</backend_model>
+                            <config_path>payment/payzen/ship_options</config_path>
+                            <sort_order>73</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </ship_options>
+                    </fields>
+                </payzen>
+
+
+                <payzen_standard translate="label">
+                    <label>PayZen - Standard Payment</label>
+                    <sort_order>101</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_standard/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_standard/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_standard/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_standard/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ========================== amount restriction parameters =========================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <allowspecific translate="label">
+                            <label>Restrict to some countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_standard/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_standard/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_standard/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+
+                        <!-- ================================== payment page ================================== -->
+                        <payment_page translate="label">
+                            <label>PAYMENT PAGE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page>
+
+                        <capture_delay translate="label,comment">
+                            <label>Capture delay</label>
+                            <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_standard/capture_delay</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </capture_delay>
+
+                        <validation_mode translate="label,comment">
+                            <label>Validation mode</label>
+                            <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_validationModes</source_model>
+                            <config_path>payment/payzen_standard/validation_mode</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validation_mode>
+
+                        <payment_cards translate="label,comment">
+                            <label>Card Types</label>
+                            <comment>The card type(s) that can be used for the payment. Select none to use platform configuration.</comment>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <source_model>payzen/source_paymentCards</source_model>
+                            <backend_model>payzen/field_paymentCards</backend_model>
+                            <config_path>payment/payzen_standard/payment_cards</config_path>
+                            <sort_order>34</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_cards>
+
+                        <use_oney_in_standard translate="label,comment">
+                            <label>Propose FacilyPay Oney</label>
+                            <comment><![CDATA[Select &laquo;Yes&raquo; if you want to propose FacilyPay Oney in standard payment. Attention, you must ensure that you have a FacilyPay Oney contract.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <backend_model>payzen/field_standard_useOney</backend_model>
+                            <config_path>payment/payzen_standard/use_oney_in_standard</config_path>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_oney_in_standard>
+
+                        <!-- ================================== payment options ================================== -->
+                        <advanced_options translate="label">
+                            <label>ADVANCED OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </advanced_options>
+
+                        <card_info_mode translate="label,comment">
+                            <label>Card data entry mode</label>
+                            <comment>Select how the credit card infos will be entered. Attention, to use data acquisition on the merchant site, you must ensure that you have subscribed to this option with PayZen.</comment>
+                            <frontend_type>select</frontend_type>
+                            <backend_model>payzen/field_standard_cardInfoModes</backend_model>
+                            <source_model>payzen/source_standard_cardInfoModes</source_model>
+                            <config_path>payment/payzen_standard/card_info_mode</config_path>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </card_info_mode>
+
+                        <one_click_active translate="label,comment">
+                            <label>1-Click payment</label>
+                            <comment>Enable 1-Click to add PayZen payment button to your cart and / or product pages.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_standard/one_click_active</config_path>
+                            <sort_order>42</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </one_click_active>
+
+                        <one_click_title translate="label,comment">
+                            <label>1-Click button text</label>
+                            <comment>The text to display on the PayZen 1-Click payment button.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_standard/one_click_title</config_path>
+                            <sort_order>43</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <one_click_active>1</one_click_active>
+                            </depends>
+                        </one_click_title>
+
+                        <one_click_location translate="label,comment">
+                            <label>1-Click button location</label>
+                            <comment>Select where to display PayZen 1-Click payment button.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_standard_oneClickLocations</source_model>
+                            <config_path>payment/payzen_standard/one_click_location</config_path>
+                            <sort_order>44</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <one_click_active>1</one_click_active>
+                            </depends>
+                        </one_click_location>
+
+                        <card_register_mode translate="label,comment">
+                            <label>Card data registration mode</label>
+                            <comment>Select how you want to propose card data registration on your website.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_standard_cardRegisterModes</source_model>
+                            <config_path>payment/payzen_standard/card_register_mode</config_path>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <card_info_mode>3</card_info_mode>
+                                <one_click_active>1</one_click_active>
+                            </depends>
+                        </card_register_mode>
+
+                        <card_register_message translate="label,comment">
+                            <label>Card data registration message</label>
+                            <comment>Message displayed on your website to invite buyers to register their card data.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_standard/card_register_message</config_path>
+                            <sort_order>46</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <card_info_mode>3</card_info_mode>
+                                <one_click_active>1</one_click_active>
+                            </depends>
+                        </card_register_message>
+                    </fields>
+                </payzen_standard>
+
+
+                <payzen_multi translate="label">
+                    <label>PayZen - Credit Card Installments</label>
+                    <sort_order>102</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_multi/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_multi/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_multi/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_multi/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ============================ amount restriction parameters ======================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <allowspecific translate="label">
+                            <label>Restrict to some countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_multi/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_multi/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_multi/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+
+                        <!-- ================================== payment page ================================== -->
+                        <payment_page translate="label">
+                            <label>PAYMENT PAGE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page>
+
+                        <capture_delay translate="label,comment">
+                            <label>Capture delay</label>
+                            <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_multi/capture_delay</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </capture_delay>
+
+                        <validation_mode translate="label,comment">
+                            <label>Validation mode</label>
+                            <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_validationModes</source_model>
+                            <config_path>payment/payzen_multi/validation_mode</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validation_mode>
+
+                        <payment_cards translate="label,comment">
+                            <label>Card Types</label>
+                            <comment>The card type(s) that can be used for the payment. Select none to use platform configuration.</comment>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <source_model>payzen/source_multi_paymentCards</source_model>
+                            <backend_model>payzen/field_paymentCards</backend_model>
+                            <config_path>payment/payzen_multi/payment_cards</config_path>
+                            <sort_order>34</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_cards>
+
+                        <!-- ================================== payment options ================================== -->
+                        <advanced_options translate="label">
+                            <label>ADVANCED OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </advanced_options>
+
+                        <card_info_mode translate="label,comment">
+                            <label>Card type selection</label>
+                            <comment>Select where card type will be selected by buyer.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_multi_cardInfoModes</source_model>
+                            <config_path>payment/payzen_multi/card_info_mode</config_path>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </card_info_mode>
+
+                        <!-- ================================== multi payment options ================================== -->
+                        <custom_options translate="label">
+                            <label>PAYMENT OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custom_options>
+
+                        <payment_options translate="label,comment">
+                            <label>Payment options</label>
+                            <frontend_model>payzen/field_multi_paymentOptions</frontend_model>
+                            <backend_model>payzen/field_multi_paymentOptions</backend_model>
+                            <config_path>payment/payzen_multi/payment_options</config_path>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Click on &laquo;Add&raquo; button to configure one or more payment options.<br /><b>Label : </b>The option label to display on the frontend.<br /><b>Min. amount : </b>Minimum amount to enable the payment option.<br /><b>Max. amount : </b>Maximum amount to enable the payment option.<br /><b>Contract : </b>ID of the contract to use with the option.<br /><b>Count : </b>Total number of payments.<br /><b>Period : </b>Delay (in days) between payments.<br /><b>1st payment : </b>Amount of first payment, in percentage of total amount. If empty, all payments will have the same amount.]]></comment>
+                        </payment_options>
+                    </fields>
+                </payzen_multi>
+
+
+                <payzen_gift translate="label">
+                    <label>PayZen - Gift Card Payment</label>
+                    <sort_order>103</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_gift/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_gift/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_gift/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_gift/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ============================ amount restriction parameters ======================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <allowspecific translate="label">
+                            <label>Restrict to some countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_gift/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_gift/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_gift/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+
+                        <!-- ================================== payment page ================================== -->
+                        <payment_page translate="label">
+                            <label>PAYMENT PAGE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page>
+
+                        <capture_delay translate="label,comment">
+                            <label>Capture delay</label>
+                            <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration. This setting is considered only if the buyer uses another CC to complete the payment.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_gift/capture_delay</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </capture_delay>
+
+                        <validation_mode translate="label,comment">
+                            <label>Validation mode</label>
+                            <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office. This setting is considered only if the buyer uses another CC to complete the payment.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_validationModes</source_model>
+                            <config_path>payment/payzen_gift/validation_mode</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validation_mode>
+
+                        <!-- ================================== gift payment options ================================== -->
+                        <custom_options translate="label">
+                            <label>PAYMENT OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custom_options>
+
+                        <gift_cards translate="label,comment">
+                            <label>Gift card types</label>
+                            <comment>Select the gift card types that can be used for the payment.</comment>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <source_model>payzen/source_gift_giftCards</source_model>
+                            <config_path>payment/payzen_gift/gift_cards</config_path>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </gift_cards>
+
+                        <added_gift_cards translate="label,comment">
+                            <label>Add cards</label>
+                            <frontend_model>payzen/field_gift_addedCards</frontend_model>
+                            <backend_model>payzen/field_gift_addedCards</backend_model>
+                            <config_path>payment/payzen_gift/added_gift_cards</config_path>
+                            <sort_order>42</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Click on button to add one or more new gift cards.<br /><b>Card code : </b>The PayZen exact gift card code.<br /><b>Card label : </b>The label of the new gift card.<br /><b>Card logo : </b>The gift card logo to display on payment method selection page.]]></comment>
+                        </added_gift_cards>
+                    </fields>
+                </payzen_gift>
+
+
+                <payzen_cof3xcb translate="label">
+                    <label>PayZen - Cofinoga CB 3 times</label>
+                    <sort_order>104</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <frontend_class>complex</frontend_class>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_cof3xcb/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_cof3xcb/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_cof3xcb/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_cof3xcb/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ============================ amount restriction parameters ======================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <allowspecific translate="label">
+                            <label>Restrict to some countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_cof3xcb/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_cof3xcb/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_cof3xcb/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+
+                        <!-- ================================== payment page ================================== -->
+                        <payment_page translate="label">
+                            <label>PAYMENT PAGE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page>
+
+                        <capture_delay translate="label,comment">
+                            <label>Capture delay</label>
+                            <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_cof3xcb/capture_delay</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </capture_delay>
+
+                        <validation_mode translate="label,comment">
+                            <label>Validation mode</label>
+                            <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_validationModes</source_model>
+                            <config_path>payment/payzen_cof3xcb/validation_mode</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validation_mode>
+                    </fields>
+                </payzen_cof3xcb>
+
+
+                <payzen_oney translate="label">
+                    <label>PayZen - FacilyPay Oney</label>
+                    <sort_order>105</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <frontend_class>complex</frontend_class>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_oney/active</config_path>
+                            <backend_model>payzen/field_oney_active</backend_model>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_oney/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_oney/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_oney/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ============================ amount restriction parameters ======================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <allowspecific translate="label">
+                            <label>Restrict to some countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_oney/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_oney/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>payzen/source_oney_availableCountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_oney_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_oney/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+
+                        <!-- ================================== payment page ================================== -->
+                        <payment_page translate="label">
+                            <label>PAYMENT PAGE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page>
+
+                        <capture_delay translate="label,comment">
+                            <label>Capture delay</label>
+                            <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_oney/capture_delay</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </capture_delay>
+
+                        <validation_mode translate="label,comment">
+                            <label>Validation mode</label>
+                            <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_validationModes</source_model>
+                            <config_path>payment/payzen_oney/validation_mode</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validation_mode>
+
+                        <!-- ================================== oney payment options ================================== -->
+                        <custom_options translate="label">
+                            <label>PAYMENT OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custom_options>
+
+                        <enable_payment_options translate="label,comment">
+                            <label>Enable options selection</label>
+                            <comment>Enable payment options selection on merchant site.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_oney/enable_payment_options</config_path>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable_payment_options>
+
+                        <payment_options translate="label,comment">
+                            <label>Payment options</label>
+                            <comment><![CDATA[Click on Add button to configure one or more payment options.<br /><b>Label: </b>The option label to display on the frontend (the %c and %r patterns will be respectively replaced by payments count and option rate).<br /><b>Code: </b>The option code as defined in your FacilyPay Oney contract.<br /><b>Min. amount: </b>Minimum amount to enable the payment option.<br /><b>Max. amount: </b>Maximum amount to enable the payment option.<br /><b>Count: </b>Total number of payments.<br /><b>Rate: </b>The interest rate in percentage.]]></comment>
+                            <frontend_model>payzen/field_oney_paymentOptions</frontend_model>
+                            <backend_model>payzen/field_oney_paymentOptions</backend_model>
+                            <config_path>payment/payzen_oney/payment_options</config_path>
+                            <sort_order>42</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enable_payment_options>1</enable_payment_options>
+                            </depends>
+                        </payment_options>
+                    </fields>
+                </payzen_oney>
+
+
+                <payzen_paypal translate="label">
+                    <label>PayZen - PayPal Payment</label>
+                    <sort_order>106</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <frontend_class>complex</frontend_class>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_paypal/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_paypal/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_paypal/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_paypal/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ============================ amount restriction parameters ======================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <allowspecific translate="label">
+                            <label>Restrict to some countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_paypal/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_paypal/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_paypal/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+
+                        <!-- ================================== payment page ================================== -->
+                        <payment_page translate="label">
+                            <label>PAYMENT PAGE</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payment_page>
+
+                        <capture_delay translate="label,comment">
+                            <label>Capture delay</label>
+                            <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_paypal/capture_delay</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </capture_delay>
+
+                        <validation_mode translate="label,comment">
+                            <label>Validation mode</label>
+                            <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payzen/source_validationModes</source_model>
+                            <config_path>payment/payzen_paypal/validation_mode</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validation_mode>
+                    </fields>
+                </payzen_paypal>
+
+
+                <payzen_sofort translate="label">
+                    <label>PayZen - Sofort Banking Payment</label>
+                    <sort_order>107</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <frontend_class>complex</frontend_class>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_sofort/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_sofort/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_sofort/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_sofort/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ============================ amount restriction parameters ======================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <allowspecific translate="label">
+                            <label>Restrict to some countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_sofort/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_sofort/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>payzen/source_sofort_availableCountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_sofort/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+                    </fields>
+                </payzen_sofort>
+
+
+                
+
+
+                
+
+                <payzen_ideal translate="label">
+                    <label>PayZen - iDEAL Payment</label>
+                    <sort_order>110</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <frontend_class>complex</frontend_class>
+
+                    <fields>
+                        <!-- ================================== module settings ================================== -->
+                        <display_options translate="label">
+                            <label>DISPLAY OPTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_options>
+
+                        <active translate="label,comment">
+                            <label>Activation</label>
+                            <comment>Enables / disbales this payment method.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_ideal/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+
+                        <sort_order translate="label,comment">
+                            <label>Sort order</label>
+                            <comment>In the payment methods list.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_ideal/sort_order</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+
+                        <title translate="label,comment">
+                            <label>Method title</label>
+                            <comment>Method title to display on payment means page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_ideal/title</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+
+                        <module_logo translate="label,comment">
+                            <label>Logo</label>
+                            <comment>Allowed file types: jpeg, gif, png.</comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_ideal/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </module_logo>
+
+                        <!-- ============================ amount restriction parameters ======================== -->
+                        <restrictions translate="label">
+                            <label>RESTRICTIONS</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restrictions>
+
+                        <specificcountry translate="label">
+                            <label>Authorized countries</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/field_label</frontend_model>
+                            <is_country>true</is_country>
+                            <config_path>payment/payzen_ideal/specificcountry</config_path>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificcountry>
+
+                        <custgroup_amount_restrictions translate="label,comment">
+                            <label>Restrict to some customer groups</label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/field_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_ideal/custgroup_amount_restrictions</config_path>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custgroup_amount_restrictions>
+                    </fields>
+                </payzen_ideal>
+            </groups>
+        </payment>
+    </sections>
+</config>

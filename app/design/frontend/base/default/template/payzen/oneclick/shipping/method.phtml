@@ -1,0 +1,63 @@
+<?php
+/**
+ * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+$methodId = uniqid('payzen_shipping_method_');
+?>
+
+<label for="<?php echo $methodId; ?>"><?php echo Mage::helper('payzen')->__('Shipping Method') ?> :</label>
+<p class="payzen-please-wait" style="display:none;">
+    <span class="please-wait">
+        <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>"
+             alt="<?php echo Mage::helper('core')->quoteEscape($this->__('Please wait...')) ?>"
+             title="<?php echo $this->__('Please wait...') ?>"
+             class="v-middle" />
+        <?php echo $this->__('Please wait...') ?>
+    </span>
+</p>
+<?php if (!($_shippingRateGroups = $this->getShippingRates())): ?>
+    <?php if ($this->getContext() === Lyra_Payzen_Helper_Payment::ONECLICK_LOCATION_PRODUCT): ?>
+        <p class="payzen-shipping-method"><?php echo Mage::helper('payzen')->__('Sorry, no quotes are available for this product configuration.') ?></p>
+    <?php else: ?>
+        <p class="payzen-shipping-method"><?php echo Mage::helper('payzen')->__('Sorry, no quotes are available for this order at this time.') ?></p>
+    <?php endif ?>
+<?php else: ?>
+    <div class="payzen-shipping-method input-box" style="clear: both; display: block;">
+        <select id="<?php echo $methodId; ?>" name="shipping_method" class="payzen-method-select" style="width: 100%;">
+            <option value=""><?php echo Mage::helper('payzen')->__('-- Please Select --') ?></option>
+            <?php foreach ($_shippingRateGroups as $code => $_rates): ?>
+                <optgroup label="<?php echo $this->getCarrierName($code) ?>" style="font-style: normal;">
+                    <?php foreach ($_rates as $_rate): ?>
+                        <?php if ($_rate->getErrorMessage()): ?>
+                            <option style="padding-left: 16px;"><?php echo $_rate->getErrorMessage() ?></option>
+                        <?php else: ?>
+                            <option value="<?php echo $this->htmlEscape($_rate->getCode()) ?>"<?php if ($_rate->getCode() === $this->getShippingMethod()) echo ' selected="selected"' ?> style="padding-left: 16px;">
+                                <?php echo $_rate->getMethodTitle() ?>
+                                <?php $_excl = $this->getShippingPrice($_rate->getPrice(), Mage::helper('tax')->displayShippingPriceIncludingTax()) ?>
+                                <?php $_incl = $this->getShippingPrice($_rate->getPrice(), true) ?>
+                                <?php echo $_excl ?>
+                                <?php if (Mage::helper('tax')->displayShippingBothPrices() && $_incl != $_excl): ?>
+                                    (<?php echo Mage::helper('payzen')->__('Incl. Tax') ?> <?php echo $_incl ?>)
+                                <?php endif ?>
+                            </option>
+                        <?php endif ?>
+                    <?php endforeach ?>
+                </optgroup>
+            <?php endforeach ?>
+        </select>
+    </div>
+<?php endif ?>
