@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 
@@ -22,17 +22,21 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
  */
 class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
-    /**
-     * @var \Magento\Customer\Model\GroupFactory
-     */
-    private $customerGroupFactory;
 
     /**
+     *
+     * @var \Magento\Customer\Model\GroupFactory
+     */
+    protected $customerGroupFactory;
+
+    /**
+     *
      * @var bool
      */
     protected $staticTable = true;
 
     /**
+     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Customer\Model\GroupFactory $customerGroupFactory
      * @param array $data
@@ -54,19 +58,28 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config
      */
     public function _prepareToRender()
     {
-        $this->addColumn('title', [
-            'label' => __('Customer group'),
-            'style' => 'width: 200px;',
-            'renderer' => $this->getLabelRenderer('_title')
-        ]);
-        $this->addColumn('amount_min', [
-            'label' => __('Minimum amount'),
-            'style' => 'width: 160px;'
-        ]);
-        $this->addColumn('amount_max', [
-            'label' => __('Maximum amount'),
-            'style' => 'width: 160px;'
-        ]);
+        $this->addColumn(
+            'title',
+            [
+                'label' => __('Customer group'),
+                'style' => 'width: 200px;',
+                'renderer' => $this->getLabelRenderer('_title')
+            ]
+        );
+        $this->addColumn(
+            'amount_min',
+            [
+                'label' => __('Minimum amount'),
+                'style' => 'width: 160px;'
+            ]
+        );
+        $this->addColumn(
+            'amount_max',
+            [
+                'label' => __('Maximum amount'),
+                'style' => 'width: 160px;'
+            ]
+        );
 
         parent::_prepareToRender();
     }
@@ -82,11 +95,11 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config
         $groups = $this->getAllCustomerGroups();
 
         $savedGroups = $this->getElement()->getValue();
-        if (!is_array($savedGroups)) {
+        if (! is_array($savedGroups)) {
             $savedGroups = [];
         }
 
-        if (!empty($savedGroups)) {
+        if (! empty($savedGroups)) {
             foreach ($savedGroups as $id => $savedGroup) {
                 if (key_exists($savedGroup['code'], $groups)) {
                     // refresh group title
@@ -103,16 +116,18 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config
         // add not saved yet groups
         foreach ($groups as $code => $title) {
             $group = [
-                    'code' => $code,
-                    'title' => $title,
-                    'amount_min' => '',
-                    'amount_max' => ''
+                'code' => $code,
+                'title' => $title,
+                'amount_min' => '',
+                'amount_max' => ''
             ];
 
             if ($code === 'all') {
                 // add all groups entry
                 $group['all'] = true;
-                $savedGroups = array_merge([uniqid('_all_') => $group], $savedGroups);
+                $savedGroups = array_merge([
+                    uniqid('_all_') => $group
+                ], $savedGroups);
             } else {
                 $savedGroups[uniqid('_' . $code . '_')] = $group;
             }

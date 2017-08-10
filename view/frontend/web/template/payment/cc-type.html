@@ -1,0 +1,58 @@
+<!--
+/**
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
+ */
+-->
+
+<div class="field">
+    <label data-bind="visible: showLabel()">
+        <!--ko if: getAvailableCcTypes().length > 1 -->
+            <span data-bind="i18n: 'Choose your payment mean'"></span>
+        <!--/ko-->
+
+        <!--ko ifnot: getAvailableCcTypes().length > 1 -->
+            <span data-bind="i18n: 'Your payment mean'"></span>
+        <!--/ko-->
+    </label>
+
+    <div class="control" style="margin-top: 20px;">
+        <ul class="credit-card-types">
+            <!-- ko foreach: {data: getAvailableCcTypes(), as: 'card'} -->
+            <li class="item" data-bind="css: {'_active': true}" style="padding-right: 10px; padding-bottom: 6px;">
+                <input type="radio"
+                       class="radio"
+                       data-bind="attr: {id: $parent.getCode() + '_cc_type_' + card.value, 
+                                         checked: (card.value == $parent.payzenCcType()), 
+                                         name: 'payment[' + $parent.getCode() + '_cc_type]'
+                                        },
+                                  value: card.value,
+                                  visible: $parent.getAvailableCcTypes().length > 1,
+                                  click: function() { $parent.payzenCcType(card.value); return true; }">
+
+                <label  data-bind="attr: {for: $parent.getCode() + '_cc_type_' + card.value}">
+                    <!--ko if: card.icon -->
+                    <img data-bind="attr: {src: card.icon, title: card.label}" style="height: 32px; vertical-align: middle;">
+                    <!--/ko-->
+
+                    <!--ko ifnot: card.icon -->
+                    <span style="display: inline !important;" data-bind="text: card.label"></span>
+                    <!--/ko-->
+                </label>
+            </li>
+            <!--/ko-->
+        </ul>
+    </div>
+</div>

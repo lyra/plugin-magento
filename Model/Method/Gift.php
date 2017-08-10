@@ -1,28 +1,31 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
 class Gift extends Payzen
 {
+
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_GIFT;
+
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Gift::class;
 
     protected $_canRefund = false;
+
     protected $_canRefundInvoicePartial = false;
 
     protected function setExtraFields($order)
@@ -62,7 +65,7 @@ class Gift extends Payzen
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if (!$this->getConfigData('gift_cards')) {
+        if (! $this->getConfigData('gift_cards')) {
             return false;
         }
 
@@ -103,7 +106,7 @@ class Gift extends Payzen
         $options = $this->_getHelper()->getConfigArray('gift_cards'); // the default gift cards
 
         $addedCards = unserialize($this->getConfigData('added_gift_cards')); // the user-added gift cards
-        if (is_array($addedCards) && !empty($addedCards)) {
+        if (is_array($addedCards) && ! empty($addedCards)) {
             foreach ($addedCards as $code => $value) {
                 if (empty($value)) {
                     continue;

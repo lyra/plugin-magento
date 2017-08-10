@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend\Gift;
 
@@ -21,22 +21,32 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized
 {
+
     /**
+     *
      * @var \Magento\Framework\File\UploaderFactory
      */
-    private $uploaderFactory;
+    protected $uploaderFactory;
 
     /**
+     *
      * @var \Magento\Framework\Filesystem
      */
-    private $filesystem;
+    protected $filesystem;
 
     /**
+     *
      * @var \Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface
      */
-    private $requestData;
+    protected $requestData;
 
     /**
+     * @var \Magento\Framework\Image\AdapterFactory
+     */
+    protected $adapterFactory;
+
+    /**
+     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -45,6 +55,7 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
      * @param \Magento\Framework\File\UploaderFactory $uploaderFactory
      * @param \Magento\Framework\Filesystem $filesystem
      * @param \Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface $requestData
+     * @param \Magento\Framework\Image\AdapterFactory $adapterFactory
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param array $data
@@ -58,6 +69,7 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
         \Magento\Framework\File\UploaderFactory $uploaderFactory,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface $requestData,
+        \Magento\Framework\Image\AdapterFactory $adapterFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -65,6 +77,7 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
         $this->uploaderFactory = $uploaderFactory;
         $this->filesystem = $filesystem;
         $this->requestData = $requestData;
+        $this->adapterFactory = $adapterFactory;
 
         parent::__construct(
             $context,
@@ -86,14 +99,14 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
         $data = $this->getGroups($this->getGroupId()); // get data of gift config group
         $cards = $data['fields'][$this->getField()]['value'];
 
-        if (!is_array($cards) || empty($cards)) {
+        if (! is_array($cards) || empty($cards)) {
             $this->setValue([]);
             return parent::beforeSave();
         }
 
         $i = 0;
         foreach ($cards as $key => $card) {
-            $i++;
+            $i ++;
 
             if (empty($card)) {
                 continue;
@@ -120,13 +133,16 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
                 if ($file['tmp_name'] && $file['name']) { // is there any file uploaded for the current card
                     try {
                         $uploader = $this->uploaderFactory->create($file);
-                        $uploader->setAllowedExtensions(['png']);
+                        $uploader->setAllowedExtensions([
+                            'png'
+                        ]);
                         $uploader->setAllowRenameFiles(false);
                         $uploader->setAllowCreateFolders(true);
+                        $uploader->addValidateCallback('gift_card_logo', $this->adapterFactory->create(), 'validateUploadFile');
 
                         $result = $uploader->save($uploadDir, strtolower($card['code']) . '.png');
 
-                        if (key_exists('file', $result) && !empty($result['file'])) {
+                        if (key_exists('file', $result) && ! empty($result['file'])) {
                             $cards[$key]['logo'] = $result['file'];
                         }
                     } catch (\Exception $e) {
@@ -143,14 +159,14 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
 
     private function checkCode($value, $i)
     {
-        if (empty($value) || !preg_match('#^[A-Za-z0-9\-_]+$#', $value)) {
+        if (empty($value) || ! preg_match('#^[A-Za-z0-9\-_]+$#', $value)) {
             $this->throwException('Card code', $i);
         }
     }
 
     private function checkName($value, $i)
     {
-        if (!preg_match('#^[^<>]*$#', $value)) {
+        if (! preg_match('#^[^<>]*$#', $value)) {
             $this->throwException('Card name', $i);
         }
     }

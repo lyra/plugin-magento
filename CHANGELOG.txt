@@ -1,3 +1,11 @@
+2.1.2, 2017-08-14:
+- Bug fix: compilation problem relative to class constructor parameters.
+- Possibility to view payment page within pop-in for standard payment (iframe mode).
+- Possibility to select payment card type on merchant website (for both standard payment and payment in installments).
+- Save both converted and original paid amounts in Magento transaction details.
+- Use of protected variables (instead of private) to facilitate module code extension.
+- Register details about all payment installments.
+
 2.1.1, 2017-01-13:
 - Bug fix: correction of an error when returning to store using browser backward button.
 - Bug fix: selected payment in installments option is not considered since Magento 2.1.3.

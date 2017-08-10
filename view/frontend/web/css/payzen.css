@@ -1,0 +1,34 @@
+.payzen-iframe.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    background: #000 none repeat scroll 0 0;
+    opacity: 0.65; /* Safari, Opera */
+    filter: alpha(opacity=65); /* IE */
+    -moz-opacity: 0.65; /* FireFox */
+}
+
+.payzen-iframe.warning {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    background: #ffffff none repeat scroll 0 0;
+    z-index: 100;
+}
+
+.payzen-iframe.iframe {
+    position: relative;
+    width: 100%;
+    min-height: 440px;
+    border: 0 none;
+    background: #ffffff none repeat scroll 0 0;
+    z-index: 100;
+}
+
+.payzen-multi fieldset div.field {
+    float: left;
+    width: 50%;
+}

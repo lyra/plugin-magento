@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 namespace Lyranetwork\Payzen\Model\Api\Ws;
@@ -74,7 +74,7 @@ class WsApi extends \SoapClient
         }
 
         $ssl = [];
-        if ($options['sni.enabled']) {
+        if (isset($options['sni.enabled']) && $options['sni.enabled']) {
             $url = parse_url($wsdl);
             $ssl = ['SNI_enabled' => true, 'SNI_server_name' => $url['host']];
 
@@ -196,7 +196,7 @@ class WsApi extends \SoapClient
         }
     }
 
-    public function checkResult(namespace\CommonResponse $commonResponse, array $expectedStatuses = [])
+    public function checkResult(CommonResponse $commonResponse, array $expectedStatuses = [])
     {
         if ($commonResponse->getResponseCode() !== 0) {
             throw new namespace\ResultException(
@@ -205,8 +205,7 @@ class WsApi extends \SoapClient
             );
         }
 
-        if (!empty($expectedStatuses)
-            && !in_array($commonResponse->getTransactionStatusLabel(), $expectedStatuses)) {
+        if (!empty($expectedStatuses) && !in_array($commonResponse->getTransactionStatusLabel(), $expectedStatuses)) {
             throw new namespace\ResultException(
                 "Unexpected transaction status returned ({$commonResponse->getTransactionStatusLabel()})."
             );
@@ -217,7 +216,7 @@ class WsApi extends \SoapClient
      * @param RefundPayment $parameters
      * @return RefundPaymentResponse
      */
-    public function refundPayment(namespace\RefundPayment $parameters)
+    public function refundPayment(RefundPayment $parameters)
     {
         return $this->__soapCall('refundPayment', [$parameters]);
     }
@@ -226,7 +225,7 @@ class WsApi extends \SoapClient
      * @param CapturePayment $parameters
      * @return CapturePaymentResponse
      */
-    public function capturePayment(namespace\CapturePayment $parameters)
+    public function capturePayment(CapturePayment $parameters)
     {
         return $this->__soapCall('capturePayment', [$parameters]);
     }
@@ -235,7 +234,7 @@ class WsApi extends \SoapClient
      * @param CreateTokenFromTransaction $parameters
      * @return CreateTokenFromTransactionResponse
      */
-    public function createTokenFromTransaction(namespace\CreateTokenFromTransaction $parameters)
+    public function createTokenFromTransaction(CreateTokenFromTransaction $parameters)
     {
         return $this->__soapCall('createTokenFromTransaction', [$parameters]);
     }
@@ -244,7 +243,7 @@ class WsApi extends \SoapClient
      * @param ReactivateToken $parameters
      * @return ReactivateTokenResponse
      */
-    public function reactivateToken(namespace\ReactivateToken $parameters)
+    public function reactivateToken(ReactivateToken $parameters)
     {
         return $this->__soapCall('reactivateToken', [$parameters]);
     }
@@ -253,7 +252,7 @@ class WsApi extends \SoapClient
      * @param DuplicatePayment $parameters
      * @return DuplicatePaymentResponse
      */
-    public function duplicatePayment(namespace\DuplicatePayment $parameters)
+    public function duplicatePayment(DuplicatePayment $parameters)
     {
         return $this->__soapCall('duplicatePayment', [$parameters]);
     }
@@ -262,7 +261,7 @@ class WsApi extends \SoapClient
      * @param VerifyThreeDSEnrollment $parameters
      * @return VerifyThreeDSEnrollmentResponse
      */
-    public function verifyThreeDSEnrollment(namespace\VerifyThreeDSEnrollment $parameters)
+    public function verifyThreeDSEnrollment(VerifyThreeDSEnrollment $parameters)
     {
         return $this->__soapCall('verifyThreeDSEnrollment', [$parameters]);
     }
@@ -271,7 +270,7 @@ class WsApi extends \SoapClient
      * @param ValidatePayment $parameters
      * @return ValidatePaymentResponse
      */
-    public function validatePayment(namespace\ValidatePayment $parameters)
+    public function validatePayment(ValidatePayment $parameters)
     {
         return $this->__soapCall('validatePayment', [$parameters]);
     }
@@ -280,7 +279,7 @@ class WsApi extends \SoapClient
      * @param CancelPayment $parameters
      * @return CancelPaymentResponse
      */
-    public function cancelPayment(namespace\CancelPayment $parameters)
+    public function cancelPayment(CancelPayment $parameters)
     {
         return $this->__soapCall('cancelPayment', [$parameters]);
     }
@@ -289,7 +288,7 @@ class WsApi extends \SoapClient
      * @param CheckThreeDSAuthentication $parameters
      * @return CheckThreeDSAuthenticationResponse
      */
-    public function checkThreeDSAuthentication(namespace\CheckThreeDSAuthentication $parameters)
+    public function checkThreeDSAuthentication(CheckThreeDSAuthentication $parameters)
     {
         return $this->__soapCall('checkThreeDSAuthentication', [$parameters]);
     }
@@ -298,7 +297,7 @@ class WsApi extends \SoapClient
      * @param GetPaymentUuid $parameters
      * @return GetPaymentUuidResponse
      */
-    public function getPaymentUuid(namespace\GetPaymentUuid $parameters)
+    public function getPaymentUuid(GetPaymentUuid $parameters)
     {
         return $this->__soapCall('getPaymentUuid', [$parameters]);
     }
@@ -307,7 +306,7 @@ class WsApi extends \SoapClient
      * @param UpdatePayment $parameters
      * @return UpdatePaymentResponse
      */
-    public function updatePayment(namespace\UpdatePayment $parameters)
+    public function updatePayment(UpdatePayment $parameters)
     {
         return $this->__soapCall('updatePayment', [$parameters]);
     }
@@ -316,7 +315,7 @@ class WsApi extends \SoapClient
      * @param UpdatePaymentDetails $parameters
      * @return UpdatePaymentDetailsResponse
      */
-    public function updatePaymentDetails(namespace\UpdatePaymentDetails $parameters)
+    public function updatePaymentDetails(UpdatePaymentDetails $parameters)
     {
         return $this->__soapCall('updatePaymentDetails', [$parameters]);
     }
@@ -325,7 +324,7 @@ class WsApi extends \SoapClient
      * @param CreatePayment $parameters
      * @return CreatePaymentResponse
      */
-    public function createPayment(namespace\CreatePayment $parameters)
+    public function createPayment(CreatePayment $parameters)
     {
         return $this->__soapCall('createPayment', [$parameters]);
     }
@@ -334,7 +333,7 @@ class WsApi extends \SoapClient
      * @param CreateSubscription $parameters
      * @return CreateSubscriptionResponse
      */
-    public function createSubscription(namespace\CreateSubscription $parameters)
+    public function createSubscription(CreateSubscription $parameters)
     {
         return $this->__soapCall('createSubscription', [$parameters]);
     }
@@ -343,7 +342,7 @@ class WsApi extends \SoapClient
      * @param GetSubscriptionDetails $parameters
      * @return GetSubscriptionDetailsResponse
      */
-    public function getSubscriptionDetails(namespace\GetSubscriptionDetails $parameters)
+    public function getSubscriptionDetails(GetSubscriptionDetails $parameters)
     {
         return $this->__soapCall('getSubscriptionDetails', [$parameters]);
     }
@@ -352,7 +351,7 @@ class WsApi extends \SoapClient
      * @param UpdateSubscription $parameters
      * @return UpdateSubscriptionResponse
      */
-    public function updateSubscription(namespace\UpdateSubscription $parameters)
+    public function updateSubscription(UpdateSubscription $parameters)
     {
         return $this->__soapCall('updateSubscription', [$parameters]);
     }
@@ -361,7 +360,7 @@ class WsApi extends \SoapClient
      * @param CancelToken $parameters
      * @return CancelTokenResponse
      */
-    public function cancelToken(namespace\CancelToken $parameters)
+    public function cancelToken(CancelToken $parameters)
     {
         return $this->__soapCall('cancelToken', [$parameters]);
     }
@@ -370,7 +369,7 @@ class WsApi extends \SoapClient
      * @param CreateToken $parameters
      * @return CreateTokenResponse
      */
-    public function createToken(namespace\CreateToken $parameters)
+    public function createToken(CreateToken $parameters)
     {
         return $this->__soapCall('createToken', [$parameters]);
     }
@@ -379,7 +378,7 @@ class WsApi extends \SoapClient
      * @param FindPayments $parameters
      * @return FindPaymentsResponse
      */
-    public function findPayments(namespace\FindPayments $parameters)
+    public function findPayments(FindPayments $parameters)
     {
         return $this->__soapCall('findPayments', [$parameters]);
     }
@@ -388,7 +387,7 @@ class WsApi extends \SoapClient
      * @param GetPaymentDetails $parameters
      * @return GetPaymentDetailsResponse
      */
-    public function getPaymentDetails(namespace\GetPaymentDetails $parameters)
+    public function getPaymentDetails(GetPaymentDetails $parameters)
     {
         return $this->__soapCall('getPaymentDetails', [$parameters]);
     }
@@ -397,7 +396,7 @@ class WsApi extends \SoapClient
      * @param UpdateToken $parameters
      * @return UpdateTokenResponse
      */
-    public function updateToken(namespace\UpdateToken $parameters)
+    public function updateToken(UpdateToken $parameters)
     {
         return $this->__soapCall('updateToken', [$parameters]);
     }
@@ -406,7 +405,7 @@ class WsApi extends \SoapClient
      * @param CancelSubscription $parameters
      * @return CancelSubscriptionResponse
      */
-    public function cancelSubscription(namespace\CancelSubscription $parameters)
+    public function cancelSubscription(CancelSubscription $parameters)
     {
         return $this->__soapCall('cancelSubscription', [$parameters]);
     }
@@ -415,7 +414,7 @@ class WsApi extends \SoapClient
      * @param GetTokenDetails $parameters
      * @return GetTokenDetailsResponse
      */
-    public function getTokenDetails(namespace\GetTokenDetails $parameters)
+    public function getTokenDetails(GetTokenDetails $parameters)
     {
         return $this->__soapCall('getTokenDetails', [$parameters]);
     }

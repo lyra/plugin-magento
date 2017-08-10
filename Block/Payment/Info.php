@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Payment;
 
@@ -21,22 +21,27 @@ use Lyranetwork\Payzen\Model\Api\PayzenResponse;
 
 class Info extends \Magento\Payment\Block\Info
 {
+
     /**
+     *
      * @var string
      */
     protected $_template = 'Lyranetwork_Payzen::payment/info.phtml';
 
     /**
+     *
      * @var \Magento\Framework\Locale\ResolverInterface
      */
-    private $localeResolver;
+    protected $localeResolver;
 
     /**
+     *
      * @var \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory
      */
-    private $trsCollectionFactory;
+    protected $trsCollectionFactory;
 
     /**
+     *
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $trsCollectionFactory
@@ -60,17 +65,21 @@ class Info extends \Magento\Payment\Block\Info
             $this->getInfo()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::ALL_RESULTS)
         );
 
-        if (!is_array($allResults) || empty($allResults)) {
+        if (! is_array($allResults) || empty($allResults)) {
             // description is stored as litteral string
             return $this->getInfo()->getCcStatusDescription();
         } else {
             // description is stored as serialized array
-            $keys = ['result', 'auth_result', 'warranty_result'];
+            $keys = [
+                'result',
+                'auth_result',
+                'warranty_result'
+            ];
 
             $labels = [];
             foreach ($keys as $key) {
                 $label = $this->translate($allResults[$key], $key, true);
-                if (!$label) {
+                if (! $label) {
                     continue;
                 }
 
@@ -105,7 +114,7 @@ class Info extends \Magento\Payment\Block\Info
 
         $html .= __('3-DS Authentication') . ' : ';
         if ($payment->getCcSecureVerify()) {
-            $html .=  __('YES');
+            $html .= __('YES');
             $html .= '<br />';
             $html .= __('3-DS Certificate') . ' : ' . $payment->getCcSecureVerify();
         } else {

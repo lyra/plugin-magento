@@ -1,33 +1,37 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
 class Oney extends Payzen
 {
+
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_ONEY;
+
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Oney::class;
 
     /**
+     *
      * @var \Magento\Framework\Pricing\Helper\Data
      */
-    private $pricingHelper;
+    protected $pricingHelper;
 
     /**
+     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -71,6 +75,7 @@ class Oney extends Payzen
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
+    
         $this->pricingHelper = $pricingHelper;
 
         parent::__construct(
@@ -143,13 +148,14 @@ class Oney extends Payzen
     /**
      * Get available payment options for the current cart amount.
      *
-     * @param double $amount a given amount
+     * @param double $amount
+     *            a given amount
      * @return array[string][array] an array "$code => $option" of available options
      */
     public function getPaymentOptions($amount)
     {
         $configOptions = unserialize($this->getConfigData('oney_payment_options'));
-        if (!is_array($configOptions) || empty($configOptions)) {
+        if (! is_array($configOptions) || empty($configOptions)) {
             return false;
         }
 
@@ -159,16 +165,24 @@ class Oney extends Payzen
                 continue;
             }
 
-            if ((!$value['minimum'] || ($amount > $value['minimum']))
-                && (!$value['maximum'] || ($amount < $value['maximum']))) {
+            if ((! $value['minimum'] || ($amount > $value['minimum'])) &&
+                 (! $value['maximum'] || ($amount < $value['maximum']))) {
                 // option will be available
                 $c = is_numeric($value['count']) ? $value['count'] : 1;
                 $r = is_numeric($value['rate']) ? $value['rate'] : 0;
                 $a = $this->pricingHelper->currency($amount * pow(1 + $r / 100, $c - 1) / $c, true, false);
 
                 // get final option description
-                $search = ['%c', '%r', '%a'];
-                $replace = [$c, $r.' %', $a];
+                $search = [
+                    '%c',
+                    '%r',
+                    '%a'
+                ];
+                $replace = [
+                    $c,
+                    $r . ' %',
+                    $a
+                ];
                 $value['label'] = str_replace($search, $replace, $value['label']); // label to display on payment page
 
                 $options[$code] = $value;
@@ -188,7 +202,7 @@ class Oney extends Payzen
         }
 
         $options = $this->getPaymentOptions($amount);
-        if ($code && $options[$code]) {
+        if ($code && isset($options[$code])) {
             return $options[$code];
         } else {
             return false;
@@ -205,37 +219,35 @@ class Oney extends Payzen
     {
         $checkResult = parent::isAvailable($quote);
 
-        if (!$checkResult || !is_object($quote) || !$quote->getCustomerId()) {
+        if (! $checkResult || ! is_object($quote) || ! $quote->getCustomerId()) {
             return false;
         }
 
-        if (!preg_match(\Lyranetwork\Payzen\Helper\Checkout::CUST_ID_REGEX, $quote->getCustomerId())) {
+        if (! preg_match(\Lyranetwork\Payzen\Helper\Checkout::CUST_ID_REGEX, $quote->getCustomerId())) {
             // customer id doesn't match FacilyPay Oney rules
 
             $msg = 'Customer ID "%s" does not match PayZen specifications.';
             $msg .= ' The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
-            $this->dataHelper->log(sprintf(
-                $msg,
-                $quote->getCustomerId(),
-                \Lyranetwork\Payzen\Helper\Checkout::CUST_ID_REGEX
-            ), \Psr\Log\LogLevel::WARNING);
+            $this->dataHelper->log(
+                sprintf($msg, $quote->getCustomerId(), \Lyranetwork\Payzen\Helper\Checkout::CUST_ID_REGEX),
+                \Psr\Log\LogLevel::WARNING
+            );
             return false;
         }
 
-        if (!$quote->getReservedOrderId()) {
+        if (! $quote->getReservedOrderId()) {
             $quote->reserveOrderId(); // guess order id
         }
 
-        if (!preg_match(\Lyranetwork\Payzen\Helper\Checkout::ORDER_ID_REGEX, $quote->getReservedOrderId())) {
+        if (! preg_match(\Lyranetwork\Payzen\Helper\Checkout::ORDER_ID_REGEX, $quote->getReservedOrderId())) {
             // order id doesn't match FacilyPay Oney rules
 
             $msg = 'The order ID "%s" does not match PayZen specifications.';
             $msg .= 'The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
-            $this->dataHelper->log(sprintf(
-                $msg,
-                $quote->getReservedOrderId(),
-                \Lyranetwork\Payzen\Helper\Checkout::ORDER_ID_REGEX
-            ), \Psr\Log\LogLevel::WARNING);
+            $this->dataHelper->log(
+                sprintf($msg, $quote->getReservedOrderId(), \Lyranetwork\Payzen\Helper\Checkout::ORDER_ID_REGEX),
+                \Psr\Log\LogLevel::WARNING
+            );
             return false;
         }
 
@@ -245,27 +257,25 @@ class Oney extends Payzen
                 continue;
             }
 
-            if (!preg_match(\Lyranetwork\Payzen\Helper\Checkout::PRODUCT_REF_REGEX, $item->getProductId())) {
+            if (! preg_match(\Lyranetwork\Payzen\Helper\Checkout::PRODUCT_REF_REGEX, $item->getProductId())) {
                 // product id doesn't match FacilyPay Oney rules
 
                 $msg = 'Product reference "%s" does not match PayZen specifications.';
                 $msg .= 'The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
-                $this->dataHelper->log(sprintf(
-                    $msg,
-                    $item->getProductId(),
-                    \Lyranetwork\Payzen\Helper\Checkout::PRODUCT_REF_REGEX
-                ), \Psr\Log\LogLevel::WARNING);
+                $this->dataHelper->log(
+                    sprintf($msg, $item->getProductId(), \Lyranetwork\Payzen\Helper\Checkout::PRODUCT_REF_REGEX),
+                    \Psr\Log\LogLevel::WARNING
+                );
                 return false;
             }
         }
 
-        if (!$quote->isVirtual() && $quote->getShippingAddress()->getShippingMethod()) {
+        if (! $quote->isVirtual() && $quote->getShippingAddress()->getShippingMethod()) {
             $method = $quote->getShippingAddress()->getShippingMethod();
 
             $shippingMethod = $this->checkoutHelper->toOneyCarrier($method);
-            if (!$shippingMethod) {
+            if (! $shippingMethod) {
                 // selected shipping method is not mapped in configuration panel
-
 
                 $this->dataHelper->log(
                     "Shipping method \"{$method}\" is not correctly mapped in module configuration panel. Module is not displayed.",

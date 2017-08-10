@@ -6,19 +6,23 @@ Namely, it enables the following payment methods :
 * PayZen - Standard credit card payment
 * PayZen - Credit card payment in installments
 
-# Installation & Upgrade
+## Installation & upgrade
 
-1 - Unzip module in your Magento 2 app/code/Lyranetwork/Payzen folder
-2 - Enable module: bin/magento module:enable --clear-static-content Lyranetwork_Payzen
-3 - Upgrade database: bin/magento setup:upgrade
-4 - Re-run compile command: bin/magento setup:di:compile
+- Create app/code/Lyranetwork/Payzen folder if not exists
+- Unzip module in your Magento 2 app/code/Lyranetwork/Payzen folder
+- Enable module: bin/magento module:enable --clear-static-content Lyranetwork_Payzen
+- Upgrade database: bin/magento setup:upgrade
+- Re-run compile command: bin/magento setup:di:compile
+- Update static files by: bin/magento setup:static-content:deploy [locale]
 
 In order to deactivate the module: bin/magento module:disable --clear-static-content Lyranetwork_Payzen
-In order to update static files: bin/magento setup:static-content:deploy [locale]
 
-# Configuration
+## Configuration
 
-Coming soon.
+- In Magento 2 administration interface, browse to "STORES > Configuration" menu
+- Click on "Payment Methods" link under "SALES" section
+- Expand PayZen payment method to enter your platform credentials
+- Refresh invalidated Magento cache afeter config saved. 
 
 ## License
 

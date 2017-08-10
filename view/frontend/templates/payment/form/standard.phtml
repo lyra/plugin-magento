@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 $oneClickActive = $block->getConfigData('oneclick_active'); // 1-Click enabled ?
@@ -45,6 +45,7 @@ if ($block->isLocalCcType() || $block->isLocalCcInfo()) :
                 .'"'.($first ? ' checked="checked"' : '').' value="'
                 .$block->escapeHtml($code).'" name="payment[payzen_standard_cc_type]"/>' ;
         }
+
         $first = false;
 
         $html .= '<label for="payzen_standard_cc_type_'.$block->escapeHtml($code).'">
@@ -130,25 +131,17 @@ if ($block->isLocalCcInfo()) : ?>
     ?>
         <li class="payzen-standard-cc-block">
         <?php
-        if ($cardRegisterMode == 1 /* register disabled by default */
-            || $cardRegisterMode == 2 /* register enabled by default */) : ?>
+        if ($cardRegisterMode == 1 /* register disabled by default */ || $cardRegisterMode == 2 /* register enabled by default */) : ?>
             <div class="payzen-register-message">
-                <input type="checkbox" value="1" class="checkbox"
-                    <?php if ($cardRegisterMode == 2) : ?>
-                        checked="checked"
-                    <?php endif; ?>
-                    name="payment[payzen_standard_cc_register]" id="payzen_standard_cc_register" />
+                <input type="checkbox" value="1" class="checkbox" <?php if ($cardRegisterMode == 2) : ?>checked="checked"<?php endif; ?>
+                       name="payment[payzen_standard_cc_register]" id="payzen_standard_cc_register" />
                 <label style="float: none !important; cursor: pointer;" for="payzen_standard_cc_register">
                     <?php echo $block->escapeHtml($block->getConfigData('card_register_message')); ?>
                 </label>
             </div>
-        <?php
-        else : /* register enabled but hidden */
-        ?>
+        <?php else : /* register enabled but hidden */ ?>
             <input type="hidden" value="1" name="payment[payzen_standard_cc_register]" />
-        <?php
-        endif;
-        ?>
+        <?php endif; ?>
         </li>
 
         <?php if ($customer->getData('payzen_identifier')) : ?>
@@ -167,11 +160,7 @@ if ($block->isLocalCcInfo()) : ?>
         <li class="payzen-standard-id-block">
             <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
             <span>
-                <?php
-                echo $block->escapeHtml(
-                    __('You will pay with your registered card. No data entry is needed.')
-                );
-                ?>
+                <?php echo $block->escapeHtml(__('You will pay with your registered card. No data entry is needed.')); ?>
             </span>
         </li>
 
@@ -186,9 +175,7 @@ if ($block->isLocalCcInfo()) : ?>
             </a>
         </li>
         <?php endif; ?>
-    <?php
-    endif;
-    ?>
+    <?php endif; ?>
 
 <?php
 else :
@@ -212,11 +199,7 @@ else :
         <li class="payzen-standard-id-block">
             <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
             <span>
-                <?php
-                echo $block->escapeHtml(
-                    __('You will pay with your registered card. No data entry is needed.')
-                );
-                ?>
+                <?php echo $block->escapeHtml(__('You will pay with your registered card. No data entry is needed.')); ?>
             </span>
         </li>
 
