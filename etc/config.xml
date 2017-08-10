@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2016 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payzen>
+            <general>
+                <module_version>2.1.1</module_version>
+                <platform_version>V2</platform_version>
+                <enable_logs>1</enable_logs>
+
+                <site_id>12345678</site_id>
+                <key_test>1111111111111111</key_test>
+                <key_prod>2222222222222222</key_prod>
+                <ctx_mode>TEST</ctx_mode>
+                <platform_url>https://secure.payzen.eu/vads-payment/</platform_url>
+                <notify_url>payzen/payment/check</notify_url>
+
+                <language>fr</language>
+                <validation_mode></validation_mode>
+                <payment_cards></payment_cards>
+
+                <redirect_enabled>0</redirect_enabled>
+                <redirect_success_timeout>5</redirect_success_timeout>
+                <redirect_success_message>Redirection vers la boutique dans quelques instants...</redirect_success_message>
+                <redirect_error_timeout>5</redirect_error_timeout>
+                <redirect_error_message>Redirection vers la boutique dans quelques instants...</redirect_error_message>
+                <return_mode>GET</return_mode>
+                <refill_cart>1</refill_cart>
+                <registered_order_status>processing</registered_order_status>
+                <capture_auto>1</capture_auto>
+
+                <oney_contract>0</oney_contract>
+                <common_category>FOOD_AND_GROCERY</common_category>
+            </general>
+        </payzen>
+
+        <payment>
+            <payzen_standard>
+                <model>Lyranetwork\Payzen\Model\Method\Standard</model>
+                <group>payzen</group>
+
+                <active>1</active>
+                <allowspecific>0</allowspecific>
+                <title>Paiement par carte bancaire</title>
+                <sort_order>1</sort_order>
+                <module_logo>standard-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+
+                <card_info_mode>1</card_info_mode>
+                <oneclick_active>0</oneclick_active>
+                <oneclick_title>Acheter maintenant</oneclick_title>
+                <oneclick_location>BOTH</oneclick_location>
+                <card_register_mode>1</card_register_mode>
+                <card_register_message><![CDATA[Cochez cette case pour enregistrer les données de votre carte et effectuer des paiements en un clic. <b>Les données de la carte seront enregistrées sur le serveur sécurisé de la plateforme de paiement.</b>]]></card_register_message>
+            </payzen_standard>
+
+            <payzen_multi>
+                <model>Lyranetwork\Payzen\Model\Method\Multi</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Paiement par carte bancaire en plusieurs fois</title>
+                <sort_order>2</sort_order>
+                <module_logo>multi-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_multi>
+
+            <!--
+            <payzen_gift>
+                <model>Lyranetwork\Payzen\Model\Method\Gift</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Paiement par carte cadeau</title>
+                <sort_order>3</sort_order>
+                <module_logo>gift-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_gift>
+
+            <payzen_cof3xcb>
+                <model>Lyranetwork\Payzen\Model\Method\Cof3xcb</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Cofinoga 3 fois CB</title>
+                <sort_order>4</sort_order>
+                <module_logo>cof3xcb-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_cof3xcb>
+
+            <payzen_oney>
+                <model>Lyranetwork\Payzen\Model\Method\Oney</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>1</allowspecific>
+                <specificcountry>FR</specificcountry>
+                <specificcountry_display>France</specificcountry_display>
+                <title>FacilyPay Oney</title>
+                <sort_order>5</sort_order>
+                <module_logo>oney-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+
+                <enable_payment_options>0</enable_payment_options>
+            </payzen_oney>
+
+            <payzen_paypal>
+                <model>Lyranetwork\Payzen\Model\Method\Paypal</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Paiement PayPal</title>
+                <sort_order>6</sort_order>
+                <module_logo>paypal-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_paypal>
+
+            <payzen_sofort>
+                <model>Lyranetwork\Payzen\Model\Method\Sofort</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Paiement Sofort Banking</title>
+                <sort_order>6</sort_order>
+                <module_logo>sofort-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_sofort>
+
+            
+            -->
+        </payment>
+    </default>
+</config>

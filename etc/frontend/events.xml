@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2016 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_cart_save_after">
+        <observer name="payzen_process_cart_oneclick_quote" instance="Lyranetwork\Payzen\Observer\ProcessCartOneclickQuoteObserver"/>
+    </event>
+    <event name="catalog_controller_product_view">
+        <observer name="payzen_process_product_oneclick_quote" instance="Lyranetwork\Payzen\Observer\ProcessProductOneclickQuoteObserver"/>
+    </event>
+    <event name="customer_logout">
+        <observer name="payzen_unset_oneclick_quote" instance="Lyranetwork\Payzen\Observer\UnsetOneclickQuoteObserver"/>
+    </event>
+</config>

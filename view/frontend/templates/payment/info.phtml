@@ -1,0 +1,67 @@
+<?php
+/**
+ * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2016 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+
+<p><b>
+    <?php echo $block->escapeHtml($block->getMethod()->getTitle()); ?>
+
+    <?php
+    $payment = $block->getInfo();
+
+    if (stripos($payment->getMethod(), 'payzen_multi') === 0) {
+        // payment in installments, show selected option
+        $option = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION);
+        if (is_string($option)) {
+            $option = @unserialize($option);
+        }
+
+        if (isset($option) && is_array($option)) {
+            echo '<br />';
+            echo $block->escapeHtml($option['label'] . ' (' . $option['count'] . 'X)');
+        }
+    } elseif ($payment->getMethod() === 'payzen_oney') {
+        // Oney payment, show selected Oney option
+        $option = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION);
+        if (is_string($option)) {
+            $option = @unserialize($option);
+        }
+
+        if (isset($option) && is_array($option)) {
+            echo '<br />';
+            echo $block->escapeHtml($option['label']);
+        }
+    }
+    ?>
+</b></p>
+
+<?php
+if ($payment->getCcTransId()) {
+    echo $block->getResultDescHtml();
+    echo '<br /><br />';
+
+    echo $block->escapeHtml(__('Transaction ID') . ' : ' . $payment->getCcTransId());
+    echo '<br />';
+
+    if ($payment->getCcType() == 'MULTI') { // multi brand
+        echo $block->getTransactionsDetailsHtml();
+    } else {
+        echo $block->getPaymentDetailsHtml();
+    }
+
+    echo '<br />';
+}
