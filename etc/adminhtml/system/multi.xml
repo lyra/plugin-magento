@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2016 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="payzen_multi" translate="label" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>CREDIT CARD IN INSTALLMENTS</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <attribute type="expanded">0</attribute>
+
+        <group id="payzen_base_settings" translate="label" type="text" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>BASIC SETTINGS</label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="active" translate="label comment" type="select" sortOrder="311" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Activation</label>
+                <comment>Enables / disables this payment method.</comment>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/payzen_multi/active</config_path>
+            </field>
+
+            <field id="sort_order" translate="label comment" type="text" sortOrder="312" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Sort order</label>
+                <comment>In the payment methods list.</comment>
+                <config_path>payment/payzen_multi/sort_order</config_path>
+            </field>
+
+            <field id="title" translate="label comment" type="text" sortOrder="313" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Method title</label>
+                <comment>Method title to display on payment means page.</comment>
+                <config_path>payment/payzen_multi/title</config_path>
+            </field>
+
+            <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="314" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Restrict to some countries</label>
+                <config_path>payment/payzen_multi/allowspecific</config_path>
+                <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            </field>
+
+            <field id="specificcountry" translate="label comment" type="multiselect" sortOrder="315" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Authorized countries</label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
+                <config_path>payment/payzen_multi/specificcountry</config_path>
+                <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                <depends>
+                    <field id="allowspecific">1</field>
+                </depends>
+            </field>
+
+            <field id="module_logo" translate="label comment" type="image" sortOrder="316" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Logo</label>
+                <comment>Allowed file types: jpeg, gif, png.</comment>
+                <config_path>payment/payzen_multi/module_logo</config_path>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Logo</frontend_model>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>
+                <upload_dir config="system/filesystem/media" scope_info="0">payzen/images</upload_dir>
+                <base_url type="media" scope_info="0">payzen/images</base_url>
+            </field>
+        </group>
+
+        <group id="payzen_amount_restriction" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>AMOUNT RESTRICTION</label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="custgroup_amount_restriction" translate="label comment" sortOrder="321" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Customer group amount restriction</label>
+                <comment><![CDATA[Define amount restriction for each customer group.]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CustgroupOptions</frontend_model>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CustgroupOptions</backend_model>
+                <config_path>payment/payzen_multi/custgroup_amount_restriction</config_path>
+            </field>
+        </group>
+
+        <group id="payzen_payment_page" translate="label" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PAYMENT PAGE</label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="capture_delay" translate="label comment" type="text" sortOrder="331" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Capture delay</label>
+                <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                <config_path>payment/payzen_multi/capture_delay</config_path>
+            </field>
+
+            <field id="validation_mode" translate="label comment" type="select" sortOrder="332" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Validation mode</label>
+                <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ValidationMode</source_model>
+                <config_path>payment/payzen_multi/validation_mode</config_path>
+            </field>
+        </group>
+
+        <group id="payzen_payment_options" translate="label" type="text" sortOrder="34" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PAYMENT OPTIONS</label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="multi_payment_options" translate="label comment" sortOrder="341" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Payment options</label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multi\MultiPaymentOptions</frontend_model>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Multi\MultiPaymentOptions</backend_model>
+                <config_path>payment/payzen_multi/multi_payment_options</config_path>
+                <comment><![CDATA[Click on &laquo;Add&raquo; button to configure one or more payment options. <br /><b>Label : </b>The option label to display on the frontend. <br /><b>Min. amount : </b>Minimum amount to enable the payment option. <br /><b>Max. amount : </b>Maximum amount to enable the payment option. <br /><b>Contract : </b>ID of the contract to use with the option. <br /><b>Count : </b>Total number of payments. <br /><b>Period : </b>Delay (in days) between payments. <br /><b>1st payment : </b>Amount of first payment, in percentage of total amount. If empty, all payments will have the same amount.]]></comment>
+            </field>
+        </group>
+    </group>
+</include>

@@ -1,0 +1,75 @@
+<?php
+/**
+ * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2016 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+$silentMode = false;
+?>
+
+<form id="payzen_payment_form" action="<?php echo $block->escapeUrl($block->getFormAction()); ?>" method="POST">
+    <?php
+    $fields = $block->getFormFields();
+    $silentMode = ($fields['vads_action_mode'] === 'SILENT');
+
+    foreach ($fields as $key => $value) :
+    ?>
+        <input type="hidden"
+               name="<?php echo $block->escapeHtml($key); ?>"
+               value="<?php echo $block->escapeHtml($value); ?>">
+    <?php
+    endforeach;
+    ?>
+
+    <table>
+        <tbody>
+            <tr>
+                <td style="vertical-align: middle; padding-right: 0;">
+                    <img src="<?php echo $block->escapeUrl(
+                        $block->getViewFileUrl('Lyranetwork_Payzen::images/loading.gif')
+                    ); ?>">
+                </td>
+                <td style="vertical-align: middle; padding-left: 0;">
+                    <span style="font-weight: bold;">
+                    <?php
+                    if ($silentMode) {
+                        echo $block->escapeHtml(__('Please wait a moment. Your order payment is now processing.'));
+                    } else {
+                        echo $block->escapeHtml(__('Please wait a moment. This page will transfer your data to PayZen payment platform in a few seconds.'));
+                    }
+                    ?>
+                    </span><br />
+                    <span><?php echo $block->escapeHtml(__('If nothing happens in 10 seconds, click the button below.')); ?></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="actions">
+        <button class="action primary redirect" title="<?php echo $block->escapeHtml(__('Send')); ?>" type="submit">
+            <span><?php echo $block->escapeHtml(__('Send')); ?></span>
+        </button>
+    </div>
+</form>
+
+<script>
+    require([
+        'jquery'
+    ], function($) {
+        $(function() {
+            $('#payzen_payment_form').submit();
+        });
+    });
+</script>

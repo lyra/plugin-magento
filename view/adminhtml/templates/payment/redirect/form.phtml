@@ -1,0 +1,66 @@
+<?php
+/**
+ * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  payment
+ * @package   payzen
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2016 Lyra Network and contributors
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+
+<form id="payzen_payment_form" action="<?php echo $block->escapeUrl($block->getFormAction()); ?>" method="POST">
+    <?php foreach ($block->getFormFields() as $key => $value) : ?>
+        <input type="hidden"
+               name="<?php echo $block->escapeHtml($key); ?>"
+               value="<?php echo $block->escapeHtml($value); ?>">
+    <?php endforeach;?>
+
+    <div class="admin__page-section-content">
+        <table>
+            <tbody>
+                <tr>
+                    <td style="vertical-align: middle;">
+                        <img src="<?php echo $block->escapeUrl($block->getViewFileUrl('Lyranetwork_Payzen::images/loading.gif')); ?>"
+                             style="margin-right: 5px;">
+                    </td>
+                    <td style="vertical-align: middle;">
+                        <span style="font-weight: bold;">
+                            <?php echo $block->escapeHtml(
+                                __('Please wait a moment. This page will transfer your data to PayZen payment platform in a few seconds.')
+                            ); ?>
+                        </span><br />
+                        <span><?php echo $block->escapeHtml(
+                            __('If nothing happens in 10 seconds, click the button below.')
+                        );?></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="actions <?php echo $block->escapeHtml($block->getHeaderCssClass()); ?>" style="margin-top: 3em;">
+            <button title="<?php echo $block->escapeHtml(__('Send')); ?>"
+                type="submit" class="action-default scalable primary" data-ui-id="widget-button-4">
+                <span><?php echo $block->escapeHtml(__('Send')); ?></span>
+            </button>
+        </div>
+    </div>
+</form>
+
+<script>
+    require([
+        'jquery'
+    ], function($) {
+        $(function() {
+            $('#payzen_payment_form').submit();
+        });
+    });
+</script>
