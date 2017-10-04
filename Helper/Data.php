@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Helper;
 
@@ -23,66 +23,85 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
+
     const METHOD_STANDARD = 'payzen_standard';
+
     const METHOD_MULTI = 'payzen_multi';
+
     const METHOD_GIFT = 'payzen_gift';
+
     const METHOD_COF3XCB = 'payzen_cof3xcb';
+
     const METHOD_ONEY = 'payzen_oney';
+
     const METHOD_PAYPAL = 'payzen_paypal';
+
     const METHOD_SOFORT = 'payzen_sofort';
+
     const METHOD_POSTFINANCE = 'payzen_postfinance';
 
     /**
+     *
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $objectManager;
+    protected $objectManager;
 
     /**
+     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $storeManager;
+    protected $storeManager;
 
     /**
+     *
      * @var \Magento\Framework\App\MaintenanceMode
      */
-    private $maintenanceMode;
+    protected $maintenanceMode;
 
     /**
+     *
      * @var \Magento\Config\Model\ResourceModel\Config
      */
-    private $resourceConfig;
+    protected $resourceConfig;
 
     /**
+     *
      * @var \Magento\Framework\Filesystem
      */
-    private $filesystem;
+    protected $filesystem;
 
     /**
+     *
      * @var \Magento\Config\Model\Config\Structure
      */
-    private $configStructure;
+    protected $configStructure;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Model\Logger\Payzen
      */
-    private $logger;
+    protected $logger;
 
     /**
+     *
      * @var \Magento\Framework\App\State
      */
-    private $appState;
+    protected $appState;
 
     /**
+     *
      * @var \Zend\Http\PhpEnvironment\RemoteAddress
      */
-    private $remoteAddress;
+    protected $remoteAddress;
 
     /**
+     *
      * @var \Magento\Framework\Filesystem\Io\File
      */
-    private $file;
+    protected $file;
 
     /**
+     *
      * @param \Lyranetwork\Payzen\Helper\Context $context
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -139,7 +158,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     *  Return user's IP Address.
+     * Return user's IP Address.
      *
      * @return string
      */
@@ -151,7 +170,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get the complete payment return URL.
      *
-     * @param int $storeId the ID of the store
+     * @param int $storeId
+     *            the ID of the store
      * @return string
      */
     public function getReturnUrl($storeId = null)
@@ -261,8 +281,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isUploadFileImageExists($fileName)
     {
-        $filePath = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)
-            ->getAbsolutePath('payzen/images/' . $fileName);
+        $filePath = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath('payzen/images/' . $fileName);
+        return $this->fileExists($filePath);
+    }
+
+    /**
+     * Check if image file is published to pub/static directory.
+     *
+     * @return string
+     */
+    public function isPublishFileImageExists($fileName)
+    {
+        $filePath = $this->filesystem->getDirectoryRead(DirectoryList::STATIC_VIEW)->getAbsolutePath($fileName);
         return $this->fileExists($filePath);
     }
 
@@ -309,25 +339,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $connection = $this->resourceConfig->getConnection();
 
         $select = $connection->select()
-                                ->from($this->resourceConfig->getMainTable())
-                                ->where('path LIKE ?', 'payment/payzen\_multi\_%x/model');
+            ->from($this->resourceConfig->getMainTable())
+            ->where('path LIKE ?', 'payment/payzen\_multi\_%x/model');
 
         return $connection->fetchAll($select);
     }
 
     /**
      * Check if server has requirements to do WS operations.
+     *
      * @throws \Lyranetwork\Payzen\Model\WsException
      */
     public function checkWsRequirements()
     {
-        if (!extension_loaded('soap')) {
+        if (! extension_loaded('soap')) {
             throw new \Lyranetwork\Payzen\Model\WsException(
                 'SOAP extension for PHP must be enabled on the server in order to use PayZen web services.'
             );
         }
 
-        if (!extension_loaded('openssl')) {
+        if (! extension_loaded('openssl')) {
             throw new \Lyranetwork\Payzen\Model\WsException(
                 'OPENSSL extension for PHP must be enabled on the server in order to use PayZen web services.'
             );
@@ -337,19 +368,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Log function.
      *
-     * @param $message
-     * @param $level
+     * @param
+     *            $message
+     * @param
+     *            $level
      */
     public function log($message, $level = \Psr\Log\LogLevel::INFO)
     {
-        if (!$this->getCommonConfigData('enable_logs')) {
+        if (! $this->getCommonConfigData('enable_logs')) {
             return;
         }
 
         $currentMethod = $this->getCallerMethod();
 
-        $log  = '';
-        $log .= 'PayZen 2.1.1';
+        $log = '';
+        $log .= 'PayZen 2.1.2';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 
@@ -358,6 +391,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Find the name of the method that called the log method.
+     *
      * @return string|null
      */
     private function getCallerMethod()

@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 
@@ -22,22 +22,27 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
  */
 class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
+
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Checkout
      */
-    private $checkoutHelper;
+    protected $checkoutHelper;
 
     /**
+     *
      * @var \Magento\Shipping\Model\Config
      */
-    private $shippingConfig;
+    protected $shippingConfig;
 
     /**
+     *
      * @var bool
      */
     protected $staticTable = true;
 
     /**
+     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
      * @param \Magento\Shipping\Model\Config $shippingConfig
@@ -62,35 +67,53 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
      */
     protected function _prepareToRender()
     {
-        $this->addColumn('title', [
-            'label' => __('Method title'),
-            'style' => 'width: 210px;',
-            'renderer' => $this->getLabelRenderer('_title')
-        ]);
-        $this->addColumn('oney_label', [
-            'label' => __('FacilyPay Oney label'),
-            'style' => 'width: 210px;'
-        ]);
+        $this->addColumn(
+            'title',
+            [
+                'label' => __('Method title'),
+                'style' => 'width: 210px;',
+                'renderer' => $this->getLabelRenderer('_title')
+            ]
+        );
+        $this->addColumn(
+            'oney_label',
+            [
+                'label' => __('FacilyPay Oney label'),
+                'style' => 'width: 210px;'
+            ]
+        );
 
-        $this->addColumn('type', [
-            'label' => __('Type'),
-            'style' => 'width: 130px;',
-            'renderer' => $this->getListRenderer('_type', [
-                'PACKAGE_DELIVERY_COMPANY' => 'Delivery company',
-                'RECLAIM_IN_SHOP' => 'Reclaim in shop',
-                'RELAY_POINT' => 'Relay point',
-                'RECLAIM_IN_STATION' => 'Reclaim in station'
-            ])
-        ]);
+        $this->addColumn(
+            'type',
+            [
+                'label' => __('Type'),
+                'style' => 'width: 130px;',
+                'renderer' => $this->getListRenderer(
+                    '_type',
+                    [
+                        'PACKAGE_DELIVERY_COMPANY' => 'Delivery company',
+                        'RECLAIM_IN_SHOP' => 'Reclaim in shop',
+                        'RELAY_POINT' => 'Relay point',
+                        'RECLAIM_IN_STATION' => 'Reclaim in station'
+                    ]
+                )
+            ]
+        );
 
-        $this->addColumn('speed', [
-            'label' => __('Speed'),
-            'style' => 'width: 75px;',
-            'renderer' => $this->getListRenderer('_speed', [
-                'STANDARD' => 'Standard',
-                'EXPRESS' => 'Express'
-            ])
-        ]);
+        $this->addColumn(
+            'speed',
+            [
+                'label' => __('Speed'),
+                'style' => 'width: 75px;',
+                'renderer' => $this->getListRenderer(
+                    '_speed',
+                    [
+                        'STANDARD' => 'Standard',
+                        'EXPRESS' => 'Express'
+                    ]
+                )
+            ]
+        );
 
         parent::_prepareToRender();
     }
@@ -108,7 +131,7 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
         $allMethods = $this->getAllShippingMethods();
 
         $savedMethods = $this->getElement()->getValue();
-        if ($savedMethods && is_array($savedMethods) && !empty($savedMethods)) {
+        if ($savedMethods && is_array($savedMethods) && ! empty($savedMethods)) {
             foreach ($savedMethods as $id => $method) {
                 if (key_exists($method['code'], $allMethods)) {
                     // update magento method title
@@ -121,7 +144,7 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
         }
 
         // add not saved yet methods
-        if ($allMethods && is_array($allMethods) && !empty($allMethods)) {
+        if ($allMethods && is_array($allMethods) && ! empty($allMethods)) {
             foreach ($allMethods as $code => $name) {
                 $value[uniqid('_' . $code . '_')] = [
                     'code' => $code,
@@ -154,13 +177,13 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
             $carrierModel->setStore($store);
 
             // filter carriers to get active ones on current scope
-            if (!$carrierModel->isActive()) {
+            if (! $carrierModel->isActive()) {
                 continue;
             }
 
             try {
                 $carrierMethods = $carrierModel->getAllowedMethods();
-                if (!$carrierMethods) {
+                if (! $carrierMethods) {
                     continue;
                 }
 
@@ -169,7 +192,7 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
                     $code = $carrierCode . '_' . $methodCode;
 
                     $title = '[' . $carrierCode . '] ';
-                    if (is_string($methodTitle) && !empty($methodTitle)) {
+                    if (is_string($methodTitle) && ! empty($methodTitle)) {
                         $title .= $methodTitle;
                     } else { // non standard method title
                         $title .= $methodCode;

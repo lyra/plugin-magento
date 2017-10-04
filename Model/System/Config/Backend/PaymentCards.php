@@ -1,37 +1,41 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend;
 
 class PaymentCards extends \Magento\Framework\App\Config\Value
 {
-    private $messages;
+
+    protected $messages;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Checkout
      */
-    private $checkoutHelper;
+    protected $checkoutHelper;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
-    private $dataHelper;
+    protected $dataHelper;
 
     /**
+     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -63,7 +67,7 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
     {
         $this->messages = [];
 
-        if (!is_array($this->getValue()) || in_array('', $this->getValue())) {
+        if (! is_array($this->getValue()) || in_array('', $this->getValue())) {
             $this->setValue([]);
         }
 
@@ -78,17 +82,24 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
                     // check Oney requirements
                     $this->checkoutHelper->checkOneyRequirements($this->getScope(), $this->getScopeId());
                 } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                    $this->setValue(array_diff($this->getValue(), ['ONEY', 'ONEY_SANDBOX']));
+                    $this->setValue(array_diff($this->getValue(), [
+                        'ONEY',
+                        'ONEY_SANDBOX'
+                    ]));
 
-                    if (!in_array($e->getMessage(), $this->messages)) {
+                    if (! in_array($e->getMessage(), $this->messages)) {
                         $this->messages[] = $e->getMessage();
                     }
+
                     $oney = false;
                 }
             }
         } else {
             // no Oney contract, let's unselect them
-            $this->setValue(array_diff($this->getValue(), ['ONEY', 'ONEY_SANDBOX']));
+            $this->setValue(array_diff($this->getValue(), [
+                'ONEY',
+                'ONEY_SANDBOX'
+            ]));
         }
 
         if (strlen(implode(';', $this->getValue())) > 127) {
@@ -97,14 +108,10 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
             $field = __($config['label'])->render();
             $group = $this->dataHelper->getGroupTitle($config['path']);
 
-            $msg = __(
-                'Invalid value for field &laquo;%1&raquo; in section &laquo;%2&raquo;.',
-                $field,
-                $group
-            )->render();
+            $msg = __('Invalid value for field &laquo;%1&raquo; in section &laquo;%2&raquo;.', $field, $group)->render();
             $msg .= ' ' . __('Too many card types are selected.')->render();
             throw new \Magento\Framework\Exception\LocalizedException(__($msg));
-        } elseif (!$oney) {
+        } elseif (! $oney) {
             $this->messages[] = __('FacilyPay Oney payment mean cannot be used.')->render();
         }
 
@@ -113,7 +120,7 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
 
     public function afterCommitCallback()
     {
-        if (!empty($this->messages)) {
+        if (! empty($this->messages)) {
             throw new \Magento\Framework\Exception\LocalizedException(__(implode("\n", $this->messages)));
         }
 

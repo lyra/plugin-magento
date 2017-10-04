@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
@@ -21,68 +21,91 @@ use Lyranetwork\Payzen\Model\Api\PayzenApi;
 
 abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 {
+
     protected $_infoBlockType = \Lyranetwork\Payzen\Block\Payment\Info::class;
 
     protected $_isplatform = true;
+
     protected $_canAuthorize = true;
+
     protected $_canCapture = true;
+
     protected $_canCapturePartial = true;
+
     protected $_canRefund = true;
+
     protected $_canRefundInvoicePartial = true;
+
     protected $_canVoid = true;
+
     protected $_canUseForMultishipping = false;
+
     protected $_canUseInternal = true;
+
     protected $_canUseCheckout = true;
+
     protected $_isInitializeNeeded = true;
+
     protected $_canSaveCc = false;
+
     protected $_canReviewPayment = false;
 
     /**
+     *
      * @var \Magento\Framework\Locale\ResolverInterface
      */
     protected $localeResolver;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenRequest
      */
     protected $payzenRequest;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Payment
      */
     protected $paymentHelper;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Checkout
      */
     protected $checkoutHelper;
 
     /**
+     *
      * @var \Magento\Framework\App\ProductMetadataInterface
      */
     protected $productMetadata;
 
     /**
+     *
      * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
 
     /**
+     *
      * @var \Magento\Framework\Module\Dir\Reader
      */
     protected $dirReader;
 
     /**
+     *
      * @var \Magento\Framework\DataObject\Factory
      */
     protected $dataObjectFactory;
 
     /**
+     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -124,6 +147,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
+    
         $this->localeResolver = $localeResolver;
         $this->payzenRequest = $payzenRequestFactory->create();
         $this->dataHelper = $dataHelper;
@@ -149,6 +173,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
+     *
      * @param \Magento\Sales\Model\Order $order
      * @return <string:mixed> array of params as key=>value
      */
@@ -175,13 +200,27 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->payzenRequest->set('amount', $currency->convertAmountToInteger($amount));
 
         // contrib info
-        $version = $this->productMetadata->getVersion(); //will return the magento version
-        $this->payzenRequest->set('contrib', 'Magento2.x_2.1.1/' . $version);
+        $version = $this->productMetadata->getVersion(); // will return the magento version
+        $this->payzenRequest->set('contrib', 'Magento2.x_2.1.2/' . $version);
 
         // set config parameters
-        $configFields = ['site_id', 'key_test', 'key_prod', 'ctx_mode', 'capture_delay', 'validation_mode',
-            'theme_config', 'shop_name', 'shop_url', 'redirect_enabled', 'redirect_success_timeout',
-            'redirect_success_message', 'redirect_error_timeout', 'redirect_error_message', 'return_mode'];
+        $configFields = [
+            'site_id',
+            'key_test',
+            'key_prod',
+            'ctx_mode',
+            'capture_delay',
+            'validation_mode',
+            'theme_config',
+            'shop_name',
+            'shop_url',
+            'redirect_enabled',
+            'redirect_success_timeout',
+            'redirect_success_message',
+            'redirect_error_timeout',
+            'redirect_error_message',
+            'return_mode'
+        ];
 
         foreach ($configFields as $field) {
             $this->payzenRequest->set($field, $this->dataHelper->getCommonConfigData($field));
@@ -204,7 +243,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // set the language code
         $lang = strtolower(substr($this->localeResolver->getLocale(), 0, 2));
-        if (!PayzenApi::isSupportedLanguage($lang)) {
+        if (! PayzenApi::isSupportedLanguage($lang)) {
             $lang = $this->dataHelper->getCommonConfigData('language');
         }
         $this->payzenRequest->set('language', $lang);
@@ -213,11 +252,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $availableLanguages = explode(',', $this->dataHelper->getCommonConfigData('available_languages'));
         $availableLanguages = in_array('', $availableLanguages) ? '' : implode(';', $availableLanguages);
         $this->payzenRequest->set('available_languages', $availableLanguages);
-
-        // payment_cards is given as csv by magento
-        $paymentCards = explode(',', $this->dataHelper->getCommonConfigData('payment_cards'));
-        $paymentCards = in_array('', $paymentCards) ? '' : implode(';', $paymentCards);
-        $this->payzenRequest->set('payment_cards', $paymentCards);
 
         // activate 3ds ?
         $threedsMpi = null;
@@ -264,11 +298,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->checkoutHelper->setOneyData($order, $this->payzenRequest);
         }
 
-        if ($this->sendPaypalFields()) {
-            // set other data specific to PayPal payment
-            $this->checkoutHelper->setPaypalData($order, $this->payzenRequest);
-        }
-
         $paramsToLog = $this->payzenRequest->getRequestFieldsArray(true);
         $this->dataHelper->log('Payment parameters : ' . json_encode($paramsToLog), \Psr\Log\LogLevel::DEBUG);
 
@@ -282,11 +311,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         return false;
     }
 
-    protected function sendPaypalFields()
-    {
-        return false;
-    }
-
     /**
      * Retrieve information from payment configuration.
      *
@@ -296,7 +320,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function getConfigData($field, $storeId = null)
     {
-        if ($storeId === null && !$this->getStore()) {
+        if ($storeId === null && ! $this->getStore()) {
             $storeId = $this->dataHelper->getCheckoutStoreId();
         }
 
@@ -324,16 +348,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     * Return true if redirection will be done in silent mode.
-     *
-     * @return bool
-     */
-    public function isSilentMode()
-    {
-        return false;
-    }
-
-    /**
      * Reset data of info model instance.
      *
      * @return $this
@@ -354,12 +368,12 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $info->setAdditionalData(null)
-                ->setCcType(null)
-                ->setCcLast4(null)
-                ->setCcNumber(null)
-                ->setCcCid(null)
-                ->setCcExpMonth(null)
-                ->setCcExpYear(null);
+            ->setCcType(null)
+            ->setCcLast4(null)
+            ->setCcNumber(null)
+            ->setCcCid(null)
+            ->setCcExpMonth(null)
+            ->setCcExpYear(null);
 
         return $this;
     }
@@ -372,7 +386,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function extractPayzenData(\Magento\Framework\DataObject $data)
     {
-        if (is_array($data->getAdditionalData()) && !empty($data->getAdditionalData())) {
+        if (is_array($data->getAdditionalData()) && ! empty($data->getAdditionalData())) {
             $dataObject = $this->dataObjectFactory->create();
             $dataObject->addData($data->getAdditionalData()); // Magento v >= 2.1
             return $dataObject;
@@ -433,8 +447,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             return true;
         }
 
-        $this->dataHelper->log("Could not find numeric codes for selected ($currencyCode)"
-            ." and base ($baseCurrencyCode) currencies.");
+        $this->dataHelper->log("Could not find numeric codes for selected ($currencyCode)" .
+            " and base ($baseCurrencyCode) currencies.");
         return false;
     }
 
@@ -451,12 +465,12 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $amount = $quote ? $quote->getBaseGrandTotal() : null;
-        if (!$amount) {
+        if (! $amount) {
             return true;
         }
 
         $configOptions = unserialize($this->getConfigData('custgroup_amount_restrictions'));
-        if (!is_array($configOptions) || empty($configOptions)) {
+        if (! is_array($configOptions) || empty($configOptions)) {
             return true;
         }
 
@@ -480,15 +494,14 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             }
         }
 
-        if (!$minAmount) {
+        if (! $minAmount) {
             $minAmount = $allMinAmount;
         }
-        if (!$maxAmount) {
+        if (! $maxAmount) {
             $maxAmount = $allMaxAmount;
         }
 
-        if (($minAmount && ($amount < $minAmount))
-                || ($maxAmount && ($amount > $maxAmount))) {
+        if (($minAmount && ($amount < $minAmount)) || ($maxAmount && ($amount > $maxAmount))) {
             // module will not be available
             return false;
         }
@@ -510,8 +523,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         $requestId = '';
 
-        $this->dataHelper->log("Start refund of {$amount} {$order->getOrderCurrencyCode()} for order "
-            . "#{$order->getId()} with {$this->_code} payment method.");
+        $this->dataHelper->log("Start refund of {$amount} {$order->getOrderCurrencyCode()} for order " .
+                 "#{$order->getId()} with {$this->_code} payment method.");
 
         try {
             $this->dataHelper->checkWsRequirements();
@@ -528,8 +541,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             // load specific configuration file for WS
             $options = parse_ini_file($this->dirReader->getModuleDir('etc', 'Lyranetwork_Payzen') . '/ws.ini') ?: [];
 
-            if (!empty($options)) {
-                if (!$options['proxy.enabled']) {
+            if (! empty($options)) {
+                if (! $options['proxy.enabled']) {
                     unset(
                         $options['proxy_host'],
                         $options['proxy_port'],
@@ -548,7 +561,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
             // retrieve transaction UUID
             $uuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
-            if (!$uuid) { // retro compatibility
+            if (! $uuid) { // retro compatibility
                 $legacyTransactionKeyRequest = new \Lyranetwork\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
                 $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
                 $legacyTransactionKeyRequest->setSequenceNumber('1'); // only single payments can be refund
@@ -564,7 +577,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 $wsApi->checkResult($getPaymentUuidResponse->getLegacyTransactionKeyResult()->getCommonResponse());
 
                 $uuid = $getPaymentUuidResponse->getLegacyTransactionKeyResult()
-                    ->getPaymentResponse()->getTransactionUuid();
+                    ->getPaymentResponse()
+                    ->getTransactionUuid();
 
                 // retrieve JSESSIONID created for getPaymentUuid call
                 $sid = $wsApi->getJsessionId();
@@ -587,12 +601,13 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $wsApi->checkResult($getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse());
 
             // retrieve JSESSIONID created for getPaymentDetails call
-            if (!$sid) {
+            if (! $sid) {
                 $sid = $wsApi->getJsessionId();
             }
 
             $transStatus = $getPaymentDetailsResponse->getGetPaymentDetailsResult()
-                ->getCommonResponse()->getTransactionStatusLabel();
+                ->getCommonResponse()
+                ->getTransactionStatusLabel();
             $amountInCents = $currency->convertAmountToInteger($amount);
 
             // common request generation
@@ -615,15 +630,13 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 $paymentRequest->setCurrency($currency->getNum());
 
                 $captureDelay = $this->getConfigData('capture_delay', $storeId); // get sub-module specific param
-                if (!is_numeric($captureDelay)) {
+                if (! is_numeric($captureDelay)) {
                     // get general param
                     $captureDelay = $this->dataHelper->getCommonConfigData('capture_delay', $storeId);
                 }
 
                 if (is_numeric($captureDelay)) {
-                    $paymentRequest->setExpectedCaptureDate(
-                        new \DateTime('@' . strtotime("+$captureDelay days", $timestamp))
-                    );
+                    $paymentRequest->setExpectedCaptureDate(new \DateTime('@' . strtotime("+$captureDelay days", $timestamp)));
                 }
 
                 $validationMode = $this->getConfigData('validation_mode', $storeId); // get sub-module specific param
@@ -643,7 +656,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
                 $wsApi->checkAuthenticity();
                 $wsApi->checkResult(
-                    $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
+                    $refurndPaymentResponse->getRefundPaymentResult()
+                    ->getCommonResponse(),
                     [
                         'INITIAL',
                         'AUTHORISED',
@@ -655,7 +669,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
                 // check operation type (0: debit, 1 refund)
                 $transType = $refurndPaymentResponse->getRefundPaymentResult()
-                    ->getPaymentResponse()->getOperationType();
+                    ->getPaymentResponse()
+                    ->getOperationType();
                 if ($transType != 1) {
                     throw new \Exception("Unexpected transaction type returned ($transType).");
                 }
@@ -663,15 +678,19 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 // create refund transaction in Magento
                 $this->createRefundTransaction(
                     $payment,
-                    $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
-                    $refurndPaymentResponse->getRefundPaymentResult()->getPaymentResponse(),
-                    $refurndPaymentResponse->getRefundPaymentResult()->getCardResponse()
+                    $refurndPaymentResponse->getRefundPaymentResult()
+                        ->getCommonResponse(),
+                    $refurndPaymentResponse->getRefundPaymentResult()
+                        ->getPaymentResponse(),
+                    $refurndPaymentResponse->getRefundPaymentResult()
+                    ->getCardResponse()
                 );
 
                 $this->dataHelper->log("Online money refund for order #{$order->getId()} is successful.");
             } else {
                 $transAmount = $getPaymentDetailsResponse->getGetPaymentDetailsResult()
-                    ->getPaymentResponse()->getAmount();
+                    ->getPaymentResponse()
+                    ->getAmount();
                 if ($amountInCents >= $transAmount) { // transaction cancel
                     $cancelPayment = new \Lyranetwork\Payzen\Model\Api\Ws\CancelPayment();
                     $cancelPayment->setCommonRequest($commonRequest);
@@ -680,10 +699,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     $cancelPaymentResponse = $wsApi->cancelPayment($cancelPayment);
 
                     $wsApi->checkAuthenticity();
-                    $wsApi->checkResult(
-                        $cancelPaymentResponse->getCancelPaymentResult()->getCommonResponse(),
-                        ['CANCELLED']
-                    );
+                    $wsApi->checkResult($cancelPaymentResponse->getCancelPaymentResult()
+                        ->getCommonResponse(), [
+                        'CANCELLED'
+                        ]);
 
                     $order->cancel();
                     $this->dataHelper->log("Online payment cancel for order #{$order->getId()} is successful.");
@@ -701,7 +720,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
                     $wsApi->checkAuthenticity();
                     $wsApi->checkResult(
-                        $updatePaymentResponse->getUpdatePaymentResult()->getCommonResponse(),
+                        $updatePaymentResponse->getUpdatePaymentResult()
+                        ->getCommonResponse(),
                         [
                             'AUTHORISED',
                             'AUTHORISED_TO_VALIDATE',
@@ -770,16 +790,31 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         $expiry = '';
         if ($cardResponse->getExpiryMonth() && $cardResponse->getExpiryYear()) {
-            $expiry = str_pad($cardResponse->getExpiryMonth(), 2, '0', STR_PAD_LEFT)
-                . ' / ' . $cardResponse->getExpiryYear();
+            $expiry = str_pad($cardResponse->getExpiryMonth(), 2, '0', STR_PAD_LEFT) . ' / ' .
+                 $cardResponse->getExpiryYear();
+        }
+
+        // save paid amount
+        $currency = PayzenApi::findCurrencyByNumCode($paymentResponse->getCurrency());
+        $amount = round($currency->convertAmountToFloat($paymentResponse->getAmount()), $currency->getDecimals());
+
+        $amountDetail = $amount . ' ' . $currency->getAlpha3();
+
+        if ($paymentResponse->getEffectiveCurrency() &&
+             ($paymentResponse->getCurrency() !== $paymentResponse->getEffectiveCurrency())) {
+            $effectiveCurrency = PayzenApi::findCurrencyByNumCode($paymentResponse->getEffectiveCurrency());
+
+            $effectiveAmount = round(
+                $effectiveCurrency->convertAmountToFloat($paymentResponse->getEffectiveAmount()),
+                $effectiveCurrency->getDecimals()
+            );
+
+            $amountDetail = $effectiveAmount . ' ' . $effectiveCurrency->getAlpha3() . ' (' . $amountDetail . ')';
         }
 
         $additionalInfo = [
             'Transaction Type' => 'CREDIT',
-            'Amount' => round(
-                $currency->convertAmountToFloat($paymentResponse->getAmount()),
-                $currency->getDecimals()
-            ) . ' ' . $currency->getAlpha3(),
+            'Amount' => $amountDetail,
             'Transaction ID' => $transactionId,
             'Transaction Status' => $commonResponse->getTransactionStatusLabel(),
             'Payment Mean' => $cardResponse->getBrand(),

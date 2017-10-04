@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 
@@ -148,32 +148,6 @@
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ValidationMode</source_model>
                 <config_path>payzen/general/validation_mode</config_path>
             </field>
-
-            <field id="payment_cards" translate="label comment" type="multiselect" sortOrder="134" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Card Types</label>
-                <comment>The card type(s) that can be used for the payment. Select none to use platform configuration.</comment>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
-                <source_model>Lyranetwork\Payzen\Model\System\Config\Source\PaymentCard</source_model>
-                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\PaymentCards</backend_model>
-                <config_path>payzen/general/payment_cards</config_path>
-            </field>
-
-            <field id="common_category" translate="label comment" type="select" sortOrder="135" showInDefault="1" showInWebsite="0" showInStore="1">
-                <label>Category mapping</label>
-                <comment>Use the same category for all products.</comment>
-                <source_model>Lyranetwork\Payzen\Model\System\Config\Source\Category</source_model>
-                <config_path>payzen/general/common_category</config_path>
-            </field>
-
-            <field id="category_mapping" translate="label comment" sortOrder="136" showInDefault="1" showInWebsite="0" showInStore="1">
-                <comment><![CDATA[Match each product category with a PayZen category. <br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CategoryMapping</frontend_model>
-                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CategoryMapping</backend_model>
-                <config_path>payzen/general/category_mapping</config_path>
-                <depends>
-                    <field id="common_category">CUSTOM_MAPPING</field>
-                </depends>
-            </field>
         </group>
 
         <group id="payzen_payment_page_customize" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -183,7 +157,7 @@
 
             <field id="theme_config" translate="label comment" type="text" sortOrder="141" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Theme configuration</label>
-                <comment>The theme configuration to customize the payment page (logo, css).</comment>
+                <comment>The theme configuration to customize the payment page.</comment>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\ThemeConfig</backend_model>
                 <config_path>payzen/general/theme_config</config_path>
             </field>
@@ -287,20 +261,30 @@
             </field>
         </group>
 
-        <!-- <group id="payzen_additional_options" translate="label comment" type="text" sortOrder="17" showInDefault="1" showInWebsite="0" showInStore="1">
+        <group id="payzen_additional_options" translate="label comment" type="text" sortOrder="17" showInDefault="1" showInWebsite="0" showInStore="1">
             <label>ADDITIONAL OPTIONS</label>
             <attribute type="expanded">0</attribute>
-            <comment>Configure this section only if you have a FacilyPay Oney contract.</comment>
+            <comment>Configure this section if you use advanced risk assessment module or if you have a FacilyPay Oney contract.</comment>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="oney_contract" translate="label comment" type="select" sortOrder="171" showInDefault="1" showInWebsite="0" showInStore="1">
-                <label>FacilyPay Oney contract</label>
-                <comment><![CDATA[Select &laquo;Yes&raquo; if you have a FacilyPay Oney contract.]]></comment>
-                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                <config_path>payzen/general/oney_contract</config_path>
+            <field id="common_category" translate="label comment" type="select" sortOrder="171" showInDefault="1" showInWebsite="0" showInStore="1">
+                <label>Category mapping</label>
+                <comment>Use the same category for all products.</comment>
+                <source_model>Lyranetwork\Payzen\Model\System\Config\Source\Category</source_model>
+                <config_path>payzen/general/common_category</config_path>
             </field>
 
-            <field id="ship_options" translate="label comment" sortOrder="172" showInDefault="1" showInWebsite="0" showInStore="1">
+            <field id="category_mapping" translate="label comment" sortOrder="172" showInDefault="1" showInWebsite="0" showInStore="1">
+                <comment><![CDATA[Match each product category with a PayZen category. <br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CategoryMapping</frontend_model>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CategoryMapping</backend_model>
+                <config_path>payzen/general/category_mapping</config_path>
+                <depends>
+                    <field id="common_category">CUSTOM_MAPPING</field>
+                </depends>
+            </field>
+
+            <!-- <field id="ship_options" translate="label comment" sortOrder="173" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label>FacilyPay Oney shipping options</label>
                 <comment><![CDATA[Define the FacilyPay Oney information about all shipping methods. <br /><b>FacilyPay Oney label: </b>The label of the shipping method (use 55 alphanumeric characters, accentuated characters and these special characters: space, slash, hyphen, apostrophe). <br /><b>Type: </b>The delivery type of shipping method. <br /><b>Speed: </b>Select whether the delivery is STANDARD or EXPRESS. <br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ShipOptions</frontend_model>
@@ -309,7 +293,7 @@
                 <depends>
                     <field id="oney_contract">1</field>
                 </depends>
-            </field>
-        </group> -->
+            </field> -->
+        </group>
     </group>
 </include>

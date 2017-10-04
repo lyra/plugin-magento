@@ -1,19 +1,19 @@
 <!--
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 
@@ -35,7 +35,7 @@
         </label>
     </div>
 
-    <div class="payment-method-content">
+    <div class="payment-method-content payzen-multi">
         <!-- ko foreach: getRegion('messages') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
@@ -44,45 +44,59 @@
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-        <fieldset class="fieldset payment method" data-bind="attr: {id: 'payment_form_' + getCode()}">
-            <div class="field type">
-                <div class="control">
-                    <ul class="multi-payment-options">
+
+        <fieldset class="fieldset payment method" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 20px;">
+            <div class="field">
+                <label>
+                    <!--ko if: getAvailableOptions().length > 1 -->
+                        <span data-bind="i18n: 'Choose your payment option'"></span>
+                    <!--/ko-->
+
+                    <!--ko ifnot: getAvailableOptions().length > 1 -->
+                        <span data-bind="i18n: 'Your payment option'"></span>
+                    <!--/ko-->
+                </label>
+
+                <div class="control" style="margin-top: 20px;">
+                    <ul class="multi-payment-options" style="padding: 0;">
                         <!-- ko foreach: {data: getAvailableOptions(), as: 'option'} -->
-                            <li style="list-style: outside none none; vertical-align: top;">
-                                <input class="radio"
-                                       type="radio"
-                                       name="payment[payzen_multi_option]"
-                                       data-bind="attr: {id: 'option_' + option.key, value: option.key, checked: (option.key == $parent.payzenMultiOption())},
-                                                  visible: $parent.getAvailableOptions().length > 1, 
-                                                  click: function() { $parent.payzenMultiOption(option.key); return true; }
-                                       " />
-                                <label style="float: none;" data-bind="attr: {for: 'option_' + option.key}, text: option.label"></label>
-                            </li>
+                        <li style="list-style: outside none none; vertical-align: top;" data-bind="css: {'_active': true}">
+                            <input class="radio"
+                                   type="radio"
+                                   name="payment[payzen_multi_option]"
+                                   data-bind="attr: {id: $parent.getCode() + '_option' + option.key, checked: (option.key == $parent.payzenMultiOption())},
+                                              value: option.key,
+                                              visible: $parent.getAvailableOptions().length > 1,
+                                              click: function() { $parent.payzenMultiOption(option.key); return true; }
+                                   " />
+                            <label style="font-weight: 700;" data-bind="attr: {for: $parent.getCode() + '_option' + option.key}, text: option.label"></label>
+                        </li>
                         <!--/ko-->
                     </ul>
                 </div>
             </div>
 
-            <!-- ko foreach: $parent.getRegion('before-place-order') -->
-                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko if: (getEntryMode() == 2) -->
+                <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
             <!--/ko-->
         </fieldset>
+
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"
                         data-bind="click: placeOrder,
-                                   attr: {title: $t('Continue to PayZen')},
+                                   attr: {title: $t('Pay with PayZen')},
                                    css: {disabled: !isPlaceOrderActionAllowed()},
                                    enable: (getCode() == isChecked())"
                         disabled>
-                    <span data-bind="i18n: 'Continue to PayZen'"></span>
+                    <span data-bind="i18n: 'Pay with PayZen'"></span>
                 </button>
             </div>
         </div>

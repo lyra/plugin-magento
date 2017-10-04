@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Api;
 
@@ -205,26 +205,29 @@ if (! class_exists('PayzenApi', false)) {
         {
             return array(
                 'CB' => 'CB', 'E-CARTEBLEUE' => 'E-Carte bleue', 'MAESTRO' => 'Maestro', 'MASTERCARD' => 'MasterCard',
-                'VISA' => 'Visa', 'VISA_ELECTRON' => 'Visa Electron', 'AMEX' => 'American Express',
-                'ACCORD_STORE' => 'Carte de paiement Banque Accord', 'ACCORD_STORE_SB' => 'Carte de paiement Banque Accord - Sandbox',
+                'VISA' => 'Visa', 'VISA_ELECTRON' => 'Visa Electron', 'VPAY' => 'V PAY', 'AMEX' => 'American Express',
+                'ACCORD_STORE' => 'Carte de paiement Oney', 'ACCORD_STORE_SB' => 'Carte de paiement Oney - Sandbox',
                 'ALINEA' => 'Carte Privative Alinea', 'ALINEA_CDX' => 'Carte cadeau Alinea',
                 'ALINEA_CDX_SB' => 'Carte cadeau Alinea - SandBox', 'ALINEA_SB' => 'Carte Privative Alinea - SandBox',
                 'AURORE-MULTI' => 'Carte Aurore', 'BANCONTACT' => 'Carte Maestro Bancontact Mistercash',
-                'BITCOIN' => 'Paiement par monnaie virtuelle', 'BIZZBEE_CDX' => 'Carte cadeau Bizzbee',
+                'BITCOIN' => 'Bitcoin', 'BIZZBEE_CDX' => 'Carte cadeau Bizzbee',
                 'BIZZBEE_CDX_SB' => 'Carte cadeau Bizzbee - Sandbox', 'BRICE_CDX' => 'Carte cadeau Brice',
                 'BRICE_CDX_SB' => 'Carte cadeau Brice - Sandbox', 'CDGP' => 'Carte Privilège', 'COF3XCB' => '3 fois CB Cofinoga',
                 'COF3XCB_SB' => '3 fois CB Cofinoga - Sandbox', 'COFINOGA' => 'Carte Be Smart', 'CORA_BLANCHE' => 'Carte Cora Blanche',
                 'CORA_PREM' => 'Carte Cora Premium', 'CORA_VISA' => 'Carte Cora Visa', 'DINERS' => 'Carte Diners Club',
-                'E_CV' => 'E-chèque vacance', 'EDENRED' => 'Ticket Restaurant', 'EDENRED_EC' => 'Ticket EcoCheque', 'GIROPAY' => 'Giropay',
-                'KLARNA' => 'Paiement par facture Klarna', 'IDEAL' => 'iDEAL virement bancaire', 'ILLICADO' => 'Carte cadeau Illicado',
+                'E_CV' => 'E-chèque vacance', 'EDENRED_TR' => 'Ticket Restaurant', 'EDENRED_EC' => 'Ticket EcoCheque',
+                'EPS' => 'eps-Überweisung', 'FULLCB3X' => 'Paiement en 3X avec BNPP PF', 'FULLCB4X' => 'Paiement en 4X avec BNPP PF',
+                'GIROPAY' => 'Giropay', 'KLARNA' => 'Klarna', 'IDEAL' => 'iDEAL', 'ILLICADO' => 'Carte cadeau Illicado',
                 'ILLICADO_SB' => 'Carte cadeau Illicado - Sandbox', 'JCB' => 'Carte JCB', 'JOUECLUB_CDX' => 'Carte cadeau Jouéclub',
                 'JOUECLUB_CDX_SB' => 'Carte cadeau Jouéclub - Sandbox', 'JULES_CDX' => 'Carte cadeau Jules',
-                'JULES_CDX_SB' => 'Carte cadeau Jules - Sandbox', 'ONEY' => 'Paiement en 3/4 fois Oney FacilyPay',
-                'ONEY_SANDBOX' => 'Paiement en 3/4 fois Oney FacilyPay - Sandbox', 'PAYLIB' => 'Paylib', 'PAYPAL' => 'PayPal',
-                'PAYPAL_SB' => 'PayPal - Sandbox', 'PAYSAFECARD' => 'Carte prépayée Paysafecard', 'POSTFINANCE' => 'PostFinance',
-                'POSTFINANCE_EFIN' => 'PostFinance mode E-finance', 'RUPAY' => 'RuPay', 'S-MONEY' => 'S-Money',
+                'JULES_CDX_SB' => 'Carte cadeau Jules - Sandbox', 'MASTERPASS' => 'Portefeuille numérique MasterCard',
+                'ONEY' => 'Paiement en 3/4 fois Oney FacilyPay', 'ONEY_SANDBOX' => 'Paiement en 3/4 fois Oney FacilyPay - Sandbox',
+                'PAYLIB' => 'Paylib', 'PAYPAL' => 'PayPal', 'PAYPAL_SB' => 'PayPal - Sandbox',
+                'PAYSAFECARD' => 'Carte prépayée Paysafecard', 'POSTFINANCE' => 'PostFinance',
+                'POSTFINANCE_EFIN' => 'PostFinance mode E-finance', 'RUPAY' => 'RuPay',
                 'SCT' => 'Virement SEPA', 'SDD' => 'Prélèvement SEPA', 'SOFORT_BANKING' => 'Sofort',
-                'TRUFFAUT_CDX' => 'Carte cadeau Truffaut'
+                'TRUFFAUT_CDX' => 'Carte cadeau Truffaut', 'VILLAVERDE' => 'Carte cadeau Villaverde',
+                'VILLAVERDE_SB' => 'Carte cadeau Villaverde - SandBox'
             );
         }
 

@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
 
@@ -21,32 +21,39 @@ use \Lyranetwork\Payzen\Model\Api\PayzenApi;
 
 class CheckProcessor
 {
+
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
-    private $dataHelper;
+    protected $dataHelper;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Payment
      */
-    private $paymentHelper;
+    protected $paymentHelper;
 
     /**
+     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $storeManager;
+    protected $storeManager;
 
     /**
+     *
      * @var \Magento\Sales\Model\OrderFactory
      */
-    private $orderFactory;
+    protected $orderFactory;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
      */
-    private $payzenResponseFactory;
+    protected $payzenResponseFactory;
 
     /**
+     *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
@@ -69,7 +76,7 @@ class CheckProcessor
 
     public function execute(\Lyranetwork\Payzen\Api\CheckActionInterface $controller)
     {
-        if (!$controller->getRequest()->isPost()) {
+        if (! $controller->getRequest()->isPost()) {
             return;
         }
 
@@ -88,14 +95,16 @@ class CheckProcessor
         $this->storeManager->setCurrentStore($storeId);
 
         // load API response
-        $payzenResponse = $this->payzenResponseFactory->create([
-            'params' => $post,
-            'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
-            'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
-            'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId)
-        ]);
+        $payzenResponse = $this->payzenResponseFactory->create(
+            [
+                'params' => $post,
+                'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
+                'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
+                'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId)
+            ]
+        );
 
-        if (!$payzenResponse->isAuthentified()) {
+        if (! $payzenResponse->isAuthentified()) {
             // authentification failed
             $this->dataHelper->log("{$this->dataHelper->getIpAddress()} tries to access our payzen/payment/check
                 page without valid signature. It may be a hacking attempt.", \Psr\Log\LogLevel::WARNING);
@@ -103,23 +112,24 @@ class CheckProcessor
         }
         $this->dataHelper->log("Request authenticated for order #{$order->getId()}.");
 
-        $reviewStatuses = ['payment_review', 'payzen_to_validate', 'fraud'];
+        $reviewStatuses = [
+            'payment_review',
+            'payzen_to_validate',
+            'fraud'
+        ];
 
         if ($order->getStatus() == 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
             // order waiting for payment
             $this->dataHelper->log("Order #{$order->getId()} is waiting payment update.");
-            $this->dataHelper->log("Payment result for order #{$order->getId()} : "
-                . $payzenResponse->getLogMessage());
+            $this->dataHelper->log("Payment result for order #{$order->getId()} : " . $payzenResponse->getLogMessage());
 
             if ($payzenResponse->isAcceptedPayment()) {
                 $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by notification URL.");
 
                 $stateObject = $this->paymentHelper->nextOrderState($order, $payzenResponse);
-                if ($order->getStatus() == $stateObject->getStatus()) { // payment status is unchanged
-                    // display notification url confirmation message
-                    return $controller->renderResponse(
-                        $payzenResponse->getOutputForPlatform('payment_ok_already_done')
-                    );
+                if ($order->getStatus() == $stateObject->getStatus()) {
+                    // payment status is unchanged display notification url confirmation message
+                    return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ok_already_done'));
                 } else {
                     // save order and optionally create invoice
                     $this->paymentHelper->registerOrder($order, $payzenResponse);
@@ -128,9 +138,7 @@ class CheckProcessor
                     return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ok'));
                 }
             } else {
-                $this->dataHelper->log(
-                    "Payment for order #{$order->getId()} has been invalidated by notification URL."
-                );
+                $this->dataHelper->log("Payment for order #{$order->getId()} has been invalidated by notification URL.");
 
                 // cancel order
                 $this->paymentHelper->cancelOrder($order, $payzenResponse);
@@ -152,22 +160,39 @@ class CheckProcessor
 
                 if ($payzenResponse->get('operation_type') == 'CREDIT') {
                     // this is a refund : create credit memo ?
-                    $currency = PayzenApi::findCurrencyByNumCode($payzenResponse->get('currency'));
 
                     $expiry = '';
                     if ($payzenResponse->get('expiry_month') && $payzenResponse->get('expiry_year')) {
-                        $expiry = str_pad($payzenResponse->get('expiry_month'), 2, '0', STR_PAD_LEFT)
-                            . ' / ' . $payzenResponse->get('expiry_year');
+                        $expiry = str_pad($payzenResponse->get('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' .
+                             $payzenResponse->get('expiry_year');
                     }
 
                     $transactionId = $payzenResponse->get('trans_id') . '-' . $payzenResponse->get('sequence_number');
 
+                    // save paid amount
+                    $currency = PayzenApi::findCurrencyByNumCode($payzenResponse->get('currency'));
+                    $amount = round(
+                        $currency->convertAmountToFloat($payzenResponse->get('amount')),
+                        $currency->getDecimals()
+                    );
+
+                    $amountDetail = $amount . ' ' . $currency->getAlpha3();
+
+                    if ($payzenResponse->get('effective_currency') &&
+                         ($payzenResponse->get('currency') !== $payzenResponse->get('effective_currency'))) {
+                        $effectiveCurrency = PayzenApi::findCurrencyByNumCode($payzenResponse->get('effective_currency'));
+
+                        $effectiveAmount = round(
+                            $effectiveCurrency->convertAmountToFloat($payzenResponse->get('effective_amount')),
+                            $effectiveCurrency->getDecimals()
+                        );
+
+                        $amountDetail = $effectiveAmount . ' ' . $effectiveCurrency->getAlpha3() . ' (' . $amountDetail . ')';
+                    }
+
                     $additionalInfo = [
                         'Transaction Type' => 'CREDIT',
-                        'Amount' => round(
-                            $currency->convertAmountToFloat($payzenResponse->get('amount')),
-                            $currency->getNum()
-                        ) . ' ' . $currency->getAlpha3(),
+                        'Amount' => $amountDetail,
                         'Transaction ID' => $transactionId,
                         'Transaction Status' => $payzenResponse->get('trans_status'),
                         'Payment Mean' => $payzenResponse->get('card_brand'),
@@ -188,10 +213,11 @@ class CheckProcessor
                     // update transaction info
                     $this->paymentHelper->updatePaymentInfo($order, $payzenResponse);
                 }
+
                 $order->save();
 
                 return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ok_already_done'));
-            } elseif ($order->isCanceled() && !$payzenResponse->isAcceptedPayment()) {
+            } elseif ($order->isCanceled() && ! $payzenResponse->isAcceptedPayment()) {
                 $this->dataHelper->log("Order #{$order->getId()} cancelation is confirmed.");
                 return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ko_already_done'));
             } else {

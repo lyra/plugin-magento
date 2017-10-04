@@ -1,32 +1,35 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend\Oney;
 
 class Active extends \Magento\Framework\App\Config\Value
 {
-    private $message;
+
+    protected $message;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Checkout
      */
-    private $checkoutHelper;
+    protected $checkoutHelper;
 
     /**
+     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -57,15 +60,12 @@ class Active extends \Magento\Framework\App\Config\Value
 
         if ($this->getValue() /* sub-module enabled */) {
             $data = $this->getGroups('payzen'); // get data of general config group
-            $oneyContract = isset($data['fields']['oney_contract']['value'])
-               && $data['fields']['oney_contract']['value'];
+            $oneyContract = isset($data['fields']['oney_contract']['value']) && $data['fields']['oney_contract']['value'];
 
-            if (!$oneyContract) {
+            if (! $oneyContract) {
                 $this->setValue(0);
 
-                $this->message = __(
-                    'Please configure &laquo;ADDITIONAL OPTIONS&raquo; part of &laquo;PayZen&raquo; section.'
-                )->render();
+                $this->message = __('Please configure &laquo;ADDITIONAL OPTIONS&raquo; part of &laquo;PayZen&raquo; section.')->render();
             } else {
                 try {
                     // check Oney requirements
@@ -83,7 +83,7 @@ class Active extends \Magento\Framework\App\Config\Value
 
     public function afterCommitCallback()
     {
-        if (!empty($this->message)) {
+        if (! empty($this->message)) {
             $this->message .= "\n" . __('FacilyPay Oney payment mean cannot be used.')->render();
             throw new \Magento\Framework\Exception\LocalizedException(__($this->message));
         }

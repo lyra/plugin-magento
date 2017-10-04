@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
+ */
+-->
+
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_layout.xsd">
+    <update handle="1column" />
+
+    <referenceBlock name="page.main.title">
+        <action method="setPageTitle">
+            <argument translate="true" name="title" xsi:type="string">Payment platform redirection</argument>
+        </action>
+    </referenceBlock>
+
+    <referenceBlock name="payzen_payment_redirect">
+        <block class="Magento\Framework\View\Element\Template" as="redirect_loader" template="Lyranetwork_Payzen::payment/form/loader.phtml" />
+    </referenceBlock>
+</layout>

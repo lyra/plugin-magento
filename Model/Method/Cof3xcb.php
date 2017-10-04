@@ -1,25 +1,27 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
 class Cof3xcb extends Payzen
 {
+
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_COF3XCB;
+
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Cof3xcb::class;
 
     protected function setExtraFields($order)
@@ -53,14 +55,14 @@ class Cof3xcb extends Payzen
     /**
      * Validate payment method information object.
      *
-     * @return  $this
+     * @return $this
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function validate()
     {
         /*
          * calling parent validate function
-        */
+         */
         parent::validate();
 
         $info = $this->getInfoInstance();
@@ -99,7 +101,7 @@ class Cof3xcb extends Payzen
 
     private function checkField($field, $fieldName, array &$errors)
     {
-        if (!$field) {
+        if (! $field) {
             $errors[] = __($fieldName);
         }
 

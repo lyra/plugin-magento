@@ -1,54 +1,68 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Payment;
 
 class Response extends \Magento\Framework\App\Action\Action implements \Lyranetwork\Payzen\Api\ResponseActionInterface
 {
+
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
-    private $dataHelper;
+    protected $dataHelper;
 
     /**
+     *
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
-    private $quoteRepository;
+    protected $quoteRepository;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor
      */
-    private $responseProcessor;
+    protected $responseProcessor;
 
     /**
+     *
+     * @var \Lyranetwork\Payzen\Controller\Result\RedirectFactory
+     */
+    protected $payzenRedirectFactory;
+
+    /**
+     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
+     * @param \Lyranetwork\Payzen\Controller\Result\RedirectFactory $payzenRedirectFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
+        \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor,
+        \Lyranetwork\Payzen\Controller\Result\RedirectFactory $payzenRedirectFactory
     ) {
         $this->dataHelper = $dataHelper;
         $this->quoteRepository = $quoteRepository;
         $this->responseProcessor = $responseProcessor;
+        $this->payzenRedirectFactory = $payzenRedirectFactory;
 
         parent::__construct($context);
     }
@@ -68,16 +82,24 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
         // clear all messages in session
         $this->messageManager->getMessages(true);
 
-        $this->dataHelper->getCheckout()->setLastQuoteId($order->getQuoteId())
-                                        ->setLastOrderId($order->getId());
+        $this->dataHelper->getCheckout()
+            ->setLastQuoteId($order->getQuoteId())
+            ->setLastOrderId($order->getId());
 
         $this->dataHelper->log('Redirecting to one page checkout failure page.');
 
         /**
+         *
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
          */
-        $resultRedirect = $this->resultRedirectFactory->create();
-        $resultRedirect->setPath('checkout/onepage/failure', ['_scope' => $order->getStore()->getId()]);
+        $resultRedirect = $this->payzenRedirectFactory->create();
+        $resultRedirect->setIframe($this->getRequest()->getParam('iframe', false));
+        $resultRedirect->setPath(
+            'checkout/onepage/failure',
+            [
+                '_scope' => $order->getStore()->getId()
+            ]
+        );
 
         return $resultRedirect;
     }
@@ -92,6 +114,7 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
     public function redirectResponse($order, $success, $checkUrlWarn = false)
     {
         /**
+         *
          * @var Magento\Checkout\Model\Session $checkout
          */
         $checkout = $this->dataHelper->getCheckout();
@@ -122,19 +145,24 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
         }
 
         /**
+         *
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
          */
-        $resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect = $this->payzenRedirectFactory->create();
+        $resultRedirect->setIframe($this->getRequest()
+            ->getParam('iframe', false));
 
         if ($success) {
             $checkout->setLastQuoteId($order->getQuoteId())
-                    ->setLastSuccessQuoteId($order->getQuoteId())
-                    ->setLastOrderId($order->getId())
-                    ->setLastRealOrderId($order->getIncrementId())
-                    ->setLastOrderStatus($order->getStatus());
+                ->setLastSuccessQuoteId($order->getQuoteId())
+                ->setLastOrderId($order->getId())
+                ->setLastRealOrderId($order->getIncrementId())
+                ->setLastOrderStatus($order->getStatus());
 
             $this->dataHelper->log('Redirecting to one page checkout success page.');
-            $resultRedirect->setPath('checkout/onepage/success', ['_scope' => $storeId]);
+            $resultRedirect->setPath('checkout/onepage/success', [
+                '_scope' => $storeId
+            ]);
         } else {
             $this->messageManager->addWarning(__('Checkout and order have been canceled.'));
 
@@ -148,7 +176,9 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
             }
 
             $this->dataHelper->log('Redirecting to cart page.');
-            $resultRedirect->setPath('checkout/cart', ['_scope' => $storeId]);
+            $resultRedirect->setPath('checkout/cart', [
+                '_scope' => $storeId
+            ]);
         }
 
         return $resultRedirect;

@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Observer;
 
@@ -23,27 +23,33 @@ use Lyranetwork\Payzen\Block\Constants;
 
 class BackendPaymentRedirectObserver implements ObserverInterface
 {
+
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
-    private $dataHelper;
+    protected $dataHelper;
 
     /**
+     *
      * @var \Magento\Framework\UrlInterface
      */
-    private $urlBuilder;
+    protected $urlBuilder;
 
     /**
+     *
      * @var \Magento\Framework\App\Request\Http
      */
-    private $request;
+    protected $request;
 
     /**
+     *
      * @var \Magento\Framework\Registry
      */
-    private $coreRegistry;
+    protected $coreRegistry;
 
     /**
+     *
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Magento\Framework\App\Request\Http $request
@@ -70,12 +76,12 @@ class BackendPaymentRedirectObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        if (!$order || !$order->getId()) {
+        if (! $order || ! $order->getId()) {
             // order creation failed
             return $this;
         }
 
-        if (!$this->dataHelper->isBackend()) {
+        if (! $this->dataHelper->isBackend()) {
             // placed on frontend
             return $this;
         }
@@ -84,17 +90,20 @@ class BackendPaymentRedirectObserver implements ObserverInterface
         if ($method instanceof \Lyranetwork\Payzen\Model\Method\Payzen) {
             $flag = false;
             if ($data = $this->request->getPost('order')) {
-                $flag = isset($data['send_confirmation']) ? (bool)$data['send_confirmation'] : false;
+                $flag = isset($data['send_confirmation']) ? (bool) $data['send_confirmation'] : false;
             }
 
-            if (!$flag) {
+            if (! $flag) {
                 $order->setSendEmail($flag);
                 $order->save();
             }
 
             $redirectUrl = $this->urlBuilder->getUrl(
                 'payzen/payment/redirect',
-                ['order_id' => $order->getId(), '_secure' => true]
+                [
+                    'order_id' => $order->getId(),
+                    '_secure' => true
+                ]
             );
             $this->coreRegistry->register(Constants::REDIRECT_URL, $redirectUrl);
             $this->coreRegistry->register(Constants::LAST_SUCCESS_QUOTE_ID, $order->getQuoteId());

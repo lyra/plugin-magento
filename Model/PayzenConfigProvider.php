@@ -1,55 +1,63 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model;
 
 class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
 {
+
     /**
+     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
     /**
+     *
      * @var \Magento\Framework\View\Asset\Repository
      */
     protected $assetRepo;
 
     /**
+     *
      * @var \Magento\Framework\UrlInterface
      */
     protected $urlBuilder;
 
     /**
+     *
      * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
+     *
      * @var \Lyranetwork\Payzen\Model\Method\Payzen
      */
     protected $method;
 
     /**
+     *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Framework\UrlInterface $urlBuilder
@@ -78,17 +86,27 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
     }
 
     /**
+     *
      * {@inheritdoc}
+     *
      */
     public function getConfig()
     {
         return [
-                'payment' => [
-                        $this->method->getCode() => [
-                                'checkoutRedirectUrl' => $this->getCheckoutRedirectUrl(),
-                                'moduleLogoUrl' => $this->getModuleLogoUrl()
+            'payment' => [
+                $this->method->getCode() => [
+                    'checkoutRedirectUrl' => $this->getCheckoutRedirectUrl(),
+                    'iframeLoaderUrl' => $this->urlBuilder->getUrl(
+                        'payzen/payment_iframe/loader',
+                        [
+                            '_secure' => true
                         ]
+                    ),
+                    'moduleLogoUrl' => $this->getModuleLogoUrl(),
+                    'availableCcTypes' => $this->getAvailableCcTypes(),
+                    'entryMode' => $this->method->getConfigData('card_info_mode')
                 ]
+            ]
         ];
     }
 
@@ -97,11 +115,23 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
         $fileName = $this->method->getConfigData('module_logo');
 
         if ($this->dataHelper->isUploadFileImageExists($fileName)) {
-            return $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
-                . 'payzen/images/' . $fileName;
+            return $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
+                 'payzen/images/' . $fileName;
         } else {
             return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $fileName);
         }
+    }
+
+    /**
+     * Checkout redirect URL getter
+     *
+     * @return string
+     */
+    protected function getCheckoutRedirectUrl()
+    {
+        return $this->urlBuilder->getUrl('payzen/payment/redirect', [
+            '_secure' => true
+        ]);
     }
 
     /**
@@ -117,17 +147,30 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
             return $this->assetRepo->getUrlWithParams($fileId, $params);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->logger->critical($e);
-            return $this->urlBuilder->getUrl('', ['_direct' => 'core/index/notFound']);
+            return $this->urlBuilder->getUrl('', [
+                '_direct' => 'core/index/notFound'
+            ]);
         }
     }
 
-    /**
-     * Checkout redirect URL getter
-     *
-     * @return string
-     */
-    protected function getCheckoutRedirectUrl()
+    private function getAvailableCcTypes()
     {
-        return $this->urlBuilder->getUrl('payzen/payment/redirect', ['_secure' => true]);
+        $cards = [];
+        foreach ($this->method->getAvailableCcTypes() as $value => $label) {
+            $asset = $this->assetRepo->createAsset('Lyranetwork_Payzen::images/cc/' . strtolower($value) . '.png');
+
+            $icon = false;
+            if ($this->dataHelper->isPublishFileImageExists($asset->getRelativeSourceFilePath())) {
+                $icon = $this->getViewFileUrl('Lyranetwork_Payzen::images/cc/' . strtolower($value) . '.png');
+            }
+
+            $cards[] = [
+                'value' => $value,
+                'label' => $label,
+                'icon' => $icon
+            ];
+        }
+
+        return $cards;
     }
 }

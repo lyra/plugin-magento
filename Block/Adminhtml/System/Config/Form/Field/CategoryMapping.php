@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2017 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 
@@ -22,22 +22,27 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
  */
 class CategoryMapping extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
+
     /**
+     *
      * @var \Lyranetwork\Payzen\Model\System\Config\Source\CategoryFactory
      */
-    private $payzenCategoryFactory;
+    protected $payzenCategoryFactory;
 
     /**
+     *
      * @var \Magento\Catalog\Model\CategoryFactory
      */
-    private $categoryFactory;
+    protected $categoryFactory;
 
     /**
+     *
      * @var bool
      */
     protected $staticTable = true;
 
     /**
+     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Lyranetwork\Payzen\Model\System\Config\Source\CategoryFactory $payzenCategoryFactory
      * @param \Magento\Catalog\Model\CategoryFactory $categoryFactory
@@ -62,22 +67,28 @@ class CategoryMapping extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\
      */
     public function _prepareToRender()
     {
-        $this->addColumn('magento_category', [
-            'label' => __('Magento category'),
-            'style' => 'width: 200px;',
-            'renderer' => $this->getLabelRenderer('_magentoCategory')
-        ]);
+        $this->addColumn(
+            'magento_category',
+            [
+                'label' => __('Magento category'),
+                'style' => 'width: 200px;',
+                'renderer' => $this->getLabelRenderer('_magentoCategory')
+            ]
+        );
 
         $options = [];
         foreach ($this->payzenCategoryFactory->create()->toOptionArray(true) as $option) {
             $options[$option['value']] = $option['label'];
         }
 
-        $this->addColumn('payzen_category', [
-            'label' => __('PayZen category'),
-            'style' => 'width: 200px;',
-            'renderer' => $this->getListRenderer('_payzenCategory', $options)
-        ]);
+        $this->addColumn(
+            'payzen_category',
+            [
+                'label' => __('PayZen category'),
+                'style' => 'width: 200px;',
+                'renderer' => $this->getListRenderer('_payzenCategory', $options)
+            ]
+        );
 
         parent::_prepareToRender();
     }
@@ -95,7 +106,7 @@ class CategoryMapping extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\
         $allCategories = $this->getAllCategories();
 
         $savedCategories = $this->getElement()->getValue();
-        if ($savedCategories && is_array($savedCategories) && !empty($savedCategories)) {
+        if ($savedCategories && is_array($savedCategories) && ! empty($savedCategories)) {
             foreach ($savedCategories as $id => $category) {
                 if (key_exists($category['code'], $allCategories)) {
                     // update magento category name
@@ -108,7 +119,7 @@ class CategoryMapping extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\
         }
 
         // add not saved yet categories
-        if ($allCategories && is_array($allCategories) && !empty($allCategories)) {
+        if ($allCategories && is_array($allCategories) && ! empty($allCategories)) {
             foreach ($allCategories as $code => $name) {
                 $value[uniqid('_' . $code . '_')] = [
                     'code' => $code,
@@ -125,18 +136,19 @@ class CategoryMapping extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\
 
     private function getAllCategories()
     {
-        $categories = $this->categoryFactory->create()->getCollection()
-                    ->addAttributeToSelect('name')
-                    ->addAttributeToSelect('id')
-                    ->addIsActiveFilter();
+        $categories = $this->categoryFactory->create()
+            ->getCollection()
+            ->addAttributeToSelect('name')
+            ->addAttributeToSelect('id')
+            ->addIsActiveFilter();
 
         if ($this->getElement()->getScope() === \Magento\Config\Block\System\Config\Form::SCOPE_STORES) {
-            $rootId = $this->_storeManager->getStore($this->getElement()->getScopeId())->getRootCategoryId();
-
-            $categories = $categories->addFieldToFilter([
-                ['attribute' => 'path', 'like' => "1/$rootId/%"],
-                ['attribute' => 'path', 'eq' => "1/$rootId"]
-            ]);
+            $rootId = $this->_storeManager->getStore($this->getElement()
+                ->getScopeId())
+                ->getRootCategoryId();
+            $categories = $categories->addPathFilter("^1/$rootId/[0-9]+$");
+        } else {
+            $categories = $categories->addPathFilter("^1/[0-9]+/[0-9]+$");
         }
 
         $allCategories = [];
