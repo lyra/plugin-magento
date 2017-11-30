@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -66,12 +66,12 @@ if (! class_exists('PayzenRequest', false)) {
         private $redirectEnabled;
 
         /**
-         * SHA-1 authentication signature.
+         * Algo used to sign forms.
          *
          * @var string
          * @access private
          */
-        private $signature;
+        private $algo = PayzenApi::ALGO_SHA1;
 
         /**
          * The original data encoding.
@@ -330,6 +330,8 @@ if (! class_exists('PayzenRequest', false)) {
                 return $this->setPlatformUrl($value);
             } elseif ($name == 'vads_redirect_enabled') {
                 return $this->setRedirectEnabled($value);
+            } elseif ($name == 'vads_sign_algo') {
+                return $this->setSignAlgo($value);
             } elseif (key_exists($name, $this->requestParameters)) {
                 return $this->requestParameters[$name]->setValue($value);
             } else {
@@ -387,8 +389,7 @@ if (! class_exists('PayzenRequest', false)) {
         /**
          * Enable/disable vads_redirect_* parameters.
          *
-         * @param mixed $enabled
-         *            false, 0, null, negative integer or 'false' to disable
+         * @param mixed $enabled false, 0, null, negative integer or 'false' to disable
          * @return boolean
          */
         public function setRedirectEnabled($enabled)
@@ -415,6 +416,22 @@ if (! class_exists('PayzenRequest', false)) {
             }
 
             return true;
+        }
+
+        /**
+         * Set signature algorithm.
+         *
+         * @param string $algo
+         * @return boolean
+         */
+        public function setSignAlgo($algo)
+        {
+            if (in_array($algo, PayzenApi::$SUPPORTED_ALGOS)) {
+                $this->algo = $algo;
+                return true;
+            }
+
+            return false;
         }
 
         /**
@@ -462,7 +479,7 @@ if (! class_exists('PayzenRequest', false)) {
          *
          * @return string|boolean
          */
-        public function getCertificate()
+        private function getCertificate()
         {
             switch ($this->requestParameters['vads_ctx_mode']->getValue()) {
                 case 'TEST':
@@ -479,23 +496,18 @@ if (! class_exists('PayzenRequest', false)) {
         /**
          * Generate signature from a list of PayzenField.
          *
-         * @param array[string][PayzenField] $fields
+         * @param array[string][PayzenField] $fields already filtered fields list
+         * @param bool $hashed
          * @return string
          */
-        private function generateSignature($fields = null, $hashed = true)
+        private function generateSignature($fields, $hashed = true)
         {
-            if (! is_array($fields)) {
-                $fields = $this->requestParameters;
-            }
-
             $params = array();
             foreach ($fields as $field) {
-                if ($field->isRequired() || $field->isFilled()) {
-                    $params[$field->getName()] = $field->getValue();
-                }
+                $params[$field->getName()] = $field->getValue();
             }
 
-            return PayzenApi::sign($params, $this->getCertificate(), $hashed);
+            return PayzenApi::sign($params, $this->getCertificate(), $this->algo, $hashed);
         }
 
         /**

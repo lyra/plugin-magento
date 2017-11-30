@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -147,7 +147,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-    
+
         $this->localeResolver = $localeResolver;
         $this->payzenRequest = $payzenRequestFactory->create();
         $this->dataHelper = $dataHelper;
@@ -201,7 +201,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // contrib info
         $version = $this->productMetadata->getVersion(); // will return the magento version
-        $this->payzenRequest->set('contrib', 'Magento2.x_2.1.2/' . $version);
+        $this->payzenRequest->set('contrib', 'Magento2.x_2.1.3/' . $version . '/' . PHP_VERSION);
 
         // set config parameters
         $configFields = [
@@ -469,7 +469,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             return true;
         }
 
-        $configOptions = unserialize($this->getConfigData('custgroup_amount_restrictions'));
+        $configOptions = $this->dataHelper->unserialize($this->getConfigData('custgroup_amount_restrictions'));
         if (! is_array($configOptions) || empty($configOptions)) {
             return true;
         }

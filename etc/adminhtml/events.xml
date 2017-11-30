@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -22,7 +22,7 @@
     <event name="checkout_submit_all_after">
         <observer name="payzen_backend_payment_redirect" instance="Lyranetwork\Payzen\Observer\BackendPaymentRedirectObserver"/>
     </event>
-    
+
     <event name="controller_front_send_response_before">
         <observer name="payzen_backend_payment_perform_redirect" instance="Lyranetwork\Payzen\Observer\BackendPaymentPerformRedirectObserver"/>
     </event>

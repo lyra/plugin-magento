@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -29,8 +29,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const METHOD_MULTI = 'payzen_multi';
 
     const METHOD_GIFT = 'payzen_gift';
-
-    const METHOD_COF3XCB = 'payzen_cof3xcb';
 
     const METHOD_ONEY = 'payzen_oney';
 
@@ -170,8 +168,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get the complete payment return URL.
      *
-     * @param int $storeId
-     *            the ID of the store
+     * @param int $storeId the ID of the store
      * @return string
      */
     public function getReturnUrl($storeId = null)
@@ -236,6 +233,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Return store obeject by ID.
      *
+     * @param int $storeId
      * @return \Magento\Store\Model\Store
      */
     public function getStore($storeId)
@@ -267,6 +265,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Return true file exists.
      *
+     * @param string $file
+     * @param bool $onlyFile
      * @return bool
      */
     public function fileExists($file, $onlyFile = true)
@@ -277,6 +277,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check if image file is uploaded to media directory.
      *
+     * @param string $fileName
      * @return string
      */
     public function isUploadFileImageExists($fileName)
@@ -288,6 +289,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check if image file is published to pub/static directory.
      *
+     * @param string $fileName
      * @return string
      */
     public function isPublishFileImageExists($fileName)
@@ -299,7 +301,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Returns a configuration parameter from XML files.
      *
-     * @param string $group
+     * @param string $path
      * @return string
      */
     public function getGroupTitle($path)
@@ -366,12 +368,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Unserialize data using JSON or PHP unserialize function if error.
+     *
+     * @param string $string
+     * @return mixed
+     */
+    public function unserialize($string)
+    {
+        $result = json_decode($string, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Magento 2.1.x : try PHP serialization
+            $result = @unserialize($string);
+        }
+
+        return $result;
+    }
+
+    /**
      * Log function.
      *
-     * @param
-     *            $message
-     * @param
-     *            $level
+     * @param string $message
+     * @param string $level
      */
     public function log($message, $level = \Psr\Log\LogLevel::INFO)
     {
@@ -382,7 +400,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $currentMethod = $this->getCallerMethod();
 
         $log = '';
-        $log .= 'PayZen 2.1.2';
+        $log .= 'PayZen 2.1.3';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

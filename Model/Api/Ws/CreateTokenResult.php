@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -41,7 +41,7 @@ class CreateTokenResult
     private $cardResponse = null;
 
     /**
-     * @var AuthenticationResultData $authorizationResponse
+     * @var AuthorizationResponse $authorizationResponse
      */
     private $authorizationResponse = null;
 
@@ -158,7 +158,7 @@ class CreateTokenResult
     }
 
     /**
-     * @return AuthenticationResultData
+     * @return AuthorizationResponse
      */
     public function getAuthorizationResponse()
     {
@@ -166,7 +166,7 @@ class CreateTokenResult
     }
 
     /**
-     * @param AuthenticationResultData $authorizationResponse
+     * @param AuthorizationResponse $authorizationResponse
      * @return CreateTokenResult
      */
     public function setAuthorizationResponse($authorizationResponse)
@@ -212,7 +212,7 @@ class CreateTokenResult
     }
 
     /**
-     * @return markResponse
+     * @return MarkResponse
      */
     public function getMarkResponse()
     {
@@ -220,7 +220,7 @@ class CreateTokenResult
     }
 
     /**
-     * @param markResponse $markResponse
+     * @param MarkResponse $markResponse
      * @return CreateTokenResult
      */
     public function setMarkResponse($markResponse)
@@ -284,7 +284,7 @@ class CreateTokenResult
     }
 
     /**
-     * @return fraudManagementResponse
+     * @return FraudManagementResponse
      */
     public function getFraudManagementResponse()
     {
@@ -292,7 +292,7 @@ class CreateTokenResult
     }
 
     /**
-     * @param fraudManagementResponse $fraudManagementResponse
+     * @param FraudManagementResponse $fraudManagementResponse
      * @return CreateTokenResult
      */
     public function setFraudManagementResponse($fraudManagementResponse)

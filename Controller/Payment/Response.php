@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -40,9 +40,9 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
 
     /**
      *
-     * @var \Lyranetwork\Payzen\Controller\Result\RedirectFactory
+     * @var \Magento\Framework\View\Result\PageFactory
      */
-    protected $payzenRedirectFactory;
+    protected $resultPageFactory;
 
     /**
      *
@@ -50,19 +50,19 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
-     * @param \Lyranetwork\Payzen\Controller\Result\RedirectFactory $payzenRedirectFactory
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor,
-        \Lyranetwork\Payzen\Controller\Result\RedirectFactory $payzenRedirectFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         $this->dataHelper = $dataHelper;
         $this->quoteRepository = $quoteRepository;
         $this->responseProcessor = $responseProcessor;
-        $this->payzenRedirectFactory = $payzenRedirectFactory;
+        $this->resultPageFactory = $resultPageFactory;
 
         parent::__construct($context);
     }
@@ -86,22 +86,8 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
             ->setLastQuoteId($order->getQuoteId())
             ->setLastOrderId($order->getId());
 
-        $this->dataHelper->log('Redirecting to one page checkout failure page.');
-
-        /**
-         *
-         * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
-         */
-        $resultRedirect = $this->payzenRedirectFactory->create();
-        $resultRedirect->setIframe($this->getRequest()->getParam('iframe', false));
-        $resultRedirect->setPath(
-            'checkout/onepage/failure',
-            [
-                '_scope' => $order->getStore()->getId()
-            ]
-        );
-
-        return $resultRedirect;
+        $this->dataHelper->log("Redirecting to one page checkout failure page for order #{$order->getId()}.");
+        return $this->createResult('checkout/onepage/failure', ['_scope' => $order->getStore()->getId()]);
     }
 
     /**
@@ -144,14 +130,6 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
             }
         }
 
-        /**
-         *
-         * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
-         */
-        $resultRedirect = $this->payzenRedirectFactory->create();
-        $resultRedirect->setIframe($this->getRequest()
-            ->getParam('iframe', false));
-
         if ($success) {
             $checkout->setLastQuoteId($order->getQuoteId())
                 ->setLastSuccessQuoteId($order->getQuoteId())
@@ -159,10 +137,8 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
                 ->setLastRealOrderId($order->getIncrementId())
                 ->setLastOrderStatus($order->getStatus());
 
-            $this->dataHelper->log('Redirecting to one page checkout success page.');
-            $resultRedirect->setPath('checkout/onepage/success', [
-                '_scope' => $storeId
-            ]);
+            $this->dataHelper->log("Redirecting to one page checkout success page for order #{$order->getId()}.");
+            $resultRedirect = $this->createResult('checkout/onepage/success', ['_scope' => $storeId]);
         } else {
             $this->messageManager->addWarning(__('Checkout and order have been canceled.'));
 
@@ -175,12 +151,33 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
                 $checkout->replaceQuote($quote);
             }
 
-            $this->dataHelper->log('Redirecting to cart page.');
-            $resultRedirect->setPath('checkout/cart', [
-                '_scope' => $storeId
-            ]);
+            $this->dataHelper->log("Redirecting to cart page for order #{$order->getId()}.");
+            $resultRedirect = $this->createResult('checkout/cart', ['_scope' => $storeId]);
         }
 
         return $resultRedirect;
+    }
+
+    private function createResult($path, $params)
+    {
+        if ($this->getRequest()->getParam('iframe', false)) {
+            $result = $this->resultPageFactory->create();
+
+            $block = $result->getLayout()
+                ->createBlock(\Lyranetwork\Payzen\Block\Payment\Iframe\Response::class)
+                ->setTemplate('Lyranetwork_Payzen::payment/iframe/response.phtml')
+                ->setForwardPath($path, $params);
+
+            $this->getResponse()->setBody($block->toHtml());
+            return null;
+        } else {
+            /**
+             *
+             * @var \Magento\Framework\Controller\Result\Redirect $result
+             */
+            $result = $this->resultRedirectFactory->create();
+            $result->setPath($path, $params);
+            return $result;
+        }
     }
 }

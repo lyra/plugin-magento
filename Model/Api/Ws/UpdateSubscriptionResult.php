@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -41,7 +41,7 @@ class UpdateSubscriptionResult
     private $cardResponse = null;
 
     /**
-     * @var AuthenticationResultData $authorizationResponse
+     * @var AuthorizationResponse $authorizationResponse
      */
     private $authorizationResponse = null;
 
@@ -153,7 +153,7 @@ class UpdateSubscriptionResult
     }
 
     /**
-     * @return AuthenticationResultData
+     * @return AuthorizationResponse
      */
     public function getAuthorizationResponse()
     {
@@ -161,7 +161,7 @@ class UpdateSubscriptionResult
     }
 
     /**
-     * @param AuthenticationResultData $authorizationResponse
+     * @param AuthorizationResponse $authorizationResponse
      * @return UpdateSubscriptionResult
      */
     public function setAuthorizationResponse($authorizationResponse)
@@ -207,7 +207,7 @@ class UpdateSubscriptionResult
     }
 
     /**
-     * @return markResponse
+     * @return MarkResponse
      */
     public function getMarkResponse()
     {
@@ -215,7 +215,7 @@ class UpdateSubscriptionResult
     }
 
     /**
-     * @param markResponse $markResponse
+     * @param MarkResponse $markResponse
      * @return UpdateSubscriptionResult
      */
     public function setMarkResponse($markResponse)
@@ -279,7 +279,7 @@ class UpdateSubscriptionResult
     }
 
     /**
-     * @return fraudManagementResponse
+     * @return FraudManagementResponse
      */
     public function getFraudManagementResponse()
     {
@@ -287,7 +287,7 @@ class UpdateSubscriptionResult
     }
 
     /**
-     * @param fraudManagementResponse $fraudManagementResponse
+     * @param FraudManagementResponse $fraudManagementResponse
      * @return UpdateSubscriptionResult
      */
     public function setFraudManagementResponse($fraudManagementResponse)

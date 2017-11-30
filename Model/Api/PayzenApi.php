@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -24,6 +24,11 @@ if (! class_exists('PayzenApi', false)) {
      */
     class PayzenApi
     {
+
+        const ALGO_SHA1 = 'SHA-1';
+        const ALGO_SHA256 = 'SHA-256';
+
+        public static $SUPPORTED_ALGOS = array(self::ALGO_SHA1, self::ALGO_SHA256);
 
         /**
          * The list of encodings supported by the API.
@@ -236,10 +241,11 @@ if (! class_exists('PayzenApi', false)) {
          *
          * @param array[string][string] $parameters payment platform request/response parameters
          * @param string $key shop certificate
+         * @param string $algo signature algorithm
          * @param boolean $hashed set to false to get the unhashed signature
          * @return string
          */
-        public static function sign($parameters, $key, $hashed = true)
+        public static function sign($parameters, $key, $algo, $hashed = true)
         {
             ksort($parameters);
 
@@ -251,7 +257,19 @@ if (! class_exists('PayzenApi', false)) {
             }
 
             $sign .= $key;
-            return $hashed ? sha1($sign) : $sign;
+
+            if (! $hashed) {
+                return $sign;
+            }
+
+            switch ($algo) {
+                case self::ALGO_SHA1:
+                    return sha1($sign);
+                case self::ALGO_SHA256:
+                    return base64_encode(hash_hmac('sha256', $sign, $key, true));
+                default:
+                    throw new \InvalidArgumentException("Unsupported algorithm passed : {$algo}.");
+            }
         }
 
         /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -83,7 +83,7 @@ class Redirect extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
             $order = $this->orderRepository->get($id);
         } catch (\Exception $e) {
             $this->dataHelper->log("No order to pay. It may be a direct access to redirection page."
-                . " [IP = {$this->dataHelper->getIpAddress()}].");
+                . " [Order = {$id}] [IP = {$this->dataHelper->getIpAddress()}].");
             throw new OrderException('Order not found in session.');
         }
 
@@ -115,7 +115,7 @@ class Redirect extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
         $this->messageManager->getMessages(true);
         $this->messageManager->addError($msg);
 
-        $this->dataHelper->log('Redirecting to backend create order page.');
+        $this->dataHelper->log($msg . ' Redirecting to backend create order page.');
 
         /**
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect

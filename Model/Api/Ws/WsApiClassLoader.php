@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -20,6 +20,11 @@ namespace Lyranetwork\Payzen\Model\Api\Ws;
 
 class WsApiClassLoader
 {
+    private function __construct()
+    {
+        // do not instantiate this class
+    }
+
     /**
      * Registers self::loadClass method as an autoloader.
      *
@@ -50,8 +55,8 @@ class WsApiClassLoader
         }
 
         $file = __DIR__ . DIRECTORY_SEPARATOR . substr($class, $pos + 1) . '.php';
-        if (is_file($file)) {
+        if (is_file($file) && ($file !== __FILE__)) {
             include_once $file;
-        };
+        }
     }
 }

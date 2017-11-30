@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -69,7 +69,7 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
         $this->messageManager->getMessages(true);
         $this->messageManager->addError(__('An error has occured during the payment process.'));
 
-        $this->dataHelper->log('Redirecting to order creation page.');
+        $this->dataHelper->log("Redirecting to order creation page for order #{$order->getId()}.");
 
         /**
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
@@ -115,6 +115,7 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
                     $message .= '<br /><br />';
                     $message .= __('For understanding the problem, please read the documentation of the module : <br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;To read carefully before going further&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;Notification URL settings&raquo;');
                 }
+
                 $this->messageManager->addError($message);
             }
         }
@@ -127,7 +128,7 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
             $this->messageManager->addWarning(__('Checkout and order have been canceled.'));
         }
 
-        $this->dataHelper->log('Redirecting to order view or order index page.');
+        $this->dataHelper->log("Redirecting to order view or order index page for order #{$order->getId()}.");
 
         /**
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect

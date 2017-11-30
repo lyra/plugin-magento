@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -48,32 +48,23 @@ class Redirect extends \Magento\Framework\App\Action\Action implements \Lyranetw
 
     /**
      *
-     * @var \Lyranetwork\Payzen\Controller\Result\RedirectFactory
-     */
-    protected $payzenRedirectFactory;
-
-    /**
-     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Lyranetwork\Payzen\Controller\Result\RedirectFactory $payzenRedirectFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Lyranetwork\Payzen\Controller\Result\RedirectFactory $payzenRedirectFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         $this->orderFactory = $orderFactory;
         $this->dataHelper = $dataHelper;
         $this->redirectProcessor = $redirectProcessor;
         $this->resultPageFactory = $resultPageFactory;
-        $this->payzenRedirectFactory = $payzenRedirectFactory;
 
         parent::__construct($context);
     }
@@ -136,14 +127,23 @@ class Redirect extends \Magento\Framework\App\Action\Action implements \Lyranetw
     {
         // clear all messages in session
         $this->messageManager->getMessages(true);
-        $this->dataHelper->log('Redirecting to cart page.');
+        $this->dataHelper->log($msg . ' Redirecting to cart page.');
 
-        $resultRedirect = $this->payzenRedirectFactory->create();
-        $resultRedirect->setIframe($this->getRequest()
-            ->getParam('iframe', false));
-        $resultRedirect->setPath('checkout/cart');
+        if ($this->getRequest()->getParam('iframe', false)) {
+            $result = $this->resultPageFactory->create();
 
-        return $resultRedirect;
+            $block = $result->getLayout()
+                ->createBlock(\Lyranetwork\Payzen\Block\Payment\Iframe\Response::class)
+                ->setTemplate('Lyranetwork_Payzen::payment/iframe/response.phtml')
+                ->setForwardPath('checkout/cart');
+
+            $this->getResponse()->setBody($block->toHtml());
+            return null;
+        } else {
+            $result = $this->resultRedirectFactory->create();
+            $result->setPath('checkout/cart');
+            return $result;
+        }
     }
 
     /**
@@ -157,9 +157,7 @@ class Redirect extends \Magento\Framework\App\Action\Action implements \Lyranetw
             $resultPage->addHandle('payzen_payment_iframe_redirect');
         } else {
             $resultPage->addHandle('payzen_payment_form_redirect');
-            $resultPage->getConfig()
-                ->getTitle()
-                ->set(__('Payment platform redirection'));
+            $resultPage->getConfig()->getTitle()->set(__('Payment platform redirection'));
         }
 
         return $resultPage;
