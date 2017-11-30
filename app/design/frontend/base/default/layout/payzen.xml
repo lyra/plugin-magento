@@ -9,7 +9,10 @@
 
     <checkout_onepage_review>
         <reference name="checkout.onepage.review.info.items.before">
-            <block type="payzen/iframe" name="payzen_iframe_before" template="payzen/iframe.phtml" />
+            <block type="payzen/review" name="payzen_review_before">
+                <action method="setIframeTemplate"><value>payzen/iframe.phtml</value></action>
+                <action method="chooseTemplate" />
+            </block>
         </reference>
     </checkout_onepage_review>
 

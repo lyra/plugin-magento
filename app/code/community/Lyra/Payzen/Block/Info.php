@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
@@ -32,13 +32,12 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
 
         $html = '';
 
-        $frontInfos = array('Transaction Type', 'Amount', 'Transaction ID', 'Payment Mean',
-            'Credit Card Number', '3-DS Certificate');
+        $frontInfos = array('Transaction Type', 'Amount', 'Transaction ID', 'Payment Mean', '3-DS Authentication');
 
         foreach ($collection as $item) {
             $html .= '<hr />';
 
-            if (!$front) {
+            if (! $front) {
                 $html .= Mage::helper('payzen')->__('Sequence Number') . ' : '
                     . substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
                 $html .= '<br />';
@@ -46,11 +45,11 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
 
             $info = $item->getAdditionalInformation('raw_details_info');
             foreach ($info as $key => $value) {
-                if (!$value) {
+                if (! $value) {
                     continue;
                 }
 
-                if ($front && !in_array($key, $frontInfos)) {
+                if ($front && ! in_array($key, $frontInfos)) {
                     continue;
                 }
 
@@ -67,10 +66,10 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
         $allResults = @unserialize($this->getInfo()->getAdditionalInformation(Lyra_Payzen_Helper_Payment::ALL_RESULTS));
 
         // backward compatibility
-        if (!is_array($allResults) || empty($allResults)) {
+        if (! is_array($allResults) || empty($allResults)) {
             $allResults = @unserialize($this->getInfo()->getCcStatusDescription());
 
-            if (!is_array($allResults) || empty($allResults)) {
+            if (! is_array($allResults) || empty($allResults)) {
                 // description is stored as litteral string
                 return $this->getInfo()->getCcStatusDescription();
             }
@@ -84,7 +83,7 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
         $labels = array();
         foreach ($keys as $key) {
             $label = $this->translate($allResults[$key], $key, true);
-            if (!$label) {
+            if (! $label) {
                 continue;
             }
 

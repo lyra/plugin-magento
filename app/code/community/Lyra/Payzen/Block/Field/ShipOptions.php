@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 /**
@@ -111,7 +111,7 @@ class Lyra_Payzen_Block_Field_ShipOptions extends Mage_Adminhtml_Block_System_Co
         $methods = $this->_getAllShippingMethods();
 
         $savedMethods = $this->getElement()->getValue();
-        if ($savedMethods && is_array($savedMethods) && !empty($savedMethods)) {
+        if ($savedMethods && is_array($savedMethods) && ! empty($savedMethods)) {
             foreach ($savedMethods as $id => $method) {
                 if (key_exists($method['code'], $methods)) {
                     // add methods current title
@@ -124,7 +124,7 @@ class Lyra_Payzen_Block_Field_ShipOptions extends Mage_Adminhtml_Block_System_Co
         }
 
         // add not saved yet methods
-        if ($methods && is_array($methods) && !empty($methods)) {
+        if ($methods && is_array($methods) && ! empty($methods)) {
             foreach ($methods as $code => $name) {
                 $value[uniqid('_' . $code . '_')] = array(
                         'code' => $code,
@@ -159,13 +159,13 @@ class Lyra_Payzen_Block_Field_ShipOptions extends Mage_Adminhtml_Block_System_Co
             $carrierModel->setStore($store);
 
             // filter carriers to get active ones on current scope
-            if (!$carrierModel->isActive()) {
+            if (! $carrierModel->isActive()) {
                 continue;
             }
 
             try {
                 $carrierMethods = $carrierModel->getAllowedMethods();
-                if (!$carrierMethods) {
+                if (! $carrierMethods) {
                     continue;
                 }
 
@@ -174,7 +174,7 @@ class Lyra_Payzen_Block_Field_ShipOptions extends Mage_Adminhtml_Block_System_Co
                     $code = $carrierCode . '_' . $methodCode;
 
                     $title = '[' . $carrierCode . '] ';
-                    if (is_string($methodTitle) && !empty($methodTitle)) {
+                    if (is_string($methodTitle) && ! empty($methodTitle)) {
                         $title .= $methodTitle;
                     } else { // non standard method title
                         $title .= $methodCode;

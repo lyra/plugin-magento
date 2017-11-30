@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 abstract class Lyra_Payzen_Block_Abstract extends Mage_Payment_Block_Form
@@ -26,7 +26,7 @@ abstract class Lyra_Payzen_Block_Abstract extends Mage_Payment_Block_Form
 
         $logoURL = $this->_checkAndGetSkinUrl($this->getConfigData('module_logo'));
 
-        if (!Mage::helper('payzen')->isAdmin() && $logoURL) {
+        if (! Mage::helper('payzen')->isAdmin() && $logoURL) {
             $logo = Mage::getConfig()->getBlockClassName('core/template');
             $logo = new $logo;
             $logo->setTemplate('payzen/logo.phtml');
@@ -40,12 +40,12 @@ abstract class Lyra_Payzen_Block_Abstract extends Mage_Payment_Block_Form
 
     protected function _checkAndGetSkinUrl($fileName)
     {
-        if (!$fileName) {
+        if (! $fileName) {
             return false;
         }
 
         $filePath = Mage::getBaseDir('media') . DS . 'payzen' . DS . 'logos' . DS . $fileName;
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return false;
         }
 

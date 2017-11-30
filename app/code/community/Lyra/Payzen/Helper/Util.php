@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
@@ -56,7 +56,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $customer = Mage::getModel('customer/customer');
         $customer->setData($args['row']);
 
-        if (!preg_match(self::CUST_ID_REGEX, $customer->getId())) {
+        if (! preg_match(self::CUST_ID_REGEX, $customer->getId())) {
             // a customer id doesn't match PayZen rules
 
             $msg = '';
@@ -101,7 +101,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     protected function _checkOrderId($orderId)
     {
-        if (!preg_match(self::ORDER_ID_REGEX, $orderId)) {
+        if (! preg_match(self::ORDER_ID_REGEX, $orderId)) {
             // the potential next order id doesn't match PayZen rules
 
             $msg = '';
@@ -139,7 +139,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $product = Mage::getModel('catalog/product');
         $product->setData($args['row']);
 
-        if (!preg_match(self::PRODUCT_REF_REGEX, $product->getId())) {
+        if (! preg_match(self::PRODUCT_REF_REGEX, $product->getId())) {
             // product id doesn't match PayZen rules
 
             $msg = '';
@@ -175,7 +175,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
         $shippingMapping = unserialize($this->_getHelper()->getCommonConfigData('ship_options'));
 
-        if (is_array($shippingMapping) && !empty($shippingMapping)) {
+        if (is_array($shippingMapping) && ! empty($shippingMapping)) {
             foreach ($shippingMapping as $id => $shippingMethod) {
                 if ($shippingMethod['code'] === $methodCode) {
                     return $shippingMethod;
@@ -196,7 +196,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
         $categoryMapping = unserialize($this->_getHelper()->getCommonConfigData('category_mapping'));
 
-        if (is_array($categoryMapping) && !empty($categoryMapping) && is_array($categoryIds) && !empty($categoryIds)) {
+        if (is_array($categoryMapping) && ! empty($categoryMapping) && is_array($categoryIds) && ! empty($categoryIds)) {
             foreach ($categoryMapping as $id => $aCategory) {
                 if (in_array($aCategory['code'], $categoryIds)) {
                     return $aCategory['payzen_category'];
@@ -226,9 +226,9 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         // load all products in the shopping cart
         foreach ($order->getAllItems() as $item) {
             // check to avoid sending the whole hierarchy of a configurable product
-            if (!$item->getParentItem()) {
+            if (! $item->getParentItem()) {
                 $product = $item->getProduct();
-                if (!$product) {
+                if (! $product) {
                     // load product instance
                     $product = Mage::getModel('catalog/product')->load($item->getProductId());
                 }
@@ -237,7 +237,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
                 // concat product label with one or two of its category names to make it clearer
                 $categoryIds = $product->getCategoryIds();
-                if (is_array($categoryIds) && !empty($categoryIds)) {
+                if (is_array($categoryIds) && ! empty($categoryIds)) {
                     if (isset($categoryIds[1]) && $categoryIds[1]) {
                         $category = Mage::getModel('catalog/category')->load($categoryIds[1]);
                         $label = $category->getName() . ' I ' . $label;
@@ -285,7 +285,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
         $notAllowedCharsRegex = "#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]#ui";
 
-        if ($order->getIsVirtual() || !$order->getShippingMethod()) { // there is no shipping method
+        if ($order->getIsVirtual() || ! $order->getShippingMethod()) { // there is no shipping method
             // set store name after illegal characters replacement
             $payzenRequest->set(
                 'ship_to_delivery_company_name',
@@ -387,7 +387,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     public function checkAddressValidity($address)
     {
-        if (!$address) {
+        if (! $address) {
             return;
         }
 
@@ -408,33 +408,33 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         // address type
         $addressType = ($address->getAddressType() === 'billing') ? 'billing address' : 'delivery address';
 
-        if (!$address->getLastname()) {
+        if (! $address->getLastname()) {
             $this->_throwException($emptyMsg, 'Last Name', $addressType);
-        } elseif (!preg_match($nameRegex, $address->getLastname())) {
+        } elseif (! preg_match($nameRegex, $address->getLastname())) {
             $this->_throwException($invalidMsg, 'Last Name', $addressType);
-        } elseif (!$address->getFirstname()) {
+        } elseif (! $address->getFirstname()) {
             $this->_throwException($emptyMsg, 'First Name', $addressType);
-        } elseif (!preg_match($nameRegex, $address->getFirstname())) {
+        } elseif (! preg_match($nameRegex, $address->getFirstname())) {
             $this->_throwException($invalidMsg, 'First Name', $addressType);
-        } elseif ($address->getTelephone() && !preg_match($phoneRegex, $address->getTelephone())) {
+        } elseif ($address->getTelephone() && ! preg_match($phoneRegex, $address->getTelephone())) {
             $this->_throwException($invalidMsg, 'Telephone', $addressType);
-        } elseif (!$address->getStreet(1)) {
+        } elseif (! $address->getStreet(1)) {
             $this->_throwException($emptyMsg, 'Address', $addressType);
-        } elseif (!preg_match($streetRegex, $address->getStreet(1))) {
+        } elseif (! preg_match($streetRegex, $address->getStreet(1))) {
             $this->_throwException($invalidMsg, 'Address', $addressType);
-        } elseif ($address->getStreet(2) && !preg_match($streetRegex, $address->getStreet(2))) {
+        } elseif ($address->getStreet(2) && ! preg_match($streetRegex, $address->getStreet(2))) {
             $this->_throwException($invalidMsg, 'Address', $addressType);
-        } elseif (!$address->getPostcode()) {
+        } elseif (! $address->getPostcode()) {
             $this->_throwException($emptyMsg, 'Postcode', $addressType);
-        } elseif (!preg_match($zipRegex, $address->getPostcode())) {
+        } elseif (! preg_match($zipRegex, $address->getPostcode())) {
             $this->_throwException($invalidMsg, 'Postcode', $addressType);
-        } elseif (!$address->getCity()) {
+        } elseif (! $address->getCity()) {
             $this->_throwException($emptyMsg, 'City', $addressType);
-        } elseif (!preg_match($cityRegex, $address->getCity())) {
+        } elseif (! preg_match($cityRegex, $address->getCity())) {
             $this->_throwException($invalidMsg, 'City', $addressType);
-        } elseif (!$address->getCountryId()) {
+        } elseif (! $address->getCountryId()) {
             $this->_throwException($emptyMsg, 'Country', $addressType);
-        } elseif (!preg_match($countryRegex, $address->getCountryId())) {
+        } elseif (! preg_match($countryRegex, $address->getCountryId())) {
             $this->_throwException($invalidMsg, 'Country', $addressType);
         }
     }

@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
@@ -65,12 +65,12 @@ if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
         private $redirectEnabled;
 
         /**
-         * SHA-1 authentication signature.
+         * Algo used to sign forms.
          *
          * @var string
          * @access private
          */
-        private $signature;
+        private $algo = Lyra_Payzen_Model_Api_Api::ALGO_SHA1;
 
         /**
          * The original data encoding.
@@ -329,6 +329,8 @@ if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
                 return $this->setPlatformUrl($value);
             } elseif ($name == 'vads_redirect_enabled') {
                 return $this->setRedirectEnabled($value);
+            } elseif ($name == 'vads_sign_algo') {
+                return $this->setSignAlgo($value);
             } elseif (key_exists($name, $this->requestParameters)) {
                 return $this->requestParameters[$name]->setValue($value);
             } else {
@@ -357,7 +359,6 @@ if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
                 // check parameters
                 if (is_numeric($total_in_cents) && $total_in_cents > $first_in_cents
                     && $total_in_cents > 0 && is_numeric($first_in_cents) && $first_in_cents > 0) {
-
                     // set value to payment_config
                     $payment_config = 'MULTI:first=' . $first_in_cents . ';count=' . $count . ';period=' . $period;
                     $result &= $this->set('amount', $total_in_cents);
@@ -387,8 +388,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
         /**
          * Enable/disable vads_redirect_* parameters.
          *
-         * @param mixed $enabled
-         *            false, 0, null, negative integer or 'false' to disable
+         * @param mixed $enabled false, 0, null, negative integer or 'false' to disable
          * @return boolean
          */
         public function setRedirectEnabled($enabled)
@@ -415,6 +415,22 @@ if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
             }
 
             return true;
+        }
+
+        /**
+         * Set signature algorithm.
+         *
+         * @param string $algo
+         * @return boolean
+         */
+        public function setSignAlgo($algo)
+        {
+            if (in_array($algo, Lyra_Payzen_Model_Api_Api::$SUPPORTED_ALGOS)) {
+                $this->algo = $algo;
+                return true;
+            }
+
+            return false;
         }
 
         /**
@@ -462,7 +478,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
          *
          * @return string|boolean
          */
-        public function getCertificate()
+        private function getCertificate()
         {
             switch ($this->requestParameters['vads_ctx_mode']->getValue()) {
                 case 'TEST':
@@ -479,23 +495,18 @@ if (! class_exists('Lyra_Payzen_Model_Api_Request', false)) {
         /**
          * Generate signature from a list of Lyra_Payzen_Model_Api_Field.
          *
-         * @param array[string][Lyra_Payzen_Model_Api_Field] $fields
+         * @param array[string][Lyra_Payzen_Model_Api_Field] $fields already filtered fields list
+         * @param bool $hashed
          * @return string
          */
-        private function generateSignature($fields = null, $hashed = true)
+        private function generateSignature($fields, $hashed = true)
         {
-            if (! is_array($fields)) {
-                $fields = $this->requestParameters;
-            }
-
             $params = array();
             foreach ($fields as $field) {
-                if ($field->isRequired() || $field->isFilled()) {
-                    $params[$field->getName()] = $field->getValue();
-                }
+                $params[$field->getName()] = $field->getValue();
             }
 
-            return Lyra_Payzen_Model_Api_Api::sign($params, $this->getCertificate(), $hashed);
+            return Lyra_Payzen_Model_Api_Api::sign($params, $this->getCertificate(), $this->algo, $hashed);
         }
 
         /**

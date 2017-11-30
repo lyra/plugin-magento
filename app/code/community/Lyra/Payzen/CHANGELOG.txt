@@ -1,3 +1,24 @@
+1.8.0, 2017-09-25:
+- Bug fix: correct simulated FacilyPay Oney funding fees calculation.
+- Bug fix: correctly translate risk assessment results.
+- Bug fix: fix shipping amount displayed in 1-Click shipping widget.
+- Bug fix: restore delivery fees when canceling payment.
+- Improve some text translations.
+- Save both effective and converted amounts in Magento transaction details.
+- Consider Magento SUPEE-9767 security patch relative to upload fields.
+- Hide masked card number in frontend order details.
+- Add a confirmation message before module configuration reset.
+- Add V PAY card type.
+- Disable Internet banking and redirection methods for backend orders.
+- Display masked card number to identify card to be used in 1-Click payment.
+- Set vads_action_mode to "IFRAME" when iframe mode is enabled (no longer use vads_theme_config).
+- Only display payment cards that allow manual payment for backend payment.
+- Add help link on CVV field.
+- Display card brand user choice if any in backend order details.
+- Restrict payment sub-modules to specific currencies.
+- Remove obsolete 3x CB Cofinoga payment mean.
+- Empty cart after a successful payment when 3 steps checkout module is used.
+
 1.7.1, 2017-04-03:
 - Bug fix: relative to category and product loading when generating HTML form.
 

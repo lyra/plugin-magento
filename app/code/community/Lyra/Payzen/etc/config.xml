@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 -->
 
@@ -22,7 +22,7 @@
     <!-- version -->
     <modules>
         <Lyra_Payzen>
-            <version>1.7.1</version>
+            <version>1.8.0</version>
         </Lyra_Payzen>
     </modules>
 
@@ -93,6 +93,18 @@
                         <name>PRODUCTION</name>
                     </production>
                 </ctx_modes>
+
+                <!-- signature algo values -->
+                <sign_algos>
+                    <sha1>
+                        <code>SHA-1</code>
+                        <name>SHA-1</name>
+                    </sha1>
+                    <sha256>
+                        <code>SHA-256</code>
+                        <name>SHA-256</name>
+                    </sha256>
+                </sign_algos>
 
                 <!-- validation mode values -->
                 <validation_modes>
@@ -303,25 +315,6 @@
                     </payzen_payment_multi_update>
                 </observers>
             </sales_order_payment_save_before>
-
-            <core_block_abstract_to_html_before>
-                <observers>
-                    <payzen_oneclick_quote_process>
-                        <type>singleton</type>
-                        <class>payzen/observer</class>
-                        <method>doOneclickQuoteProcess</method>
-                    </payzen_oneclick_quote_process>
-                </observers>
-            </core_block_abstract_to_html_before>
-
-            <customer_logout>
-                <observers>
-                    <payzen_oneclick_unset_quote>
-                        <class>payzen/observer</class>
-                        <method>doOneclickUnsetQuote</method>
-                    </payzen_oneclick_unset_quote>
-                </observers>
-            </customer_logout>
         </events>
 
         <payment>
@@ -421,6 +414,26 @@
                 </Lyra_Payzen>
             </modules>
         </translate>
+        <events>
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <payzen_oneclick_quote_process>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doOneclickQuoteProcess</method>
+                    </payzen_oneclick_quote_process>
+                </observers>
+            </core_block_abstract_to_html_before>
+
+            <customer_logout>
+                <observers>
+                    <payzen_oneclick_unset_quote>
+                        <class>payzen/observer</class>
+                        <method>doOneclickUnsetQuote</method>
+                    </payzen_oneclick_unset_quote>
+                </observers>
+            </customer_logout>
+        </events>
     </frontend>
 
     <admin>
@@ -441,7 +454,7 @@
             <payzen>
                 <developed_by>Lyra Network</developed_by>
                 <contact_email>support@payzen.eu</contact_email>
-                <module_version>1.7.1</module_version>
+                <module_version>1.8.0</module_version>
                 <gateway_version>V2</gateway_version>
                 <enable_logs>1</enable_logs>
                 <title>PayZen</title>
@@ -450,6 +463,7 @@
                 <key_test>1111111111111111</key_test>
                 <key_prod>2222222222222222</key_prod>
                 <ctx_mode>TEST</ctx_mode>
+                <sign_algo>SHA-1</sign_algo>
                 <platform_url>https://secure.payzen.eu/vads-payment/</platform_url>
 
                 <language>fr</language>
@@ -522,19 +536,7 @@
                 <validation_mode>-1</validation_mode>
             </payzen_gift>
 
-            <payzen_cof3xcb>
-                <model>payzen/payment_cof3xcb</model>
-                <group>payzen</group>
-
-                <active>0</active>
-                <allowspecific>0</allowspecific>
-                <title>Cofinoga 3 fois CB</title>
-                <sort_order>4</sort_order>
-                <module_logo>cof3xcb.png</module_logo>
-                <payment_action>authorize</payment_action>
-
-                <validation_mode>-1</validation_mode>
-            </payzen_cof3xcb>
+            
 
             <payzen_oney>
                 <model>payzen/payment_oney</model>
@@ -543,7 +545,7 @@
                 <active>0</active>
                 <allowspecific>1</allowspecific>
                 <specificcountry>FR</specificcountry>
-                <title>FacilyPay Oney</title>
+                <title>Paiement FacilyPay Oney</title>
                 <sort_order>5</sort_order>
                 <module_logo>oney.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -573,7 +575,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title>Paiement Sofort Banking</title>
+                <title>Paiement SOFORT Banking</title>
                 <sort_order>7</sort_order>
                 <module_logo>sofort_banking.png</module_logo>
                 <payment_action>authorize</payment_action>

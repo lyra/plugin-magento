@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 /**
@@ -21,6 +21,8 @@
  */
 class Lyra_Payzen_Block_Field_CustgroupOptions extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
 {
+    protected $_default = array();
+
     public function __construct()
     {
         $this->addColumn(
@@ -66,11 +68,11 @@ class Lyra_Payzen_Block_Field_CustgroupOptions extends Mage_Adminhtml_Block_Syst
         $groups = $this->_getAllCustomerGroups();
 
         $savedGroups = $this->getElement()->getValue();
-        if (!is_array($savedGroups)) {
+        if (! is_array($savedGroups)) {
             $savedGroups = array();
         }
 
-        if (!empty($savedGroups)) {
+        if (! empty($savedGroups)) {
             foreach ($savedGroups as $id => $savedGroup) {
                 if (key_exists($savedGroup['code'], $groups)) {
                     // refresh group title
@@ -86,11 +88,14 @@ class Lyra_Payzen_Block_Field_CustgroupOptions extends Mage_Adminhtml_Block_Syst
 
         // add not saved yet groups
         foreach ($groups as $code => $title) {
+            $min = (($code === 'all') && isset($this->_default['amount_min'])) ? $this->_default['amount_min'] : '';
+            $max = (($code === 'all') && isset($this->_default['amount_max'])) ? $this->_default['amount_max'] : '';
+
             $group = array(
-                    'code' => $code,
-                    'title' => $title,
-                    'amount_min' => '',
-                    'amount_max' => ''
+                'code' => $code,
+                'title' => $title,
+                'amount_min' => $min,
+                'amount_max' => $max
             );
 
             if ($code === 'all') {

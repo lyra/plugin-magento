@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
@@ -60,7 +60,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getIpAddress()
     {
-        return Mage::helper('core/http')->getRemoteAddr(true);
+        return Mage::helper('core/http')->getRemoteAddr();
     }
 
     /**
@@ -186,13 +186,13 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function checkWsRequirements()
     {
-        if (!extension_loaded('soap')) {
+        if (! extension_loaded('soap')) {
             throw new Lyra_Payzen_Model_WsException(
                 'SOAP extension for PHP must be enabled on the server in order to use PayZen web services.'
             );
         }
 
-        if (!extension_loaded('openssl')) {
+        if (! extension_loaded('openssl')) {
             throw new Lyra_Payzen_Model_WsException(
                 'OPENSSL extension for PHP must be enabled on the server in order to use PayZen web services.'
             );
@@ -207,14 +207,14 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function log($message, $level = null)
     {
-        if (!$this->getCommonConfigData('enable_logs')) {
+        if (! $this->getCommonConfigData('enable_logs')) {
             return;
         }
 
         $currentMethod = $this->_getCallerMethod();
 
         $log  = '';
-        $log .= 'PayZen 1.7.1';
+        $log .= 'PayZen 1.8.0';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

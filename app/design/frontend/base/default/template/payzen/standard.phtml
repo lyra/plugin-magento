@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 $oneClickActive = $this->getConfigData('one_click_active'); // 1-Click enabled ?
@@ -91,6 +91,7 @@ if ($this->isLocalCcInfo()) : ?>
         <div class="input-box">
             <label class="required" for="payzen_standard_cc_cvv"><?php echo Mage::helper('payzen')->__('CVV'); ?><em>*</em></label><br/>
             <input class="input-text required-entry validate-payzen-standard-cc-cvv" autocomplete="off" maxlength="4" type="text" name="payment[payzen_standard_cc_cvv]" id="payzen_standard_cc_cvv" style="width: 60px;" />
+            <a href="#" class="cvv-what-is-this"><?php echo Mage::helper('payzen')->__('Help ?'); ?></a>
         </div>
     </li>
 
@@ -121,7 +122,7 @@ if ($this->isLocalCcInfo()) : ?>
         <!-- payment with registered card block -->
         <li class="payzen-standard-id-block">
             <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
-            <span><?php echo Mage::helper('payzen')->__('You will pay with your registered card. No data entry is needed.') ?></span>
+            <span><?php echo Mage::helper('payzen')->__('You will pay with your registered card %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
         </li>
 
         <li class="payzen-standard-id-block">
@@ -148,7 +149,7 @@ if ($this->isLocalCcInfo()) : ?>
     <!-- payment with registered card block -->
     <li class="payzen-standard-id-block">
         <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
-        <span><?php echo Mage::helper('payzen')->__('You will pay with your registered card. No data entry is needed.') ?></span>
+        <span><?php echo Mage::helper('payzen')->__('You will pay with your registered card %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
     </li>
 
     <li class="payzen-standard-id-block">
@@ -163,6 +164,7 @@ if ($this->isLocalCcInfo()) : ?>
 
 <script type="text/javascript">
 //<![CDATA[
+<?php if ($this->isLocalCcInfo()) : ?>
     Translator.add(
             'Incorrect credit card number.',
             '<?php echo addslashes(Mage::helper('payzen')->__('Incorrect credit card number.')) ?>'
@@ -195,13 +197,14 @@ if ($this->isLocalCcInfo()) : ?>
                 return /^\d{3,4}$/.test(v);
             }]
     ]);
+<?php endif; ?>
 
-    <?php if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
-        // display payment by identifier block when PayZen standard payment is selected
-        Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
-        Event.observe('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
+<?php if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
+    // display payment by identifier block when PayZen standard payment is selected
+    Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
+    Event.observe('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
 
-        payzenUpdatePaymentBlock.delay(0.2, 'id');
-    <?php endif;?>
+    payzenUpdatePaymentBlock.delay(0.2, 'id');
+<?php endif;?>
 //]]>
 </script>

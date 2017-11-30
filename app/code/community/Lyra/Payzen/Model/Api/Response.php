@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 if (! class_exists('Lyra_Payzen_Model_Api_Response', false)) {
@@ -43,6 +43,14 @@ if (! class_exists('Lyra_Payzen_Model_Api_Response', false)) {
          * @var string
          */
         private $certificate;
+
+        /**
+         * Algorithm used to check the signature.
+         *
+         * @see Lyra_Payzen_Model_Api_Api::sign
+         * @var string
+         */
+        private $algo = Lyra_Payzen_Model_Api_Api::ALGO_SHA1;
 
         /**
          * Value of vads_result.
@@ -87,12 +95,16 @@ if (! class_exists('Lyra_Payzen_Model_Api_Response', false)) {
          * @param string $ctx_mode
          * @param string $key_test
          * @param string $key_prod
-         * @param string $encoding
+         * @param string $algo
          */
-        public function __construct($params, $ctx_mode, $key_test, $key_prod)
+        public function __construct($params, $ctx_mode, $key_test, $key_prod, $algo = Lyra_Payzen_Model_Api_Api::ALGO_SHA1)
         {
             $this->rawResponse = Lyra_Payzen_Model_Api_Api::uncharm($params);
             $this->certificate = $ctx_mode == 'PRODUCTION' ? $key_prod : $key_test;
+
+            if (in_array($algo, Lyra_Payzen_Model_Api_Api::$SUPPORTED_ALGOS)) {
+                $this->algo = $algo;
+            }
 
             // payment results
             $this->result = self::findInArray('vads_result', $this->rawResponse, null);
@@ -119,7 +131,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Response', false)) {
          */
         public function getComputedSignature($hashed = true)
         {
-            return Lyra_Payzen_Model_Api_Api::sign($this->rawResponse, $this->certificate, $hashed);
+            return Lyra_Payzen_Model_Api_Api::sign($this->rawResponse, $this->certificate, $this->algo, $hashed);
         }
 
         /**

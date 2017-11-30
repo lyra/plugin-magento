@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Controller_Action
@@ -45,14 +45,13 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
     {
         $this->_getDataHelper()->log('Start =================================================');
 
-        $adminSession = Mage::getSingleton('adminhtml/session');
-        $adminSession->getMessages(true);
+        $this->getAdminSession()->getMessages(true);
 
         // retrieve order to validate
         $id = $this->getRequest()->getParam('order_id');
         $order = Mage::getModel('sales/order')->load($id);
-        if (!$order->getId()) {
-            $adminSession->addError($this->__('This order no longer exists.'));
+        if (! $order->getId()) {
+            $this->getAdminSession()->addError($this->__('This order no longer exists.'));
             $this->_redirect('*/*/');
             return;
         }
@@ -76,9 +75,9 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
     {
         // clear all messages from session
         $this->getCheckout()->getMessages(true);
-        Mage::getSingleton('adminhtml/session')->getMessages(true);
+        $this->getAdminSession()->getMessages(true);
 
-        Mage::getSingleton('adminhtml/session')->addError($this->__($msg));
+        $this->getAdminSession()->addError($this->__($msg));
 
         $this->_getDataHelper()->log($msg . ' Redirecting to create order page.');
         $this->_redirect('adminhtml/sales_order_create/index');
@@ -93,11 +92,9 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
     {
         // clear all messages from session
         $this->getCheckout()->getMessages(true);
-        Mage::getSingleton('adminhtml/session')->getMessages(true);
+        $this->getAdminSession()->getMessages(true);
 
-        Mage::getSingleton('adminhtml/session')->addError(
-            $this->__('An error has occured during the payment process.')
-        );
+        $this->getAdminSession()->addError($this->__('An error has occured during the payment process.'));
         $this->_redirect('adminhtml/sales_order_create/index');
     }
 
@@ -110,18 +107,16 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
      */
     public function redirectResponse($order, $success, $checkUrlWarn = false)
     {
-        $adminSession = Mage::getSingleton('adminhtml/session');
-
         // clear all messages in session
         $this->getCheckout()->getMessages(true);
-        $adminSession->getMessages(true);
+        $this->getAdminSession()->getMessages(true);
 
         $storeId = $order->getStore()->getId();
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
             // display going to production message
             $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
             $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
-            $adminSession->addNotice($message);
+            $this->getAdminSession()->addNotice($message);
 
             if ($checkUrlWarn) {
                 // order not validated by notification URL, in TEST mode, user is webmaster
@@ -135,24 +130,24 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
                     $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;To read carefully before going further&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;Notification URL settings&raquo;');
                 }
 
-                $adminSession->addError($message);
+                $this->getAdminSession()->addError($message);
             }
         }
 
         if ($success) {
-            $this->_getDataHelper()->log('Redirecting to order review page.');
+            $this->_getDataHelper()->log("Redirecting to order review page for order #{$order->getId()}.");
             $this->getCheckout()->setLastSuccessQuoteId($order->getQuoteId());
-            $adminSession->addSuccess($this->__('The payment was successful. Your order was registered successfully.'));
+            $this->getAdminSession()->addSuccess($this->__('The payment was successful. Your order was registered successfully.'));
             $this->_redirect('adminhtml/sales_order/view', array('order_id' => $order->getId()));
         } else {
-            $this->_getDataHelper()->log('Unsetting order data in session.');
+            $this->_getDataHelper()->log("Unsetting order data in session for order #{$order->getId()}.");
             $this->getCheckout()->unsLastQuoteId()
                                 ->unsLastSuccessQuoteId()
                                 ->unsLastOrderId()
                                 ->unsLastRealOrderId();
 
-            $this->_getDataHelper()->log('Redirecting to order review page.');
-            $adminSession->addWarning($this->__('Checkout and order have been canceled.'));
+            $this->_getDataHelper()->log("Redirecting to order review page for order #{$order->getId()}.");
+            $this->getAdminSession()->addWarning($this->__('Checkout and order have been canceled.'));
             $this->_redirect('adminhtml/sales_order/view', array('order_id' => $order->getId()));
         }
     }
@@ -170,6 +165,16 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
     public function getCheckout()
     {
         return Mage::getSingleton('adminhtml/session_quote');
+    }
+
+    /**
+     * Get admin main session namespace.
+     *
+     * @return Mage_Adminhtml_Model_Session
+     */
+    public function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
     }
 
     /**
