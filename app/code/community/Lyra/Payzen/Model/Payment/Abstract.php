@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstract
@@ -35,6 +35,8 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
     protected $_canReviewPayment = true;
 
     protected $_payzenRequest = null;
+
+    protected $_currencies = array();
 
     public function __construct()
     {
@@ -69,12 +71,13 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         // set the amount to pay
         $this->_payzenRequest->set('amount', $currency->convertAmountToInteger($amount));
 
-        $this->_payzenRequest->set('contrib', 'Magento1.4-1.9_1.7.1/' . Mage::getVersion());
+        $this->_payzenRequest->set('contrib', 'Magento1.4-1.9_1.8.0/' . Mage::getVersion() . '/' . PHP_VERSION);
 
         // set config parameters
         $configFields = array('site_id', 'key_test', 'key_prod', 'ctx_mode', 'capture_delay', 'validation_mode',
-                'theme_config', 'shop_name', 'shop_url', 'redirect_enabled', 'redirect_success_timeout',
-                'redirect_success_message', 'redirect_error_timeout', 'redirect_error_message', 'return_mode'
+            'theme_config', 'shop_name', 'shop_url', 'redirect_enabled', 'redirect_success_timeout',
+            'redirect_success_message', 'redirect_error_timeout', 'redirect_error_message', 'return_mode',
+            'sign_algo'
         );
         foreach ($configFields as $field) {
             $this->_payzenRequest->set($field, $this->_getHelper()->getCommonConfigData($field));
@@ -84,6 +87,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         if (is_numeric($this->getConfigData('capture_delay'))) {
             $this->_payzenRequest->set('capture_delay', $this->getConfigData('capture_delay'));
         }
+
         if ($this->getConfigData('validation_mode') !== '-1') {
             $this->_payzenRequest->set('validation_mode', $this->getConfigData('validation_mode'));
         }
@@ -99,7 +103,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
         // set the language code
         $lang = strtolower(substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2));
-        if (!Lyra_Payzen_Model_Api_Api::isSupportedLanguage($lang)) {
+        if (! Lyra_Payzen_Model_Api_Api::isSupportedLanguage($lang)) {
             $lang = $this->_getHelper()->getCommonConfigData('language');
         }
         $this->_payzenRequest->set('language', $lang);
@@ -112,7 +116,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         // activate 3ds ?
         $threedsMpi = null;
         $configOptions = unserialize($this->getConfigData('custgroup_threeds_min_amount'));
-        if (is_array($configOptions) && !empty($configOptions)) {
+        if (is_array($configOptions) && ! empty($configOptions)) {
             $group = $order->getCustomerGroupId();
 
             $allThreedsMinAmount = null;
@@ -136,7 +140,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
                 }
             }
 
-            if (!$threedsMinAmount) {
+            if (! $threedsMinAmount) {
                 $threedsMinAmount = $allThreedsMinAmount;
             }
 
@@ -209,9 +213,10 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
      */
     public function getConfigData($field, $storeId = null)
     {
-        if (is_null($storeId) && !$this->getStore() && $this->_getHelper()->isAdmin()) {
+        if (is_null($storeId) && ! $this->getStore() && $this->_getHelper()->isAdmin()) {
             $storeId = Mage::getSingleton('adminhtml/session_quote')->getStoreId();
         }
+
         return parent::getConfigData($field, $storeId);
     }
 
@@ -259,7 +264,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             // retrieve transaction UUID
             $uuid = $payment->getAdditionalInformation(Lyra_Payzen_Helper_Payment::TRANS_UUID);
-            if (!$uuid) { // retro compatibility
+            if (! $uuid) { // retro compatibility
                 $legacyTransactionKeyRequest = new \Lyra\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
                 $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
                 $legacyTransactionKeyRequest->setSequenceNumber('1');
@@ -298,9 +303,11 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             $wsApi->checkAuthenticity();
             $wsApi->checkResult(
-                    $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse(),
-                    array('INITIAL', 'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE', 'UNDER_VERIFICATION',
-                            'AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'CAPTURED', 'CAPTURE_FAILED') // pending or accepted payment
+                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse(),
+                array(
+                    'INITIAL', 'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE', 'UNDER_VERIFICATION',
+                    'AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'CAPTURED', 'CAPTURE_FAILED'
+                ) // pending or accepted payment
             );
 
             // check operation type (0: debit, 1 refund)
@@ -315,12 +322,12 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             $payment->setIsFraudDetected(false);
 
             $wrapper = new Lyra_Payzen_Model_Api_Ws_ResultWrapper(
-                    $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse(),
-                    $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getPaymentResponse(),
-                    $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getAuthorizationResponse(),
-                    $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCardResponse(),
-                    $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getThreeDSResponse(),
-                    $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getFraudManagementResponse()
+                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse(),
+                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getPaymentResponse(),
+                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getAuthorizationResponse(),
+                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCardResponse(),
+                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getThreeDSResponse(),
+                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getFraudManagementResponse()
             );
             $stateObject = $this->_getPaymentHelper()->nextOrderState($wrapper, $order, true);
 
@@ -341,20 +348,19 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             $this->_getAdminSession()->addWarning($this->_getHelper()->__('Please correct this error to use PayZen web services.'));
             $this->_getAdminSession()->addError($this->_getHelper()->__($e->getMessage()));
             return true;
-        } catch(SoapFault $f) {
+        } catch(\SoapFault $f) {
             $this->_getHelper()->log("[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.", Zend_Log::WARN);
 
             $this->_getAdminSession()->addWarning($this->_getHelper()->__('Please correct this error to use PayZen web services.'));
             $this->_getAdminSession()->addError($f->faultstring);
             return true;
-        } catch(\Lyra\Payzen\Model\Api\Ws\SecurityException $e) {
-            $this->_getHelper()->log("[$requestId] " . $e->getMessage(), Zend_Log::ERR);
+        } catch(\UnexpectedValueException $e) {
+            $this->_getHelper()->log("[$requestId] getPaymentDetails error with code {$e->getCode()}: {$e->getMessage()}.", Zend_Log::ERR);
 
-            Mage::throwException($this->_getHelper()->__('Authentication error !'));
-        } catch(\Lyra\Payzen\Model\Api\Ws\ResultException $e) {
-            $this->_getHelper()->log("[$requestId] getPaymentDetails error with code {$e->getRealCode()}: {$e->getMessage()}.", Zend_Log::WARN);
-
-            if ($e->getRealCode() == 1) { // merchant does not subscribe to WS option
+            if ($e->getCode() === -1) {
+                Mage::throwException($this->_getHelper()->__('Authentication error ! '));
+            } elseif ($e->getCode() === 1) {
+                // merchant does not subscribe to WS option, accept payment offline
                 return true;
             } else {
                 Mage::throwException($e->getMessage());
@@ -390,7 +396,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             // retrieve transaction UUID
             $uuid = $payment->getAdditionalInformation(Lyra_Payzen_Helper_Payment::TRANS_UUID);
-            if (!$uuid) { // retro compatibility
+            if (! $uuid) { // retro compatibility
                 $legacyTransactionKeyRequest = new \Lyra\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
                 $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
                 $legacyTransactionKeyRequest->setSequenceNumber('1');
@@ -430,8 +436,8 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             $wsApi->checkAuthenticity();
             $wsApi->checkResult(
-                    $cancelPaymentResponse->getCancelPaymentResult()->getCommonResponse(),
-                    array('CANCELLED')
+                $cancelPaymentResponse->getCancelPaymentResult()->getCommonResponse(),
+                array('CANCELLED')
             );
 
             $this->_getHelper()->log("Payment cancelled successfully online for order #{$order->getId()}.");
@@ -457,20 +463,19 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             $this->_getAdminSession()->addWarning($this->_getHelper()->__('Please correct this error to use PayZen web services.'));
             $this->_getAdminSession()->addError($this->_getHelper()->__($e->getMessage()));
             return true;
-        } catch(SoapFault $f) {
+        } catch(\SoapFault $f) {
             $this->_getHelper()->log("[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.", Zend_Log::WARN);
 
             $this->_getAdminSession()->addWarning($this->_getHelper()->__('Please correct this error to use PayZen web services.'));
             $this->_getAdminSession()->addError($f->faultstring);
             return true;
-        } catch(\Lyra\Payzen\Model\Api\Ws\SecurityException $e) {
-            $this->_getHelper()->log("[$requestId] " . $e->getMessage(), Zend_Log::ERR);
+        } catch(\UnexpectedValueException $e) {
+            $this->_getHelper()->log("[$requestId] cancelPayment error with code {$e->getCode()}: {$e->getMessage()}.", Zend_Log::ERR);
 
-            Mage::throwException($this->_getHelper()->__('Authentication error !'));
-        } catch(\Lyra\Payzen\Model\Api\Ws\ResultException $e) {
-            $this->_getHelper()->log("[$requestId] cancelPayment error with code {$e->getRealCode()}: {$e->getMessage()}.", Zend_Log::WARN);
-
-            if ($e->getRealCode() == 1) { // merchant does not subscribe to WS option
+            if ($e->getCode() === -1) {
+                Mage::throwException($this->_getHelper()->__('Authentication error ! '));
+            } elseif ($e->getCode() === 1) {
+                // merchant does not subscribe to WS option, cancel payment offline
                 $notice = $this->_getHelper()->__('You are not authorized to do this action online. Please, consider updating the payment in PayZen Back Office.');
                 $this->_getAdminSession()->addNotice($notice);
                 return true;
@@ -500,7 +505,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             // retrieve transaction UUID
             $uuid = $payment->getAdditionalInformation(Lyra_Payzen_Helper_Payment::TRANS_UUID);
-            if (!$uuid) { // retro compatibility
+            if (! $uuid) { // retro compatibility
                 $legacyTransactionKeyRequest = new \Lyra\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
                 $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
                 $legacyTransactionKeyRequest->setSequenceNumber('1');
@@ -540,8 +545,8 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             $wsApi->checkAuthenticity();
             $wsApi->checkResult(
-                    $validatePaymentResponse->getValidatePaymentResult()->getCommonResponse(),
-                    array('WAITING_AUTHORISATION', 'AUTHORISED')
+                $validatePaymentResponse->getValidatePaymentResult()->getCommonResponse(),
+                array('WAITING_AUTHORISATION', 'AUTHORISED')
             );
 
             $this->_getHelper()->log("Updating payment information for validated order #{$order->getId()}.");
@@ -550,7 +555,11 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             $stateObject = $this->_getPaymentHelper()->nextOrderState($wrapper, $order, true);
 
             $this->_getHelper()->log("Order #{$order->getId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
-            $order->setState($stateObject->getState(), $stateObject->getStatus(), $this->_getHelper()->__('Payment validated successfully.'));
+            $order->setState(
+                $stateObject->getState(),
+                $stateObject->getStatus(),
+                $this->_getHelper()->__('Payment validated successfully.')
+            );
 
             // update transaction status
             $txn = Mage::getModel('sales/order_payment_transaction')->setOrderPaymentObject($order->getPayment())
@@ -575,19 +584,18 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             $this->_getAdminSession()->addWarning($this->_getHelper()->__('Please correct this error to use PayZen web services.'));
             $this->_getAdminSession()->addError($this->_getHelper()->__($e->getMessage()));
-        } catch(SoapFault $f) {
+        } catch(\SoapFault $f) {
             $this->_getHelper()->log("[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.", Zend_Log::WARN);
 
             $this->_getAdminSession()->addWarning($this->_getHelper()->__('Please correct this error to use PayZen web services.'));
             $this->_getAdminSession()->addError($f->faultstring);
-        } catch(\Lyra\Payzen\Model\Api\Ws\SecurityException $e) {
-            $this->_getHelper()->log("[$requestId] " . $e->getMessage(), Zend_Log::ERR);
+        } catch(\UnexpectedValueException $e) {
+            $this->_getHelper()->log("[$requestId] validatePayment error with code {$e->getCode()}: {$e->getMessage()}.", Zend_Log::ERR);
 
-            $this->_getAdminSession()->addError($this->_getHelper()->__('Authentication error !'));
-        } catch(\Lyra\Payzen\Model\Api\Ws\ResultException $e) {
-            $this->_getHelper()->log("[$requestId] validatePayment error with code {$e->getRealCode()}: {$e->getMessage()}.", Zend_Log::WARN);
-
-            if ($e->getRealCode() == 1) { // merchant does not subscribe to WS option
+            if ($e->getCode() === -1) {
+                $this->_getAdminSession()->addError($this->_getHelper()->__('Authentication error ! '));
+            } elseif ($e->getCode() === 1) {
+                // merchant does not subscribe to WS option, validate payment offline
                 $notice = $this->_getHelper()->__('You are not authorized to do this action online. Please, consider updating the payment in PayZen Back Office.');
                 $this->_getAdminSession()->addNotice($notice);
             } else {
@@ -664,6 +672,12 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         $quote = $this->_getHelper()->getCheckoutQuote();
         if ($quote && $quote->getId()) {
             $currencyCode = $quote->getQuoteCurrencyCode();
+
+            // if sub-module support specific currencies, check quote currency over them
+            if (is_array($this->_currencies) && ! empty($this->_currencies)) {
+                return in_array($currencyCode, $this->_currencies);
+            }
+
             $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByAlphaCode($currencyCode);
             if ($currency) {
                 return true;
@@ -692,12 +706,12 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         }
 
         $amount = $quote ? $quote->getBaseGrandTotal() : null;
-        if (!$amount) {
+        if (! $amount) {
             return true;
         }
 
         $configOptions = unserialize($this->getConfigData('custgroup_amount_restrictions'));
-        if (!is_array($configOptions) || empty($configOptions)) {
+        if (! is_array($configOptions) || empty($configOptions)) {
             return true;
         }
 
@@ -728,11 +742,11 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             }
         }
 
-        if (!$minAmount) {
+        if (! $minAmount) {
             $minAmount = $allMinAmount;
         }
 
-        if (!$maxAmount) {
+        if (! $maxAmount) {
             $maxAmount = $allMaxAmount;
         }
 
@@ -768,7 +782,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
             // retrieve transaction UUID
             $uuid = $payment->getAdditionalInformation(Lyra_Payzen_Helper_Payment::TRANS_UUID);
-            if (!$uuid) { // retro compatibility
+            if (! $uuid) { // retro compatibility
                 $legacyTransactionKeyRequest = new \Lyra\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
                 $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
                 $legacyTransactionKeyRequest->setSequenceNumber('1'); // only single payments can be refund at this time
@@ -809,7 +823,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             $wsApi->checkResult($getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse());
 
             // retrieve JSESSIONID created for getPaymentDetails call
-            if (!$sid) {
+            if (! $sid) {
                 $sid = $wsApi->getJsessionId();
             }
 
@@ -839,9 +853,10 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
                 $paymentRequest->setCurrency($currency->getNum());
 
                 $captureDelay = $this->getConfigData('capture_delay', $storeId); // get sub-module specific param
-                if (!is_numeric($captureDelay)) {
+                if (! is_numeric($captureDelay)) {
                     $captureDelay = $this->_getHelper()->getCommonConfigData('capture_delay', $storeId); // get general param
                 }
+
                 if (is_numeric($captureDelay)) {
                     $paymentRequest->setExpectedCaptureDate(new DateTime('@' . strtotime("+$captureDelay days", $timestamp)));
                 }
@@ -850,6 +865,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
                 if ($validationMode === '-1') {
                     $validationMode = $this->_getHelper()->getCommonConfigData('validation_mode', $storeId); // get general param
                 }
+
                 if ($validationMode !== '') {
                     $paymentRequest->setManualValidation($validationMode);
                 }
@@ -863,8 +879,11 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
                 $wsApi->checkAuthenticity();
                 $wsApi->checkResult(
-                        $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
-                        array('INITIAL', 'AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE')
+                    $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
+                    array(
+                        'INITIAL', 'AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'WAITING_AUTHORISATION',
+                        'WAITING_AUTHORISATION_TO_VALIDATE'
+                    )
                 );
 
                 // check operation type (0: debit, 1 refund)
@@ -875,10 +894,10 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
                 // create refund transaction in Magento
                 $this->createRefundTransaction(
-                        $payment,
-                        $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
-                        $refurndPaymentResponse->getRefundPaymentResult()->getPaymentResponse(),
-                        $refurndPaymentResponse->getRefundPaymentResult()->getCardResponse()
+                    $payment,
+                    $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
+                    $refurndPaymentResponse->getRefundPaymentResult()->getPaymentResponse(),
+                    $refurndPaymentResponse->getRefundPaymentResult()->getCardResponse()
                 );
 
                 $this->_getHelper()->log("Online money refund for order #{$order->getId()} is successful.");
@@ -910,8 +929,8 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
                     $wsApi->checkAuthenticity();
                     $wsApi->checkResult(
-                            $updatePaymentResponse->getUpdatePaymentResult()->getCommonResponse(),
-                            array('AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE')
+                        $updatePaymentResponse->getUpdatePaymentResult()->getCommonResponse(),
+                        array('AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE')
                     );
                     $this->_getHelper()->log("Online payment update for order #{$order->getId()} is successful.");
                 }
@@ -922,23 +941,22 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             $warn = $this->_getHelper()->__('Please correct error to refund payments through PayZen. If you want to refund order in Magento, use the &laquo;Refund Offline&raquo; button.');
             $this->_getAdminSession()->addWarning($warn);
             Mage::throwException($this->_getHelper()->__($e->getMessage()));
-        } catch(SoapFault $f) {
+        } catch(\SoapFault $f) {
             $this->_getHelper()->log("[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.", Zend_Log::WARN);
 
             $warn = $this->_getHelper()->__('Please correct error to refund payments through PayZen. If you want to refund order in Magento, use the &laquo;Refund Offline&raquo; button.');
             $this->_getAdminSession()->addWarning($warn);
             Mage::throwException($f->faultstring);
-        } catch(\Lyra\Payzen\Model\Api\Ws\SecurityException $e) {
-            $this->_getHelper()->log("[$requestId] " . $e->getMessage(), Zend_Log::ERR);
+        } catch(\UnexpectedValueException $e) {
+            $this->_getHelper()->log("[$requestId] refund error with code {$e->getCode()}: {$e->getMessage()}.", Zend_Log::ERR);
 
-            Mage::throwException($this->_getHelper()->__('Authentication error !'));
-        } catch(\Lyra\Payzen\Model\Api\Ws\ResultException $e) {
-            $this->_getHelper()->log("[$requestId] Refund error with code {$e->getRealCode()}: {$e->getMessage()}.", Zend_Log::WARN);
-
-            if ($e->getRealCode() == 1) { // merchant does not subscribe to WS option
+            if ($e->getCode() === -1) {
+                Mage::throwException($this->_getHelper()->__('Authentication error ! '));
+            } elseif ($e->getCode() === 1) {
+                // merchant does not subscribe to WS option, refund payment offline
                 $notice = $this->_getHelper()->__('You are not authorized to do this action online. Please, consider updating the payment in PayZen Back Office.');
                 $this->_getAdminSession()->addNotice($notice);
-                // magento will do an offline refund
+                // Magento will do an offline refund
             } else {
                 Mage::throwException($e->getMessage());
             }
@@ -954,8 +972,6 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
     protected function createRefundTransaction($payment, $commonResponse, $paymentResponse, $cardResponse)
     {
-        $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByNumCode($paymentResponse->getCurrency());
-
         // save transaction details to sales_payment_transaction
         $transactionId = $paymentResponse->getTransactionId() . '-' . $paymentResponse->getSequenceNumber();
 
@@ -964,15 +980,33 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             $expiry = str_pad($cardResponse->getExpiryMonth(), 2, '0', STR_PAD_LEFT) . ' / ' . $cardResponse->getExpiryYear();
         }
 
+        // save paid amount
+        $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByNumCode($paymentResponse->getCurrency());
+        $amount = number_format($currency->convertAmountToFloat($paymentResponse->getAmount()), $currency->getDecimals(), ',', ' ');
+
+        $amountDetail = $amount . ' ' . $currency->getAlpha3();
+
+        if ($paymentResponse->getEffectiveCurrency() && ($paymentResponse->getCurrency() !== $paymentResponse->getEffectiveCurrency())) {
+            $effectiveCurrency = Lyra_Payzen_Model_Api_Api::findCurrencyByNumCode($paymentResponse->getEffectiveCurrency());
+
+            $effectiveAmount = number_format(
+                $effectiveCurrency->convertAmountToFloat($paymentResponse->getEffectiveAmount()),
+                $effectiveCurrency->getDecimals(),
+                ',',
+                ' '
+            );
+
+            $amountDetail = $effectiveAmount . ' ' . $effectiveCurrency->getAlpha3() . ' (' . $amountDetail . ')';
+        }
+
         $additionalInfo = array(
-                'Transaction Type' => 'CREDIT',
-                'Amount' => round($currency->convertAmountToFloat($paymentResponse->getAmount()), $currency->getDecimals()) . ' ' . $currency->getAlpha3(),
-                'Transaction ID' => $transactionId,
-                'Transaction Status' => $commonResponse->getTransactionStatusLabel(),
-                'Payment Mean' => $cardResponse->getBrand(),
-                'Credit Card Number' => $cardResponse->getNumber(),
-                'Expiration Date' => $expiry,
-                '3-DS Certificate' => ''
+            'Transaction Type' => 'CREDIT',
+            'Amount' => $amountDetail,
+            'Transaction ID' => $transactionId,
+            'Transaction Status' => $commonResponse->getTransactionStatusLabel(),
+            'Payment Mean' => $cardResponse->getBrand(),
+            'Credit Card Number' => $cardResponse->getNumber(),
+            'Expiration Date' => $expiry
         );
 
         $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND;
@@ -992,8 +1026,8 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         // load specific configuration file for WSDL access
         $options = parse_ini_file(Mage::getModuleDir('etc', 'Lyra_Payzen') . DS . 'ws.ini') ?: array();
 
-        if (!empty($options)) {
-            if (!$options['proxy.enabled']) {
+        if (! empty($options)) {
+            if (! $options['proxy.enabled']) {
                 unset($options['proxy_host'], $options['proxy_port'], $options['proxy_login'], $options['proxy_password']);
             }
 

@@ -1,28 +1,23 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
-class Lyra_Payzen_Block_Iframe extends Mage_Core_Block_Template
+class Lyra_Payzen_Block_Review extends Mage_Core_Block_Template
 {
-    /**
-     * @var bool
-     */
-    protected $_shouldRender = false;
-
     /**
      * @var Mage_Sales_Model_Quote
      */
@@ -45,7 +40,7 @@ class Lyra_Payzen_Block_Iframe extends Mage_Core_Block_Template
      */
     protected function _getQuote()
     {
-        if (!$this->_quote) {
+        if (! $this->_quote) {
             $this->_quote = $this->_getCheckout()->getQuote();
         }
 
@@ -66,18 +61,13 @@ class Lyra_Payzen_Block_Iframe extends Mage_Core_Block_Template
         return null;
     }
 
-    /**
-     * Before rendering html, check if is block rendering needed.
-     *
-     * @return Mage_Core_Block_Abstract
-     */
-    protected function _beforeToHtml()
+    public function chooseTemplate()
     {
         if ($this->_isIframeMode()) {
-            $this->_shouldRender = true;
+            $this->setTemplate($this->getIframeTemplate());
+        } else {
+            $this->setTemplate(null);
         }
-
-        return parent::_beforeToHtml();
     }
 
     protected function _isIframeMode()
@@ -88,21 +78,7 @@ class Lyra_Payzen_Block_Iframe extends Mage_Core_Block_Template
         return $check;
     }
 
-    /**
-     * Render the block if needed.
-     *
-     * @return string
-     */
-    protected function _toHtml()
-    {
-        if (!$this->_shouldRender) {
-            return '';
-        }
-
-        return parent::_toHtml();
-    }
-
-    /**
+     /**
      * Return payzen data helper.
      *
      * @return Lyra_Payzen_Helper_Data

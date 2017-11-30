@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 namespace Lyra\Payzen\Model\Api\Ws;
@@ -41,7 +41,7 @@ class CreateTokenFromTransactionResult
     private $cardResponse = null;
 
     /**
-     * @var AuthenticationResultData $authorizationResponse
+     * @var AuthorizationResponse $authorizationResponse
      */
     private $authorizationResponse = null;
 
@@ -158,7 +158,7 @@ class CreateTokenFromTransactionResult
     }
 
     /**
-     * @return AuthenticationResultData
+     * @return AuthorizationResponse
      */
     public function getAuthorizationResponse()
     {
@@ -166,7 +166,7 @@ class CreateTokenFromTransactionResult
     }
 
     /**
-     * @param AuthenticationResultData $authorizationResponse
+     * @param AuthorizationResponse $authorizationResponse
      * @return CreateTokenFromTransactionResult
      */
     public function setAuthorizationResponse($authorizationResponse)
@@ -212,7 +212,7 @@ class CreateTokenFromTransactionResult
     }
 
     /**
-     * @return markResponse
+     * @return MarkResponse
      */
     public function getMarkResponse()
     {
@@ -220,7 +220,7 @@ class CreateTokenFromTransactionResult
     }
 
     /**
-     * @param markResponse $markResponse
+     * @param MarkResponse $markResponse
      * @return CreateTokenFromTransactionResult
      */
     public function setMarkResponse($markResponse)
@@ -284,7 +284,7 @@ class CreateTokenFromTransactionResult
     }
 
     /**
-     * @return fraudManagementResponse
+     * @return FraudManagementResponse
      */
     public function getFraudManagementResponse()
     {
@@ -292,7 +292,7 @@ class CreateTokenFromTransactionResult
     }
 
     /**
-     * @param fraudManagementResponse $fraudManagementResponse
+     * @param FraudManagementResponse $fraudManagementResponse
      * @return CreateTokenFromTransactionResult
      */
     public function setFraudManagementResponse($fraudManagementResponse)

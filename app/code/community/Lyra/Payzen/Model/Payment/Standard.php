@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstract
@@ -27,7 +27,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
     {
         $info = $this->getInfoInstance();
 
-        if (!$this->_getHelper()->isAdmin() && ($this->isLocalCcType() || $this->isLocalCcInfo())) {
+        if (! $this->_getHelper()->isAdmin() && ($this->isLocalCcType() || $this->isLocalCcInfo())) {
             // set payment_cards
             $this->_payzenRequest->set('payment_cards', $info->getCcType());
         } else {
@@ -51,15 +51,9 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         }
 
         $session = Mage::getSingleton('payzen/session');
-        if ($this->isIframeMode() && !$session->getPayzenOneclickPayment() /* no iframe in 1-Click */) {
+        if ($this->isIframeMode() && ! $session->getPayzenOneclickPayment() /* no iframe in 1-Click */) {
             // iframe enabled and this is not 1-Click
-            $themeConfig = $this->_getHelper()->getCommonConfigData('theme_config');
-            if (!empty($themeConfig) && substr($themeConfig, -1) !== ';') {
-                $themeConfig .= ';';
-            }
-
-            $themeConfig .= 'MODE_IFRAME=true;';
-            $this->_payzenRequest->set('theme_config', $themeConfig);
+            $this->_payzenRequest->set('action_mode', 'IFRAME');
 
             // enable automatic redirection
             $this->_payzenRequest->set('redirect_enabled', '1');
@@ -70,7 +64,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $this->_payzenRequest->set('url_return', $returnUrl . '?iframe=true');
         }
 
-        if (!$this->getConfigData('one_click_active') || !$order->getCustomerId()) {
+        if (! $this->getConfigData('one_click_active') || ! $order->getCustomerId()) {
             $this->_setCcInfo();
         } else {
             // 1-Click enabled and customer logged-in
@@ -94,7 +88,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                         $this->_getHelper()->log('Customer ' . $customer->getEmail() . ' has not identifier and chose to register his card info.');
                         $this->_payzenRequest->set('page_action', 'REGISTER_PAY');
                     }
-                } elseif (!$this->isLocalCcInfo()) {
+                } elseif (! $this->isLocalCcInfo()) {
                     // card data entry on payment page, let's ask customer for data registration
                     $this->_getHelper()->log('Customer ' . $customer->getEmail() . ' will be asked for card data registration on payment page.');
                     $this->_payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
@@ -107,7 +101,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
     protected function _setCcInfo()
     {
-        if (!$this->isLocalCcInfo()) {
+        if (! $this->isLocalCcInfo()) {
             return;
         }
 
@@ -128,7 +122,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
     {
         $info = $this->getInfoInstance();
 
-        return (!$info->getCcType() && $this->getConfigData('use_oney_in_standard'))
+        return (! $info->getCcType() && $this->getConfigData('use_oney_in_standard'))
             || in_array($info->getCcType(), array('ONEY_SANDBOX', 'ONEY'));
     }
 
@@ -145,14 +139,14 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         // selected cards from module configuration
         $cards = $this->getConfigData('payment_cards');
 
-        if (!empty($cards)) {
+        if (! empty($cards)) {
             $cards = explode(',', $cards);
         } else {
             $cards = array_keys($allCards);
             $cards = array_diff($cards, array('ONEY_SANDBOX', 'ONEY'));
         }
 
-        if (!$this->_getHelper()->isAdmin() && $this->isLocalCcType() && $this->getConfigData('use_oney_in_standard')) {
+        if (! $this->_getHelper()->isAdmin() && $this->isLocalCcType() && $this->getConfigData('use_oney_in_standard')) {
             $testMode = $this->_getHelper()->getCommonConfigData('ctx_mode') == 'TEST';
 
             $cards[] = $testMode ? 'ONEY_SANDBOX' : 'ONEY';
@@ -169,12 +163,12 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
     public function isOneclickAvailable()
     {
-        if (!$this->isAvailable()) {
+        if (! $this->isAvailable()) {
             return false;
         }
 
         // no 1-Click
-        if (!$this->getConfigData('one_click_active')) {
+        if (! $this->getConfigData('one_click_active')) {
             return false;
         }
 
@@ -185,13 +179,13 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         $session = Mage::getSingleton('customer/session');
 
         // customer not logged in
-        if (!$session->isLoggedIn()) {
+        if (! $session->isLoggedIn()) {
             return false;
         }
 
         // customer has not PayZen identifier
         $customer = $session->getCustomer();
-        if (!$customer || !$customer->getPayzenIdentifier()) {
+        if (! $customer || ! $customer->getPayzenIdentifier()) {
             return false;
         }
 
@@ -214,7 +208,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
      */
     public function assignData($data)
     {
-        if (!($data instanceof Varien_Object)) {
+        if (! ($data instanceof Varien_Object)) {
             $data = new Varien_Object($data);
         }
 
@@ -349,7 +343,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $paymentRequest->setCurrency($currency->getNum());
 
             $captureDelay = $this->getConfigData('capture_delay', $storeId); // get sub-module specific param
-            if (!is_numeric($captureDelay)) {
+            if (! is_numeric($captureDelay)) {
                 $captureDelay = $this->_getHelper()->getCommonConfigData('capture_delay', $storeId); // get general param
             }
             if (is_numeric($captureDelay)) {
@@ -443,9 +437,12 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $createPaymentResponse = $wsApi->createPayment($createPayment);
 
             $wsApi->checkAuthenticity();
-            $wsApi->checkResult($createPaymentResponse->getCreatePaymentResult()->getCommonResponse(),
-                    array('INITIAL', 'NOT_CREATED', 'AUTHORISED', 'AUTHORISED_TO_VALIDATE',
-                            'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE')
+            $wsApi->checkResult(
+                $createPaymentResponse->getCreatePaymentResult()->getCommonResponse(),
+                array(
+                    'INITIAL', 'NOT_CREATED', 'AUTHORISED', 'AUTHORISED_TO_VALIDATE',
+                    'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE'
+                )
             );
 
             // check operation type (0: debit, 1 refund)
@@ -459,12 +456,12 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $payment->setBaseAmountAuthorized($order->getBaseTotalDue());
 
             $wrapper = new Lyra_Payzen_Model_Api_Ws_ResultWrapper(
-                    $createPaymentResponse->getCreatePaymentResult()->getCommonResponse(),
-                    $createPaymentResponse->getCreatePaymentResult()->getPaymentResponse(),
-                    $createPaymentResponse->getCreatePaymentResult()->getAuthorizationResponse(),
-                    $createPaymentResponse->getCreatePaymentResult()->getCardResponse(),
-                    $createPaymentResponse->getCreatePaymentResult()->getThreeDSResponse(),
-                    $createPaymentResponse->getCreatePaymentResult()->getFraudManagementResponse()
+                $createPaymentResponse->getCreatePaymentResult()->getCommonResponse(),
+                $createPaymentResponse->getCreatePaymentResult()->getPaymentResponse(),
+                $createPaymentResponse->getCreatePaymentResult()->getAuthorizationResponse(),
+                $createPaymentResponse->getCreatePaymentResult()->getCardResponse(),
+                $createPaymentResponse->getCreatePaymentResult()->getThreeDSResponse(),
+                $createPaymentResponse->getCreatePaymentResult()->getFraudManagementResponse()
             );
 
             // retrieve new order state and status
@@ -493,22 +490,22 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $this->_getAdminSession()->addWarning($warn);
             $this->_getAdminSession()->addError($this->_getHelper()->__($e->getMessage()));
             Mage::throwException('');
-        } catch(SoapFault $f) {
+        } catch(\SoapFault $f) {
             $this->_getHelper()->log("[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.", Zend_Log::WARN);
 
             $warn = $this->_getHelper()->__('Please correct this error to use PayZen web services.');
             $this->_getAdminSession()->addWarning($warn);
             $this->_getAdminSession()->addError($f->faultstring);
             Mage::throwException('');
-        } catch(\Lyra\Payzen\Model\Api\Ws\SecurityException $e) {
-            $this->_getHelper()->log("[$requestId] " . $e->getMessage(), Zend_Log::ERR);
+        } catch(\UnexpectedValueException $e) {
+            $this->_getHelper()->log("[$requestId] createPayment error with code {$e->getCode()}: {$e->getMessage()}.", Zend_Log::ERR);
 
-            $this->_getAdminSession()->addError($this->_getHelper()->__('Authentication error !'));
-            Mage::throwException('');
-        } catch(\Lyra\Payzen\Model\Api\Ws\ResultException $e) {
-            $this->_getHelper()->log("[$requestId] createPayment error with code {$e->getRealCode()}: {$e->getMessage()}.", Zend_Log::WARN);
+            if ($e->getCode() === -1) {
+                $this->_getAdminSession()->addError($this->_getHelper()->__('Authentication error ! '));
+            } else {
+                $this->_getAdminSession()->addError($e->getMessage());
+            }
 
-            $this->_getAdminSession()->addError($e->getMessage());
             Mage::throwException('');
         } catch (Exception $e) {
             $this->_getHelper()->log("[$requestId] Exception with code {$e->getCode()}: {$e->getMessage()}", Zend_Log::ERR);

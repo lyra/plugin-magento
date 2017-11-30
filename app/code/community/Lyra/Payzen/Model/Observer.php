@@ -1,33 +1,33 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 class Lyra_Payzen_Model_Observer
 {
     public function doPaymentRedirect($observer)
     {
-        if (!$this->_getHelper()->isAdmin()) {
+        if (! $this->_getHelper()->isAdmin()) {
             // not an admin-passed order, do nothing
             return;
         }
 
         $order = $observer->getOrder();
 
-        if (!$order || $order->getId() <= 0) {
+        if (! $order || $order->getId() <= 0) {
             // order creation failed
             return;
         }
@@ -86,18 +86,18 @@ class Lyra_Payzen_Model_Observer
         if (isset($block) && ($block->getType() == 'adminhtml/sales_order_grid')) {
             $availableMethods = Mage::getStoreConfig('payment');
 
-            if (!$block->getColumn('payment_method')) {
+            if (! $block->getColumn('payment_method')) {
                 $groupedMethods = array();
                 $methods = array();
 
                 foreach ($availableMethods as $code => $method) {
-                    if (!is_array($method) || !isset($method['model'])) {
+                    if (! is_array($method) || ! isset($method['model'])) {
                         continue;
                     }
 
                     // use method codes and titles only
                     $title = $code;
-                    if (isset($method['title']) && !empty($method['title'])) {
+                    if (isset($method['title']) && ! empty($method['title'])) {
                         $title = Mage::helper('payment')->__($method['title']) . " ($code)";
                     }
 
@@ -245,7 +245,7 @@ class Lyra_Payzen_Model_Observer
                 $this->_oneclickQuoteProcess($currentQuote);
             }
         } elseif ($block->getNameInLayout() == 'alert.urls') {
-            if ($block->getProduct() && $block->getProduct()->getId()) {
+            if (($product = Mage::registry('product')) && $product->getId()) {
                 $this->_oneclickQuoteProcess($block->getProduct());
             }
         }
@@ -253,7 +253,7 @@ class Lyra_Payzen_Model_Observer
 
     protected function _oneclickQuoteProcess($data)
     {
-        if (!Mage::getModel('payzen/payment_standard')->isOneclickAvailable()) {
+        if (! Mage::getModel('payzen/payment_standard')->isOneclickAvailable()) {
             // no 1-Click payment
             return;
         }

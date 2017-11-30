@@ -1,19 +1,19 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.7.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
  * This source file is licensed under the Open Software License version 3.0
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
- * @category  payment
- * @package   payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2017 Lyra Network and contributors
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
  */
 
 class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
@@ -114,7 +114,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
             $oneClickQuote->getBillingAddress()->importCustomerAddress($customerAddress)->setSaveInAddressBook(0);
 
             $this->_getDataHelper()->log('Add payment info to PayZen 1-Click quote.');
-            if (!$oneClickQuote->isVirtual() && $oneClickQuote->getShippingAddress()) {
+            if (! $oneClickQuote->isVirtual() && $oneClickQuote->getShippingAddress()) {
                 $oneClickQuote->getShippingAddress()->setPaymentMethod('payzen_standard');
             } else {
                 $oneClickQuote->getBillingAddress()->setPaymentMethod('payzen_standard');
@@ -177,10 +177,10 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                                      ->unsPayzenOneclickBackUrl();
 
             // use core/session instance to be able to show messages from all pages
-            if (Mage::getSingleton('core/session')->getUseNotice(true)) {
-                Mage::getSingleton('core/session')->addNotice($e->getMessage());
+            if ($this->getCoreSession()->getUseNotice(true)) {
+                $this->getCoreSession()->addNotice($e->getMessage());
             } else {
-                Mage::getSingleton('core/session')->addError($e->getMessage());
+                $this->getCoreSession()->addError($e->getMessage());
             }
 
             $this->_getDataHelper()->log('Redirecting to referer URL.');
@@ -194,7 +194,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     {
         $session = $this->getPayzenSession();
 
-        if (!$this->getRequest()->isPost() || !$session->getQuote() || $session->getQuote()->getHasError()) {
+        if (! $this->getRequest()->isPost() || ! $session->getQuote() || $session->getQuote()->getHasError()) {
             $this->getResponse()
                     ->setHeader('HTTP/1.1', '403 Session Expired')
                     ->setHeader('Login-Required', 'true')
@@ -229,7 +229,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                 $oneClickQuote->setCouponCode('');
 
                 $request = new Varien_Object($this->getRequest()->getParams());
-                if (!$request->hasQty()) {
+                if (! $request->hasQty()) {
                     $request->setQty(1);
                 }
 
@@ -238,7 +238,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
                     if (is_string($result)) {
                         // error message
-                        Mage::getSingleton('core/session')->setUseNotice(true);
+                        $this->getCoreSession()->setUseNotice(true);
                         Mage::throwException($result);
                     }
                 } catch (Mage_Core_Exception $e) {
@@ -251,16 +251,16 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
                 // related products
                 $productIds = $this->getRequest()->getParam('related_product');
-                if (!empty($productIds)) {
+                if (! empty($productIds)) {
                     $productIds = explode(',', $productIds);
 
-                    if (!empty($productIds)) {
+                    if (! empty($productIds)) {
                         $allAvailable = true;
                         $allAdded = true;
 
                         foreach ($productIds as $productId) {
                             $productId = (int) $productId;
-                            if (!$productId) {
+                            if (! $productId) {
                                 continue;
                             }
 
@@ -278,15 +278,15 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                             }
                         }
 
-                        if (!$ignoreNotices) {
-                            if (!$allAvailable) {
-                                Mage::getSingleton('core/session')->addError(
+                        if (! $ignoreNotices) {
+                            if (! $allAvailable) {
+                                $this->getCoreSession()->addError(
                                     $this->__('Some of the products you requested are unavailable.')
                                 );
                             }
 
-                            if (!$allAdded) {
-                                Mage::getSingleton('core/session')->addError(
+                            if (! $allAdded) {
+                                $this->getCoreSession()->addError(
                                     $this->__('Some of the products you requested are not available in the desired quantity.')
                                 );
                             }
@@ -298,7 +298,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
         $addressId = $this->getRequest()->getPost('shipping_address', false);
         $customerAddress = Mage::getModel('customer/address')->load((int)$addressId);
-        if (!$oneClickQuote->isVirtual() && $customerAddress->getId()) {
+        if (! $oneClickQuote->isVirtual() && $customerAddress->getId()) {
             if ($customerAddress->getCustomerId() != Mage::getSingleton('customer/session')->getCustomer()->getId()) {
                 Mage::throwException($this->__('Customer Address is not valid.'));
             }
@@ -324,7 +324,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     {
         // clear all messages from session
         $this->getCheckout()->getMessages(true);
-        Mage::getSingleton('core/session')->getMessages(true);
+        $this->getCoreSession()->getMessages(true);
 
         $this->_getDataHelper()->log($msg . ' Redirecting to cart page.');
         $this->_redirect('checkout/cart', array('_store' => Mage::app()->getStore()->getId()));
@@ -339,9 +339,9 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     {
         // clear all messages in session
         $this->getCheckout()->getMessages(true);
-        Mage::getSingleton('core/session')->getMessages(true);
+        $this->getCoreSession()->getMessages(true);
 
-        $this->_getDataHelper()->log('Redirecting to failure page.');
+        $this->_getDataHelper()->log("Redirecting to failure page for order #{$order->getId()}.");
         $this->_redirect('checkout/onepage/failure', array('_store' => $order->getStore()->getId()));
     }
 
@@ -356,14 +356,14 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     {
         // clear all messages in session
         $this->getCheckout()->getMessages(true);
-        Mage::getSingleton('core/session')->getMessages(true);
+        $this->getCoreSession()->getMessages(true);
 
         $storeId = $order->getStore()->getId();
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
             // display going to production message
             $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
             $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
-            Mage::getSingleton('core/session')->addNotice($message);
+            $this->getCoreSession()->addNotice($message);
 
             if ($checkUrlWarn) {
                 // order not validated by notification URL, in TEST mode, user is webmaster
@@ -377,7 +377,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                     $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;To read carefully before going further&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;Notification URL settings&raquo;');
                 }
 
-                Mage::getSingleton('core/session')->addError($message);
+                $this->getCoreSession()->addError($message);
             }
         }
 
@@ -395,13 +395,18 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                                 ->setLastRealOrderId($order->getIncrementId())
                                 ->setLastOrderStatus($order->getStatus());
 
-            $this->_getDataHelper()->log('Redirecting to success page.');
+            $this->_getDataHelper()->log("Redirecting to success page for order #{$order->getId()}.");
             $this->_redirect('checkout/onepage/success', array('_store' => $storeId));
         } else {
-            $this->_getDataHelper()->log('Unsetting order data in session.');
-            $this->getCheckout()->unsetAll();
+            $this->_getDataHelper()->log("Unsetting order data in session for order #{$order->getId()}.");
+            $this->getCheckout()->setLastBillingAgreementId(null)
+                                ->setRedirectUrl(null)
+                                ->setLastOrderId(null)
+                                ->setLastRealOrderId(null)
+                                ->setLastRecurringProfileIds(null)
+                                ->setAdditionalMessages(null);
 
-            Mage::getSingleton('core/session')->addWarning($this->__('Checkout and order have been canceled.'));
+            $this->getCoreSession()->addWarning($this->__('Checkout and order have been canceled.'));
 
             if ($oneclick) {
                 $oneClickQuote = $this->getPayzenSession()->getQuote();
@@ -411,7 +416,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->getPayzenSession()->unsPayzenInitialQuoteId();
 
                 // in case of 1-Click payment , redirect to referer URL
-                $this->_getDataHelper()->log('Redirecting to referer URL (product view or cart page).');
+                $this->_getDataHelper()->log("Redirecting to referer URL (product view or cart page) for order #{$order->getId()}.");
                 $this->_redirectUrl($this->getPayzenSession()->getPayzenOneclickBackUrl(true));
             } else {
                 $this->_getDataHelper()->log("Restore cart for order #{$order->getId()} to allow re-order quicker.");
@@ -422,7 +427,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                     $this->getCheckout()->replaceQuote($quote);
                 }
 
-                $this->_getDataHelper()->log('Redirecting to cart page.');
+                $this->_getDataHelper()->log("Redirecting to cart page for order #{$order->getId()}.");
                 $this->_redirect('checkout/cart', array('_store' => $storeId));
             }
         }
@@ -466,6 +471,16 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     public function getCheckout()
     {
         return Mage::getSingleton('checkout/session');
+    }
+
+    /**
+     * Get main session namespace.
+     *
+     * @return Mage_Core_Model_Session
+     */
+    public function getCoreSession()
+    {
+        return Mage::getSingleton('core/session');
     }
 
     /**
