@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -66,7 +66,6 @@ class ResponseProcessor
     public function execute(\Lyranetwork\Payzen\Api\ResponseActionInterface $controller)
     {
         $request = $controller->getRequest()->getParams();
-        $this->dataHelper->log('Payment response parameters : ' . json_encode($request), \Psr\Log\LogLevel::DEBUG);
 
         // loading order
         $orderId = key_exists('vads_order_id', $request) ? $request['vads_order_id'] : 0;
@@ -88,8 +87,11 @@ class ResponseProcessor
 
         if (! $payzenResponse->isAuthentified()) {
             // authentification failed
-            $this->dataHelper->log("{$this->dataHelper->getIpAddress()} tries to access our payzen/payment/return" .
-            " page without valid signature. It may be a hacking attempt.", \Psr\Log\LogLevel::ERROR);
+            $this->dataHelper->log(
+                "{$this->dataHelper->getIpAddress()} tries to access payzen/payment/response page without valid signature with parameters: " . json_encode($request),
+                \Psr\Log\LogLevel::ERROR
+            );
+
             return $controller->redirectError($order);
         }
 

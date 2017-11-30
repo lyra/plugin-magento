@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -41,7 +41,7 @@ class DuplicatePaymentResult
     private $cardResponse = null;
 
     /**
-     * @var AuthenticationResultData $authorizationResponse
+     * @var AuthorizationResponse $authorizationResponse
      */
     private $authorizationResponse = null;
 
@@ -148,7 +148,7 @@ class DuplicatePaymentResult
     }
 
     /**
-     * @return AuthenticationResultData
+     * @return AuthorizationResponse
      */
     public function getAuthorizationResponse()
     {
@@ -156,7 +156,7 @@ class DuplicatePaymentResult
     }
 
     /**
-     * @param AuthenticationResultData $authorizationResponse
+     * @param AuthorizationResponse $authorizationResponse
      * @return DuplicatePaymentResult
      */
     public function setAuthorizationResponse($authorizationResponse)
@@ -202,7 +202,7 @@ class DuplicatePaymentResult
     }
 
     /**
-     * @return markResponse
+     * @return MarkResponse
      */
     public function getMarkResponse()
     {
@@ -210,7 +210,7 @@ class DuplicatePaymentResult
     }
 
     /**
-     * @param markResponse $markResponse
+     * @param MarkResponse $markResponse
      * @return DuplicatePaymentResult
      */
     public function setMarkResponse($markResponse)
@@ -256,7 +256,7 @@ class DuplicatePaymentResult
     }
 
     /**
-     * @return fraudManagementResponse
+     * @return FraudManagementResponse
      */
     public function getFraudManagementResponse()
     {
@@ -264,7 +264,7 @@ class DuplicatePaymentResult
     }
 
     /**
-     * @param fraudManagementResponse $fraudManagementResponse
+     * @param FraudManagementResponse $fraudManagementResponse
      * @return DuplicatePaymentResult
      */
     public function setFraudManagementResponse($fraudManagementResponse)

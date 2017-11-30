@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -210,7 +210,7 @@ class Checkout
 
     public function toOneyCarrier($methodCode)
     {
-        $shippingMapping = unserialize($this->dataHelper->getCommonConfigData('ship_options'));
+        $shippingMapping = $this->dataHelper->unserialize($this->dataHelper->getCommonConfigData('ship_options'));
 
         if (is_array($shippingMapping) && ! empty($shippingMapping)) {
             foreach ($shippingMapping as $id => $shippingMethod) {
@@ -231,7 +231,7 @@ class Checkout
             return $commonCategory;
         }
 
-        $categoryMapping = unserialize($this->dataHelper->getCommonConfigData('category_mapping'));
+        $categoryMapping = $this->dataHelper->unserialize($this->dataHelper->getCommonConfigData('category_mapping'));
 
         if (is_array($categoryMapping) && ! empty($categoryMapping) && is_array($categoryIds) && ! empty($categoryIds)) {
             foreach ($categoryMapping as $id => $category) {

@@ -8,14 +8,15 @@ Namely, it enables the following payment methods :
 
 ## Installation & upgrade
 
-- Create app/code/Lyranetwork/Payzen folder if not exists
-- Unzip module in your Magento 2 app/code/Lyranetwork/Payzen folder
-- Enable module: bin/magento module:enable --clear-static-content Lyranetwork_Payzen
-- Upgrade database: bin/magento setup:upgrade
-- Re-run compile command: bin/magento setup:di:compile
-- Update static files by: bin/magento setup:static-content:deploy [locale]
+- Create app/code/Lyranetwork/Payzen folder if not exists.
+- Unzip module in your Magento 2 app/code/Lyranetwork/Payzen folder.
+- Open command line and change to Magento installation root directory.
+- Enable module: php bin/magento module:enable --clear-static-content Lyranetwork_Payzen
+- Upgrade database: php bin/magento setup:upgrade
+- Re-run compile command: php bin/magento setup:di:compile
+- Update static files by: php bin/magento setup:static-content:deploy [locale]
 
-In order to deactivate the module: bin/magento module:disable --clear-static-content Lyranetwork_Payzen
+In order to deactivate the module: php bin/magento module:disable --clear-static-content Lyranetwork_Payzen
 
 ## Configuration
 

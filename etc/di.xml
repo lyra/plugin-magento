@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -30,7 +30,6 @@
             <argument name="name" xsi:type="string">payzen</argument>
             <argument name="handlers"  xsi:type="array">
                 <item name="debug" xsi:type="object">Lyranetwork\Payzen\Model\Logger\Handler\Payzen</item>
-                <item name="system" xsi:type="object">Lyranetwork\Payzen\Model\Logger\Handler\Payzen</item>
             </argument>
         </arguments>
     </type>

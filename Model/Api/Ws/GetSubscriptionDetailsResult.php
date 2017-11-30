@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -41,7 +41,7 @@ class GetSubscriptionDetailsResult
     private $cardResponse = null;
 
     /**
-     * @var AuthenticationResultData $authorizationResponse
+     * @var AuthorizationResponse $authorizationResponse
      */
     private $authorizationResponse = null;
 
@@ -158,7 +158,7 @@ class GetSubscriptionDetailsResult
     }
 
     /**
-     * @return AuthenticationResultData
+     * @return AuthorizationResponse
      */
     public function getAuthorizationResponse()
     {
@@ -166,7 +166,7 @@ class GetSubscriptionDetailsResult
     }
 
     /**
-     * @param AuthenticationResultData $authorizationResponse
+     * @param AuthorizationResponse $authorizationResponse
      * @return GetSubscriptionDetailsResult
      */
     public function setAuthorizationResponse($authorizationResponse)
@@ -212,7 +212,7 @@ class GetSubscriptionDetailsResult
     }
 
     /**
-     * @return markResponse
+     * @return MarkResponse
      */
     public function getMarkResponse()
     {
@@ -220,7 +220,7 @@ class GetSubscriptionDetailsResult
     }
 
     /**
-     * @param markResponse $markResponse
+     * @param MarkResponse $markResponse
      * @return GetSubscriptionDetailsResult
      */
     public function setMarkResponse($markResponse)
@@ -266,7 +266,7 @@ class GetSubscriptionDetailsResult
     }
 
     /**
-     * @return fraudManagementResponse
+     * @return FraudManagementResponse
      */
     public function getFraudManagementResponse()
     {
@@ -274,7 +274,7 @@ class GetSubscriptionDetailsResult
     }
 
     /**
-     * @param fraudManagementResponse $fraudManagementResponse
+     * @param FraudManagementResponse $fraudManagementResponse
      * @return GetSubscriptionDetailsResult
      */
     public function setFraudManagementResponse($fraudManagementResponse)

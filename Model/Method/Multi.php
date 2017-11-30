@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -79,7 +79,6 @@ class Multi extends Payzen
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-    
         $this->multiCardPayment = $multiCardPayment;
 
         parent::__construct(
@@ -191,7 +190,7 @@ class Multi extends Payzen
      */
     public function getAvailableOptions($amount = null)
     {
-        $configOptions = unserialize($this->getConfigData('multi_payment_options'));
+        $configOptions = $this->dataHelper->unserialize($this->getConfigData('multi_payment_options'));
 
         $options = [];
         if (is_array($configOptions) && ! empty($configOptions)) {

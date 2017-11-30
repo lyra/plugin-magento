@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -25,6 +25,19 @@ class Response extends \Magento\Framework\View\Element\Template
      * @var string
      */
     protected $forwardUrl;
+
+    /**
+     * Set forward path.
+     *
+     * @param string $path
+     * @param string $params
+     * @return \Lyranetwork\Payzen\Block\Payment\Iframe\Response
+     */
+    public function setForwardPath($path, $params = [])
+    {
+        $this->forwardUrl = $this->_urlBuilder->getUrl($path, $params);
+        return $this;
+    }
 
     /**
      * Set forward URL.

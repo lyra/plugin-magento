@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -21,7 +21,7 @@ namespace Lyranetwork\Payzen\Model\Api\Ws;
 class CustomerResponse
 {
     /**
-     * @var BillingDetailsRequest $billingDetails
+     * @var BillingDetailsResponse $billingDetails
      */
     private $billingDetails = null;
 
@@ -36,7 +36,7 @@ class CustomerResponse
     private $extraDetails = null;
 
     /**
-     * @return BillingDetailsRequest
+     * @return BillingDetailsResponse
      */
     public function getBillingDetails()
     {
@@ -44,7 +44,7 @@ class CustomerResponse
     }
 
     /**
-     * @param BillingDetailsRequest $billingDetails
+     * @param BillingDetailsResponse $billingDetails
      * @return CustomerResponse
      */
     public function setBillingDetails($billingDetails)

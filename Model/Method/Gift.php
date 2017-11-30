@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -105,7 +105,7 @@ class Gift extends Payzen
     {
         $options = $this->_getHelper()->getConfigArray('gift_cards'); // the default gift cards
 
-        $addedCards = unserialize($this->getConfigData('added_gift_cards')); // the user-added gift cards
+        $addedCards = $this->dataHelper->unserialize($this->getConfigData('added_gift_cards')); // the user-added gift cards
         if (is_array($addedCards) && ! empty($addedCards)) {
             foreach ($addedCards as $code => $value) {
                 if (empty($value)) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -46,6 +46,14 @@ if (! class_exists('PayzenResponse', false)) {
         private $certificate;
 
         /**
+         * Algorithm used to check the signature.
+         *
+         * @see PayzenApi::sign
+         * @var string
+         */
+        private $algo = PayzenApi::ALGO_SHA1;
+
+        /**
          * Value of vads_result.
          *
          * @var string
@@ -88,12 +96,16 @@ if (! class_exists('PayzenResponse', false)) {
          * @param string $ctx_mode
          * @param string $key_test
          * @param string $key_prod
-         * @param string $encoding
+         * @param string $algo
          */
-        public function __construct($params, $ctx_mode, $key_test, $key_prod)
+        public function __construct($params, $ctx_mode, $key_test, $key_prod, $algo = PayzenApi::ALGO_SHA1)
         {
             $this->rawResponse = PayzenApi::uncharm($params);
             $this->certificate = $ctx_mode == 'PRODUCTION' ? $key_prod : $key_test;
+
+            if (in_array($algo, PayzenApi::$SUPPORTED_ALGOS)) {
+                $this->algo = $algo;
+            }
 
             // payment results
             $this->result = self::findInArray('vads_result', $this->rawResponse, null);
@@ -120,7 +132,7 @@ if (! class_exists('PayzenResponse', false)) {
          */
         public function getComputedSignature($hashed = true)
         {
-            return PayzenApi::sign($this->rawResponse, $this->certificate, $hashed);
+            return PayzenApi::sign($this->rawResponse, $this->certificate, $this->algo, $hashed);
         }
 
         /**

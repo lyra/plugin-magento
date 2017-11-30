@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -64,7 +64,7 @@ class CommonRequest
     public function getSubmissionDate()
     {
         if ($this->submissionDate == null) {
-                return null;
+            return null;
         } else {
             try {
                 return \DateTime::createFromFormat(\DateTime::ATOM, $this->submissionDate);

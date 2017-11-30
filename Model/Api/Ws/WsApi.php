@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -27,7 +27,7 @@ class WsApi extends \SoapClient
     /**
      * @var array $classes The defined classes
      */
-    private static $classes = [
+    private static $classes = array(
         'refundPayment', 'commonRequest', 'paymentRequest', 'queryRequest', 'refundPaymentResponse',
         'refundPaymentResult', 'commonResponse', 'paymentResponse', 'orderResponse', 'extInfo', 'cardResponse',
         'authorizationResponse', 'captureResponse', 'customerResponse', 'billingDetailsResponse',
@@ -55,7 +55,7 @@ class WsApi extends \SoapClient
         'getPaymentDetailsResponse', 'getPaymentDetailsResult', 'updateToken', 'updateTokenResponse',
         'updateTokenResult', 'cancelSubscription', 'cancelSubscriptionResponse', 'cancelSubscriptionResult',
         'getTokenDetails', 'getTokenDetailsResponse', 'getTokenDetailsResult'
-    ];
+    );
 
     private $shopId;
     private $mode;
@@ -65,7 +65,7 @@ class WsApi extends \SoapClient
      * @param string $wsdl The WSDL file to use
      * @param array $options An array of config values
      */
-    public function __construct(array $options = [], $wsdl = 'https://secure.payzen.eu/vads-ws/v5?wsdl')
+    public function __construct(array $options = array(), $wsdl = 'https://secure.payzen.eu/vads-ws/v5?wsdl')
     {
         foreach (self::$classes as $class) {
             if (!isset($options['classmap'][$class])) {
@@ -73,15 +73,15 @@ class WsApi extends \SoapClient
             }
         }
 
-        $ssl = [];
+        $ssl = array();
         if (isset($options['sni.enabled']) && $options['sni.enabled']) {
             $url = parse_url($wsdl);
-            $ssl = ['SNI_enabled' => true, 'SNI_server_name' => $url['host']];
+            $ssl = array('SNI_enabled' => true, 'SNI_server_name' => $url['host']);
 
             unset($options['sni.enabled']);
         }
 
-        $options = array_merge([
+        $options = array_merge(array(
             'trace' => true,
             'exceptions' => true,
             'soapaction' => '',
@@ -91,9 +91,9 @@ class WsApi extends \SoapClient
             'encoding' => 'UTF-8',
             'soap_version' => SOAP_1_2,
             'stream_context' => stream_context_create(
-                ['ssl' => $ssl, 'http' => ['user_agent' => 'PHPSoapClient']]
+                array('ssl' => $ssl, 'http' => array('user_agent' => 'PHPSoapClient'))
             )
-        ], $options);
+        ), $options);
 
         parent::__construct($wsdl, $options);
     }
@@ -113,17 +113,43 @@ class WsApi extends \SoapClient
 
     public function genUuid()
     {
-        return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff)
-        );
+        if ($data = $this->genRandomBytes()) {
+            $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 100
+            $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6 & 7 to 10
+
+            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+        } else {
+            return sprintf(
+                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0x0fff) | 0x4000,
+                mt_rand(0, 0x3fff) | 0x8000,
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff)
+            );
+        }
+    }
+
+    private function genRandomBytes()
+    {
+        if (function_exists('random_bytes')) {
+            // PHP 7 code
+            try {
+                return random_bytes(16);
+            } catch(\Exception $e) {
+                // try something else below
+            }
+        }
+
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            // PHP 5.3 code but needs OpenSSL library
+            return openssl_random_pseudo_bytes(16);
+        }
+
+        return null;
     }
 
     public function setHeaders()
@@ -135,7 +161,7 @@ class WsApi extends \SoapClient
         $authToken = $this->getAuthToken($requestId, $timestamp);
 
         // create headers for shopId, requestId, timestamp, mode and authToken
-        $headers = [];
+        $headers = array();
 
         $headers[] = new \SOAPHeader(self::HEADER_NAMESPACE, 'shopId', $this->shopId);
         $headers[] = new \SOAPHeader(self::HEADER_NAMESPACE, 'requestId', $requestId);
@@ -154,7 +180,7 @@ class WsApi extends \SoapClient
         // retrieve header of the last response
         $header = $this->__getLastResponseHeaders();
 
-        $matches = [];
+        $matches = array();
         if (!preg_match('#JSESSIONID=([A-Za-z0-9\._]+)#', $header, $matches)) {
             // no session created by platform
             throw new \SoapFault('PayzenSID', 'No session ID returned by platform.' . $header);
@@ -177,36 +203,36 @@ class WsApi extends \SoapClient
         $path = new \DOMXPath($dom);
         $xmlHeaders = $path->query('//*[local-name()="Header"]/*');
 
-        $headers = [];
+        $headers = array();
         foreach ($xmlHeaders as $xmlHeader) {
             $headers[$xmlHeader->nodeName] = $xmlHeader->nodeValue;
         }
 
         if ($this->shopId !== $headers['shopId']) {
-            throw new namespace\SecurityException("Inconsistent returned shopId {$headers['shopId']}.");
+            throw new \UnexpectedValueException("Inconsistent returned shopId {$headers['shopId']}.", -1);
         }
 
         if ($this->mode !== $headers['mode']) {
-            throw new namespace\SecurityException("Inconsistent returned mode {$headers['mode']}.");
+            throw new \UnexpectedValueException("Inconsistent returned mode {$headers['mode']}.", -1);
         }
 
         $authToken = $this->getAuthToken($headers['timestamp'], $headers['requestId']);
         if ($authToken !== $headers['authToken']) {
-            throw new namespace\SecurityException('Authentication failed.');
+            throw new \UnexpectedValueException('Authentication failed.', -1);
         }
     }
 
-    public function checkResult(CommonResponse $commonResponse, array $expectedStatuses = [])
+    public function checkResult(CommonResponse $commonResponse, array $expectedStatuses = array())
     {
         if ($commonResponse->getResponseCode() !== 0) {
-            throw new namespace\ResultException(
+            throw new \UnexpectedValueException(
                 $commonResponse->getResponseCodeDetail(),
                 $commonResponse->getResponseCode()
             );
         }
 
         if (!empty($expectedStatuses) && !in_array($commonResponse->getTransactionStatusLabel(), $expectedStatuses)) {
-            throw new namespace\ResultException(
+            throw new \UnexpectedValueException(
                 "Unexpected transaction status returned ({$commonResponse->getTransactionStatusLabel()})."
             );
         }
@@ -218,7 +244,7 @@ class WsApi extends \SoapClient
      */
     public function refundPayment(RefundPayment $parameters)
     {
-        return $this->__soapCall('refundPayment', [$parameters]);
+        return $this->__soapCall('refundPayment', array($parameters));
     }
 
     /**
@@ -227,7 +253,7 @@ class WsApi extends \SoapClient
      */
     public function capturePayment(CapturePayment $parameters)
     {
-        return $this->__soapCall('capturePayment', [$parameters]);
+        return $this->__soapCall('capturePayment', array($parameters));
     }
 
     /**
@@ -236,7 +262,7 @@ class WsApi extends \SoapClient
      */
     public function createTokenFromTransaction(CreateTokenFromTransaction $parameters)
     {
-        return $this->__soapCall('createTokenFromTransaction', [$parameters]);
+        return $this->__soapCall('createTokenFromTransaction', array($parameters));
     }
 
     /**
@@ -245,7 +271,7 @@ class WsApi extends \SoapClient
      */
     public function reactivateToken(ReactivateToken $parameters)
     {
-        return $this->__soapCall('reactivateToken', [$parameters]);
+        return $this->__soapCall('reactivateToken', array($parameters));
     }
 
     /**
@@ -254,7 +280,7 @@ class WsApi extends \SoapClient
      */
     public function duplicatePayment(DuplicatePayment $parameters)
     {
-        return $this->__soapCall('duplicatePayment', [$parameters]);
+        return $this->__soapCall('duplicatePayment', array($parameters));
     }
 
     /**
@@ -263,7 +289,7 @@ class WsApi extends \SoapClient
      */
     public function verifyThreeDSEnrollment(VerifyThreeDSEnrollment $parameters)
     {
-        return $this->__soapCall('verifyThreeDSEnrollment', [$parameters]);
+        return $this->__soapCall('verifyThreeDSEnrollment', array($parameters));
     }
 
     /**
@@ -272,7 +298,7 @@ class WsApi extends \SoapClient
      */
     public function validatePayment(ValidatePayment $parameters)
     {
-        return $this->__soapCall('validatePayment', [$parameters]);
+        return $this->__soapCall('validatePayment', array($parameters));
     }
 
     /**
@@ -281,7 +307,7 @@ class WsApi extends \SoapClient
      */
     public function cancelPayment(CancelPayment $parameters)
     {
-        return $this->__soapCall('cancelPayment', [$parameters]);
+        return $this->__soapCall('cancelPayment', array($parameters));
     }
 
     /**
@@ -290,7 +316,7 @@ class WsApi extends \SoapClient
      */
     public function checkThreeDSAuthentication(CheckThreeDSAuthentication $parameters)
     {
-        return $this->__soapCall('checkThreeDSAuthentication', [$parameters]);
+        return $this->__soapCall('checkThreeDSAuthentication', array($parameters));
     }
 
     /**
@@ -299,7 +325,7 @@ class WsApi extends \SoapClient
      */
     public function getPaymentUuid(GetPaymentUuid $parameters)
     {
-        return $this->__soapCall('getPaymentUuid', [$parameters]);
+        return $this->__soapCall('getPaymentUuid', array($parameters));
     }
 
     /**
@@ -308,7 +334,7 @@ class WsApi extends \SoapClient
      */
     public function updatePayment(UpdatePayment $parameters)
     {
-        return $this->__soapCall('updatePayment', [$parameters]);
+        return $this->__soapCall('updatePayment', array($parameters));
     }
 
     /**
@@ -317,7 +343,7 @@ class WsApi extends \SoapClient
      */
     public function updatePaymentDetails(UpdatePaymentDetails $parameters)
     {
-        return $this->__soapCall('updatePaymentDetails', [$parameters]);
+        return $this->__soapCall('updatePaymentDetails', array($parameters));
     }
 
     /**
@@ -326,7 +352,7 @@ class WsApi extends \SoapClient
      */
     public function createPayment(CreatePayment $parameters)
     {
-        return $this->__soapCall('createPayment', [$parameters]);
+        return $this->__soapCall('createPayment', array($parameters));
     }
 
     /**
@@ -335,7 +361,7 @@ class WsApi extends \SoapClient
      */
     public function createSubscription(CreateSubscription $parameters)
     {
-        return $this->__soapCall('createSubscription', [$parameters]);
+        return $this->__soapCall('createSubscription', array($parameters));
     }
 
     /**
@@ -344,7 +370,7 @@ class WsApi extends \SoapClient
      */
     public function getSubscriptionDetails(GetSubscriptionDetails $parameters)
     {
-        return $this->__soapCall('getSubscriptionDetails', [$parameters]);
+        return $this->__soapCall('getSubscriptionDetails', array($parameters));
     }
 
     /**
@@ -353,7 +379,7 @@ class WsApi extends \SoapClient
      */
     public function updateSubscription(UpdateSubscription $parameters)
     {
-        return $this->__soapCall('updateSubscription', [$parameters]);
+        return $this->__soapCall('updateSubscription', array($parameters));
     }
 
     /**
@@ -362,7 +388,7 @@ class WsApi extends \SoapClient
      */
     public function cancelToken(CancelToken $parameters)
     {
-        return $this->__soapCall('cancelToken', [$parameters]);
+        return $this->__soapCall('cancelToken', array($parameters));
     }
 
     /**
@@ -371,7 +397,7 @@ class WsApi extends \SoapClient
      */
     public function createToken(CreateToken $parameters)
     {
-        return $this->__soapCall('createToken', [$parameters]);
+        return $this->__soapCall('createToken', array($parameters));
     }
 
     /**
@@ -380,7 +406,7 @@ class WsApi extends \SoapClient
      */
     public function findPayments(FindPayments $parameters)
     {
-        return $this->__soapCall('findPayments', [$parameters]);
+        return $this->__soapCall('findPayments', array($parameters));
     }
 
     /**
@@ -389,7 +415,7 @@ class WsApi extends \SoapClient
      */
     public function getPaymentDetails(GetPaymentDetails $parameters)
     {
-        return $this->__soapCall('getPaymentDetails', [$parameters]);
+        return $this->__soapCall('getPaymentDetails', array($parameters));
     }
 
     /**
@@ -398,7 +424,7 @@ class WsApi extends \SoapClient
      */
     public function updateToken(UpdateToken $parameters)
     {
-        return $this->__soapCall('updateToken', [$parameters]);
+        return $this->__soapCall('updateToken', array($parameters));
     }
 
     /**
@@ -407,7 +433,7 @@ class WsApi extends \SoapClient
      */
     public function cancelSubscription(CancelSubscription $parameters)
     {
-        return $this->__soapCall('cancelSubscription', [$parameters]);
+        return $this->__soapCall('cancelSubscription', array($parameters));
     }
 
     /**
@@ -416,6 +442,6 @@ class WsApi extends \SoapClient
      */
     public function getTokenDetails(GetTokenDetails $parameters)
     {
-        return $this->__soapCall('getTokenDetails', [$parameters]);
+        return $this->__soapCall('getTokenDetails', array($parameters));
     }
 }

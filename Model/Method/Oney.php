@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -75,7 +75,7 @@ class Oney extends Payzen
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-    
+
         $this->pricingHelper = $pricingHelper;
 
         parent::__construct(
@@ -154,7 +154,7 @@ class Oney extends Payzen
      */
     public function getPaymentOptions($amount)
     {
-        $configOptions = unserialize($this->getConfigData('oney_payment_options'));
+        $configOptions = $this->dataHelper->unserialize($this->getConfigData('oney_payment_options'));
         if (! is_array($configOptions) || empty($configOptions)) {
             return false;
         }

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -81,7 +81,6 @@ class CheckProcessor
         }
 
         $post = $controller->getRequest()->getParams();
-        $this->dataHelper->log('Payment response parameters : ' . json_encode($post), \Psr\Log\LogLevel::DEBUG);
 
         // loading order
         $orderId = key_exists('vads_order_id', $post) ? $post['vads_order_id'] : 0;
@@ -106,10 +105,14 @@ class CheckProcessor
 
         if (! $payzenResponse->isAuthentified()) {
             // authentification failed
-            $this->dataHelper->log("{$this->dataHelper->getIpAddress()} tries to access our payzen/payment/check
-                page without valid signature. It may be a hacking attempt.", \Psr\Log\LogLevel::WARNING);
+            $this->dataHelper->log(
+                "{$this->dataHelper->getIpAddress()} tries to access payzen/payment/check page without valid signature with parameters: " . json_encode($post),
+                \Psr\Log\LogLevel::ERROR
+            );
+
             return $controller->renderResponse($payzenResponse->getOutputForPlatform('auth_fail'));
         }
+
         $this->dataHelper->log("Request authenticated for order #{$order->getId()}.");
 
         $reviewStatuses = [
