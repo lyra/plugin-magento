@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -21,8 +21,9 @@
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="payzen_paypal" translate="label" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>PAYPAL PAYMENT</label>
-        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset\Dependant</frontend_model>
         <attribute type="expanded">0</attribute>
+        <attribute type="feature">paypal</attribute>
 
         <group id="payzen_display_options" translate="label" type="text" sortOrder="71" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>BASIC SETTINGS</label>

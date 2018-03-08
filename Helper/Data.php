@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -37,6 +37,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const METHOD_SOFORT = 'payzen_sofort';
 
     const METHOD_POSTFINANCE = 'payzen_postfinance';
+
+    /**
+     *
+     * @var array a global var to easily enable/disable features
+     */
+    public static $plugin_features = [
+        'multi' => true,
+        'qualif' => false
+    ];
 
     /**
      *
@@ -400,7 +409,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $currentMethod = $this->getCallerMethod();
 
         $log = '';
-        $log .= 'PayZen 2.1.3';
+        $log .= 'PayZen 2.1.4';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

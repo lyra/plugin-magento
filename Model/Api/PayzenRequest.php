@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -442,9 +442,10 @@ if (! class_exists('PayzenRequest', false)) {
          * @param int $qty
          * @param string $ref
          * @param string $type
+         * @param float vat
          * @return boolean
          */
-        public function addProduct($label, $amount, $qty, $ref, $type)
+        public function addProduct($label, $amount, $qty, $ref, $type = null, $vat = null)
         {
             $index = $this->get('nb_products') ? $this->get('nb_products') : 0;
             $ok = true;
@@ -455,6 +456,7 @@ if (! class_exists('PayzenRequest', false)) {
             $ok &= $this->addField('vads_product_qty' . $index, 'Product quantity', '#^[1-9]\d*$#u', false, 255, $qty);
             $ok &= $this->addField('vads_product_ref' . $index, 'Product reference', '#^[A-Za-z0-9]{0,64}$#u', false, 64, $ref);
             $ok &= $this->addField('vads_product_type' . $index, 'Product type', '#^' . implode('|', self::$ACCORD_CATEGORIES) . '$#u', false, 30, $type);
+            $ok &= $this->addField('vads_product_vat' . $index, 'Product tax rate', '#^((\d{1,12})|(\d{1,2}\.\d{1,4}))$#u', false, 12, $vat);
 
             // increment the number of products
             $ok &= $this->set('nb_products', $index + 1);

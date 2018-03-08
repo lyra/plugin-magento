@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.3 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -23,8 +23,10 @@ class Logo extends \Magento\Config\Model\Config\Backend\Image
     public function beforeSave()
     {
         $value = $this->getValue();
-        $value['value'] = $value['name'];
-        $this->setValue($value);
+        if (is_array($value) && ! empty($value['name'])) {
+            $value['value'] = $value['name'];
+            $this->setValue($value);
+        }
 
         parent::beforeSave();
 

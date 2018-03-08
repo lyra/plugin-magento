@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
+  * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -15,23 +15,22 @@
  * @category  payment
  * @package   payzen
  */
-namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
+namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset;
 
 /**
- * Custom renderer for the PayZen multi select fields.
+ * Fieldset renderer which depends on features enabled.
  */
-class Multiselect extends \Magento\Config\Block\System\Config\Form\Field
+class Dependant extends \Magento\Config\Block\System\Config\Form\Fieldset
 {
-
-    /**
-     * Set field size.
-     *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
-     * @return string
-     */
     public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-        $element->setSize(5);
+        // get configured features
+        $features = \Lyranetwork\Payzen\Helper\Data::$plugin_features;
+
+        $data = $element->getOriginalData();
+        if (isset($data['feature']) && key_exists($data['feature'], $features) && ! $features[$data['feature']]) {
+            return '';
+        }
 
         return parent::render($element);
     }
