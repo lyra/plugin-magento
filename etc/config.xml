@@ -38,9 +38,9 @@
 
                 <redirect_enabled>0</redirect_enabled>
                 <redirect_success_timeout>5</redirect_success_timeout>
-                <redirect_success_message>Redirection vers la boutique dans quelques instants...</redirect_success_message>
+                <redirect_success_message>Redirection to shop in a few seconds...</redirect_success_message>
                 <redirect_error_timeout>5</redirect_error_timeout>
-                <redirect_error_message>Redirection vers la boutique dans quelques instants...</redirect_error_message>
+                <redirect_error_message>Redirection to shop in a few seconds...</redirect_error_message>
                 <return_mode>GET</return_mode>
                 <refill_cart>1</refill_cart>
                 <registered_order_status>processing</registered_order_status>

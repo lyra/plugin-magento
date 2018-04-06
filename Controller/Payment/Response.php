@@ -109,7 +109,8 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
         $this->messageManager->getMessages(true);
 
         $storeId = $order->getStore()->getId();
-        if ($this->dataHelper->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
+        $features = \Lyranetwork\Payzen\Helper\Data::$plugin_features;
+        if ($features['prodfaq'] && ($this->dataHelper->getCommonConfigData('ctx_mode', $storeId) == 'TEST')) {
             // display going to production message
             $message = __('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
             $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';

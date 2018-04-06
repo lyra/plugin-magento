@@ -43,6 +43,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var array a global var to easily enable/disable features
      */
     public static $plugin_features = [
+        'prodfaq' => true,
         'multi' => true,
         'qualif' => false
     ];

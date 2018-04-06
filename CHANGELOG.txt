@@ -19,6 +19,7 @@
 - [multi]Bug fix: selected payment in installments option is not considered since Magento 2.1.3.
 - Update module structure and code to fulfill Magento marketplace requirements.
 - Using "lyranetwork" as vendor name instead of "lyra" (already used in Magento Marketplace).
+- [giropay]Upgrade supported card types list.
 
 2.1.0, 2016-11-05:
 - Bug fix: error relative to CMS version detection since Magento V 2.1.
