@@ -232,7 +232,7 @@ if (! class_exists('PayzenApi', false)) {
                 'POSTFINANCE_EFIN' => 'PostFinance mode E-finance', 'RUPAY' => 'RuPay',
                 'SCT' => 'Virement SEPA', 'SDD' => 'Prélèvement SEPA', 'SOFORT_BANKING' => 'Sofort',
                 'TRUFFAUT_CDX' => 'Carte cadeau Truffaut', 'VILLAVERDE' => 'Carte cadeau Villaverde',
-                'VILLAVERDE_SB' => 'Carte cadeau Villaverde - SandBox'
+                'VILLAVERDE_SB' => 'Carte cadeau Villaverde - SandBox', 'ECCARD' => 'EC Card'
             );
         }
 

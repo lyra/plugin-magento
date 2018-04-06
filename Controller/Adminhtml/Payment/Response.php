@@ -99,10 +99,13 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
 
         $storeId = $order->getStore()->getId();
         if ($this->dataHelper->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
-            // display going to production message
-            $message = __('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
-            $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
-            $this->messageManager->addNotice($message);
+            $features = \Lyranetwork\Payzen\Helper\Data::$plugin_features;
+            if ($features['prodfaq']) {
+                // display going to production message
+                $message = __('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
+                $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
+                $this->messageManager->addNotice($message);
+            }
 
             if ($checkUrlWarn) {
                 // order not validated by notification URL, in TEST mode, user is webmaster
