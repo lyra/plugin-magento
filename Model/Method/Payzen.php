@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
+ * @copyright 2014-2017 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -49,6 +49,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     protected $_canSaveCc = false;
 
     protected $_canReviewPayment = false;
+
+    protected $currencies = [];
 
     /**
      *
@@ -201,7 +203,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // contrib info
         $version = $this->productMetadata->getVersion(); // will return the magento version
-        $this->payzenRequest->set('contrib', 'Magento2.x_2.1.4/' . $version . '/' . PHP_VERSION);
+        $this->payzenRequest->set('contrib', 'Magento2.x_2.2.0/' . $version . '/' . PHP_VERSION);
 
         // set config parameters
         $configFields = [
@@ -209,6 +211,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             'key_test',
             'key_prod',
             'ctx_mode',
+            'sign_algo',
             'capture_delay',
             'validation_mode',
             'theme_config',
@@ -299,7 +302,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $paramsToLog = $this->payzenRequest->getRequestFieldsArray(true);
-        $this->dataHelper->log('Payment parameters : ' . json_encode($paramsToLog), \Psr\Log\LogLevel::DEBUG);
+        $this->dataHelper->log('Payment parameters : ' . json_encode($paramsToLog), \Psr\Log\LogLevel::INFO);
 
         return $this->payzenRequest->getRequestFieldsArray(false, false);
     }
@@ -358,6 +361,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         $keys = [
             \Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION,
+            \Lyranetwork\Payzen\Helper\Payment::CHOOZEO_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::CC_REGISTER,
             \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER
@@ -435,6 +439,12 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $quote = $this->dataHelper->getCheckoutQuote();
         if ($quote && $quote->getId()) {
             $currencyCode = $quote->getQuoteCurrencyCode();
+
+            // if sub-module support specific currencies, check quote currency over them
+            if (is_array($this->currencies) && ! empty($this->currencies)) {
+                return in_array($currencyCode, $this->currencies);
+            }
+
             $currency = PayzenApi::findCurrencyByAlphaCode($currencyCode);
             if ($currency) {
                 return true;

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
+ * @copyright 2014-2017 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -81,7 +81,8 @@ class ResponseProcessor
                 'params' => $request,
                 'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
                 'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
-                'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId)
+                'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId),
+                'algo' => $this->dataHelper->getCommonConfigData('sign_algo', $storeId)
             ]
         );
 
@@ -91,6 +92,11 @@ class ResponseProcessor
                 "{$this->dataHelper->getIpAddress()} tries to access payzen/payment/response page without valid signature with parameters: " . json_encode($request),
                 \Psr\Log\LogLevel::ERROR
             );
+
+//             $this->dataHelper->log(
+//                 'Signature algorithm selected in module settings must be the same as one selected in PayZen Back Office.',
+//                 \Psr\Log\LogLevel::ERROR
+//             );
 
             return $controller->redirectError($order);
         }

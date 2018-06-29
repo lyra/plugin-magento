@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
+ * @copyright 2014-2017 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -109,8 +109,7 @@ class Response extends \Magento\Framework\App\Action\Action implements \Lyranetw
         $this->messageManager->getMessages(true);
 
         $storeId = $order->getStore()->getId();
-        $features = \Lyranetwork\Payzen\Helper\Data::$plugin_features;
-        if ($features['prodfaq'] && ($this->dataHelper->getCommonConfigData('ctx_mode', $storeId) == 'TEST')) {
+        if ($this->dataHelper->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
             // display going to production message
             $message = __('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
             $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
