@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -43,8 +43,36 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
      */
     public function loaderAction()
     {
+        $this->_getDataHelper()->log('Start =================================================');
+        if ($this->getRequest()->getParam('mode', null) === 'cancel') {
+            // load order
+            $lastIncrementId = $this->getCheckout()->getLastRealOrderId();
+            $order = Mage::getModel('sales/order');
+            $order->loadByIncrementId($lastIncrementId);
+
+            if ($order->getId()) {
+                $this->_getDataHelper()->log("Cancel order #{$order->getId()} to allow payment retry.");
+                $order->registerCancellation($this->__('Payment canceled.'))->save();
+
+                $this->_getDataHelper()->log("Clean session for #{$order->getId()} and restore last quote if any.");
+                $this->getCheckout()->setLastBillingAgreementId(null)
+                    ->setRedirectUrl(null)
+                    ->setLastOrderId(null)
+                    ->setLastRealOrderId(null)
+                    ->setLastRecurringProfileIds(null)
+                    ->setAdditionalMessages(null);
+
+                $quote = Mage::getModel('sales/quote')->load($order->getQuoteId());
+                if ($quote->getId()) {
+                    $quote->setIsActive(true)->setReservedOrderId(null)->save();
+                    $this->getCheckout()->replaceQuote($quote);
+                }
+            }
+        }
+
         $block = $this->getLayout()->createBlock('core/template')->setTemplate('payzen/iframe/loader.phtml');
         $this->getResponse()->setBody($block->toHtml());
+        $this->_getDataHelper()->log('End =================================================');
     }
 
     /**
@@ -165,7 +193,9 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
             // restore initial checkout quote
             if ($this->getPayzenSession()->getPayzenInitialQuoteId()) {
-                $quote = Mage::getModel('sales/quote')->load((int)$this->getPayzenSession()->getPayzenInitialQuoteId(true));
+                $quote = Mage::getModel('sales/quote')->load(
+                    (int) $this->getPayzenSession()->getPayzenInitialQuoteId(true)
+                );
 
                 if ($quote->getId()) {
                     $quote->setIsActive(true)->save();
@@ -218,13 +248,14 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
         if ($productId = $this->getRequest()->getPost('product', false)) {
             $product = Mage::getModel('catalog/product')
                     ->setStoreId(Mage::app()->getStore()->getId())
-                    ->load((int)$productId);
+                    ->load((int) $productId);
 
             if ($product->getId()) {
                 // remove all 1-Click quote items to refresh it
                 foreach ($oneClickQuote->getItemsCollection() as $item) {
                     $oneClickQuote->removeItem($item->getId());
                 }
+
                 $oneClickQuote->getShippingAddress()->removeAllShippingRates();
                 $oneClickQuote->setCouponCode('');
 
@@ -286,9 +317,8 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                             }
 
                             if (! $allAdded) {
-                                $this->getCoreSession()->addError(
-                                    $this->__('Some of the products you requested are not available in the desired quantity.')
-                                );
+                                $msg = 'Some of the products you requested are not available in the desired quantity.';
+                                $this->getCoreSession()->addError($this->__($msg));
                             }
                         }
                     }
@@ -297,7 +327,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
         }
 
         $addressId = $this->getRequest()->getPost('shipping_address', false);
-        $customerAddress = Mage::getModel('customer/address')->load((int)$addressId);
+        $customerAddress = Mage::getModel('customer/address')->load((int) $addressId);
         if (! $oneClickQuote->isVirtual() && $customerAddress->getId()) {
             if ($customerAddress->getCustomerId() != Mage::getSingleton('customer/session')->getCustomer()->getId()) {
                 Mage::throwException($this->__('Customer Address is not valid.'));
@@ -331,7 +361,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     }
 
     /**
-     * Redirect to error page (when an unexpected error occured).
+     * Redirect to error page (when an unexpected error occurred).
      *
      * @param Mage_Sales_Model_Order $order
      */
@@ -360,10 +390,12 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
         $storeId = $order->getStore()->getId();
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
-            // display going to production message
-            $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
-            $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
-            $this->getCoreSession()->addNotice($message);
+            if (Lyra_Payzen_Helper_Data::$pluginFeatures['prodfaq']) {
+                // display going to production message
+                $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
+                $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
+                $this->getCoreSession()->addNotice($message);
+            }
 
             if ($checkUrlWarn) {
                 // order not validated by notification URL, in TEST mode, user is webmaster
@@ -416,7 +448,9 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->getPayzenSession()->unsPayzenInitialQuoteId();
 
                 // in case of 1-Click payment , redirect to referer URL
-                $this->_getDataHelper()->log("Redirecting to referer URL (product view or cart page) for order #{$order->getId()}.");
+                $this->_getDataHelper()->log(
+                    "Redirecting to referer URL (product view or cart page) for order #{$order->getId()}."
+                );
                 $this->_redirectUrl($this->getPayzenSession()->getPayzenOneclickBackUrl(true));
             } else {
                 $this->_getDataHelper()->log("Restore cart for order #{$order->getId()} to allow re-order quicker.");

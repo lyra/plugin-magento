@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -44,7 +44,7 @@ class Lyra_Payzen_Model_Observer
 
             $flag = false;
             if ($data = Mage::app()->getRequest()->getPost('order')) {
-                $flag = isset($data['send_confirmation']) ? (bool)$data['send_confirmation'] : false;
+                $flag = isset($data['send_confirmation']) ? (bool) $data['send_confirmation'] : false;
             }
 
             $session = Mage::getSingleton('adminhtml/session_quote');
@@ -246,7 +246,7 @@ class Lyra_Payzen_Model_Observer
             }
         } elseif ($block->getNameInLayout() == 'alert.urls') {
             if (($product = Mage::registry('product')) && $product->getId()) {
-                $this->_oneclickQuoteProcess($block->getProduct());
+                $this->_oneclickQuoteProcess($product);
             }
         }
     }
@@ -331,7 +331,7 @@ class Lyra_Payzen_Model_Observer
             if ($order && $order->getPayment() && stripos($order->getPayment()->getMethod(), 'payzen_') === 0) {
                 switch ($order->getStatus()) {
                     case 'payzen_to_validate':
-                        $message = $this->_getHelper()->__('Are you sure you want to validate this order in PayZen platform ?');
+                        $message = $this->_getHelper()->__('Are you sure you want to validate this order in PayZen gateway ?');
 
                         $block->addButton('payzen_validate_payment', array(
                                 'label'     => $this->_getHelper()->__('Validate payment'),

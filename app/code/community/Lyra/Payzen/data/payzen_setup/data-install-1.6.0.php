@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -32,13 +32,13 @@ $stateTable = $installer->getTable('sales/order_status_state');
 $select = $connection->select()->from($statusTable, 'status')->where('status = "payzen_to_validate"');
 if (! $connection->fetchOne($select)) { // status does not exist
     $connection->insert(
-            $statusTable,
-            array('status' => 'payzen_to_validate', 'label' => 'To validate payment')
+        $statusTable,
+        array('status' => 'payzen_to_validate', 'label' => 'To validate payment')
     );
 
     $connection->insert(
-            $stateTable,
-            array('status' => 'payzen_to_validate', 'state' => 'payment_review', 'is_default' => 0)
+        $stateTable,
+        array('status' => 'payzen_to_validate', 'state' => 'payment_review', 'is_default' => 0)
     );
 }
 

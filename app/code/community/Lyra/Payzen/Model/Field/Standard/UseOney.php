@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -24,9 +24,9 @@ class Lyra_Payzen_Model_Field_Standard_UseOney extends Mage_Core_Model_Config_Da
     {
         $this->message = '';
 
-        if ($this->getValue() /* propose FacilyPay Oney in standard payment enabled */) {
+        if ($this->getValue() /* propose FacilyPay Oney in one-time payment enabled */) {
             $data = $this->getGroups('payzen_oney'); // get data of FacilyPay Oney config group
-            $oneyActive = isset($data['fields']['active']['value']) && $data['fields']['active']['value'];
+            $oneyActive = isset($data['fields']['oney_active']['value']) && $data['fields']['oney_active']['value'];
 
             if ($oneyActive) {
                 $this->setValue(0);
@@ -48,7 +48,7 @@ class Lyra_Payzen_Model_Field_Standard_UseOney extends Mage_Core_Model_Config_Da
     public function afterCommitCallback()
     {
         if (! empty($this->message)) {
-            Mage::throwException($this->message . "\n" . Mage::helper('payzen')->__('FacilyPay Oney payment mean cannot be used.'));
+            Mage::throwException($this->message . "\n" . Mage::helper('payzen')->__('FacilyPay Oney means of payment cannot be used.'));
         }
 
         return parent::afterCommitCallback();

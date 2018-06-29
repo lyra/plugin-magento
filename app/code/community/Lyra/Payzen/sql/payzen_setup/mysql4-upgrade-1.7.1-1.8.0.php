@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,13 +10,18 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
  */
 
-$upgradeFile = dirname(__FILE__) . DS . 'upgrade-1.7.1-1.8.0.php';
-if (file_exists($upgradeFile)) {
+/**
+ * For backward compatibility (less than 1.6 Magento versions).
+ */
+
+$io = new Varien_Io_File();
+$upgradeFile = __DIR__ . DS . 'upgrade-1.7.1-1.8.0.php';
+if ($io->fileExists($upgradeFile)) {
     require_once $upgradeFile;
 }

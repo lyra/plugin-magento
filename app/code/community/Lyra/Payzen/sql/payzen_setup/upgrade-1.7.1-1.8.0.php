@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -23,23 +23,26 @@
 /** @var $this Lyra_Payzen_Model_Resource_Setup */
 $installer = $this;
 
-/** @var $installer Mage_Paypal_Model_Resource_Setup */
-$installer->addAttribute('customer', 'payzen_masked_card', array(
-    'type' => 'varchar',
-    'input' => 'text',
-    'label' => 'PayZen masked card',
+$installer->addAttribute(
+    'customer',
+    'payzen_masked_card',
+    array(
+        'type' => 'varchar',
+        'input' => 'text',
+        'label' => 'PayZen masked card',
 
-    'global' => 1,
-    'visible' => 0,
-    'searchable' => 0,
-    'filterable' => 0,
-    'comparable' => 0,
-    'visible_on_front' => 0,
-    'required' => 0,
-    'user_defined' => 0,
-    'default' => '',
-    'source' => null
-));
+        'global' => 1,
+        'visible' => 0,
+        'searchable' => 0,
+        'filterable' => 0,
+        'comparable' => 0,
+        'visible_on_front' => 0,
+        'required' => 0,
+        'user_defined' => 0,
+        'default' => '',
+        'source' => null
+    )
+);
 
 $entityTypeId     = $installer->getEntityTypeId('customer');
 $attributeSetId   = $installer->getDefaultAttributeSetId($entityTypeId);

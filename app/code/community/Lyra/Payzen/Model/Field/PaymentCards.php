@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -25,7 +25,7 @@ class Lyra_Payzen_Model_Field_PaymentCards extends Mage_Core_Model_Config_Data
         }
 
         if (strlen(implode(';', $this->getValue())) > 127) {
-            $field = Mage::helper('payzen')->__((string)$this->getFieldConfig()->label);
+            $field = Mage::helper('payzen')->__((string) $this->getFieldConfig()->label);
             $group = Mage::helper('payzen')->getConfigGroupTitle($this->getGroupId());
 
             $msg = sprintf(Mage::helper('payzen')->__('Invalid value for field &laquo;%s&raquo; in section &laquo;%s&raquo;.'), $field, $group);

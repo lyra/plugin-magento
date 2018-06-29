@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -158,7 +158,7 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
         if ($quote->getCustomerId() && ! preg_match(Lyra_Payzen_Helper_Util::CUST_ID_REGEX, $quote->getCustomerId())) {
             // customer id doesn't match FacilyPay Oney rules
 
-            $msg = 'Customer ID "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
+            $msg = 'Customer ID "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
             $this->_getHelper()->log(sprintf($msg, $quote->getCustomerId(), Lyra_Payzen_Helper_Util::CUST_ID_REGEX), Zend_Log::WARN);
             return false;
         }
@@ -170,7 +170,7 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
         if (! preg_match(Lyra_Payzen_Helper_Util::ORDER_ID_REGEX, $quote->getReservedOrderId())) {
             // order id doesn't match FacilyPay Oney rules
 
-            $msg = 'The order ID "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
+            $msg = 'The order ID "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
             $this->_getHelper()->log(sprintf($msg, $quote->getReservedOrderId(), Lyra_Payzen_Helper_Util::ORDER_ID_REGEX), Zend_Log::WARN);
             return false;
         }
@@ -184,7 +184,7 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
             if (! preg_match(Lyra_Payzen_Helper_Util::PRODUCT_REF_REGEX, $item->getProductId())) {
                 // product id doesn't match FacilyPay Oney rules
 
-                $msg = 'Product reference "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
+                $msg = 'Product reference "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
                 $this->_getHelper()->log(sprintf($msg, $item->getProductId(), Lyra_Payzen_Helper_Util::PRODUCT_REF_REGEX), Zend_Log::WARN);
                 return false;
             }

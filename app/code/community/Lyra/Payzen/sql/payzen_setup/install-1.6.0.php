@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -23,7 +23,10 @@
 /** @var $this Lyra_Payzen_Model_Resource_Setup */
 $installer = $this;
 
-$installer->addAttribute('customer', 'payzen_identifier', array(
+$installer->addAttribute(
+    'customer',
+    'payzen_identifier',
+    array(
         'type' => 'varchar',
         'input' => 'text',
         'label' => 'PayZen identifier',
@@ -38,22 +41,26 @@ $installer->addAttribute('customer', 'payzen_identifier', array(
         'user_defined' => 0,
         'default' => '',
         'source' => null
-));
+    )
+);
 
 $entityTypeId     = $installer->getEntityTypeId('customer');
 $attributeSetId   = $installer->getDefaultAttributeSetId($entityTypeId);
 $attributeGroupId = $installer->getDefaultAttributeGroupId($entityTypeId, $attributeSetId);
 $installer->addAttributeToGroup(
-        $entityTypeId,
-        $attributeSetId,
-        $attributeGroupId,
-        'payzen_identifier',
-        '999' // sort_order
+    $entityTypeId,
+    $attributeSetId,
+    $attributeGroupId,
+    'payzen_identifier',
+    '999' // sort_order
 );
 
 // empty log file
-$logFileName = Mage::getBaseDir('var') . DS . 'log' . DS . 'payzen.log';
-if (file_exists($logFileName)) {
-    $f = fopen($logFileName, 'w'); // just for emptying module log file
-    fclose($f);
+$io = new Varien_Io_File();
+$logDir = Mage::getBaseDir('var') . DS . 'log';
+$logFileName = $logDir . DS . 'payzen.log';
+if ($io->fileExists($logFileName)) {
+    $io->open(array('path' => $logDir));
+    $io->streamOpen($logFileName, 'w'); // just for emptying module log file
+    $io->streamClose();
 }

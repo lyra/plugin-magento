@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -84,7 +84,7 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
     }
 
     /**
-     * Redirect to error page (when an unexpected error occured).
+     * Redirect to error page (when an unexpected error occurred).
      *
      * @param Mage_Sales_Model_Order $order
      */
@@ -94,7 +94,9 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
         $this->getCheckout()->getMessages(true);
         $this->getAdminSession()->getMessages(true);
 
-        $this->getAdminSession()->addError($this->__('An error has occured during the payment process.'));
+        $this->getAdminSession()->addError($this->__('An error has occurred during the payment process.'));
+
+        $this->_getDataHelper()->log("Redirecting to order create page for order #{$order->getId()}.");
         $this->_redirect('adminhtml/sales_order_create/index');
     }
 
@@ -113,10 +115,12 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
 
         $storeId = $order->getStore()->getId();
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
-            // display going to production message
-            $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
-            $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
-            $this->getAdminSession()->addNotice($message);
+            if (Lyra_Payzen_Helper_Data::$pluginFeatures['prodfaq']) {
+                // display going to production message
+                $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
+                $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
+                $this->getAdminSession()->addNotice($message);
+            }
 
             if ($checkUrlWarn) {
                 // order not validated by notification URL, in TEST mode, user is webmaster
@@ -137,7 +141,9 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
         if ($success) {
             $this->_getDataHelper()->log("Redirecting to order review page for order #{$order->getId()}.");
             $this->getCheckout()->setLastSuccessQuoteId($order->getQuoteId());
-            $this->getAdminSession()->addSuccess($this->__('The payment was successful. Your order was registered successfully.'));
+            $this->getAdminSession()->addSuccess(
+                $this->__('The payment was successful. Your order was registered successfully.')
+            );
             $this->_redirect('adminhtml/sales_order/view', array('order_id' => $order->getId()));
         } else {
             $this->_getDataHelper()->log("Unsetting order data in session for order #{$order->getId()}.");

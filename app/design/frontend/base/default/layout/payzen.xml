@@ -3,7 +3,6 @@
     <checkout_onepage_index>
         <reference name="head">
             <action method="addCss"><stylesheet>css/payzen.css</stylesheet></action>
-            <block type="core/template" name="payzen_oneclick_js" template="payzen/oneclick/js.phtml" />
         </reference>
     </checkout_onepage_index>
 
@@ -46,10 +45,6 @@
     </payzen_oneclick_shipping_method>
 
     <checkout_cart_index>
-        <reference name="head">
-            <block type="core/template" name="payzen_oneclick_js" template="payzen/oneclick/js.phtml" />
-        </reference>
-
         <reference name="checkout.cart.methods">
             <block type="payzen/oneclick_cart" name="payzen_oneclick_cart" before="-" template="payzen/oneclick/cart.phtml" >
                 <block type="core/template" name="payzen_oneclick_cart_shipping" as="payzen_shipping" template="payzen/oneclick/shipping.phtml">
@@ -61,6 +56,10 @@
     </checkout_cart_index>
 
     <default>
+        <reference name="head">
+            <block type="core/template" name="payzen_oneclick_js" template="payzen/oneclick/js.phtml" />
+        </reference>
+
         <reference name="cart_sidebar.extra_actions">
             <block type="payzen/oneclick_cart" name="payzen_oneclick_minicart" template="payzen/oneclick/minicart.phtml" >
                 <block type="core/template" name="payzen_oneclick_minicart_shipping" as="payzen_shipping" template="payzen/oneclick/shipping.phtml">
@@ -72,10 +71,6 @@
     </default>
 
     <catalog_product_view>
-        <reference name="head">
-            <block type="core/template" name="payzen_oneclick_js" template="payzen/oneclick/js.phtml" />
-        </reference>
-
         <reference name="alert.urls">
             <block type="payzen/oneclick_product" name="payzen_oneclick_product" as="alert_urls" template="payzen/oneclick/product.phtml">
                 <block type="core/template" name="payzen_oneclick_product_shipping" as="payzen_shipping" template="payzen/oneclick/shipping.phtml">

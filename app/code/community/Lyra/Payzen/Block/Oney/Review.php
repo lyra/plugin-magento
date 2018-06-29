@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -81,8 +81,8 @@ class Lyra_Payzen_Block_Oney_Review extends Mage_Core_Block_Template
 
         if (is_array($this->_option) && ! empty($this->_option)) {
             $amount = $this->_amount;
-            $count = (int)$this->_option['count'];
-            $rate = (float)$this->_option['rate'];
+            $count = (int) $this->_option['count'];
+            $rate = (float) $this->_option['rate'];
 
             $maxFees = null;
             switch ($count) {
@@ -113,7 +113,7 @@ class Lyra_Payzen_Block_Oney_Review extends Mage_Core_Block_Template
             $details->setMonthlyPayment($this->currency($payment));
             $details->setFundingTotal($this->currency(($count - 1) * $payment - $fees));
             $details->setFundingFees($this->currency($fees));
-            $details->setTaeg(''); // TODO calculate TAEG
+            $details->setTaeg('');
         }
 
         return $details;

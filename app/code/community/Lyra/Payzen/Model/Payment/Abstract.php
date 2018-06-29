@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -71,7 +71,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         // set the amount to pay
         $this->_payzenRequest->set('amount', $currency->convertAmountToInteger($amount));
 
-        $this->_payzenRequest->set('contrib', 'Magento1.4-1.9_1.8.0/' . Mage::getVersion() . '/' . PHP_VERSION);
+        $this->_payzenRequest->set('contrib', 'Magento1.4-1.9_1.9.0/' . Mage::getVersion() . '/' . PHP_VERSION);
 
         // set config parameters
         $configFields = array('site_id', 'key_test', 'key_prod', 'ctx_mode', 'capture_delay', 'validation_mode',
@@ -115,7 +115,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
 
         // activate 3ds ?
         $threedsMpi = null;
-        $configOptions = unserialize($this->getConfigData('custgroup_threeds_min_amount'));
+        $configOptions = unserialize($this->_getHelper()->getCommonConfigData('custgroup_threeds_min_amount'));
         if (is_array($configOptions) && ! empty($configOptions)) {
             $group = $order->getCustomerGroupId();
 
@@ -144,10 +144,11 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
                 $threedsMinAmount = $allThreedsMinAmount;
             }
 
-            if ($threedsMinAmount && $order->getTotalDue() < $threedsMinAmount) {
+            if ($threedsMinAmount && ($order->getTotalDue() < $threedsMinAmount)) {
                 $threedsMpi = '2';
             }
         }
+
         $this->_payzenRequest->set('threeds_mpi', $threedsMpi);
 
         $this->_payzenRequest->set('cust_email', $order->getCustomerEmail());
@@ -221,7 +222,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
     }
 
     /**
-     * Return the payment platform URL.
+     * Return the payment gateway URL.
      *
      * @return string
      */
@@ -454,7 +455,8 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             // new transaction status
             $additionalInfo['Transaction Status'] = 'CANCELLED';
 
-            $this->_getPaymentHelper()->addTransaction($payment, Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID, $transactionId, $additionalInfo);
+            $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
+            $this->_getPaymentHelper()->addTransaction($payment, $transactionType, $transactionId, $additionalInfo);
             return true; // let Magento cancel order
 
         } catch(Lyra_Payzen_Model_WsException $e) {
@@ -626,8 +628,8 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
                 $shippingAddress =  $info->getQuote()->isVirtual() ? null : $info->getQuote()->getShippingAddress();
             }
 
-            Mage::helper('payzen/util')->checkAddressValidity($billingAddress);
-            Mage::helper('payzen/util')->checkAddressValidity($shippingAddress);
+            Mage::helper('payzen/util')->checkAddressValidity($billingAddress, 'oney');
+            Mage::helper('payzen/util')->checkAddressValidity($shippingAddress, 'oney');
 
             return $this;
         } else {
@@ -1004,7 +1006,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             'Amount' => $amountDetail,
             'Transaction ID' => $transactionId,
             'Transaction Status' => $commonResponse->getTransactionStatusLabel(),
-            'Payment Mean' => $cardResponse->getBrand(),
+            'Means of Payment' => $cardResponse->getBrand(),
             'Credit Card Number' => $cardResponse->getNumber(),
             'Expiration Date' => $expiry
         );

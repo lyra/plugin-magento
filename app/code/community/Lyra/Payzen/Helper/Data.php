@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -18,6 +18,29 @@
 
 class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
 {
+
+    /**
+     *
+     * @var array a global var to easily enable/disable features
+     */
+    public static $pluginFeatures = array(
+        'qualif' => false,
+        'prodfaq' => true,
+        'acquis' => true,
+        'restrictmulti' => false,
+
+        'multi' => true,
+        'gift' => true,
+        'oney' => true,
+        'paypal' => true,
+        'sofort' => true,
+        'postfinance' => false,
+        'giropay' => true,
+        'ideal' => true,
+        'choozeo' => false,
+        'fullcb' => true,
+        'sepa' => true
+    );
 
     /**
      * Shortcut method to get general PayZen module configuration.
@@ -76,7 +99,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         $config->loadFile(Mage::getConfig()->getModuleDir('etc', 'Lyra_Payzen').DS.'system.xml');
         $node = $config->getNode('sections/payment/groups/'.$group);
 
-        return Mage::helper('payzen')->__((string)$node->label);
+        return Mage::helper('payzen')->__((string) $node->label);
     }
 
     /**
@@ -146,11 +169,23 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     public function isMaintenanceMode()
     {
         $maintenanceFile = Mage::getRoot() . '/maintenance.flag';
-        if (file_exists($maintenanceFile)) {
+        if ($this->fileExists($maintenanceFile)) {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Return true if file exists. Uses Varien_Io_File API.
+     *
+     * @param $fileName
+     * @return bool
+     */
+    public function fileExists($fileName)
+    {
+        $io = new Varien_Io_File();
+        return $io->fileExists($fileName);
     }
 
     /**
@@ -214,7 +249,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         $currentMethod = $this->_getCallerMethod();
 
         $log  = '';
-        $log .= 'PayZen 1.8.0';
+        $log .= 'PayZen 1.9.0';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 
@@ -231,7 +266,11 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         $traces = debug_backtrace();
 
         if (isset($traces[2])) {
-            return $traces[2]['class'] . '::' . $traces[2]['function'];
+            $trace = '';
+
+            $trace .= isset($traces[2]['class']) ? ($traces[2]['class'] . '::') : '';
+            $trace .= isset($traces[2]['function']) ? $traces[2]['function'] : '';
+            return $trace;
         }
 
         return null;
