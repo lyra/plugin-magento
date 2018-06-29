@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
+ * @copyright 2014-2017 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -423,17 +423,16 @@ if (! class_exists('PayzenResponse', false)) {
         {
             // predefined response messages according to case
             $cases = array(
-                'payment_ok' => array(true, 'Accepted payment, order has been updated.'),
-                'payment_ko' => array(true, 'Payment failure, order has been cancelled.'),
-                'payment_ko_bis' => array(true, 'Payment failure.'),
-                'payment_ok_already_done' => array(true, 'Accepted payment, already registered.'),
-                'payment_ko_already_done' => array(true, 'Payment failure, already registered.'),
-                'order_not_found' => array(false, 'Order not found.'),
-                'payment_ko_on_order_ok' => array(false, 'Order status does not match the payment result.'),
-                'auth_fail' => array(false, 'An error occurred while computing the signature.'),
-                'empty_cart' => array(false, 'Empty cart detected before order processing.'),
-                'unknown_status' => array(false, 'Unknown order status.'),
-                'amount_error' => array(false, 'Total paid is different from order amount.'),
+                'payment_ok' => array(true, 'Paiement valide traité'),
+                'payment_ko' => array(true, 'Paiement invalide traité'),
+                'payment_ok_already_done' => array(true, 'Paiement valide traité, déjà enregistré'),
+                'payment_ko_already_done' => array(true, 'Paiement invalide traité, déjà enregistré'),
+                'order_not_found' => array(false, 'Impossible de retrouver la commande'),
+                'payment_ko_on_order_ok' => array(false, 'Code paiement invalide reçu pour une commande déjà validée'),
+                'auth_fail' => array(false, 'Echec d\'authentification'),
+                'empty_cart' => array(false, 'Le panier a été vidé avant la redirection'),
+                'unknown_status' => array(false, 'Statut de commande inconnu'),
+                'amount_error' => array(false, 'Le montant payé est différent du montant intial'),
                 'ok' => array(true, ''),
                 'ko' => array(false, '')
             );
@@ -454,6 +453,7 @@ if (! class_exists('PayzenResponse', false)) {
             }
 
             $content = $success ? 'OK-' : 'KO-';
+            $content .= $this->get('trans_id');
             $content .= "$message\n";
 
             $response = '';

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
+ * @copyright 2014-2017 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -31,6 +31,9 @@ class Payment
     // key to save choosen multi option
     const MULTI_OPTION = 'payzen_multi_option';
 
+    // key to save choosen Choozeo option
+    const CHOOZEO_OPTION = 'payzen_choozeo_option';
+
     // key to save choosen Oney option
     const ONEY_OPTION = 'payzen_oney_option';
 
@@ -44,6 +47,8 @@ class Payment
     const ALL_RESULTS = 'payzen_all_results';
 
     const TRANS_UUID = 'payzen_trans_uuid';
+
+    const BRAND_USER_CHOICE = 'payzen_brand_user_choice';
 
     const ONECLICK_LOCATION_CART = 'CART';
 
@@ -238,6 +243,14 @@ class Payment
             ->setCcStatusDescription($response->getMessage())
             ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::ALL_RESULTS, serialize($response->getAllResults()))
             ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID, $response->get('trans_uuid'));
+
+
+        if ($response->get('brand_management')) {
+            $brandInfo = json_decode($response->get('brand_management'));
+
+            $userChoice = (isset($brandInfo->userChoice) && $brandInfo->userChoice);
+            $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE, $userChoice);
+        }
 
         if ($response->isCancelledPayment()) {
             // no more data to save

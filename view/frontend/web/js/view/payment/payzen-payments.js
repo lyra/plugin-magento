@@ -1,5 +1,5 @@
 /**
- * PayZen V2-Payment Module version 2.1.4 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,7 +9,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
+ * @copyright 2014-2017 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -30,6 +30,10 @@ define(
             {
                 type: 'payzen_multi',
                 component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-multi'
+            },
+            {
+                type: 'payzen_choozeo',
+                component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-choozeo'
             }
         );
 
