@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -11,7 +11,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -22,7 +22,7 @@
     <default>
         <payzen>
             <general>
-                <module_version>2.2.0</module_version>
+                <module_version>2.3.0</module_version>
                 <platform_version>V2</platform_version>
                 <enable_logs>1</enable_logs>
 
@@ -39,9 +39,9 @@
 
                 <redirect_enabled>0</redirect_enabled>
                 <redirect_success_timeout>5</redirect_success_timeout>
-                <redirect_success_message>Redirection vers la boutique dans quelques instants...</redirect_success_message>
+                <redirect_success_message>Redirection to shop in a few seconds...</redirect_success_message>
                 <redirect_error_timeout>5</redirect_error_timeout>
-                <redirect_error_message>Redirection vers la boutique dans quelques instants...</redirect_error_message>
+                <redirect_error_message>Redirection to shop in a few seconds...</redirect_error_message>
                 <return_mode>GET</return_mode>
                 <refill_cart>1</refill_cart>
                 <registered_order_status>processing</registered_order_status>
@@ -92,7 +92,19 @@
                 <card_info_mode>1</card_info_mode>
             </payzen_multi>
 
-            
+            <payzen_choozeo>
+                <model>Lyranetwork\Payzen\Model\Method\Choozeo</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>1</allowspecific>
+                <specificcountry>FR</specificcountry>
+                <specificcountry_display>France</specificcountry_display>
+                <title>Paiement Choozeo</title>
+                <sort_order>3</sort_order>
+                <module_logo>choozeo-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+            </payzen_choozeo>
 
             <!--
             <payzen_gift>
@@ -155,7 +167,19 @@
                 <validation_mode>-1</validation_mode>
             </payzen_sofort>
 
-            
+            <payzen_postfinance>
+                <model>Lyranetwork\Payzen\Model\Method\Postfinance</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Paiement PostFinance</title>
+                <sort_order>7</sort_order>
+                <module_logo>postfinance-logo.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_postfinance>
             -->
         </payment>
     </default>

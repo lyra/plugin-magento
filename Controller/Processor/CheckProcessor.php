@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -111,10 +111,10 @@ class CheckProcessor
                 \Psr\Log\LogLevel::ERROR
             );
 
-//             $this->dataHelper->log(
-//                 'Signature algorithm selected in module settings must be the same as one selected in PayZen Back Office.',
-//                 \Psr\Log\LogLevel::ERROR
-//             );
+            $this->dataHelper->log(
+                'Signature algorithm selected in module settings must be the same as one selected in PayZen Back Office.',
+                \Psr\Log\LogLevel::ERROR
+            );
 
             return $controller->renderResponse($payzenResponse->getOutputForPlatform('auth_fail'));
         }
@@ -207,7 +207,7 @@ class CheckProcessor
                         'Payment Mean' => $payzenResponse->get('card_brand'),
                         'Card Number' => $payzenResponse->get('card_number'),
                         'Expiration Date' => $expiry,
-                        '3-DS Certificate' => ''
+                        '3DS Certificate' => ''
                     ];
 
                     $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;
