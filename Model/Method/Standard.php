@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -116,7 +116,7 @@ class Standard extends Payzen
     {
         $info = $this->getInfoInstance();
 
-        if ($this->isLocalCcType() || $this->isLocalCcInfo()) {
+        if ($this->isLocalCcType()) {
             // set payment_cards
             $this->payzenRequest->set('payment_cards', $info->getCcType());
         } else {
@@ -146,60 +146,20 @@ class Standard extends Payzen
             $this->payzenRequest->set('url_return', $returnUrl . '?iframe=true');
         }
 
-        if (! $this->getConfigData('oneclick_active') || ! $order->getCustomerId()) {
-            $this->setCcInfo();
-        } else {
+        if ($this->getConfigData('oneclick_active') && $order->getCustomerId()) {
             // 1-Click enabled and customer logged-in
             $customer = $this->customerRepository->getById($this->getCustomerId());
 
-            if ($customer->getData('payzen_identifier') &&
-                 $info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::IDENTIFIER)) {
+            if ($customer->getData('payzen_identifier') && $info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::IDENTIFIER)) {
                 // customer has an identifier and wants to use it
                 $this->dataHelper->log('Customer ' . $customer->getEmail() . ' has an identifier and chose to use it for payment.');
                 $this->payzenRequest->set('identifier', $customer->getData('payzen_identifier'));
             } else {
-                if ($this->isLocalCcInfo() &&
-                     $info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::CC_REGISTER)) {
-                    // customer wants to register card data
-
-                    if ($customer->getData('payzen_identifier')) {
-                        // customer has already an identifier
-                        $this->dataHelper->log('Customer ' . $customer->getEmail() .
-                             ' has an identifier and chose to update it with new card info.');
-                        $this->payzenRequest->set('identifier', $customer->getData('payzen_identifier'));
-                        $this->payzenRequest->set('page_action', 'REGISTER_UPDATE_PAY');
-                    } else {
-                        $this->dataHelper->log('Customer ' . $customer->getEmail() .
-                             ' has not identifier and chose to register his card info.');
-                        $this->payzenRequest->set('page_action', 'REGISTER_PAY');
-                    }
-                } elseif (! $this->isLocalCcInfo()) {
-                    // bank data acquisition on payment page, let's ask customer for data registration
-                    $this->dataHelper->log('Customer ' . $customer->getEmail() .
-                         ' will be asked for card data registration on payment page.');
-                    $this->payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
-                }
-
-                $this->setCcInfo();
+                // bank data acquisition on payment page, let's ask customer for data registration
+                $this->dataHelper->log('Customer ' . $customer->getEmail() . ' will be asked for card data registration on payment page.');
+                $this->payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
             }
         }
-    }
-
-    private function setCcInfo()
-    {
-        if (! $this->isLocalCcInfo()) {
-            return;
-        }
-
-        $info = $this->getInfoInstance();
-
-        $this->payzenRequest->set('cvv', $info->getCcCid());
-        $this->payzenRequest->set('card_number', $info->getCcNumber());
-        $this->payzenRequest->set('expiry_year', $info->getCcExpYear());
-        $this->payzenRequest->set('expiry_month', $info->getCcExpMonth());
-
-        // override action_mode
-        $this->payzenRequest->set('action_mode', 'SILENT');
     }
 
     protected function sendOneyFields()
@@ -295,24 +255,11 @@ class Standard extends Payzen
 
         $payzenData = $this->extractPayzenData($data);
 
-        if ($payzenData->getData('payzen_use_identifier')) {
-            // payment by identifier
-            $info->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::IDENTIFIER, true);
-        } else {
-            // set card info
-            $info->setCcType($payzenData->getData('payzen_standard_cc_type'))
-                ->setCcLast4(substr($payzenData->getData('payzen_standard_cc_number'), - 4))
-                ->setCcNumber($payzenData->getData('payzen_standard_cc_number'))
-                ->setCcCid($payzenData->getData('payzen_standard_cc_cvv'))
-                ->setCcExpMonth($payzenData->getData('payzen_standard_cc_exp_month'))
-                ->setCcExpYear($payzenData->getData('payzen_standard_cc_exp_year'))
-                // wether to register data
-                ->setAdditionalInformation(
-                    \Lyranetwork\Payzen\Helper\Payment::CC_REGISTER,
-                    $payzenData->getData('payzen_standard_cc_register')
-                )
-                ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::IDENTIFIER, false);
-        }
+        // wether to do a payment by identifier
+        $info->setAdditionalInformation(
+            \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER,
+            $payzenData->getData('payzen_use_identifier')
+        );
 
         return $this;
     }
@@ -329,21 +276,6 @@ class Standard extends Payzen
         }
 
         return $this->getConfigData('card_info_mode') == 3;
-    }
-
-    /**
-     * Check if the bank data acquisition on merchant site option is selected.
-     *
-     * @return bool
-     */
-    public function isLocalCcInfo()
-    {
-        if ($this->dataHelper->isBackend()) {
-            return false;
-        }
-
-        // this mode will disappear
-        return false;
     }
 
     /**

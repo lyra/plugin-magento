@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -203,7 +203,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // contrib info
         $version = $this->productMetadata->getVersion(); // will return the magento version
-        $this->payzenRequest->set('contrib', 'Magento2.x_2.2.0/' . $version . '/' . PHP_VERSION);
+        $this->payzenRequest->set('contrib', 'Magento2.x_2.3.0/' . $version . '/' . PHP_VERSION);
 
         // set config parameters
         $configFields = [
@@ -302,7 +302,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $paramsToLog = $this->payzenRequest->getRequestFieldsArray(true);
-        $this->dataHelper->log('Payment parameters : ' . json_encode($paramsToLog), \Psr\Log\LogLevel::INFO);
+        $this->dataHelper->log('Payment parameters : ' . json_encode($paramsToLog), \Psr\Log\LogLevel::DEBUG);
 
         return $this->payzenRequest->getRequestFieldsArray(false, false);
     }
@@ -341,7 +341,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     * Return the payment platform URL.
+     * Return the payment gateway URL.
      *
      * @return string
      */
@@ -363,7 +363,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             \Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::CHOOZEO_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION,
-            \Lyranetwork\Payzen\Helper\Payment::CC_REGISTER,
             \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER
         ];
 
@@ -830,7 +829,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             'Payment Mean' => $cardResponse->getBrand(),
             'Credit Card Number' => $cardResponse->getNumber(),
             'Expiration Date' => $expiry,
-            '3-DS Certificate' => ''
+            '3DS Certificate' => ''
         ];
 
         $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -24,9 +24,6 @@ class Payment
 
     // key to save if payment is by identifier
     const IDENTIFIER = 'payzen_identifier';
-
-    // key to save if card data register is on
-    const CC_REGISTER = 'payzen_cc_register';
 
     // key to save choosen multi option
     const MULTI_OPTION = 'payzen_multi_option';
@@ -167,7 +164,7 @@ class Payment
             ->setStatus($stateObject->getStatus())
             ->addStatusHistoryComment($response->getMessage());
 
-        // save platform responses
+        // save gateway responses
         $this->updatePaymentInfo($order, $response);
 
         // try to save PayZen identifier if any
@@ -244,17 +241,16 @@ class Payment
             ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::ALL_RESULTS, serialize($response->getAllResults()))
             ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID, $response->get('trans_uuid'));
 
+        if ($response->isCancelledPayment()) {
+            // no more data to save
+            return;
+        }
 
         if ($response->get('brand_management')) {
             $brandInfo = json_decode($response->get('brand_management'));
 
             $userChoice = (isset($brandInfo->userChoice) && $brandInfo->userChoice);
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE, $userChoice);
-        }
-
-        if ($response->isCancelledPayment()) {
-            // no more data to save
-            return;
         }
 
         // save risk control result if any
@@ -309,7 +305,7 @@ class Payment
                 $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
             }
         } else {
-            // 3-DS authentication result
+            // 3DS authentication result
             $threedsCavv = '';
             if ($response->get('threeds_status') === 'Y') {
                 $threedsCavv = $response->get('threeds_cavv');
@@ -404,7 +400,7 @@ class Payment
                         'Payment Mean' => $response->get('card_brand'),
                         'Credit Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
-                        '3-DS Certificate' => $threedsCavv
+                        '3DS Certificate' => $threedsCavv
                     ];
 
                     $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
@@ -444,7 +440,7 @@ class Payment
                     'Payment Mean' => $response->get('card_brand'),
                     'Credit Card Number' => $response->get('card_number'),
                     'Expiration Date' => $expiry,
-                    '3-DS Certificate' => $threedsCavv
+                    '3DS Certificate' => $threedsCavv
                 ];
 
                 $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
@@ -473,7 +469,7 @@ class Payment
             $customer = $this->customerFactory->create()->load($order->getCustomerId());
 
             $this->dataHelper->log("Identifier for customer #{$customer->getId()} successfully created" .
-                 ' or updated on payment platform. Let us save it to customer entity.');
+                 ' or updated on payment gateway. Let us save it to customer entity.');
 
             $customer->setData('payzen_identifier', $response->get('identifier'));
             $customer->save();
@@ -521,7 +517,7 @@ class Payment
 
         $order->registerCancellation($response->getMessage());
 
-        // save platform responses
+        // save gateway responses
         $this->updatePaymentInfo($order, $response);
         $order->save();
 

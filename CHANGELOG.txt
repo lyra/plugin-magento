@@ -1,5 +1,14 @@
-2.2.0, 2018-01-15:
+2.3.0, 2018-05-23:
+- Enable signature algorithm selection (SHA-1 or SHA-256).
+- Improve backend configuration screen.
+
+2.2.0, 2018-03-19:
 - Display card brand user choice if any in backend order details.
+
+2.1.4, 2018-03-08:
+- Bug fix: Check value type in logo uploader to avoid a PHP warning during import data from configuration files.
+- Bug fix: Added the component load order in etc/module.xml to avoid an exception during Magento installation using comand-line interface.
+- [technical]Manage enabled/disabled features by plugin variant.
 
 2.1.3, 2017-10-16:
 - Compatibility with Magento 2.2 version (method signature, namespace use, JSON unserialize and layout init).
@@ -10,34 +19,36 @@
 - Possibility to select payment card type on merchant website (for both standard payment and payment in installments).
 - Save both converted and original paid amounts in Magento transaction details.
 - Use of protected variables (instead of private) to facilitate module code extension.
-- Register details about all payment installments.
+- [multi]Register details about all payment installments.
 
 2.1.1, 2017-01-13:
 - Bug fix: correction of an error when returning to store using browser backward button.
-- Bug fix: selected payment in installments option is not considered since Magento 2.1.3.
+- [multi]Bug fix: selected payment in installments option is not considered since Magento 2.1.3.
 - Update module structure and code to fulfill Magento marketplace requirements.
 - Using "lyranetwork" as vendor name instead of "lyra" (already used in Magento Marketplace).
+- [giropay]Upgrade supported card types list.
 
 2.1.0, 2016-11-05:
 - Bug fix: error relative to CMS version detection since Magento V 2.1.
 - Bug fix: notify URL is not displayed correctly in module backend since Magento V 2.1.
-- Bug fix: multiple payment sub-module dos not work since Magento V 2.1 (selected payment option is not considered in frontend).
-- Remove control over certificate format modified on the platform.
+- [multi]Bug fix: multiple payment sub-module dos not work since Magento V 2.1 (selected payment option is not considered in frontend).
+- Remove control over certificate format modified on the gateway.
 - Possibility to refund payments from Magento backend via WS.
 - Backend payments in MOTO mode.
-- Adding "Ticket EcoCheque" card type to supported cards list.
+- Upgrade supported card types list.
 
 2.0.1, 2016-06-02:
 - Bug fix: correction of an error in backend order creation page when module is enabled.
 - Bug fix: use of _scope parameter (instead of _store) in store URLs to redirect to the correct store (in multistore mode).
 - Bug fix: error occures when saving module settings without resfreshing cache (if asked by Magento).
 - Bug fix: capture delay in sub-modules not considered if equals 0.
+- [multi]Bug fix: payment in installments did not work (always processed as single).
 - Dispatch event order_cancel_after after order cancellation.
 - Check if current quote currency is supported before to check base currency.
 - Improve logging system and log request format errors.
 - Update german language file.
 - Improve of label fields display on admin panel.
-- Do not delete virtual multi payment methods (payzen_multi_Nx) to avoid errors when viewing orders paid with these methods.
+- [multi]Do not delete virtual multi payment methods (payzen_multi_Nx) to avoid errors when viewing orders paid with these methods.
 
 2.0.0, 2016-03-10:
 - New PayZen payment module for magento 2.

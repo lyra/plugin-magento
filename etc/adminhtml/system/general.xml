@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -11,7 +11,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -50,7 +50,7 @@
             </field>
 
             <field id="platform_version" translate="label" type="label" sortOrder="114" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Platform version</label>
+                <label>Gateway version</label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
                 <config_path>payzen/general/platform_version</config_path>
             </field>
@@ -72,7 +72,7 @@
         </group>
 
         <group id="payzen_platform_access" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>PAYMENT PLATFORM ACCESS</label>
+            <label>PAYMENT GATEWAY ACCESS</label>
             <attribute type="expanded">1</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
@@ -85,6 +85,7 @@
             <field id="key_test" translate="label comment" type="text" sortOrder="122" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Certificate in test mode</label>
                 <comment>Certificate provided by PayZen for test mode (available in your store Back Office).</comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\KeyTest</frontend_model>
                 <config_path>payzen/general/key_test</config_path>
             </field>
 
@@ -97,28 +98,29 @@
             <field id="ctx_mode" translate="label comment" type="select" sortOrder="124" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Mode</label>
                 <comment>The context mode of this module.</comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CtxMode</frontend_model>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\CtxMode</source_model>
                 <config_path>payzen/general/ctx_mode</config_path>
             </field>
 
-            <!-- <field id="sign_algo" translate="label comment" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="sign_algo" translate="label comment" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Signature algorithm</label>
-                <comment><![CDATA[Algorithm used to compute the payment form signature. <b>Selected algorithm must be the same as one configured in the PayZen Back Office for the current context mode.</b>]]></comment>
+                <comment><![CDATA[Algorithm used to compute the payment form signature. Selected algorithm must be the same as one configured in the PayZen Back Office.<br /><b>The SHA-256 algorithm should not be activated if it is not yet available in the PayZen Back Office, the feature will be available soon.</b>]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\SignAlgo</source_model>
                 <config_path>payzen/general/sign_algo</config_path>
-            </field> -->
+            </field>
 
-            <field id="platform_url" translate="label comment" type="text" sortOrder="126" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="notify_url" translate="label comment" type="label" sortOrder="126" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Instant Payment Notification URL</label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\NotifyUrl</frontend_model>
+                <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
+                <config_path>payzen/general/notify_url</config_path>
+            </field>
+
+            <field id="platform_url" translate="label comment" type="text" sortOrder="127" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Payment page URL</label>
                 <comment>Link to the payment page.</comment>
                 <config_path>payzen/general/platform_url</config_path>
-            </field>
-
-            <field id="notify_url" translate="label comment" type="label" sortOrder="127" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Notification URL to copy into your PayZen Back Office</label>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\NotifyUrl</frontend_model>
-                <comment><![CDATA[<span style='color: red;'>In multistore mode, notification URL is the same for all the stores.</span>]]></comment>
-                <config_path>payzen/general/notify_url</config_path>
             </field>
         </group>
 
@@ -171,26 +173,26 @@
 
             <field id="shop_name" translate="label comment" type="text" sortOrder="142" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Shop name</label>
-                <comment>Shop name to display on the payment page. Leave blank to use platform configuration.</comment>
+                <comment>Shop name to display on the payment page. Leave blank to use gateway configuration.</comment>
                 <config_path>payzen/general/shop_name</config_path>
             </field>
 
             <field id="shop_url" translate="label comment" type="text" sortOrder="143" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Shop URL</label>
-                <comment>Shop URL to display on the payment page. Leave blank to use platform configuration.</comment>
+                <comment>Shop URL to display on the payment page. Leave blank to use gateway configuration.</comment>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\ShopUrl</backend_model>
                 <config_path>payzen/general/shop_url</config_path>
             </field>
         </group>
 
         <group id="payzen_selective_3ds" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>SELECTIVE 3-DS</label>
+            <label>SELECTIVE 3DS</label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="threeds_min_amount" translate="label comment" type="text" sortOrder="151" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Minimum amount to activate 3-DS</label>
-                <comment>Needs subscription to Selective 3-D Secure option.</comment>
+                <label>Disable 3DS</label>
+                <comment>Amount below which 3DS will be disabled. Needs subscription to selective 3DS option. For more information, refer to the module documentation.</comment>
                 <config_path>payzen/general/threeds_min_amount</config_path>
             </field>
         </group>

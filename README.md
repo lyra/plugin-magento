@@ -22,7 +22,7 @@ In order to deactivate the module: php bin/magento module:disable --clear-static
 
 - In Magento 2 administration interface, browse to "STORES > Configuration" menu
 - Click on "Payment Methods" link under "SALES" section
-- Expand PayZen payment method to enter your platform credentials
+- Expand PayZen payment method to enter your gateway credentials
 - Refresh invalidated Magento cache afeter config saved. 
 
 ## License

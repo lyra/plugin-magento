@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -122,11 +122,11 @@ class Info extends \Magento\Payment\Block\Info
         $html .= __('Expiration Date') . ' : ' . $expiry;
         $html .= '<br />';
 
-        $html .= __('3-DS Authentication') . ' : ';
+        $html .= __('3DS Authentication') . ' : ';
         if ($payment->getCcSecureVerify()) {
             $html .= __('YES');
             $html .= '<br />';
-            $html .= __('3-DS Certificate') . ' : ' . $payment->getCcSecureVerify();
+            $html .= __('3DS Certificate') . ' : ' . $payment->getCcSecureVerify();
         } else {
             $html .= __('NO');
         }

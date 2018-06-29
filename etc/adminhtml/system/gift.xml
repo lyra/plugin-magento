@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -11,7 +11,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -21,8 +21,9 @@
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="payzen_gift" translate="label" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>GIFT CARD PAYMENT</label>
-        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset\Dependant</frontend_model>
         <attribute type="expanded">0</attribute>
+        <attribute type="feature">gift</attribute>
 
         <group id="payzen_display_options" translate="label" type="text" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>BASIC SETTINGS</label>

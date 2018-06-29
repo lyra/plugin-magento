@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.2.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -24,7 +24,7 @@ $customer = $block->getLoggedCustomer(); // logged in customer
     id="payment_form_<?php echo $block->escapeHtml($block->getMethodCode()); ?>"
     style="display:none;">
 <?php
-if ($block->isLocalCcType() || $block->isLocalCcInfo()) :
+if ($block->isLocalCcType()) :
     $cards = $block->getAvailableCcTypes();
     $single = (count($cards) == 1);
 
@@ -76,111 +76,7 @@ if ($block->isLocalCcType() || $block->isLocalCcInfo()) :
     }
 endif;
 
-if ($block->isLocalCcInfo()) : ?>
-    <li class="payzen-standard-cc-block">
-        <div class="input-box">
-            <label class="required" for="payzen_standard_cc_number">
-                <?php echo $block->escapeHtml(__('Credit Card Number')); ?><em>*</em>
-            </label><br/>
-            <input class="input-text required-entry validate-payzen-standard-cc-number" autocomplete="off"
-                maxlength="19" type="text" name="payment[payzen_standard_cc_number]" id="payzen_standard_cc_number"
-                style="width: 200px;" />
-        </div>
-    </li>
-    <li class="payzen-standard-cc-block">
-        <div class="input-box">
-            <label class="required" for="payzen_standard_cc_exp_month">
-                <?php echo $block->escapeHtml(__('Expiration Date')); ?><em>*</em>
-            </label><br/>
-            <div class="v-fix">
-                <select class="month required-entry validate-payzen-standard-cc-exp"
-                    name="payment[payzen_standard_cc_exp_month]" id="payzen_standard_cc_exp_month"
-                    style="width: 95px;" >
-                    <?php foreach (range(1, 12) as $month) : ?>
-                        <option value="<?php echo $block->escapeHtml($month); ?>">
-                            <?php echo $block->escapeHtml(str_pad($month, 2, '0', STR_PAD_LEFT)); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="v-fix">
-                <select class="year required-entry" name="payment[payzen_standard_cc_exp_year]"
-                    id="payzen_standard_cc_exp_year" style="width: 100px;">
-                    <?php foreach (range(date('Y'), date('Y') + 9) as $year) : ?>
-                        <option value="<?php echo $block->escapeHtml($year); ?>">
-                            <?php echo $block->escapeHtml($year); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-        </div>
-    </li>
-    <li class="payzen-standard-cc-block">
-        <div class="input-box">
-            <label class="required" for="payzen_standard_cc_cvv">
-                <?php echo $block->escapeHtml(__('CVV')); ?><em>*</em>
-            </label><br/>
-            <input class="input-text required-entry validate-payzen-standard-cc-cvv" autocomplete="off" maxlength="4"
-                type="text" name="payment[payzen_standard_cc_cvv]" id="payzen_standard_cc_cvv" style="width: 60px;" />
-        </div>
-    </li>
-
-    <?php
-    if ($oneClickActive && $customer) :
-        $cardRegisterMode = $block->getConfigData('card_register_mode');
-    ?>
-        <li class="payzen-standard-cc-block">
-        <?php
-        if ($cardRegisterMode == 1 /* register disabled by default */ || $cardRegisterMode == 2 /* register enabled by default */) : ?>
-            <div class="payzen-register-message">
-                <input type="checkbox" value="1" class="checkbox" <?php if ($cardRegisterMode == 2) : ?>checked="checked"<?php endif; ?>
-                       name="payment[payzen_standard_cc_register]" id="payzen_standard_cc_register" />
-                <label style="float: none !important; cursor: pointer;" for="payzen_standard_cc_register">
-                    <?php echo $block->escapeHtml($block->getConfigData('card_register_message')); ?>
-                </label>
-            </div>
-        <?php else : /* register enabled but hidden */ ?>
-            <input type="hidden" value="1" name="payment[payzen_standard_cc_register]" />
-        <?php endif; ?>
-        </li>
-
-        <?php if ($customer->getData('payzen_identifier')) : ?>
-        <li class="payzen-standard-cc-block">
-            <span class="or"><?php echo $block->escapeHtml(__('OR')); ?></span>
-        </li>
-
-        <li class="payzen-standard-cc-block">
-            <a class="payzen-payment-link" href="javascript: void(0);"
-                onclick="javascript: payzenUpdatePaymentBlock('id');">
-                <?php echo $block->escapeHtml(__('Click here to pay with your registered card.')); ?>
-            </a>
-        </li>
-
-        <!-- payment with registered card block -->
-        <li class="payzen-standard-id-block">
-            <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
-            <span>
-                <?php echo $block->escapeHtml(__('You will pay with your registered card. No data entry is needed.')); ?>
-            </span>
-        </li>
-
-        <li class="payzen-standard-id-block">
-            <span class="or"><?php echo $block->escapeHtml(__('OR')); ?></span>
-        </li>
-
-        <li class="payzen-standard-id-block">
-            <a class="payzen-payment-link" href="javascript: void(0);"
-                onclick="javascript: payzenUpdatePaymentBlock('cc');">
-                <?php echo $block->escapeHtml(__('Click here to pay with another payment mean.')); ?>
-            </a>
-        </li>
-        <?php endif; ?>
-    <?php endif; ?>
-
-<?php
-else :
-?>
-    <?php if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?>
+if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?>
         <li class="payzen-standard-cc-block">
             <?php echo $block->escapeHtml(__('You will enter payment data after order confirmation.')); ?>
         </li>
@@ -213,53 +109,19 @@ else :
                 <?php echo $block->escapeHtml(__('Click here to pay with another payment mean.')); ?>
             </a>
         </li>
-    <?php endif; ?>
 <?php endif; ?>
 </ul>
 
+<?php if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?>
 <script>
     require([
         'prototype'
     ], function() {
-        Translator.add(
-                'Incorrect credit card number.',
-                '<?php echo $block->escapeQuote(__('Incorrect credit card number.')); ?>'
-        );
-        Translator.add(
-                'Incorrect credit card CVV.',
-                '<?php echo $block->escapeQuote(__('Incorrect credit card CVV.')); ?>'
-        );
-        Translator.add(
-                'Incorrect credit card expiration date.',
-                '<?php echo $block->escapeQuote(__('Incorrect credit card expiration date.')); ?>'
-        );
+        // display payment by identifier block when PayZen standard payment is selected
+        Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
+        Event.observe('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
 
-        Validation.addAllThese([
-                ['validate-payzen-standard-cc-exp', 'Incorrect credit card expiration date.', function(v, elm) {
-                        var ccExpMonth = v;
-                        var ccExpYear = $('payzen_standard_cc_exp_year').value;
-                        var currentTime = new Date();
-                        var currentMonth = currentTime.getMonth() + 1;
-                        var currentYear = currentTime.getFullYear();
-                        if (ccExpMonth < currentMonth && ccExpYear == currentYear) {
-                            return false;
-                        }
-                        return true;
-                }],
-                ['validate-payzen-standard-cc-number', 'Incorrect credit card number.', function(v) {
-                    return /^\d{13,19}$/.test(v);
-                }],
-                ['validate-payzen-standard-cc-cvv', 'Incorrect credit card CVV.', function(v) {
-                    return /^\d{3,4}$/.test(v);
-                }]
-        ]);
-
-        <?php if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?>
-            // display payment by identifier block when PayZen standard payment is selected
-            Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
-            Event.observe('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
-
-            payzenUpdatePaymentBlock.delay(0.2, 'id');
-        <?php endif;?>
+        payzenUpdatePaymentBlock.delay(0.2, 'id');
     });
 </script>
+<?php endif;?>
