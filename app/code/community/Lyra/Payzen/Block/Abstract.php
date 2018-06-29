@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -26,7 +26,7 @@ abstract class Lyra_Payzen_Block_Abstract extends Mage_Payment_Block_Form
 
         $logoURL = $this->_checkAndGetSkinUrl($this->getConfigData('module_logo'));
 
-        if (! Mage::helper('payzen')->isAdmin() && $logoURL) {
+        if (! $this->_getHelper()->isAdmin() && $logoURL) {
             $logo = Mage::getConfig()->getBlockClassName('core/template');
             $logo = new $logo;
             $logo->setTemplate('payzen/logo.phtml');
@@ -45,7 +45,7 @@ abstract class Lyra_Payzen_Block_Abstract extends Mage_Payment_Block_Form
         }
 
         $filePath = Mage::getBaseDir('media') . DS . 'payzen' . DS . 'logos' . DS . $fileName;
-        if (! file_exists($filePath)) {
+        if (! $this->_getHelper()->fileExists($filePath)) {
             return false;
         }
 
@@ -57,7 +57,7 @@ abstract class Lyra_Payzen_Block_Abstract extends Mage_Payment_Block_Form
         $card = strtolower($card);
 
         $path = Mage::getBaseDir('media') . DS . 'payzen' . DS . 'ct' . DS . $card . '.png';
-        if (file_exists($path)) {
+        if ($this->_getHelper()->fileExists($path)) {
             return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'payzen/ct/' . $card . '.png';
         } else {
             return false;
@@ -72,5 +72,15 @@ abstract class Lyra_Payzen_Block_Abstract extends Mage_Payment_Block_Form
     public function getConfigData($name)
     {
         return $this->_getModel()->getConfigData($name);
+    }
+
+    /**
+     * Return payzen data helper.
+     *
+     * @return Lyra_Payzen_Helper_Data
+     */
+    protected function _getHelper()
+    {
+        return Mage::helper('payzen');
     }
 }

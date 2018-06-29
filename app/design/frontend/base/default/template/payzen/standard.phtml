@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -116,13 +116,13 @@ if ($this->isLocalCcInfo()) : ?>
         </li>
 
         <li class="payzen-standard-cc-block">
-            <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('id');"><?php echo Mage::helper('payzen')->__('Click here to pay with your registered card.') ?></a>
+            <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('id');"><?php echo Mage::helper('payzen')->__('Click here to pay with your registered means of payment.') ?></a>
         </li>
 
         <!-- payment with registered card block -->
         <li class="payzen-standard-id-block">
             <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
-            <span><?php echo Mage::helper('payzen')->__('You will pay with your registered card %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
+            <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
         </li>
 
         <li class="payzen-standard-id-block">
@@ -130,7 +130,7 @@ if ($this->isLocalCcInfo()) : ?>
         </li>
 
         <li class="payzen-standard-id-block">
-            <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('cc');"><?php echo Mage::helper('payzen')->__('Click here to pay with another payment mean.') ?></a>
+            <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('cc');"><?php echo Mage::helper('payzen')->__('Click here to pay with another means of payment.') ?></a>
         </li>
         <?php endif; ?>
     <?php endif; ?>
@@ -143,13 +143,13 @@ if ($this->isLocalCcInfo()) : ?>
     </li>
 
     <li class="payzen-standard-cc-block">
-        <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('id');"><?php echo Mage::helper('payzen')->__('Click here to pay with your registered card.') ?></a>
+        <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('id');"><?php echo Mage::helper('payzen')->__('Click here to pay with your registered means of payment.') ?></a>
     </li>
 
     <!-- payment with registered card block -->
     <li class="payzen-standard-id-block">
         <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
-        <span><?php echo Mage::helper('payzen')->__('You will pay with your registered card %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
+        <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
     </li>
 
     <li class="payzen-standard-id-block">
@@ -157,7 +157,7 @@ if ($this->isLocalCcInfo()) : ?>
     </li>
 
     <li class="payzen-standard-id-block">
-        <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('cc');"><?php echo Mage::helper('payzen')->__('Click here to pay with another payment mean.') ?></a>
+        <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('cc');"><?php echo Mage::helper('payzen')->__('Click here to pay with another means of payment.') ?></a>
     </li>
 <?php endif;?>
 </ul>
@@ -200,7 +200,7 @@ if ($this->isLocalCcInfo()) : ?>
 <?php endif; ?>
 
 <?php if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
-    // display payment by identifier block when PayZen standard payment is selected
+    // display payment by identifier block when PayZen one-time payment is selected
     Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
     Event.observe('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
 

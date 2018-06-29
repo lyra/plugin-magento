@@ -1,0 +1,75 @@
+<?php
+/**
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is licensed under the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2018 Lyra Network and contributors
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  payment
+ * @package   payzen
+ */
+
+$optionDetails = $this->getOptionDetails();
+
+$date = time();
+?>
+
+<table class="payzen_fullcb_review payzen_review" style="padding : 15px;<?php if (! $this->getFirst()) {?> display: none; <?php }?>" id="payzen_fullcb_review_<?php echo $optionDetails->getOptionCode(); ?>">
+    <tbody>
+        <tr>
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><?php echo Mage::helper('payzen')->__('Order amount :'); ?></td>
+                            <td><strong><?php echo $optionDetails->getOrderTotal(); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td><?php echo Mage::helper('payzen')->__('Fees :'); ?></td>
+                            <td><strong><?php echo $optionDetails->getFundingFees(); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><hr style="margin: 0px;" /></td>
+                        </tr>
+                        <tr>
+                            <td><?php echo Mage::helper('payzen')->__('Total amount :' ); ?></td>
+                            <td><strong><?php echo $optionDetails->getFundingTotal(); ?></strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+
+            <td>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th colspan="2"><strong><?php echo Mage::helper('payzen')->__('Installments'); ?></strong></th>
+                        </tr>
+                        <tr>
+                            <td><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></td>
+                            <td><strong><?php echo $optionDetails->getFirstPayment(); ?></strong></td>
+                        </tr>
+                        <?php
+                        for ($i=1; $i <= $optionDetails->getCount(); $i++) {
+                            $date = strtotime('+30 days', $date);
+                        ?>
+                        <tr>
+                            <td><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></td>
+                            <td><strong><?php echo $optionDetails->getMonthlyPayment(); ?></strong></td>
+                        </tr>
+                        <?php
+                        }
+                        ?>
+                   </tbody>
+                </table>
+           </td>
+       </tr>
+    </tbody>
+</table>

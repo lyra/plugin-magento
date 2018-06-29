@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -18,7 +18,9 @@
 
 class Lyra_Payzen_Model_Source_Sofort_AvailableCountries
 {
-    private $_availableCountries = array('FR', 'DE', 'BE', 'CH', 'AT', 'NL', 'IT', 'ES', 'GB', 'PL', 'CZ', 'SK', 'HU');
+    protected $_availableCountries = array(
+        'FR', 'DE', 'BE', 'CH', 'AT', 'NL', 'IT', 'ES', 'GB', 'PL', 'CZ', 'SK', 'HU'
+    );
 
     public function toOptionArray()
     {
@@ -30,8 +32,8 @@ class Lyra_Payzen_Model_Source_Sofort_AvailableCountries
             }
 
             $result[] = array(
-                    'value' => $code,
-                    'label' => $name
+                'value' => $code,
+                'label' => $name
             );
         }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -22,6 +22,25 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
     const CUST_ID_REGEX = '#^[a-zA-Z0-9]{1,8}$#u';
 
     const PRODUCT_REF_REGEX = '#^[a-zA-Z0-9]{1,64}$#u';
+
+    public static $address_regex = array(
+        'oney' => array(
+            'name' => "#^[A-ZÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,63}$#ui",
+            'street' => "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui",
+            'zip' => '#^[0-9]{5}$#',
+            'city' => "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,127}$#ui",
+            'country' => '#^FR|GP|MQ|GF|RE|YT$#i',
+            'phone' => '#^[0-9]{10}$#'
+        ),
+        'fullcb' => array(
+            'name' => "#^[A-Za-z0-9àâçèéêîôùû]+([ \-']?[A-Za-z0-9àâçèéêîôùû]+)*$#",
+            'street' => '#^[^;]*$#',
+            'zip' => '#^[0-9]{5}$#',
+            'city' => '#^[^;]*$#',
+            'country' => '#^FR$#',
+            'phone' => '#^(0|33)[0-9]{9}$#'
+        )
+    );
 
     /**
      * Normalize shipping method name.
@@ -250,7 +269,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                 }
 
                 $priceInCents = $currency->convertAmountToInteger($item->getPrice());
-                $qty = (int)$item->getQtyOrdered();
+                $qty = (int) $item->getQtyOrdered();
 
                 $payzenRequest->addProduct(
                     preg_replace($notAllowed, ' ', $label),
@@ -385,21 +404,21 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         }
     }
 
-    public function checkAddressValidity($address)
+    public function checkAddressValidity($address, $payment)
     {
         if (! $address) {
             return;
         }
 
-        // oney validation regular expressions
-        $nameRegex = "#^[A-ZÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,63}$#ui";
-        $phoneRegex = "#^[0-9]{10}$#";
-        $cityRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,127}$#ui";
-        $streetRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui";
+        $regex = self::$address_regex[$payment];
 
-        $availableCountries = Mage::getModel('payzen/source_oney_availableCountries')->getCountryCodes();
-        $countryRegex = "#^" . implode('|', $availableCountries) . "$#i";
-        $zipRegex = "#^[0-9]{5}$#";
+        // specific validation regular expressions
+        $nameRegex = $regex['name'];
+        $phoneRegex = $regex['phone'];
+        $cityRegex = $regex['city'];
+        $streetRegex = $regex['street'];
+        $countryRegex = $regex['country'];
+        $zipRegex = $regex['zip'];
 
         // error messages
         $invalidMsg = 'The field %s of your %s is invalid.';

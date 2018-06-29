@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.8.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2017 Lyra Network and contributors
+ * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @category  payment
  * @package   payzen
@@ -20,7 +20,7 @@ class Lyra_Payzen_Block_Standard extends Lyra_Payzen_Block_Abstract
 {
     protected $_model = 'standard';
 
-    private $_manualCcTypes = array(
+    protected $_manualCcTypes = array(
         'AMEX', 'AURORE-MULTI', 'BUT', 'CASINO', 'CB', 'CDGP', 'CDISCOUNT', 'COFINOGA', 'CONFORAMA', 'CORA_BLANCHE',
         'CORA_PREM', 'CORA_VISA', 'DINERS', 'DISCOVER', 'E-CARTEBLEUE', 'EDENRED_EC', 'EDENRED_TR', 'JCB', 'LECLERC',
         'MASTERCARD', 'PAYBOX', 'PAYDIREKT', 'PRV_BDP', 'PRV_BDT', 'PRV_OPT', 'PRV_SOC', 'SDD', 'SOFICARTE', 'SYGMA',
@@ -58,7 +58,9 @@ class Lyra_Payzen_Block_Standard extends Lyra_Payzen_Block_Abstract
     {
         if ($code == 'AMEX') {
             return 'AMEX';
-        } elseif (in_array($code, array('CB', 'VISA', 'VISA_ELECTRON', 'MASTERCARD', 'MAESTRO', 'E-CARTEBLEUE', 'VPAY'))) {
+        } elseif (in_array(
+            $code, array('CB', 'VISA', 'VISA_ELECTRON', 'MASTERCARD', 'MAESTRO', 'E-CARTEBLEUE', 'VPAY')
+        )) {
             return 'CB';
         } else {
             return null;
