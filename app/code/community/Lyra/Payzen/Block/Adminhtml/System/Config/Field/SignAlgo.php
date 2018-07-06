@@ -16,30 +16,26 @@
  * @package   payzen
  */
 
-namespace Lyra\Payzen\Model\Api\Ws;
-
-class RiskAssessments
+/**
+ * Custom renderer for the signature algorithm field.
+ */
+class Lyra_Payzen_Block_Adminhtml_System_Config_Field_SignAlgo extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
-    /**
-     * @var string $results
-     */
-    private $results = null;
-
-    /**
+     /**
+     * Render field HTML.
+     *
+     * @param Varien_Data_Form_Element_Abstract $element
      * @return string
      */
-    public function getResults()
+    public function render(Varien_Data_Form_Element_Abstract $element)
     {
-        return $this->results;
-    }
+        // get configured features
+        $features = Lyra_Payzen_Helper_Data::$pluginFeatures;
+        if ($features['shatwo']) {
+            $comment = preg_replace('#<br /><b>[^<>]+</b>#', '', $element->getComment());
+            $element->setComment($comment);
+        }
 
-    /**
-     * @param string $results
-     * @return RiskAssessments
-     */
-    public function setResults($results)
-    {
-        $this->results = $results;
-        return $this;
+        return parent::render($element);
     }
 }

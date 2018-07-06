@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -36,8 +36,8 @@ class Lyra_Payzen_Block_Adminhtml_System_Config_Field_NotifyUrl extends Mage_Adm
         $element->setValue($ipnUrl);
 
         $warnImg = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'payzen/warn.png';
-        $comment = '<img src="' . $warnImg . '" style="vertical-align: middle; padding-right: 5px;"/>';
-        $comment .= '<span style="color: red; display: inline-block; position: absolute; font-weight:bold;">'
+        $comment = '<img src="' . $warnImg . '" style="vertical-align: top; padding-right: 5px;"/>';
+        $comment .= '<span style="color: red; display: inline-block; font-weight:bold;">'
             . $element->getComment() . '</span>';
         $element->setComment($comment);
 

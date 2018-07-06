@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -390,7 +390,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $billingDetailsRequest->setReference($order->getCustomerId());
 
             if ($order->getBillingAddress()->getPrefix()) {
-                $billingDetailsRequest->setTitlte($order->getBillingAddress()->getPrefix());
+                $billingDetailsRequest->setTitle($order->getBillingAddress()->getPrefix());
             }
 
             $billingDetailsRequest->setFirstName($order->getBillingAddress()->getFirstname());

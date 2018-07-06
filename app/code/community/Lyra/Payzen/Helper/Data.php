@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -28,6 +28,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         'prodfaq' => true,
         'acquis' => true,
         'restrictmulti' => false,
+        'shatwo' => true,
 
         'multi' => true,
         'gift' => true,
@@ -249,7 +250,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         $currentMethod = $this->_getCallerMethod();
 
         $log  = '';
-        $log .= 'PayZen 1.9.0';
+        $log .= 'PayZen 1.9.1';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 
