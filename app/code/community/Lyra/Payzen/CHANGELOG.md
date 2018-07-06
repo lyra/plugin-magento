@@ -1,7 +1,13 @@
+1.9.1, 2018-07-06:
+- Bug fix: Fixed setTitle() function name in payment from backend WS call.
+- [shatwo]Enable SHA-256 signature algorithm by default.
+- Ignore spaces at the beginning and the end of certificates on return signature processing.
+
 1.9.0, 2018-05-23:
 - Bug fix: fix error during payment from backend caused by clearing quote data.
 - Bug fix: relative to reloading "Shipping method" field in 1-Click component.
 - Bug fix: consider 3 DS options in all payment sub-modules.
+- Bug fix: correct function name in WS call when paying from backend.
 - Enable signature algorithm selection (SHA-1 or SHA-256).
 - [fullcb]Adding FullCB means of payment as sub-module.
 - [sepa]Adding SEPA means of payment as sub-module.

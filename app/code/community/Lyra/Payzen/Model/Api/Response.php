@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -100,7 +100,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Response', false)) {
         public function __construct($params, $ctx_mode, $key_test, $key_prod, $algo = Lyra_Payzen_Model_Api_Api::ALGO_SHA1)
         {
             $this->rawResponse = Lyra_Payzen_Model_Api_Api::uncharm($params);
-            $this->certificate = $ctx_mode == 'PRODUCTION' ? $key_prod : $key_test;
+            $this->certificate = trim(($ctx_mode == 'PRODUCTION') ? $key_prod : $key_test);
 
             if (in_array($algo, Lyra_Payzen_Model_Api_Api::$SUPPORTED_ALGOS)) {
                 $this->algo = $algo;
@@ -443,6 +443,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Response', false)) {
             if (! empty($extra_message)) {
                 $message .= ' ' . $extra_message;
             }
+
             $message = str_replace("\n", ' ', $message);
 
             // set original CMS encoding to convert if necessary response to send to platform

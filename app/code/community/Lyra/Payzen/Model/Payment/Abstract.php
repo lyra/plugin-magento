@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -71,7 +71,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
         // set the amount to pay
         $this->_payzenRequest->set('amount', $currency->convertAmountToInteger($amount));
 
-        $this->_payzenRequest->set('contrib', 'Magento1.4-1.9_1.9.0/' . Mage::getVersion() . '/' . PHP_VERSION);
+        $this->_payzenRequest->set('contrib', 'Magento1.4-1.9_1.9.1/' . Mage::getVersion() . '/' . PHP_VERSION);
 
         // set config parameters
         $configFields = array('site_id', 'key_test', 'key_prod', 'ctx_mode', 'capture_delay', 'validation_mode',

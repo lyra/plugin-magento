@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * PayZen V2-Payment Module version 1.9.0 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -22,7 +22,7 @@
     <!-- version -->
     <modules>
         <Lyra_Payzen>
-            <version>1.9.0</version>
+            <version>1.9.1</version>
         </Lyra_Payzen>
     </modules>
 
@@ -478,7 +478,7 @@
             <payzen>
                 <developed_by>Lyra Network</developed_by>
                 <contact_email>support@payzen.eu</contact_email>
-                <module_version>1.9.0</module_version>
+                <module_version>1.9.1</module_version>
                 <gateway_version>V2</gateway_version>
                 <enable_logs>1</enable_logs>
                 <title>PayZen</title>
@@ -487,7 +487,7 @@
                 <key_test>1111111111111111</key_test>
                 <key_prod>2222222222222222</key_prod>
                 <ctx_mode>TEST</ctx_mode>
-                <sign_algo>SHA-1</sign_algo>
+                <sign_algo>SHA-256</sign_algo>
                 <notify_url>payzen/payment/check</notify_url>
                 <platform_url>https://secure.payzen.eu/vads-payment/</platform_url>
 
