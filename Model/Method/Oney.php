@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -203,7 +203,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // contrib info
         $version = $this->productMetadata->getVersion(); // will return the magento version
-        $this->payzenRequest->set('contrib', 'Magento2.x_2.3.0/' . $version . '/' . PHP_VERSION);
+        $this->payzenRequest->set('contrib', 'Magento2.x_2.3.1/' . $version . '/' . PHP_VERSION);
 
         // set config parameters
         $configFields = [

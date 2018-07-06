@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -220,7 +220,7 @@ if (! class_exists('PayzenApi', false)) {
                 'BRICE_CDX_SB' => 'Carte cadeau Brice - Sandbox', 'CDGP' => 'Carte Privilège', 'COF3XCB' => '3 fois CB Cofinoga',
                 'COF3XCB_SB' => '3 fois CB Cofinoga - Sandbox', 'COFINOGA' => 'Carte Be Smart', 'CORA_BLANCHE' => 'Carte Cora Blanche',
                 'CORA_PREM' => 'Carte Cora Premium', 'CORA_VISA' => 'Carte Cora Visa', 'DINERS' => 'Carte Diners Club',
-                'E_CV' => 'E-chèque vacance', 'EDENRED_TR' => 'Ticket Restaurant', 'EDENRED_EC' => 'Ticket EcoCheque',
+                'E_CV' => 'E-chèque vacance', 'EDENRED_TR' => 'Ticket Restaurant', 'EDENRED_EC' => 'Ticket EcoCheque', 'EDENRED_TC' => 'Ticket Compliments',
                 'EPS' => 'eps-Überweisung', 'FULLCB3X' => 'Paiement en 3X avec BNPP PF', 'FULLCB4X' => 'Paiement en 4X avec BNPP PF',
                 'GIROPAY' => 'Giropay', 'KLARNA' => 'Klarna', 'IDEAL' => 'iDEAL', 'ILLICADO' => 'Carte cadeau Illicado',
                 'ILLICADO_SB' => 'Carte cadeau Illicado - Sandbox', 'JCB' => 'Carte JCB', 'JOUECLUB_CDX' => 'Carte cadeau Jouéclub',

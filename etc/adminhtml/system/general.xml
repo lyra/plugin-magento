@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -106,6 +106,7 @@
             <field id="sign_algo" translate="label comment" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Signature algorithm</label>
                 <comment><![CDATA[Algorithm used to compute the payment form signature. Selected algorithm must be the same as one configured in the PayZen Back Office.<br /><b>The SHA-256 algorithm should not be activated if it is not yet available in the PayZen Back Office, the feature will be available soon.</b>]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\SignAlgo</frontend_model>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\SignAlgo</source_model>
                 <config_path>payzen/general/sign_algo</config_path>
             </field>

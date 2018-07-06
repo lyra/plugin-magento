@@ -18,22 +18,25 @@
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 
 /**
- * Custom renderer for the PayZen label.
+ * Custom renderer for the PayZen signature algorithm selector.
  */
-class Label extends \Magento\Config\Block\System\Config\Form\Field
+class SignAlgo extends \Magento\Config\Block\System\Config\Form\Field
 {
-
     /**
-     * Unset some non-related element parameters.
+     * Update comment.
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
     public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-        $element->unsScope()
-            ->unsCanUseWebsiteValue()
-            ->unsCanUseDefaultValue();
+        // get configured features
+        $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
+        if ($features['shatwo']) {
+            $comment = preg_replace('#<br /><b>[^<>]+</b>#', '', $element->getComment());
+            $element->setComment($comment);
+        }
+
         return parent::render($element);
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -22,7 +22,7 @@
     <default>
         <payzen>
             <general>
-                <module_version>2.3.0</module_version>
+                <module_version>2.3.1</module_version>
                 <platform_version>V2</platform_version>
                 <enable_logs>1</enable_logs>
 
@@ -30,7 +30,7 @@
                 <key_test>1111111111111111</key_test>
                 <key_prod>2222222222222222</key_prod>
                 <ctx_mode>TEST</ctx_mode>
-                <sign_algo>SHA-1</sign_algo>
+                <sign_algo>SHA-256</sign_algo>
                 <platform_url>https://secure.payzen.eu/vads-payment/</platform_url>
                 <notify_url>payzen/payment/check</notify_url>
 
