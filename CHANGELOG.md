@@ -1,3 +1,7 @@
+2.3.1, 2018-07-06:
+- [shatwo]Enable SHA-256 signature algorithm by default.
+- Ignore spaces at the beginning and the end of certificates on return signature processing.
+
 2.3.0, 2018-05-23:
 - Enable signature algorithm selection (SHA-1 or SHA-256).
 - Improve backend configuration screen.

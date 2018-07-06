@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -48,6 +48,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'qualif' => false,
         'prodfaq' => true,
         'restrictmulti' => false,
+        'shatwo' => true,
 
         'multi' => true,
         'choozeo' => false
@@ -415,7 +416,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $currentMethod = $this->getCallerMethod();
 
         $log = '';
-        $log .= 'PayZen 2.3.0';
+        $log .= 'PayZen 2.3.1';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.0 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -62,8 +62,8 @@ class NotifyUrl extends Label
         $element->setValue($notifyUrl);
 
         $warnImg = $this->getViewFileUrl('Lyranetwork_Payzen::images/warn.png');
-        $comment = '<img src="' . $warnImg . '" style="vertical-align: middle; padding-right: 5px;"/>';
-        $comment .= '<span style="color: red; display: inline-block; position: absolute; font-weight:bold;">'
+        $comment = '<img src="' . $warnImg . '" style="vertical-align: top; padding-right: 5px;"/>';
+        $comment .= '<span style="color: red; font-weight: bold; display: inline-block; width: 88%;">'
             . $element->getComment() . '</span>';
         $element->setComment($comment);
 
