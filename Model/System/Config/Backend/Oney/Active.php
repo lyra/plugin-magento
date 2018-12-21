@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend\Oney;
 
@@ -65,7 +65,7 @@ class Active extends \Magento\Framework\App\Config\Value
             if (! $oneyContract) {
                 $this->setValue(0);
 
-                $this->message = __('Please configure &laquo;ADDITIONAL OPTIONS&raquo; part of &laquo;PayZen&raquo; section.')->render();
+                $this->message = __('Please configure &laquo; ADDITIONAL OPTIONS &raquo; part of &laquo; PayZen &raquo; section.')->render();
             } else {
                 try {
                     // check Oney requirements
@@ -84,7 +84,7 @@ class Active extends \Magento\Framework\App\Config\Value
     public function afterCommitCallback()
     {
         if (! empty($this->message)) {
-            $this->message .= "\n" . __('FacilyPay Oney payment mean cannot be used.')->render();
+            $this->message .= "\n" . __('FacilyPay Oney means of payment cannot be used.')->render();
             throw new \Magento\Framework\Exception\LocalizedException(__($this->message));
         }
 

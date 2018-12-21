@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend\Oney;
 
@@ -27,7 +27,7 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\C
 
         $data = $this->getGroups('payzen_oney'); // get data of FacilyPay Oney config group
         if ($data['fields']['active']['value']) { // FacilyPay Oney is activated
-            foreach ($values as $key => $value) {
+            foreach ($values as $value) {
                 if (empty($value) || ($value['code'] !== 'all')) {
                     continue;
                 }
@@ -42,7 +42,7 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\C
                     $field = __($field)->render(); // translate field name
                     $group = $this->dataHelper->getGroupTitle($config['path']);
                     $msg = __(
-                        'Please enter a value for &laquo;ALL GROUPS - %1&raquo; in &laquo;%2&raquo; section as agreed with Banque Accord.',
+                        'Please enter a value for &laquo; ALL GROUPS - %1 &raquo; in &laquo; %2 &raquo; section as agreed with Banque Accord.',
                         $field,
                         $group
                     );

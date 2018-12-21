@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized;
 
@@ -63,7 +63,7 @@ class ConfigArraySerialized extends \Magento\Config\Model\Config\Backend\Seriali
 
         // main message
         $msg = __(
-            'The field &laquo;%1&raquo; is invalid: please check column &laquo;%2&raquo; of the option %3 in section &laquo;%4&raquo;.',
+            'The field &laquo; %1 &raquo; is invalid: please check column &laquo; %2 &raquo; of the option %3 in section &laquo; %4 &raquo;.',
             $field,
             $column,
             $position,

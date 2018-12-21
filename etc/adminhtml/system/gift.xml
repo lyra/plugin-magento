@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,47 +10,47 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 -->
 
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="payzen_gift" translate="label" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>GIFT CARD PAYMENT</label>
+        <label><![CDATA[GIFT CARD PAYMENT]]></label>
         <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset\Dependant</frontend_model>
         <attribute type="expanded">0</attribute>
         <attribute type="feature">gift</attribute>
 
         <group id="payzen_display_options" translate="label" type="text" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>BASIC SETTINGS</label>
+            <label><![CDATA[BASIC SETTINGS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="active" translate="label comment" type="select" sortOrder="411" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Activation</label>
-                <comment>Enables / disables this payment method.</comment>
+                <label><![CDATA[Activation]]></label>
+                <comment><![CDATA[Enables / disables this payment method.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>payment/payzen_gift/active</config_path>
             </field>
 
             <field id="title" translate="label comment" type="text" sortOrder="412" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Method title</label>
-                <comment>Method title to display on payment means page.</comment>
+                <label><![CDATA[Method title]]></label>
+                <comment><![CDATA[Method title to display on payment means page.]]></comment>
                 <config_path>payment/payzen_gift/title</config_path>
             </field>
 
             <field id="sort_order" translate="label comment" type="text" sortOrder="413" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Sort order</label>
-                <comment>In the payment methods list.</comment>
+                <label><![CDATA[Sort order]]></label>
+                <comment><![CDATA[In the payment methods list.]]></comment>
                 <config_path>payment/payzen_gift/sort_order</config_path>
             </field>
 
             <field id="module_logo" translate="label comment" type="image" sortOrder="414" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Logo</label>
-                <comment>Allowed file types: jpeg, gif, png.</comment>
+                <label><![CDATA[Logo]]></label>
+                <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
                 <config_path>payment/payzen_gift/module_logo</config_path>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>
                 <upload_dir config="system/filesystem/media" scope_info="0">payzen/images</upload_dir>
@@ -59,17 +59,17 @@
         </group>
 
         <group id="payzen_restrictions" translate="label" type="text" sortOrder="42" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>RESTRICTIONS</label>
+            <label><![CDATA[RESTRICTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="421" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Restrict to some countries</label>
+                <label><![CDATA[Restrict to some countries]]></label>
                 <config_path>payment/payzen_gift/allowspecific</config_path>
                 <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
             </field>
 
             <field id="specificcountry" translate="label comment" type="multiselect" sortOrder="422" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Authorized countries</label>
+                <label><![CDATA[Authorized countries]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
                 <config_path>payment/payzen_gift/specificcountry</config_path>
                 <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -79,7 +79,7 @@
             </field>
 
             <field id="custgroup_amount_restriction" translate="label comment" sortOrder="423" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Customer group amount restriction</label>
+                <label><![CDATA[Customer group amount restriction]]></label>
                 <comment><![CDATA[Define amount restriction for each customer group.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CustgroupOptions</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CustgroupOptions</backend_model>
@@ -88,38 +88,38 @@
         </group>
 
         <group id="payzen_payment_page" translate="label" type="text" sortOrder="43" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>PAYMENT PAGE</label>
+            <label><![CDATA[PAYMENT PAGE]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="capture_delay" translate="label comment" type="text" sortOrder="431" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Capture delay</label>
-                <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                <label><![CDATA[Capture delay]]></label>
+                <comment><![CDATA[The number of days before the bank capture. Enter value only if different from PayZen general configuration.]]></comment>
                 <config_path>payment/payzen_gift/capture_delay</config_path>
             </field>
 
             <field id="validation_mode" translate="label comment" type="select" sortOrder="432" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Validation mode</label>
-                <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                <label><![CDATA[Validation mode]]></label>
+                <comment><![CDATA[If manual is selected, you will have to confirm payments manually in your PayZen Back Office.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ValidationMode</source_model>
                 <config_path>payment/payzen_gift/validation_mode</config_path>
             </field>
         </group>
 
         <group id="payzen_payment_options" translate="label" type="text" sortOrder="44" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>PAYMENT OPTIONS</label>
+            <label><![CDATA[PAYMENT OPTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="gift_cards" translate="label comment" type="multiselect" sortOrder="441" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Gift card types</label>
-                <comment>Select the gift card types that can be used for the payment.</comment>
+                <label><![CDATA[Gift card types]]></label>
+                <comment><![CDATA[Select the gift card types that can be used for the payment.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\GiftCard</source_model>
                 <config_path>payment/payzen_gift/gift_cards</config_path>
             </field>
 
             <field id="added_gift_cards" translate="label comment" sortOrder="442" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Add cards</label>
-                <comment><![CDATA[Click on button to add one or more new gift cards. <br /><b>Card code : </b>The PayZen exact gift card code. <br /><b>Card label : </b>The label of the new gift card. <br /><b>Card logo : </b>The gift card logo to display on payment method selection page.]]></comment>
+                <label><![CDATA[Add cards]]></label>
+                <comment><![CDATA[Click on button to add one or more new gift cards.<br /><b>Card code: </b>The PayZen exact gift card code.<br /><b>Card label: </b>The label of the new gift card.<br /><b>Card logo: </b>The gift card logo to display on payment method selection page.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Gift\AddedCards</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Gift\AddedCards</backend_model>
                 <config_path>payment/payzen_gift/added_gift_cards</config_path>

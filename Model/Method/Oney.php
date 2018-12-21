@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
@@ -227,7 +227,7 @@ class Oney extends Payzen
             // customer id doesn't match FacilyPay Oney rules
 
             $msg = 'Customer ID "%s" does not match PayZen specifications.';
-            $msg .= ' The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
+            $msg .= ' The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
             $this->dataHelper->log(
                 sprintf($msg, $quote->getCustomerId(), \Lyranetwork\Payzen\Helper\Checkout::CUST_ID_REGEX),
                 \Psr\Log\LogLevel::WARNING
@@ -243,7 +243,7 @@ class Oney extends Payzen
             // order id doesn't match FacilyPay Oney rules
 
             $msg = 'The order ID "%s" does not match PayZen specifications.';
-            $msg .= 'The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
+            $msg .= 'The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
             $this->dataHelper->log(
                 sprintf($msg, $quote->getReservedOrderId(), \Lyranetwork\Payzen\Helper\Checkout::ORDER_ID_REGEX),
                 \Psr\Log\LogLevel::WARNING
@@ -261,7 +261,7 @@ class Oney extends Payzen
                 // product id doesn't match FacilyPay Oney rules
 
                 $msg = 'Product reference "%s" does not match PayZen specifications.';
-                $msg .= 'The regular expression for this field is %s. FacilyPay Oney payment mean cannot be used.';
+                $msg .= 'The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
                 $this->dataHelper->log(
                     sprintf($msg, $item->getProductId(), \Lyranetwork\Payzen\Helper\Checkout::PRODUCT_REF_REGEX),
                     \Psr\Log\LogLevel::WARNING

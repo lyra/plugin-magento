@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Helper;
 
@@ -119,7 +119,7 @@ class Checkout
 
                 $msg = '';
                 $msg .= __(
-                    'Customer ID &laquo;%1&raquo; does not match PayZen specifications.',
+                    'Customer ID &laquo; %1 &raquo; does not match PayZen specifications.',
                     $customer->getId()
                 )->render() . ' ';
                 $msg .= __('This field must agree to the regular expression %1.', self::CUST_ID_REGEX)->render();
@@ -163,7 +163,7 @@ class Checkout
 
             $msg = '';
             $msg .= __(
-                'The next order ID  &laquo;%1&raquo; does not match PayZen specifications.',
+                'The next order ID  &laquo; %1 &raquo; does not match PayZen specifications.',
                 $orderId
             )->render() . ' ';
             $msg .= __('This field must agree to the regular expression %1.', self::ORDER_ID_REGEX)->render();
@@ -191,7 +191,7 @@ class Checkout
 
                 $msg = '';
                 $msg .= __(
-                    'Product reference &laquo;%1&raquo; does not match PayZen specifications.',
+                    'Product reference &laquo; %1 &raquo; does not match PayZen specifications.',
                     $product->getId()
                 )->render() . ' ';
                 $msg .= __('This field must agree to the regular expression %1.', self::PRODUCT_REF_REGEX)->render();
@@ -213,7 +213,7 @@ class Checkout
         $shippingMapping = $this->dataHelper->unserialize($this->dataHelper->getCommonConfigData('ship_options'));
 
         if (is_array($shippingMapping) && ! empty($shippingMapping)) {
-            foreach ($shippingMapping as $id => $shippingMethod) {
+            foreach ($shippingMapping as $shippingMethod) {
                 if ($shippingMethod['code'] === $methodCode) {
                     return $shippingMethod;
                 }
@@ -234,7 +234,7 @@ class Checkout
         $categoryMapping = $this->dataHelper->unserialize($this->dataHelper->getCommonConfigData('category_mapping'));
 
         if (is_array($categoryMapping) && ! empty($categoryMapping) && is_array($categoryIds) && ! empty($categoryIds)) {
-            foreach ($categoryMapping as $id => $category) {
+            foreach ($categoryMapping as $category) {
                 if (in_array($category['code'], $categoryIds)) {
                     return $category['payzen_category'];
                 }
@@ -301,6 +301,9 @@ class Checkout
         }
 
         $payzenRequest->set('tax_amount', $taxAmount);
+
+        // VAT amount for colombian payment means
+        $payzenRequest->set('totalamount_vat', $taxAmount);
     }
 
     public function setOneyData($order, &$payzenRequest)
@@ -384,10 +387,6 @@ class Checkout
         $streetRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui";
         $countryRegex = "#^FR$#i";
         $zipRegex = "#^[0-9]{5}$#";
-
-        // error messages
-        $invalidMsg = 'The field %1 of your %2 is invalid.';
-        $emptyMsg = 'The field %1 of your %2 is mandatory.';
 
         // address type
         $addressType = ($address->getAddressType() === 'billing') ? 'billing address' : 'delivery address';

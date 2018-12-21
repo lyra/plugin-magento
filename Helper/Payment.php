@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Helper;
 
@@ -52,6 +52,10 @@ class Payment
     const ONECLICK_LOCATION_PRODUCT = 'PRODUCT';
 
     const ONECLICK_LOCATION_BOTH = 'BOTH';
+
+    const SUCCESS = 1;
+    const FAILURE = 2;
+    const CANCEL = 3;
 
     /**
      *
@@ -158,8 +162,8 @@ class Payment
         // retrieve new order state and status
         $stateObject = $this->nextOrderState($order, $response);
 
-        $this->dataHelper->log("Order #{$order->getId()}, new state : {$stateObject->getState()}," .
-                 " new status : {$stateObject->getStatus()}.");
+        $this->dataHelper->log("Order #{$order->getId()}, new state: {$stateObject->getState()}," .
+             " new status: {$stateObject->getStatus()}.");
         $order->setState($stateObject->getState())
             ->setStatus($stateObject->getStatus())
             ->addStatusHistoryComment($response->getMessage());
@@ -293,9 +297,10 @@ class Payment
                     'Transaction Type' => $trs->{'operation_type'},
                     'Amount' => $amountDetail,
                     'Transaction ID' => $transactionId,
+                    'Transaction UUID' => $trs->{'trans_uuid'},
                     'Extra Transaction ID' => property_exists($trs, 'ext_trans_id') && isset($trs->{'ext_trans_id'}) ? $trs->{'ext_trans_id'} : '',
                     'Transaction Status' => $trs->{'trans_status'},
-                    'Payment Mean' => $trs->{'card_brand'},
+                    'Means of payment' => $trs->{'card_brand'},
                     'Card Number' => $trs->{'card_number'},
                     'Expiration Date' => $expiry
                 ];
@@ -396,9 +401,10 @@ class Payment
                             \IntlDateFormatter::NONE
                         ),
                         'Transaction ID' => $transactionId,
+                        'Transaction UUID' =>  ($i == 1) ? $response->get('trans_uuid') : '',
                         'Transaction Status' => ($i == 1) ? $response->getTransStatus() : $this->getNextTransStatus($response->getTransStatus()),
-                        'Payment Mean' => $response->get('card_brand'),
-                        'Credit Card Number' => $response->get('card_number'),
+                        'Means of payment' => $response->get('card_brand'),
+                        'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
                         '3DS Certificate' => $threedsCavv
                     ];
@@ -436,9 +442,10 @@ class Payment
                         \IntlDateFormatter::NONE
                     ),
                     'Transaction ID' => $transactionId,
+                    'Transaction UUID' => $response->get('trans_uuid'),
                     'Transaction Status' => $response->getTransStatus(),
-                    'Payment Mean' => $response->get('card_brand'),
-                    'Credit Card Number' => $response->get('card_number'),
+                    'Means of payment' => $response->get('card_brand'),
+                    'Card Number' => $response->get('card_number'),
                     'Expiration Date' => $expiry,
                     '3DS Certificate' => $threedsCavv
                 ];

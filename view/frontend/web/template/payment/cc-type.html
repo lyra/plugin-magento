@@ -1,6 +1,6 @@
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,22 +9,22 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 -->
 
 <div class="field">
     <label data-bind="visible: showLabel()">
         <!--ko if: getAvailableCcTypes().length > 1 -->
-            <span data-bind="i18n: 'Choose your payment mean'"></span>
+            <span data-bind="i18n: 'Choose your means of payment'"></span>
         <!--/ko-->
 
         <!--ko ifnot: getAvailableCcTypes().length > 1 -->
-            <span data-bind="i18n: 'Your payment mean'"></span>
+            <span data-bind="i18n: 'Your means of payment'"></span>
         <!--/ko-->
     </label>
 
@@ -44,7 +44,7 @@
 
                 <label  data-bind="attr: {for: $parent.getCode() + '_cc_type_' + card.value}">
                     <!--ko if: card.icon -->
-                    <img data-bind="attr: {src: card.icon, title: card.label}" style="height: 32px; vertical-align: middle;">
+                    <img data-bind="attr: {src: card.icon, title: card.label}" style="max-height: 35px; max-width: 90px; vertical-align: middle;">
                     <!--/ko-->
 
                     <!--ko ifnot: card.icon -->

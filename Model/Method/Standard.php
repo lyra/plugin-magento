@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
@@ -148,7 +148,7 @@ class Standard extends Payzen
 
         if ($this->getConfigData('oneclick_active') && $order->getCustomerId()) {
             // 1-Click enabled and customer logged-in
-            $customer = $this->customerRepository->getById($this->getCustomerId());
+            $customer = $this->customerRepository->getById($order->getCustomerId());
 
             if ($customer->getData('payzen_identifier') && $info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::IDENTIFIER)) {
                 // customer has an identifier and wants to use it
@@ -255,10 +255,12 @@ class Standard extends Payzen
 
         $payzenData = $this->extractPayzenData($data);
 
+        $info->setCcType($payzenData->getData('payzen_standard_cc_type'));
+
         // wether to do a payment by identifier
         $info->setAdditionalInformation(
             \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER,
-            $payzenData->getData('payzen_use_identifier')
+            $payzenData->getData('payzen_standard_use_identifier')
         );
 
         return $this;

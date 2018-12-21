@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,13 +9,15 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
+
+use Lyranetwork\Payzen\Helper\Payment;
 
 class ResponseProcessor
 {
@@ -107,7 +109,7 @@ class ResponseProcessor
 
         if (! $orderId) {
             $this->dataHelper->log(
-                "Order ID not returned. Payment result : " . $payzenResponse->getLogMessage(),
+                "Order ID not returned. Payment result: " . $payzenResponse->getLogMessage(),
                 \Psr\Log\LogLevel::ERROR
             );
             return $controller->redirectError($order);
@@ -116,7 +118,7 @@ class ResponseProcessor
         if ($order->getStatus() == 'pending_payment') {
             // order waiting for payment
             $this->dataHelper->log("Order #{$order->getId()} is waiting payment.");
-            $this->dataHelper->log("Payment result for order #{$order->getId()} : " . $payzenResponse->getLogMessage());
+            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $payzenResponse->getLogMessage());
 
             if ($payzenResponse->isAcceptedPayment()) {
                 $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by client return !" .
@@ -128,7 +130,7 @@ class ResponseProcessor
                 // display success page
                 return $controller->redirectResponse(
                     $order,
-                    true /* is success ? */,
+                    Payment::SUCCESS,
                     true /* notification url warn in TEST mode */
                 );
             } else {
@@ -138,7 +140,8 @@ class ResponseProcessor
                 $this->paymentHelper->cancelOrder($order, $payzenResponse);
 
                 // redirect to cart page
-                return $controller->redirectResponse($order, false /* is success ? */);
+                $case = $payzenResponse->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
+                return $controller->redirectResponse($order, $case /* is success ? */);
             }
         } else {
             // payment already processed
@@ -155,10 +158,12 @@ class ResponseProcessor
 
             if ($payzenResponse->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
                 $this->dataHelper->log("Order #{$order->getId()} is confirmed.");
-                return $controller->redirectResponse($order, true /* is success ? */);
+                return $controller->redirectResponse($order, Payment::SUCCESS);
             } elseif ($order->isCanceled() && ! $payzenResponse->isAcceptedPayment()) {
                 $this->dataHelper->log("Order #{$order->getId()} cancelation is confirmed.");
-                return $controller->redirectResponse($order, false /* is success ? */);
+
+                $case = $payzenResponse->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
+                return $controller->redirectResponse($order, $case);
             } else {
                 // error case, the client returns with an error code but the payment has already been accepted
                 $this->dataHelper->log(

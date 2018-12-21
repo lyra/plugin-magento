@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,13 +9,15 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Model\Method;
+
+use Lyranetwork\Payzen\Model\System\Config\Source\ChoozeoCountry;
 
 class Choozeo extends Payzen
 {
@@ -33,9 +35,7 @@ class Choozeo extends Payzen
         // override some form data
         $this->payzenRequest->set('validation_mode', '0');
         $this->payzenRequest->set('cust_status', 'PRIVATE');
-
-        // send phone number as cell phone
-        $this->payzenRequest->set('cust_cell_phone', $order->getBillingAddress()->getTelephone());
+        $this->payzenRequest->set('cust_country', 'FR');
 
         // override with selected Choozeo payment card
         $info = $this->getInfoInstance();
@@ -85,6 +85,22 @@ class Choozeo extends Payzen
 
         return true;
     }
+
+    /**
+     * To check billing country is allowed for Choozeo payment method.
+     *
+     * @return bool
+     */
+    public function canUseForCountry($country)
+    {
+        if ($this->getConfigData('allowspecific') == 1) {
+            $availableCountries = explode(',', $this->getConfigData('specificcountry'));
+            return in_array($country, $availableCountries);
+        } else {
+            return in_array($country, ChoozeoCountry::$availableCountries);
+        }
+    }
+
 
     /**
      * Return available payment options to be displayed on payment method list page.
