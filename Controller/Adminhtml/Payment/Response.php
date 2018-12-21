@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,13 +9,15 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Controller\Adminhtml\Payment;
+
+use Lyranetwork\Payzen\Helper\Payment;
 
 class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payzen\Api\ResponseActionInterface
 {
@@ -59,7 +61,7 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
     }
 
     /**
-     * Redirect to error page (when technical error occured).
+     * Redirect to error page (when technical error occurred).
      *
      * @param \Magento\Sales\Model\Order $order
      */
@@ -67,7 +69,7 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
     {
         // clear all messages in session
         $this->messageManager->getMessages(true);
-        $this->messageManager->addError(__('An error has occured during the payment process.'));
+        $this->messageManager->addError(__('An error has occurred during the payment process.'));
 
         $this->dataHelper->log("Redirecting to order creation page for order #{$order->getId()}.");
 
@@ -84,10 +86,10 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
      * Redirect to result page (according to payment status).
      *
      * @param \Magento\Sales\Model\Order $order
-     * @param bool $success
+     * @param string $case
      * @param bool $checkUrlWarn
      */
-    public function redirectResponse($order, $success, $checkUrlWarn = false)
+    public function redirectResponse($order, $case, $checkUrlWarn = false)
     {
         /**
          * @var Magento\Backend\Model\Session\Quote $checkout
@@ -102,8 +104,7 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
             $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
             if ($features['prodfaq']) {
                 // display going to production message
-                $message = __('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
-                $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
+                $message = __('<u><p>GOING INTO PRODUCTION:</u></p> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
                 $this->messageManager->addNotice($message);
             }
 
@@ -114,21 +115,21 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
                 if ($this->dataHelper->isMaintenanceMode()) {
                     $message = __('The shop is in maintenance mode.The automatic notification cannot work.');
                 } else {
-                    $message = __('The automatic validation hasn\'t worked. Have you correctly set up the notification URL in your PayZen Back Office ?');
+                    $message = __('The automatic validation has not worked. Have you correctly set up the notification URL in your PayZen Back Office?');
                     $message .= '<br /><br />';
-                    $message .= __('For understanding the problem, please read the documentation of the module : <br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;To read carefully before going further&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;Notification URL settings&raquo;');
+                    $message .= __('For understanding the problem, please read the documentation of the module:<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
 
                 $this->messageManager->addError($message);
             }
         }
 
-        if ($success) {
+        if ($case === Payment::SUCCESS) {
             $this->messageManager->addSuccess(
                 __('The payment was successful. Your order was registered successfully.')
             );
-        } else {
-            $this->messageManager->addWarning(__('Checkout and order have been canceled.'));
+        } elseif ($case === Payment::FAILURE) {
+            $this->messageManager->addWarning(__('Your payment was not accepted. Please, try to re-order.'));
         }
 
         $this->dataHelper->log("Redirecting to order view or order index page for order #{$order->getId()}.");

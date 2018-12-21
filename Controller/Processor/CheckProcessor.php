@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
 
@@ -130,7 +130,7 @@ class CheckProcessor
         if ($order->getStatus() == 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
             // order waiting for payment
             $this->dataHelper->log("Order #{$order->getId()} is waiting payment update.");
-            $this->dataHelper->log("Payment result for order #{$order->getId()} : " . $payzenResponse->getLogMessage());
+            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $payzenResponse->getLogMessage());
 
             if ($payzenResponse->isAcceptedPayment()) {
                 $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by notification URL.");
@@ -168,7 +168,7 @@ class CheckProcessor
                 $this->dataHelper->log("Order #{$order->getId()} is confirmed.");
 
                 if ($payzenResponse->get('operation_type') == 'CREDIT') {
-                    // this is a refund : create credit memo ?
+                    // this is a refund: create credit memo ?
 
                     $expiry = '';
                     if ($payzenResponse->get('expiry_month') && $payzenResponse->get('expiry_year')) {
@@ -203,8 +203,9 @@ class CheckProcessor
                         'Transaction Type' => 'CREDIT',
                         'Amount' => $amountDetail,
                         'Transaction ID' => $transactionId,
+                        'Transaction UUID' => $payzenResponse->get('trans_uuid'),
                         'Transaction Status' => $payzenResponse->get('trans_status'),
-                        'Payment Mean' => $payzenResponse->get('card_brand'),
+                        'Means of payment' => $payzenResponse->get('card_brand'),
                         'Card Number' => $payzenResponse->get('card_number'),
                         'Expiration Date' => $expiry,
                         '3DS Certificate' => ''

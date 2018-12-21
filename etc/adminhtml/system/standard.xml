@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,46 +10,46 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 -->
 
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="payzen_standard" translate="label" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>ONE-TIME PAYMENT</label>
+        <label><![CDATA[ONE-TIME PAYMENT]]></label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <attribute type="expanded">0</attribute>
 
         <group id="payzen_display_options" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>DISPLAY OPTIONS</label>
+            <label><![CDATA[DISPLAY OPTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="active" translate="label comment" type="select" sortOrder="211" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Activation</label>
-                <comment>Enables / disables this payment method.</comment>
+                <label><![CDATA[Activation]]></label>
+                <comment><![CDATA[Enables / disables this payment method.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>payment/payzen_standard/active</config_path>
             </field>
 
             <field id="title" translate="label comment" type="text" sortOrder="212" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Method title</label>
-                <comment>Method title to display on payment means page.</comment>
+                <label><![CDATA[Method title]]></label>
+                <comment><![CDATA[Method title to display on payment means page.]]></comment>
                 <config_path>payment/payzen_standard/title</config_path>
             </field>
 
             <field id="sort_order" translate="label comment" type="text" sortOrder="213" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Sort order</label>
-                <comment>In the payment methods list.</comment>
+                <label><![CDATA[Sort order]]></label>
+                <comment><![CDATA[In the payment methods list.]]></comment>
                 <config_path>payment/payzen_standard/sort_order</config_path>
             </field>
 
             <field id="module_logo" translate="label comment" type="image" sortOrder="214" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Logo</label>
-                <comment>Allowed file types: jpeg, gif, png.</comment>
+                <label><![CDATA[Logo]]></label>
+                <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
                 <config_path>payment/payzen_standard/module_logo</config_path>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Logo</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>
@@ -59,17 +59,17 @@
         </group>
 
         <group id="payzen_restrictions" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>RESTRICTIONS</label>
+            <label><![CDATA[RESTRICTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="221" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Restrict to some countries</label>
+                <label><![CDATA[Restrict to some countries]]></label>
                 <config_path>payment/payzen_standard/allowspecific</config_path>
                 <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
             </field>
 
             <field id="specificcountry" translate="label comment" type="multiselect" sortOrder="222" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Authorized countries</label>
+                <label><![CDATA[Authorized countries]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
                 <config_path>payment/payzen_standard/specificcountry</config_path>
                 <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -79,7 +79,7 @@
             </field>
 
             <field id="custgroup_amount_restriction" translate="label comment" sortOrder="223" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Customer group amount restriction</label>
+                <label><![CDATA[Customer group amount restriction]]></label>
                 <comment><![CDATA[Define amount restriction for each customer group.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CustgroupOptions</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CustgroupOptions</backend_model>
@@ -88,25 +88,25 @@
         </group>
 
         <group id="payzen_payment_page" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>PAYMENT PAGE</label>
+            <label><![CDATA[PAYMENT PAGE]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="capture_delay" translate="label comment" type="text" sortOrder="231" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Capture delay</label>
-                <comment>The number of days before the bank capture. Enter value only if different from PayZen general configuration.</comment>
+                <label><![CDATA[Capture delay]]></label>
+                <comment><![CDATA[The number of days before the bank capture. Enter value only if different from PayZen general configuration.]]></comment>
                 <config_path>payment/payzen_standard/capture_delay</config_path>
             </field>
 
             <field id="validation_mode" translate="label comment" type="select" sortOrder="232" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Validation mode</label>
-                <comment>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.</comment>
+                <label><![CDATA[Validation mode]]></label>
+                <comment><![CDATA[If manual is selected, you will have to confirm payments manually in your PayZen Back Office.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ValidationMode</source_model>
                 <config_path>payment/payzen_standard/validation_mode</config_path>
             </field>
 
             <field id="payment_cards" translate="label comment" type="multiselect" sortOrder="233" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Card Types</label>
-                <comment>The card type(s) that can be used for the payment. Select none to use gateway configuration.</comment>
+                <label><![CDATA[Card Types]]></label>
+                <comment><![CDATA[The card type(s) that can be used for the payment. Select none to use gateway configuration.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\PaymentCard</source_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\PaymentCards</backend_model>
@@ -115,26 +115,26 @@
         </group>
 
         <group id="payzen_advanced_options" translate="label" type="text" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>ADVANCED OPTIONS</label>
+            <label><![CDATA[ADVANCED OPTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="card_info_mode" translate="label comment" type="select" sortOrder="241" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Bank data acquisition mode</label>
-                <comment>Select how the credit card infos will be entered. Attention, to use data acquisition on the merchant site, you must ensure that you have subscribed to this option with PayZen.</comment>
+                <label><![CDATA[Bank data acquisition mode]]></label>
+                <comment><![CDATA[Select how the credit card infos will be entered. Attention, to use data acquisition on the merchant site, you must ensure that you have subscribed to this option with PayZen.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\CardInfoMode</source_model>
                 <config_path>payment/payzen_standard/card_info_mode</config_path>
             </field>
 
             <!-- <field id="oneclick_active" translate="label comment" type="select" sortOrder="242" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>1-Click payment</label>
-                <comment>Enable 1-Click to add PayZen payment button to your cart and / or product pages.</comment>
+                <label><![CDATA[1-Click payment]]></label>
+                <comment><![CDATA[Enable 1-Click to add PayZen payment button to your cart and / or product pages.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payment/payzen_standard/oneclick_active</config_path>
             </field>
 
             <field id="oneclick_title" translate="label comment" type="text" sortOrder="243" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>1-Click button text</label>
-                <comment>The text to display on the PayZen 1-Click payment button.</comment>
+                <label><![CDATA[1-Click button text]]></label>
+                <comment><![CDATA[The text to display on the PayZen 1-Click payment button.]]></comment>
                 <config_path>payment/payzen_standard/oneclick_title</config_path>
                 <depends>
                     <field id="oneclick_active">1</field>
@@ -142,8 +142,8 @@
             </field>
 
             <field id="oneclick_location" translate="label comment" type="select" sortOrder="244" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>1-Click button location</label>
-                <comment>Select where to display PayZen 1-Click payment button.</comment>
+                <label><![CDATA[1-Click button location]]></label>
+                <comment><![CDATA[Select where to display PayZen 1-Click payment button.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\OneclickLocation</source_model>
                 <config_path>payment/payzen_standard/oneclick_location</config_path>
                 <depends>
@@ -152,8 +152,8 @@
             </field>
 
             <field id="card_register_mode" translate="label comment" type="select" sortOrder="245" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Card data registration mode</label>
-                <comment>Select how you want to propose card data registration on your website.</comment>
+                <label><![CDATA[Card data registration mode]]></label>
+                <comment><![CDATA[Select how you want to propose card data registration on your website.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\CardRegisterMode</source_model>
                 <config_path>payment/payzen_standard/card_register_mode</config_path>
                 <depends>
@@ -163,8 +163,8 @@
             </field>
 
             <field id="card_register_message" translate="label comment" type="text" sortOrder="246" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Card data registration message</label>
-                <comment>Message displayed on your website to invite buyers to register their card data.</comment>
+                <label><![CDATA[Card data registration message]]></label>
+                <comment><![CDATA[Message displayed on your website to invite buyers to register their card data.]]></comment>
                 <config_path>payment/payzen_standard/card_register_message</config_path>
                 <depends>
                     <field id="oneclick_active">1</field>

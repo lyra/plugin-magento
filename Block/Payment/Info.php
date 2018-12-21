@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.1 for Magento 2.x. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 namespace Lyranetwork\Payzen\Block\Payment;
 
@@ -99,7 +99,7 @@ class Info extends \Magento\Payment\Block\Info
         $html = '';
         $payment = $this->getInfo();
 
-        $html .= __('Payment Mean') . ' : ' . $payment->getCcType();
+        $html .= '<b>' . __('Means of payment') . ': </b>' . $payment->getCcType();
 
         if ($backend) {
             $userChoice = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE);
@@ -108,25 +108,27 @@ class Info extends \Magento\Payment\Block\Info
             } elseif ($userChoice === false) {
                 $html .= ' ' . __('(default card brand used)');
             }
+
+            $html .= '<br />';
+
+            $html .= '<b>' . __('Card Number') . ': </b>' . $payment->getCcNumberEnc();
+            $html .= '<br />';
+
+            $expiry = '';
+            if ($payment->getCcExpMonth() && $payment->getCcExpYear()) {
+                $expiry = str_pad($payment->getCcExpMonth(), 2, '0', STR_PAD_LEFT) . ' / ' . $payment->getCcExpYear();
+            }
+
+            $html .= '<b>' . __('Expiration Date') . ': </b>' . $expiry;
         }
 
         $html .= '<br />';
 
-        $html .= __('Credit Card Number') . ' : ' . $payment->getCcNumberEnc();
-        $html .= '<br />';
-
-        $expiry = '';
-        if ($payment->getCcExpMonth() && $payment->getCcExpYear()) {
-            $expiry = str_pad($payment->getCcExpMonth(), 2, '0', STR_PAD_LEFT) . ' / ' . $payment->getCcExpYear();
-        }
-        $html .= __('Expiration Date') . ' : ' . $expiry;
-        $html .= '<br />';
-
-        $html .= __('3DS Authentication') . ' : ';
+        $html .= '<b>' . __('3DS Authentication') . ': </b>';
         if ($payment->getCcSecureVerify()) {
             $html .= __('YES');
             $html .= '<br />';
-            $html .= __('3DS Certificate') . ' : ' . $payment->getCcSecureVerify();
+            $html .= '<b>' . __('3DS Certificate') . ': </b>' . $payment->getCcSecureVerify();
         } else {
             $html .= __('NO');
         }
@@ -145,12 +147,12 @@ class Info extends \Magento\Payment\Block\Info
         foreach ($collection as $item) {
             $html .= '<hr />';
 
-            $html .= __('Sequence Number') . ' : ' . substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
+            $html .= '<b>' . __('Sequence Number') . ': </b>' . substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
             $html .= '<br />';
 
             $info = $item->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
             foreach ($info as $key => $value) {
-                $html .= __($key) . ' : ' . $value;
+                $html .= __($key) . ': ' . $value;
                 $html .= '<br />';
             }
         }

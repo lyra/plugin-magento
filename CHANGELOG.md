@@ -1,9 +1,21 @@
+2.3.2, 2018-12-24:
+- Bug fix: get the correct means of payment when selection on site is enabled.
+- [paypal]Bug fix: error when refunding a PayPal payment.
+- Fix new signature algorithm name (HMAC-SHA-256).
+- Send Magento phone number as vads\_cell\_phone (required for some payment means).
+- Update payment means logos.
+- Improve iframe mode interface.
+- Save transaction UUID in order payment details.
+- Added Spanish translation.
+- [prodfaq]Fix notice about shifting the shop to production mode.
+- Improve error message after a failed payment.
+
 2.3.1, 2018-07-06:
-- [shatwo]Enable SHA-256 signature algorithm by default.
+- [shatwo]Enable HMAC-SHA-256 signature algorithm by default.
 - Ignore spaces at the beginning and the end of certificates on return signature processing.
 
 2.3.0, 2018-05-23:
-- Enable signature algorithm selection (SHA-1 or SHA-256).
+- Enable signature algorithm selection (SHA-1 or HMAC-SHA-256).
 - Improve backend configuration screen.
 
 2.2.0, 2018-03-19:
