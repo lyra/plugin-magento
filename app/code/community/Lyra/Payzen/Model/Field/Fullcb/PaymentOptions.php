@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Field_Fullcb_PaymentOptions extends Lyra_Payzen_Model_Field_Array
@@ -28,7 +28,7 @@ class Lyra_Payzen_Model_Field_Fullcb_PaymentOptions extends Lyra_Payzen_Model_Fi
             $this->setValue(array());
         } else {
             $i = 0;
-            foreach ($values as $key => $value) {
+            foreach ($values as $value) {
                 $i++;
 
                 if (empty($value)) {
@@ -38,15 +38,19 @@ class Lyra_Payzen_Model_Field_Fullcb_PaymentOptions extends Lyra_Payzen_Model_Fi
                 if (empty($value['label'])) {
                     $this->_throwError('Label', $i);
                 }
+
                 if (! empty($value['amount_min']) && (! is_numeric($value['amount_min']) || $value['amount_min'] < 0)) {
                     $this->_throwError('Minimum amount', $i);
                 }
+
                 if (! empty($value['amount_max']) && (! is_numeric($value['amount_max']) || $value['amount_max'] < 0)) {
                     $this->_throwError('Maximum amount', $i);
                 }
+
                 if (! is_numeric($value['rate']) || $value['rate'] > 100 || $value['rate'] < 0) {
                     $this->_throwError('Rate', $i);
                 }
+
                 if (! is_numeric($value['cap']) || $value['cap'] < 0) {
                     $this->_throwError('Cap', $i);
                 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
@@ -32,13 +32,13 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
 
         $html = '';
 
-        $frontInfos = array('Transaction Type', 'Amount', 'Transaction ID', 'Means of Payment', '3DS Authentication');
+        $frontInfos = array('Transaction Type', 'Amount', 'Transaction ID', 'Transaction UUID', 'Means of Payment', '3DS Authentication');
 
         foreach ($collection as $item) {
             $html .= '<hr />';
 
             if (! $front) {
-                $html .= Mage::helper('payzen')->__('Sequence Number') . ' : '
+                $html .= Mage::helper('payzen')->__('Sequence Number') . ': '
                     . substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
                 $html .= '<br />';
             }
@@ -53,7 +53,7 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
                     continue;
                 }
 
-                $html .= Mage::helper('payzen')->__($key) . ' : ' . $value;
+                $html .= Mage::helper('payzen')->__($key) . ': ' . $value;
                 $html .= '<br />';
             }
         }

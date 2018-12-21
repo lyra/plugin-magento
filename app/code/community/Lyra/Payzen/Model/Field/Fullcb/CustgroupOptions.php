@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Field_Fullcb_CustgroupOptions extends Lyra_Payzen_Model_Field_CustgroupOptions
@@ -22,9 +22,9 @@ class Lyra_Payzen_Model_Field_Fullcb_CustgroupOptions extends Lyra_Payzen_Model_
     {
         $values = $this->getValue();
 
-        $data = $this->getGroups('payzen_fullcb'); // get data of FullCB config group
-        if ($data['fields']['fullcb_active']['value']) { // FullCB is activated
-            foreach ($values as $key => $value) {
+        $data = $this->getGroups('payzen_fullcb'); // get data of Full CB config group
+        if ($data['fields']['fullcb_active']['value']) { // Full CB is activated
+            foreach ($values as $value) {
                 if (empty($value) || ($value['code'] !== 'all')) {
                     continue;
                 }
@@ -38,7 +38,7 @@ class Lyra_Payzen_Model_Field_Fullcb_CustgroupOptions extends Lyra_Payzen_Model_
                 if (isset($field)) {
                     $field = Mage::helper('payzen')->__($field); // translate field name
                     $group = Mage::helper('payzen')->getConfigGroupTitle($this->getGroupId());
-                    $msg = Mage::helper('payzen')->__('Please enter a value for &laquo;ALL GROUPS - %s&raquo; in &laquo;%s&raquo; section as agreed with your bank.', $field, $group);
+                    $msg = Mage::helper('payzen')->__('Please enter a value for &laquo; ALL GROUPS - %s &raquo; in &laquo; %s &raquo; section as agreed with your bank.', $field, $group);
 
                     // throw exception
                     Mage::throwException($msg);

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
@@ -31,6 +31,10 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     const ONECLICK_LOCATION_CART = 'CART';
     const ONECLICK_LOCATION_PRODUCT = 'PRODUCT';
     const ONECLICK_LOCATION_BOTH = 'BOTH';
+
+    const SUCCESS = 1;
+    const FAILURE = 2;
+    const CANCEL = 3;
 
     public function doPaymentForm($controller)
     {
@@ -160,7 +164,7 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 $this->_registerOrder($order, $response);
 
                 // display success page
-                $controller->redirectResponse($order, true /* is success ? */, true /* IPN URL warn in TEST mode */);
+                $controller->redirectResponse($order, self::SUCCESS, true /* IPN URL warn in TEST mode */);
             } else {
                 $this->_getHelper()->log("Payment for order #{$order->getId()} has failed.");
 
@@ -168,7 +172,8 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 $this->_cancelOrder($order, $response);
 
                 // redirect to cart page
-                $controller->redirectResponse($order, false /* is success ? */);
+                $case = $response->isCancelledPayment() ? self::CANCEL : self::FAILURE;
+                $controller->redirectResponse($order, $case);
             }
         } else {
             // payment already processed
@@ -180,15 +185,18 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 'complete' /* case of virtual orders */,
                 'payment_review' /* case of Oney (and other) pending payments */,
                 'fraud' /* fraud status is taken as successful because it's just a suspicion */,
-                'payzen_to_validate' /* payment will be done after manual validation */
+                'payzen_to_validate' /* payment will be done after manual validation */,
+                'payzen_pending_transfer' /* for SEPA and SOFORT payments */
             );
 
             if ($this->_isPaymentSuccessfullyProcessed($response) && in_array($order->getStatus(), $successStatuses)) {
                 $this->_getHelper()->log("Order #{$order->getId()} is confirmed.");
-                $controller->redirectResponse($order, true /* is success ? */);
+                $controller->redirectResponse($order, self::SUCCESS);
             } elseif ($order->isCanceled() && ! $this->_isPaymentSuccessfullyProcessed($response)) {
                 $this->_getHelper()->log("Order #{$order->getId()} cancelation is confirmed.");
-                $controller->redirectResponse($order, false /* is success ? */);
+
+                $case = $response->isCancelledPayment() ? self::CANCEL : self::FAILURE;
+                $controller->redirectResponse($order, $case);
             } else {
                 // this is an error case, the client returns with an error but the payment already has been accepted
                 $this->_getHelper()->log(
@@ -242,7 +250,7 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         $this->_getHelper()->log("Request authenticated for order #{$order->getId()}.");
 
-        $reviewStatuses = array('payment_review', 'payzen_to_validate', 'fraud');
+        $reviewStatuses = array('payment_review', 'payzen_to_validate', 'fraud', 'payzen_pending_transfer');
         if ($order->getStatus() == 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
             // order waiting for payment
             $this->_getHelper()->log("Order #{$order->getId()} is waiting for payment.");
@@ -320,9 +328,10 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                         'Transaction Type' => 'CREDIT',
                         'Amount' => $amountDetail,
                         'Transaction ID' => $transactionId,
+                        'Transaction UUID' => $response->get('trans_uuid'),
                         'Transaction Status' => $response->getTransStatus(),
                         'Means of Payment' => $response->get('card_brand'),
-                        'Credit Card Number' => $response->get('card_number'),
+                        'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry
                     );
 
@@ -357,14 +366,13 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             return true;
         }
 
-        return ! $response->getTransStatus() && $response->get('identifier') &&
-            in_array($response->get('identifier_status'), array('CREATED', 'UPDATED'));
+        return $response->get('identifier') && in_array($response->get('identifier_status'), array('CREATED', 'UPDATED'));
     }
 
     /**
      * Update order status and eventually create invoice.
      *
-     * @param Mage_Sales_Model_Order $order
+     * @param Mage_Sales_Model_Order         $order
      * @param Lyra_Payzen_Model_Api_Response $response
      */
     protected function _registerOrder(Mage_Sales_Model_Order $order, Lyra_Payzen_Model_Api_Response $response)
@@ -413,18 +421,18 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     /**
      * Update order payment information.
      *
-     * @param Mage_Sales_Model_Order $order
+     * @param Mage_Sales_Model_Order                                                $order
      * @param Lyra_Payzen_Model_Api_Response|Lyra_Payzen_Model_Api_Ws_ResultWrapper $response
      */
     public function updatePaymentInfo(Mage_Sales_Model_Order $order, $response)
     {
         // set common payment information
         $order->getPayment()->setCcTransId($response->get('trans_id'))
-                            ->setCcType($response->get('card_brand'))
-                            ->setCcStatus($response->getResult())
-                            ->setCcStatusDescription($response->getMessage())
-                            ->setAdditionalInformation(self::ALL_RESULTS, serialize($response->getAllResults()))
-                            ->setAdditionalInformation(self::TRANS_UUID, $response->get('trans_uuid'));
+            ->setCcType($response->get('card_brand'))
+            ->setCcStatus($response->getResult())
+            ->setCcStatusDescription($response->getMessage())
+            ->setAdditionalInformation(self::ALL_RESULTS, serialize($response->getAllResults()))
+            ->setAdditionalInformation(self::TRANS_UUID, $response->get('trans_uuid'));
 
         if ($response->isCancelledPayment()) {
             // no more data to save
@@ -477,11 +485,12 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                     'Transaction Type' => $trs->{'operation_type'},
                     'Amount' => $amountDetail,
                     'Transaction ID' => $transactionId,
+                    'Transaction UUID' => $trs->{'trans_uuid'},
                     'Extra Transaction ID' => property_exists($trs, 'ext_trans_id')
                         && isset($trs->{'ext_trans_id'}) ? $trs->{'ext_trans_id'} : '',
                     'Transaction Status' => $trs->{'trans_status'},
                     'Means of Payment' => $trs->{'card_brand'},
-                    'Credit Card Number' => $trs->{'card_number'},
+                    'Card Number' => $trs->{'card_number'},
                     'Expiration Date' => $expiry
                 );
 
@@ -499,9 +508,9 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
             // save payment infos to sales_flat_order_payment
             $order->getPayment()->setCcExpMonth($response->get('expiry_month'))
-                                ->setCcExpYear($response->get('expiry_year'))
-                                ->setCcNumberEnc($response->get('card_number'))
-                                ->setCcSecureVerify($threedsCavv);
+                ->setCcExpYear($response->get('expiry_year'))
+                ->setCcNumberEnc($response->get('card_number'))
+                ->setCcSecureVerify($threedsCavv);
 
             // format card expiration data
             $expiry = '';
@@ -519,7 +528,10 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
             $option = @unserialize($order->getPayment()->getAdditionalData()); // get choosen payment option if any
             if ($response->get('sequence_number') == 1 && (stripos($order->getPayment()->getMethod(), 'payzen_multi') === 0)
-                && is_array($option) && ! empty($option)) {
+                && is_array($option) && ! empty($option)
+            ) {
+                $count = (int) $option['count'];
+
                 // first payment of payment in installments
                 if (isset($option['first']) && $option['first']) {
                     $firstAmount = round($totalAmount * $option['first'] / 100);
@@ -528,9 +540,9 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 }
 
                 // double cast to avoid rounding
-                $installmentAmount = (int) (string) (($totalAmount - $firstAmount) / ((int) $option['count'] - 1));
+                $installmentAmount = (int) (string) (($totalAmount - $firstAmount) / ($count - 1));
 
-                for ($i = 1; $i <= (int) $option['count']; $i++) {
+                for ($i = 1; $i <= $count; $i++) {
                     $transactionId = $response->get('trans_id') . '-' . $i;
 
                     $delay = (int) $option['period'] * ($i - 1);
@@ -541,7 +553,7 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                             $amount = $firstAmount;
                             break;
 
-                        case($i == $option['count']): // last transaction
+                        case($i == $count): // last transaction
                             $amount = $totalAmount - $firstAmount - $installmentAmount * ($i - 2);
                             break;
 
@@ -553,8 +565,9 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                     $floatAmount = number_format($currency->convertAmountToFloat($amount), $currency->getDecimals(), ',', ' ');
                     $amountDetail = $floatAmount . ' ' . $currency->getAlpha3();
 
-                    if (($rate = $response->get('change_rate')) && $response->get('effective_currency') &&
-                        ($response->get('currency') !== $response->get('effective_currency'))) {
+                    if (($rate = $response->get('change_rate')) && $response->get('effective_currency')
+                        && ($response->get('currency') !== $response->get('effective_currency'))
+                    ) {
                         // effective amount
                         $effectiveCurrency = Lyra_Payzen_Model_Api_Api::findCurrencyByNumCode($response->get('effective_currency'));
 
@@ -573,10 +586,11 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                         'Amount' => $amountDetail,
                         'Presentation Date' => Mage::helper('core')->formatDate(date('Y-m-d', $date)),
                         'Transaction ID' => $transactionId,
-                        'Transaction Status' => ($i == 1) ? $response->getTransStatus()
-                            : $this->getNextInstallmentsTransStatus($response->getTransStatus()),
+                        'Transaction UUID' =>  ($i == 1) ? $response->get('trans_uuid') : '',
+                        'Transaction Status' => ($i == 1) ? $response->getTransStatus() :
+                            $this->getNextInstallmentsTransStatus($response->getTransStatus()),
                         'Means of Payment' => $response->get('card_brand'),
-                        'Credit Card Number' => $response->get('card_number'),
+                        'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
                         '3DS Authentication' => $threedsCavv
                     );
@@ -611,9 +625,10 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                     'Amount' => $amountDetail,
                     'Presentation Date' => Mage::helper('core')->formatDate(date('Y-m-d', $firstDate)),
                     'Transaction ID' => $transactionId,
+                    'Transaction UUID' => $response->get('trans_uuid'),
                     'Transaction Status' => $response->getTransStatus(),
                     'Means of Payment' => $response->get('card_brand'),
-                    'Credit Card Number' => $response->get('card_number'),
+                    'Card Number' => $response->get('card_number'),
                     'Expiration Date' => $expiry,
                     '3DS Authentication' => $threedsCavv
                 );
@@ -634,10 +649,9 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             return;
         }
 
-        if ($response->get('identifier') && (
-            $response->get('identifier_status') == 'CREATED' /* page_action is REGISTER_PAY or ASK_REGISTER_PAY */ ||
-            $response->get('identifier_status') == 'UPDATED' /* page_action is REGISTER_UPDATE_PAY */
-        )) {
+        if ($response->get('identifier') && ($response->get('identifier_status') == 'CREATED' /* page_action is REGISTER_PAY or ASK_REGISTER_PAY */
+            || $response->get('identifier_status') == 'UPDATED' /* page_action is REGISTER_UPDATE_PAY */)
+        ) {
             $customer = Mage::getModel('customer/customer');
             $customer->load($order->getCustomerId());
 
@@ -708,7 +722,7 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     /**
      * Cancel order.
      *
-     * @param Mage_Sales_Model_Order $order
+     * @param Mage_Sales_Model_Order         $order
      * @param Lyra_Payzen_Model_Api_Response $response
      */
     protected function _cancelOrder(Mage_Sales_Model_Order $order, Lyra_Payzen_Model_Api_Response $response)
@@ -727,19 +741,19 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     /**
      * Public access to Mage_Sales_Model_Order_Payment::_addTransaction method to let it available for magento 1.4.0.1.
      *
-     * @param Mage_Sales_Model_Order_Payment $payment
-     * @param string $type
-     * @param string $transactionId
-     * @param array $additionalInfo
-     * @param string $parentTransactionId
+     * @param  Mage_Sales_Model_Order_Payment $payment
+     * @param  string                         $type
+     * @param  string                         $transactionId
+     * @param  array                          $additionalInfo
+     * @param  string                         $parentTransactionId
      * @return null|Mage_Sales_Model_Order_Payment_Transaction
      */
     public function addTransaction($payment, $type, $transactionId, $additionalInfo, $parentTransactionId = null)
     {
         if (! $parentTransactionId) { // not forcing parent transaction id
             $txn = Mage::getModel('sales/order_payment_transaction')
-                    ->setOrderPaymentObject($payment)
-                    ->loadByTxnId($transactionId);
+                ->setOrderPaymentObject($payment)
+                ->loadByTxnId($transactionId);
 
             if ($txn && $txn->getId() && $txn->getTxnType() != $type) {
                 $parentTransactionId = $txn->getTxnId();
@@ -758,16 +772,16 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         if (method_exists($payment, 'addTransaction')) {
             $payment->setSkipTransactionCreation(false)
-                    ->setTransactionId($transactionId)
-                    ->setTransactionAdditionalInfo('raw_details_info', $additionalInfo);
+                ->setTransactionId($transactionId)
+                ->setTransactionAdditionalInfo('raw_details_info', $additionalInfo);
 
             $payment->addTransaction($type, null, true);
         } else {
             // set transaction parameters
             $transaction = Mage::getModel('sales/order_payment_transaction')->setOrderPaymentObject($payment)
-                                                                            ->setTxnType($type)
-                                                                            ->setTxnId($transactionId)
-                                                                            ->isFailsafe(true);
+                ->setTxnType($type)
+                ->setTxnId($transactionId)
+                ->isFailsafe(true);
 
             if ($payment->hasIsTransactionClosed()) {
                 $transaction->setIsClosed((int) $payment->getIsTransactionClosed());
@@ -805,9 +819,9 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     /**
      * Get new order state and status according to PayZen response.
      *
-     * @param Lyra_Payzen_Model_Api_Response|Lyra_Payzen_Model_Api_Ws_ResultWrapper $response
-     * @param Mage_Sales_Model_Order $order
-     * @param boolean $ignoreFraud
+     * @param  Lyra_Payzen_Model_Api_Response|Lyra_Payzen_Model_Api_Ws_ResultWrapper $response
+     * @param  Mage_Sales_Model_Order                                                $order
+     * @param  boolean                                                               $ignoreFraud
      * @return Varien_Object
      */
     public function nextOrderState($response, $order, $ignoreFraud = false)
@@ -869,7 +883,7 @@ class Lyra_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     /**
      * Convert PayZen transaction statuses to magento transaction statuses
      *
-     * @param string $payzenType
+     * @param  string $payzenType
      * @return string
      */
     public function convertTxnType($payzenType)

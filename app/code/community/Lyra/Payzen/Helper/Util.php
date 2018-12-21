@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
@@ -45,14 +45,14 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
     /**
      * Normalize shipping method name.
      *
-     * @param string $name
+     * @param  string $name
      * @return string normalized name
      */
     public function normalizeShipMethodName($name)
     {
         $notAllowed = "#[^A-ZÇ0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]#ui";
 
-        return preg_replace($notAllowed, '', $name);
+        return substr(preg_replace($notAllowed, '', $name), 0, 127);
     }
 
     public function checkCustormers($scope, $scopeId)
@@ -80,7 +80,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
             $msg = '';
             $msg .= $this->_getHelper()->__(
-                'Customer ID &laquo;%s&raquo; does not match PayZen specifications.',
+                'Customer ID &laquo; %s &raquo; does not match PayZen specifications.',
                 $customer->getId()
             );
             $msg .= ' ';
@@ -125,7 +125,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
             $msg = '';
             $msg .= $this->_getHelper()->__(
-                'The next order ID  &laquo;%s&raquo; does not match PayZen specifications.',
+                'The next order ID  &laquo; %s &raquo; does not match PayZen specifications.',
                 $orderId
             ) . ' ';
             $msg .= $this->_getHelper()->__(
@@ -163,7 +163,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
             $msg = '';
             $msg .= $this->_getHelper()->__(
-                'Product reference &laquo;%s&raquo; does not match PayZen specifications.',
+                'Product reference &laquo; %s &raquo; does not match PayZen specifications.',
                 $product->getId()
             );
             $msg .= ' ';
@@ -195,7 +195,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $shippingMapping = unserialize($this->_getHelper()->getCommonConfigData('ship_options'));
 
         if (is_array($shippingMapping) && ! empty($shippingMapping)) {
-            foreach ($shippingMapping as $id => $shippingMethod) {
+            foreach ($shippingMapping as $shippingMethod) {
                 if ($shippingMethod['code'] === $methodCode) {
                     return $shippingMethod;
                 }
@@ -216,14 +216,14 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $categoryMapping = unserialize($this->_getHelper()->getCommonConfigData('category_mapping'));
 
         if (is_array($categoryMapping) && ! empty($categoryMapping) && is_array($categoryIds) && ! empty($categoryIds)) {
-            foreach ($categoryMapping as $id => $aCategory) {
+            foreach ($categoryMapping as $aCategory) {
                 if (in_array($aCategory['code'], $categoryIds)) {
                     return $aCategory['payzen_category'];
                 }
             }
 
             $category = Mage::getModel('catalog/category')->load($categoryIds[0]);
-            foreach ($categoryMapping as $id => $aCategory) {
+            foreach ($categoryMapping as $aCategory) {
                 if (in_array($aCategory['code'], $category->getParentIds())) {
                     return $aCategory['payzen_category'];
                 }
@@ -294,6 +294,9 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         }
 
         $payzenRequest->set('tax_amount', $taxAmount);
+
+        // VAT amount for colombian payment means
+        $payzenRequest->set('totalamount_vat', $taxAmount);
     }
 
     public function setAdditionalShippingData($order, &$payzenRequest, $useOney = false)

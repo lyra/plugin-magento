@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstract
@@ -32,7 +32,7 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
         $this->_payzenRequest->set('validation_mode', '0');
         $this->_payzenRequest->set('capture_delay', '0');
 
-        // override with selected FullCB payment card
+        // override with selected Full CB payment card
         $info = $this->getInfoInstance();
 
         // set choosen option if any
@@ -46,7 +46,7 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
     /**
      * Assign data to info model instance
      *
-     * @param mixed $data
+     * @param  mixed $data
      * @return Mage_Payment_Model_Info
      */
     public function assignData($data)
@@ -57,12 +57,12 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
 
         // init all payment data
         $info->setAdditionalData($option ? serialize($option) : null)
-                ->setCcType(null)
-                ->setCcLast4(null)
-                ->setCcNumber(null)
-                ->setCcCid(null)
-                ->setCcExpMonth(null)
-                ->setCcExpYear(null);
+            ->setCcType(null)
+            ->setCcLast4(null)
+            ->setCcNumber(null)
+            ->setCcCid(null)
+            ->setCcExpMonth(null)
+            ->setCcExpYear(null);
 
         return $this;
     }
@@ -91,7 +91,8 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
 
     /**
      * Get available payment options for the current cart amount.
-     * @param double $amount a given amount
+     *
+     * @param  double $amount a given amount
      * @return array[string][array] an array "$code => $option" of available options
      */
     public function getPaymentOptions($amount)
@@ -108,7 +109,8 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
             }
 
             if ((! $amount || ! $value['amount_min'] || $amount > $value['amount_min'])
-                && (! $amount || ! $value['amount_max'] || $amount < $value['amount_max'])) {
+                && (! $amount || ! $value['amount_max'] || $amount < $value['amount_max'])
+            ) {
                 // option will be available
                 $availOptions[$code] = $value;
             }
@@ -137,8 +139,8 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
     /**
      * Validate payment method information object
      *
-     * @param   Mage_Payment_Model_Info $info
-     * @return  Mage_Payment_Model_Abstract
+     * @param  Mage_Payment_Model_Info $info
+     * @return Mage_Payment_Model_Abstract
      */
     public function validate()
     {
@@ -155,6 +157,5 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
         Mage::helper('payzen/util')->checkAddressValidity($shippingAddress, 'fullcb');
 
         return $this;
-
     }
 }

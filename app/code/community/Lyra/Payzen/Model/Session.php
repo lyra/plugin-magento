@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Session extends Mage_Checkout_Model_Session
@@ -70,11 +70,12 @@ class Lyra_Payzen_Model_Session extends Mage_Checkout_Model_Session
                 if (version_compare(Mage::getVersion(), '1.4.1.1', '<')) {
                     $orders->addAttributeToSelect('shipping_method');
                 }
+
                 $orders->addFilter('customer_id', $customer->getId())
-                        ->addFilter('is_virtual', 0)
-                        ->setOrder('created_at', Varien_Data_Collection_Db::SORT_ORDER_DESC)
-                        ->setPageSize(1)
-                        ->setCurPage(1);
+                    ->addFilter('is_virtual', 0)
+                    ->setOrder('created_at', Varien_Data_Collection_Db::SORT_ORDER_DESC)
+                    ->setPageSize(1)
+                    ->setCurPage(1);
                 $order = $orders->getFirstItem();
 
                 if ($order && $order->getId()) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 $methodId = uniqid('payzen_shipping_method_');
@@ -29,7 +29,7 @@ $methodId = uniqid('payzen_shipping_method_');
         <?php echo $this->__('Please wait...') ?>
     </span>
 </p>
-<?php if (! ($_shippingRateGroups = $this->getShippingRates())): ?>
+<?php if (! ($shippingRateGroups = $this->getShippingRates())): ?>
     <?php if (Mage::registry('current_product')): ?>
         <p class="payzen-shipping-method"><?php echo Mage::helper('payzen')->__('Sorry, no quotes are available for this product configuration.') ?></p>
     <?php else: ?>
@@ -39,19 +39,19 @@ $methodId = uniqid('payzen_shipping_method_');
     <div class="payzen-shipping-method input-box" style="clear: both; display: block;">
         <select id="<?php echo $methodId; ?>" name="shipping_method" class="payzen-method-select" style="width: 100%;">
             <option value=""><?php echo Mage::helper('payzen')->__('-- Please Select --') ?></option>
-            <?php foreach ($_shippingRateGroups as $code => $_rates): ?>
+            <?php foreach ($shippingRateGroups as $code => $rates): ?>
                 <optgroup label="<?php echo $this->getCarrierName($code) ?>" style="font-style: normal;">
-                    <?php foreach ($_rates as $_rate): ?>
-                        <?php if ($_rate->getErrorMessage()): ?>
-                            <option style="padding-left: 16px;"><?php echo $_rate->getErrorMessage() ?></option>
+                    <?php foreach ($rates as $rate): ?>
+                        <?php if ($rate->getErrorMessage()): ?>
+                            <option style="padding-left: 16px;"><?php echo $rate->getErrorMessage() ?></option>
                         <?php else: ?>
-                            <option value="<?php echo $this->htmlEscape($_rate->getCode()) ?>"<?php if ($_rate->getCode() === $this->getShippingMethod()) echo ' selected="selected"' ?> style="padding-left: 16px;">
-                                <?php echo $_rate->getMethodTitle() ?>
-                                <?php $_excl = $this->getShippingPrice($_rate->getPrice(), Mage::helper('tax')->displayShippingPriceIncludingTax()) ?>
-                                <?php $_incl = $this->getShippingPrice($_rate->getPrice(), true) ?>
-                                <?php echo $_excl ?>
-                                <?php if (Mage::helper('tax')->displayShippingBothPrices() && $_incl != $_excl): ?>
-                                    (<?php echo Mage::helper('payzen')->__('Incl. Tax') ?> <?php echo $_incl ?>)
+                            <option value="<?php echo $this->htmlEscape($rate->getCode()) ?>"<?php if ($rate->getCode() === $this->getShippingMethod()) echo ' selected="selected"' ?> style="padding-left: 16px;">
+                                <?php echo $rate->getMethodTitle() ?>
+                                <?php $excl = $this->getShippingPrice($rate->getPrice(), Mage::helper('tax')->displayShippingPriceIncludingTax()) ?>
+                                <?php $incl = $this->getShippingPrice($rate->getPrice(), true) ?>
+                                <?php echo $excl ?>
+                                <?php if (Mage::helper('tax')->displayShippingBothPrices() && $incl != $excl): ?>
+                                    (<?php echo Mage::helper('payzen')->__('Incl. Tax') ?> <?php echo $incl ?>)
                                 <?php endif ?>
                             </option>
                         <?php endif ?>

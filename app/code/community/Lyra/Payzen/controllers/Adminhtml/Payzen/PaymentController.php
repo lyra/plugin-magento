@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Controller_Action
@@ -104,10 +104,10 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
      * Redirect to result page (according to payment status).
      *
      * @param Mage_Sales_Model_Order $order
-     * @param boolean $success
-     * @param boolean $checkUrlWarn
+     * @param $case
+     * @param $checkUrlWarn
      */
-    public function redirectResponse($order, $success, $checkUrlWarn = false)
+    public function redirectResponse($order, $case, $checkUrlWarn = false)
     {
         // clear all messages in session
         $this->getCheckout()->getMessages(true);
@@ -117,8 +117,8 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
             if (Lyra_Payzen_Helper_Data::$pluginFeatures['prodfaq']) {
                 // display going to production message
-                $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
-                $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
+                $message = $this->__('<b>GOING INTO PRODUCTION :</b> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
+                $message .= '<a href="https://payzen.io/en-EN/faq/how-to-switch-my-shop-to-production-mode.html" target="_blank">https://payzen.io/en-EN/faq/how-to-switch-my-shop-to-production-mode.html</a>';
                 $this->getAdminSession()->addNotice($message);
             }
 
@@ -131,14 +131,14 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
                 } else {
                     $message = $this->__('The automatic validation hasn\'t worked. Have you correctly set up the notification URL in your PayZen Back Office ?');
                     $message .= '<br /><br />';
-                    $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;To read carefully before going further&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;Notification URL settings&raquo;');
+                    $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
 
                 $this->getAdminSession()->addError($message);
             }
         }
 
-        if ($success) {
+        if ($case === Lyra_Payzen_Helper_Payment::SUCCESS) {
             $this->_getDataHelper()->log("Redirecting to order review page for order #{$order->getId()}.");
             $this->getCheckout()->setLastSuccessQuoteId($order->getQuoteId());
             $this->getAdminSession()->addSuccess(
@@ -148,12 +148,16 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
         } else {
             $this->_getDataHelper()->log("Unsetting order data in session for order #{$order->getId()}.");
             $this->getCheckout()->unsLastQuoteId()
-                                ->unsLastSuccessQuoteId()
-                                ->unsLastOrderId()
-                                ->unsLastRealOrderId();
+                ->unsLastSuccessQuoteId()
+                ->unsLastOrderId()
+                ->unsLastRealOrderId();
 
             $this->_getDataHelper()->log("Redirecting to order review page for order #{$order->getId()}.");
-            $this->getAdminSession()->addWarning($this->__('Checkout and order have been canceled.'));
+
+            if ($case === Lyra_Payzen_Helper_Payment::FAILURE) {
+                $this->getAdminSession()->addWarning($this->__('Your payment was not accepted. Please, try to re-order.'));
+            }
+
             $this->_redirect('adminhtml/sales_order/view', array('order_id' => $order->getId()));
         }
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Payment_Choozeo extends Lyra_Payzen_Model_Payment_Abstract
@@ -30,9 +30,7 @@ class Lyra_Payzen_Model_Payment_Choozeo extends Lyra_Payzen_Model_Payment_Abstra
         // override some form data
         $this->_payzenRequest->set('validation_mode', '0');
         $this->_payzenRequest->set('cust_status', 'PRIVATE');
-
-        // send phone number as cell phone
-        $this->_payzenRequest->set('cust_cell_phone', $order->getBillingAddress()->getTelephone());
+        $this->_payzenRequest->set('cust_country', 'FR');
 
         // override with selected Choozeo payment card
         $info = $this->getInfoInstance();
@@ -42,7 +40,7 @@ class Lyra_Payzen_Model_Payment_Choozeo extends Lyra_Payzen_Model_Payment_Abstra
     /**
      * Assign data to info model instance
      *
-     * @param mixed $data
+     * @param  mixed $data
      * @return Mage_Payment_Model_Info
      */
     public function assignData($data)
@@ -51,12 +49,12 @@ class Lyra_Payzen_Model_Payment_Choozeo extends Lyra_Payzen_Model_Payment_Abstra
 
         // init all payment data
         $info->setCcType($data->getPayzenChoozeoCcType())
-                ->setCcLast4(null)
-                ->setCcNumber(null)
-                ->setCcCid(null)
-                ->setCcExpMonth(null)
-                ->setCcExpYear(null)
-                ->setAdditionalData(null);
+            ->setCcLast4(null)
+            ->setCcNumber(null)
+            ->setCcCid(null)
+            ->setCcExpMonth(null)
+            ->setCcExpYear(null)
+            ->setAdditionalData(null);
 
         return $this;
     }
@@ -82,16 +80,34 @@ class Lyra_Payzen_Model_Payment_Choozeo extends Lyra_Payzen_Model_Payment_Abstra
     }
 
     /**
+     * To check billing country is allowed for Choozeo payment method.
+     *
+     * @return bool
+     */
+    public function canUseForCountry($country)
+    {
+        $availableCountries = Mage::getModel('payzen/source_choozeo_availableCountries')->getCountryCodes();
+
+        if ($this->getConfigData('allowspecific') == 1) {
+            $availableCountries = explode(',', $this->getConfigData('specificcountry'));
+        }
+
+        return in_array($country, $availableCountries);
+    }
+
+    /**
      * Return available payment options to be displayed on payment method list page.
      *
-     * @param double $amount a given amount
+     * @param  double $amount a given amount
      * @return array[string][array] An array "$code => $option" of availables options
      */
     public function getAvailableOptions($amount = null)
     {
         $configOptions = unserialize($this->getConfigData('payment_options'));
 
-        /** @var array[string][string] $options */
+        /**
+         * @var array[string][string] $options 
+         */
         $options = array(
             'EPNF_3X' => 'Choozeo 3X CB',
             'EPNF_4X' => 'Choozeo 4X CB'
@@ -105,7 +121,8 @@ class Lyra_Payzen_Model_Payment_Choozeo extends Lyra_Payzen_Model_Payment_Abstra
                 }
 
                 if ((! $amount || ! $value['amount_min'] || $amount > $value['amount_min'])
-                    && (! $amount || ! $value['amount_max'] || $amount < $value['amount_max'])) {
+                    && (! $amount || ! $value['amount_max'] || $amount < $value['amount_max'])
+                ) {
                     $value['label'] = $options[$value['code']];
 
                     // option will be available

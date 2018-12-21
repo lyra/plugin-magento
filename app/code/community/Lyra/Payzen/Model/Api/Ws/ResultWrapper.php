@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 /**
@@ -77,6 +77,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Check if the payment was successful (authorized or captured).
+     *
      * @return boolean
      */
     public function isAcceptedPayment()
@@ -88,6 +89,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
     /**
      * Check if the payment is waiting confirmation (successful but the amount has not
      *  been transfered and is not yet guaranteed).
+     *
      * @return boolean
      */
     public function isPendingPayment()
@@ -103,6 +105,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Check if the payment process was interrupted by the client.
+     *
      * @return bool
      */
     public function isCancelledPayment()
@@ -113,6 +116,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Check if the payment is to validate manually in the PayZen Back Office.
+     *
      * @return boolean
      */
     public function isToValidatePayment()
@@ -123,6 +127,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Check if the payment is suspected to be fraudulent.
+     *
      * @return boolean
      */
     public function isSuspectedFraud()
@@ -135,6 +140,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Return the risk control result.
+     *
      * @return boolean
      */
     public function getRiskControl()
@@ -153,6 +159,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Return the risk assessment result.
+     *
      * @return array[string]
      */
     public function getRiskAssessment()
@@ -167,7 +174,8 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Return the value of a response parameter.
-     * @param string $name
+     *
+     * @param  string $name
      * @return string
      */
     public function get($key)
@@ -177,14 +185,17 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Return the payment response result.
+     *
      * @return string
      */
-    public function getResult() {
+    public function getResult()
+    {
         return $this->get('result');
     }
 
     /**
      * Return all the payment response results as array.
+     *
      * @return array[string][string]
      */
     public function getAllResults()
@@ -199,6 +210,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Return the payment transaction status.
+     *
      * @return string
      */
     public function getTransStatus()
@@ -208,6 +220,7 @@ class Lyra_Payzen_Model_Api_Ws_ResultWrapper
 
     /**
      * Return the payment response message.
+     *
      * @return string
      */
     public function getMessage()

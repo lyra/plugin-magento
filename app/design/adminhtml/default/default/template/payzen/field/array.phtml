@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,22 +9,22 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 ?>
 
 <?php
-$_htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getElement()->getId() . '_');
+$htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getElement()->getId() . '_');
 ?>
 
 <div id="<?php echo $this->getElement()->getId() ?>" class="grid">
-    <table cellspacing="0" cellpadding="0" class="border" id="grid<?php echo $_htmlId ?>">
+    <table cellspacing="0" cellpadding="0" class="border" id="grid<?php echo $htmlId ?>">
         <tbody>
-            <tr class="headings" id="headings<?php echo $_htmlId ?>">
+            <tr class="headings" id="headings<?php echo $htmlId ?>">
                 <?php foreach ($this->_columns as $columnName => $column): ?>
                     <th><?php echo $column['label'] ?></th>
                 <?php endforeach; ?>
@@ -38,7 +38,7 @@ $_htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getElem
 <script type="text/javascript">
 //<![CDATA[
     // create row creator
-    var arrayRow<?php echo $_htmlId ?> = {
+    var arrayRow<?php echo $htmlId ?> = {
         // define row prototypeJS template
         template : new Template(
             '<tr id="#{_id}">'
@@ -66,7 +66,7 @@ $_htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getElem
 
             // insert after headings row
             if ('' == insertAfterId) {
-                Element.insert($('headings<?php echo $_htmlId ?>'), {after: this.template.evaluate(templateData)});
+                Element.insert($('headings<?php echo $htmlId ?>'), {after: this.template.evaluate(templateData)});
             }
             // insert after specified row
             else {
@@ -79,10 +79,10 @@ $_htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getElem
 
     // add existing rows
     <?php
-    $_addAfterId = "headings{$_htmlId}";
-    foreach ($this->getArrayRows() as $_rowId => $_row) {
-        echo "arrayRow{$_htmlId}.add(" . $_row->toJson() . ", '{$_addAfterId}');\n";
-        $_addAfterId = $_rowId;
+    $addAfterId = "headings{$htmlId}";
+    foreach ($this->getArrayRows() as $rowId => $row) {
+        echo "arrayRow{$htmlId}.add(" . $row->toJson() . ", '{$addAfterId}');\n";
+        $addAfterId = $rowId;
     }
     ?>
 

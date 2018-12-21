@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
@@ -166,7 +166,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
             // save PayZen 1-Click quote to checkout session
             $this->getPayzenSession()->setPayzenOneclickPayment(true)
-                                     ->setPayzenOneclickBackUrl($this->_getRefererUrl());
+                ->setPayzenOneclickBackUrl($this->_getRefererUrl());
             $this->getCheckout()->replaceQuote($oneClickQuote);
 
             $this->_getDataHelper()->log('Create order from PayZen 1-Click quote.');
@@ -177,7 +177,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                 'Set PayZen 1-Click payment information to session and redirect to payment page.'
             );
             $this->getCheckout()->setLastSuccessQuoteId($this->getCheckout()->getQuoteId())
-                                ->setLastRealOrderId($order->getIncrementId());
+                ->setLastRealOrderId($order->getIncrementId());
 
             $redirectUrl = Mage::getUrl('payzen/payment/form', array('_secure' => true));
             $this->_redirectUrl($redirectUrl);
@@ -204,7 +204,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
             }
 
             $this->getPayzenSession()->unsPayzenOneclickPayment()
-                                     ->unsPayzenOneclickBackUrl();
+                ->unsPayzenOneclickBackUrl();
 
             // use core/session instance to be able to show messages from all pages
             if ($this->getCoreSession()->getUseNotice(true)) {
@@ -226,9 +226,9 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
         if (! $this->getRequest()->isPost() || ! $session->getQuote() || $session->getQuote()->getHasError()) {
             $this->getResponse()
-                    ->setHeader('HTTP/1.1', '403 Session Expired')
-                    ->setHeader('Login-Required', 'true')
-                    ->sendResponse();
+                ->setHeader('HTTP/1.1', '403 Session Expired')
+                ->setHeader('Login-Required', 'true')
+                ->sendResponse();
             return true;
         }
 
@@ -247,8 +247,8 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
         if ($productId = $this->getRequest()->getPost('product', false)) {
             $product = Mage::getModel('catalog/product')
-                    ->setStoreId(Mage::app()->getStore()->getId())
-                    ->load((int) $productId);
+                ->setStoreId(Mage::app()->getStore()->getId())
+                ->load((int) $productId);
 
             if ($product->getId()) {
                 // remove all 1-Click quote items to refresh it
@@ -276,7 +276,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                     Mage::throwException($e->getMessage());
                 } catch (Exception $e) {
                     Mage::throwException(
-                        $this->__('Cannot pay requested product with &laquo;PayZen Buy now&raquo;.')
+                        $this->__('Cannot pay requested product with &laquo; PayZen Buy now &raquo;.')
                     );
                 }
 
@@ -296,8 +296,8 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                             }
 
                             $product = Mage::getModel('catalog/product')
-                                    ->setStoreId(Mage::app()->getStore()->getId())
-                                    ->load($productId);
+                                ->setStoreId(Mage::app()->getStore()->getId())
+                                ->load($productId);
                             if ($product->getId() && $product->isVisibleInCatalog()) {
                                 try {
                                     $oneClickQuote->addProduct($product);
@@ -378,11 +378,11 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     /**
      * Redirect to result page (according to payment status).
      *
-     * @param Mage_Sales_Model_Order $order
-     * @param boolean $success
-     * @param boolean $checkUrlWarn
+     * @param $order
+     * @param $case
+     * @param $checkUrlWarn
      */
-    public function redirectResponse($order, $success, $checkUrlWarn = false)
+    public function redirectResponse($order, $case, $checkUrlWarn = false)
     {
         // clear all messages in session
         $this->getCheckout()->getMessages(true);
@@ -392,8 +392,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
             if (Lyra_Payzen_Helper_Data::$pluginFeatures['prodfaq']) {
                 // display going to production message
-                $message = $this->__('<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL : ');
-                $message .= '<a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>';
+                $message = $this->__('<b>GOING INTO PRODUCTION :</b> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
                 $this->getCoreSession()->addNotice($message);
             }
 
@@ -406,7 +405,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                 } else {
                     $message = $this->__('The automatic validation has not worked. Have you correctly set up the notification URL in your PayZen Back Office ?');
                     $message .= '<br /><br />';
-                    $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;To read carefully before going further&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;Notification URL settings&raquo;');
+                    $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
 
                 $this->getCoreSession()->addError($message);
@@ -416,29 +415,31 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
         // was this a PayZen 1-click payment ?
         $oneclick = $this->getPayzenSession()->getPayzenOneclickPayment(true);
 
-        if ($success) {
+        if ($case === Lyra_Payzen_Helper_Payment::SUCCESS) {
             if ($oneclick) {
                 $this->getPayzenSession()->unsetAll();
             }
 
             $this->getCheckout()->setLastQuoteId($order->getQuoteId())
-                                ->setLastSuccessQuoteId($order->getQuoteId())
-                                ->setLastOrderId($order->getId())
-                                ->setLastRealOrderId($order->getIncrementId())
-                                ->setLastOrderStatus($order->getStatus());
+                ->setLastSuccessQuoteId($order->getQuoteId())
+                ->setLastOrderId($order->getId())
+                ->setLastRealOrderId($order->getIncrementId())
+                ->setLastOrderStatus($order->getStatus());
 
             $this->_getDataHelper()->log("Redirecting to success page for order #{$order->getId()}.");
             $this->_redirect('checkout/onepage/success', array('_store' => $storeId));
         } else {
             $this->_getDataHelper()->log("Unsetting order data in session for order #{$order->getId()}.");
             $this->getCheckout()->setLastBillingAgreementId(null)
-                                ->setRedirectUrl(null)
-                                ->setLastOrderId(null)
-                                ->setLastRealOrderId(null)
-                                ->setLastRecurringProfileIds(null)
-                                ->setAdditionalMessages(null);
+                ->setRedirectUrl(null)
+                ->setLastOrderId(null)
+                ->setLastRealOrderId(null)
+                ->setLastRecurringProfileIds(null)
+                ->setAdditionalMessages(null);
 
-            $this->getCoreSession()->addWarning($this->__('Checkout and order have been canceled.'));
+            if ($case === Lyra_Payzen_Helper_Payment::FAILURE) {
+                $this->getCoreSession()->addWarning($this->__('Your payment was not accepted. Please, try to re-order.'));
+            }
 
             if ($oneclick) {
                 $oneClickQuote = $this->getPayzenSession()->getQuote();
@@ -470,15 +471,15 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     /**
      * Set redirect into response
      *
-     * @param string $path
-     * @param array $arguments
+     * @param  string $path
+     * @param  array  $arguments
      * @return Mage_Core_Controller_Varien_Action
      */
     protected function _redirect($path, $arguments = array())
     {
         if ($this->getRequest()->getParam('iframe', false) /* if iframe payment */) {
             $block = $this->getLayout()->createBlock('payzen/iframe_response')
-                                        ->setForwardUrl(Mage::getUrl($path, $arguments));
+                ->setForwardUrl(Mage::getUrl($path, $arguments));
 
             $this->getResponse()->setBody($block->toHtml());
             return $this;

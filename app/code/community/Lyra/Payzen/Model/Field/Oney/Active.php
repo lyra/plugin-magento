@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,20 +9,20 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Field_Oney_Active extends Mage_Core_Model_Config_Data
 {
-    protected $message;
+    protected $_message;
 
     public function save()
     {
-        $this->message = '';
+        $this->_message = '';
 
         if ($this->getValue() /* sub-module enabled */) {
             try {
@@ -31,7 +31,7 @@ class Lyra_Payzen_Model_Field_Oney_Active extends Mage_Core_Model_Config_Data
             } catch (Mage_Core_Exception $e) {
                 $this->setValue(0);
 
-                $this->message = $e->getMessage();
+                $this->_message = $e->getMessage();
             }
         }
 
@@ -40,9 +40,9 @@ class Lyra_Payzen_Model_Field_Oney_Active extends Mage_Core_Model_Config_Data
 
     public function afterCommitCallback()
     {
-        if (! empty($this->message)) {
+        if (! empty($this->_message)) {
             Mage::throwException(
-                $this->message . "\n" . Mage::helper('payzen')->__('FacilyPay Oney means of payment cannot be used.')
+                $this->_message . "\n" . Mage::helper('payzen')->__('FacilyPay Oney means of payment cannot be used.')
             );
         }
 
