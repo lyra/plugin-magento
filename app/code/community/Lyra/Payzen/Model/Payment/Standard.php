@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstract
@@ -152,7 +152,8 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         }
 
         if (! $this->_getHelper()->isAdmin() && $this->isLocalCcType()
-            && $this->getConfigData('use_oney_in_standard')) {
+            && $this->getConfigData('use_oney_in_standard')
+        ) {
             $testMode = $this->_getHelper()->getCommonConfigData('ctx_mode') == 'TEST';
 
             $cards[] = $testMode ? 'ONEY_SANDBOX' : 'ONEY';
@@ -211,8 +212,8 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
     /**
      * Assign data to info model instance
      *
-     * @param   mixed $data
-     * @return  Mage_Payment_Model_Info
+     * @param  mixed $data
+     * @return Mage_Payment_Model_Info
      */
     public function assignData($data)
     {
@@ -224,23 +225,23 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
         if ($data->getPayzenStandardUseIdentifier()) {
             $info->setCcType(null)
-                    ->setCcLast4(null)
-                    ->setCcNumber(null)
-                    ->setCcCid(null)
-                    ->setCcExpMonth(null)
-                    ->setCcExpYear(null)
-                    ->setAdditionalData(null)
-                    ->setAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER, true); // payment by identifier
+                ->setCcLast4(null)
+                ->setCcNumber(null)
+                ->setCcCid(null)
+                ->setCcExpMonth(null)
+                ->setCcExpYear(null)
+                ->setAdditionalData(null)
+                ->setAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER, true); // payment by identifier
         } else {
             // set card info
             $info->setCcType($data->getPayzenStandardCcType())
-                    ->setCcLast4(substr($data->getPayzenStandardCcNumber(), -4))
-                    ->setCcNumber($data->getPayzenStandardCcNumber())
-                    ->setCcCid($data->getPayzenStandardCcCvv())
-                    ->setCcExpMonth($data->getPayzenStandardCcExpMonth())
-                    ->setCcExpYear($data->getPayzenStandardCcExpYear())
-                    ->setAdditionalData($data->getPayzenStandardCcRegister()) // wether to register data
-                    ->setAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER, false);
+                ->setCcLast4(substr($data->getPayzenStandardCcNumber(), -4))
+                ->setCcNumber($data->getPayzenStandardCcNumber())
+                ->setCcCid($data->getPayzenStandardCcCvv())
+                ->setCcExpMonth($data->getPayzenStandardCcExpMonth())
+                ->setCcExpYear($data->getPayzenStandardCcExpYear())
+                ->setAdditionalData($data->getPayzenStandardCcRegister()) // wether to register data
+                ->setAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER, false);
         }
 
         return $this;
@@ -309,7 +310,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
     /**
      * Call gateway by WS to do an instant payment
      *
-     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param  Mage_Sales_Model_Order_Payment $payment
      * @return Varien_Object
      */
     protected function _doInstantPayment($payment)
@@ -396,6 +397,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $billingDetailsRequest->setFirstName($order->getBillingAddress()->getFirstname());
             $billingDetailsRequest->setLastName($order->getBillingAddress()->getLastname());
             $billingDetailsRequest->setPhoneNumber($order->getBillingAddress()->getTelephone());
+            $billingDetailsRequest->setCellPhoneNumber($order->getBillingAddress()->getTelephone());
             $billingDetailsRequest->setEmail($order->getCustomerEmail());
 
             $address = $order->getBillingAddress()->getStreet(1) . ' ' . $order->getBillingAddress()->getStreet(2);
@@ -543,6 +545,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
     /**
      * Check if the card data entry on merchant site option is selected
+     *
      * @return boolean
      */
     public function isLocalCcInfo()
@@ -563,6 +566,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
     /**
      * Check if the local card type selection option is choosen
+     *
      * @return boolean
      */
     public function isLocalCcType()

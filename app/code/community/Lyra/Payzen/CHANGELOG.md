@@ -1,6 +1,21 @@
+1.9.2, 2018-12-24:
+- [multi] Bug fix: Fixed error in first installment amount calculation when saving payment in installments details.
+- [sepa] Bug fix: update country list for submodule SEPA.
+- [sepa] Bug fix: redirection to error page after a successful payment.
+- [paypal] Bug fix: error when refunding a PayPal payment.
+- Fix new signature algorithm name (HMAC-SHA-256).
+- Send Magento phone number as vads\_cell\_phone (required for some payment means).
+- Possibility to validate *all* transactions of a payment in installments from Magento backend.
+- Save transaction UUID in order payment details.
+- Imrpove "Shipping options" configuration field management.
+- Added Spanish translation.
+- [prodfaq] Fix notice about shifting the shop to production mode.
+- Comply with the new management of REGISTER feature on gateway.
+- Improve error message after a failed payment.
+
 1.9.1, 2018-07-06:
 - Bug fix: Fixed setTitle() function name in payment from backend WS call.
-- [shatwo]Enable SHA-256 signature algorithm by default.
+- [shatwo] Enable HMAC-SHA-256 signature algorithm by default.
 - Ignore spaces at the beginning and the end of certificates on return signature processing.
 
 1.9.0, 2018-05-23:
@@ -8,15 +23,15 @@
 - Bug fix: relative to reloading "Shipping method" field in 1-Click component.
 - Bug fix: consider 3 DS options in all payment sub-modules.
 - Bug fix: correct function name in WS call when paying from backend.
-- Enable signature algorithm selection (SHA-1 or SHA-256).
-- [fullcb]Adding FullCB means of payment as sub-module.
-- [sepa]Adding SEPA means of payment as sub-module.
-- [sofort]Update SOFORT Banking payment logo.
+- Enable signature algorithm selection (SHA-1 or HMAC-SHA-256).
+- [fullcb] Adding Full CB means of payment as sub-module.
+- [sepa] Adding SEPA means of payment as sub-module.
+- [sofort] Update SOFORT Banking payment logo.
 - Improve backend configuration screen.
-- [sofort]New "Pending funds transfer" order status for SEPA and SOFORT payments.
+- [sofort] New "Pending funds transfer" order status for SEPA and SOFORT payments.
 
 1.8.0, 2017-09-25:
-- [oney]Bug fix: correct simulated FacilyPay Oney funding fees calculation.
+- [oney] Bug fix: correct simulated FacilyPay Oney funding fees calculation.
 - Bug fix: correctly translate risk assessment results.
 - Bug fix: fix shipping amount displayed in 1-Click shipping widget.
 - Bug fix: restore delivery fees when canceling payment.
@@ -33,7 +48,7 @@
 - Add help link on CVV field.
 - Display card brand user choice if any in backend order details.
 - Restrict payment sub-modules to specific currencies.
-- [cofinoga]Remove obsolete 3x CB Cofinoga means of payment.
+- [cofinoga] Remove obsolete 3x CB Cofinoga means of payment.
 - Empty cart after a successful payment when 3 steps checkout module is used.
 
 1.7.1, 2017-04-03:
@@ -42,7 +57,7 @@
 1.7.0, 2017-01-12:
 - Bug fix: when 1-Click is enabled, the payment from backend was sending REGISTER_PAY as action (instead of PAYMENT).
 - Bug fix: cart is emptied after a failed payment in guest mode.
-- [oney]Bug fix: FacilyPay Oney method is not available when user is disconnected.
+- [oney] Bug fix: FacilyPay Oney method is not available when user is disconnected.
 - Bug fix: when iframe mode is enabled, payment page is displayed in iframe inside a blank page for 1-Click payments.
 - Bug fix: optimize collection loading to avoid memory overflow errors.
 - Bug fix: do not send order confirmation by e-mail if "Email Order Confirmation" option is unchecked (for backend orders only).
@@ -51,29 +66,29 @@
 - Adding "PRIORITY" as a possible value for "Speed" field in shipping options configuration.
 - Adding field "Delay" to shipping options configuration.
 - Use "Processing" as label for "Fraud Suspected" order status in frontend context.
-- [oney]Do not check FacilyPay Oney data for Gift card payment sub-module.
-- [oney]FacilyPay Oney is now available for DOM. Merchant can configure allowed countries in module backend.
-- [oney]Compliance with Modial Relay shipping module when using FacilyPay Oney method.
-- [oney]Display FacilyPay Oney payment review in checkout process and cap Oney fees as requested by Oney.
-- [multi]Display all transactions in backend order detail view for payment in installments.
+- [oney] Do not check FacilyPay Oney data for Gift card payment sub-module.
+- [oney] FacilyPay Oney is now available for DOM. Merchant can configure allowed countries in module backend.
+- [oney] Compliance with Modial Relay shipping module when using FacilyPay Oney method.
+- [oney] Display FacilyPay Oney payment review in checkout process and cap Oney fees as requested by Oney.
+- [multi] Display all transactions in backend order detail view for payment in installments.
 - Reorganize module backend options.
 - Only load parent categories to associate them with PayZen categories in module configuration.
 - Possibility to disable 3DS for each customer group.
-- [multi]Possibility to enable card type selection on merchant website for payment in installments sub-module.
-- [ideal]Adding iDEAL means of payment as sub-module.
-- [sofort]Remove the useless PAYMENT PAGE section from SOFORT Banking sub-module configuration.
+- [multi] Possibility to enable card type selection on merchant website for payment in installments sub-module.
+- [ideal] Adding iDEAL means of payment as sub-module.
+- [sofort] Remove the useless PAYMENT PAGE section from SOFORT Banking sub-module configuration.
 - Upgrade Web Services from v3 to v5.
 - Use new MODE_IFRAME=true gateway feature instead of CSS customize to enable iframe mode.
-- [sofort]Adding SOFORT Banking means of payment as sub-module.
+- [sofort] Adding SOFORT Banking means of payment as sub-module.
 - Improve payment information display in frontend order view.
 
 1.6.2, 2016-06-01:
 - Bug fix: problem with "Payment Method" column in orders grid added by the module.
-- [giropay]Bug fix: problem with Giropay payment redirection from backend.
+- [giropay] Bug fix: problem with Giropay payment redirection from backend.
 - Improve of english and german translations.
 - Improve of label fields display on admin panel.
 - Do not post disabled and hidden settings to improve performance.
-- [multi]Do not delete virtual multi payment methods (payzen_multi_Nx) to avoid errors when viewing orders paid with these methods.
+- [multi] Do not delete virtual multi payment methods (payzen_multi_Nx) to avoid errors when viewing orders paid with these methods.
 
 1.6.1, 2016-04-05:
 - Bug fix: override of Mage_Sales_Model_Order model to avoid a problem with payment_review order statuses (as with fraud suspected payments) in EE.
@@ -84,12 +99,12 @@
 - Deletion of "Re-fill cart on failure" setting. Cart is now automatically recovered after a failed payment.
 - Adding a warning message if number of configuration settings is bigger than the limit defined in PHP configuration (php.ini).
 - Checking order (selected) currency availability before checking store basic currency.
-- [giropay]Adding Giropay means of payment as sub-module.
+- [giropay] Adding Giropay means of payment as sub-module.
 
 1.6.0, 2015-10-28:
 - Bug fix: consider the store ID chosen for payment from Magento backend.
 - 1-Click payment (require PayZen payment by identifier option).
-- [oney]Ability to choose (force) FacilyPay Oney payment option from Magento frontend.
+- [oney] Ability to choose (force) FacilyPay Oney payment option from Magento frontend.
 - Adding product category to product label sent to gateway (when shopping cart data are sent).
 - Possibility to configure capture delay and validation mode in sub-modules.
 - Management of risk assessment module (saving module results, accept / deny transactions from Magento backend).
@@ -103,10 +118,10 @@
 - Correction of PT and DE payment results translations.
 - After PayZen v2.4 delivery, amounts are now not automatically wrongly checked. So, cart data are again sent for all sub-modules.
 - Tax amount and delivery fees are again sent to gateway for PayPal payments.
-- [oney]Product labels are modified according to FacilyPay Oney regex before redirection to the gateway to make module configuration easier.
-- [oney]Consideration of Magento configuration scope for delivery options in the module admin panel.
+- [oney] Product labels are modified according to FacilyPay Oney regex before redirection to the gateway to make module configuration easier.
+- [oney] Consideration of Magento configuration scope for delivery options in the module admin panel.
 - Consideration of Magento configuration scope for product categories in the module admin panel.
-- [sofort]Ability to choose many countries in SOFORT Banking sub-module configuration.
+- [sofort] Ability to choose many countries in SOFORT Banking sub-module configuration.
 - Saving the results of risk controls in order details.
 - Ability to accept or deny orders when fraud suspected from Magento backend.
 - Adding EN translations for gateway responses.
@@ -131,24 +146,24 @@
 - Bug fix: cart items were not loaded correctly for Magento v 1.5 or lower (Fatal error: Call to a member function getCategoryIds() on a non-object).
 - Bug fix: rounding problem causing difference between order total amount and the sum of cart items amounts.
 - Displaying of payment methods labels instead of their codes in payment method column of backend orders grid.
-- [sofort]Adding SOFORT Banking means of payment as sub-module.
+- [sofort] Adding SOFORT Banking means of payment as sub-module.
 - Ability to restrict different payment means by minimum / maximum amount for each customer group.
 
 1.4.1, 2014-10-20:
 - "ALL" is recovered as an option for available card types.
-- [oney]Adding a checkbox to allow merchants to specifiy if they have FacilyPay Oney contract.
+- [oney] Adding a checkbox to allow merchants to specifiy if they have FacilyPay Oney contract.
 - Product categories configuration is moved to admin general configuration section.
 - Upgrade of PayPal logo.
 
 1.4, 2014-06-16:
 - Bug fix: virtual orders were not automatically moved to "Processing" status.
-- [oney]Adding FacilyPay Oney means of payment as sub-module.
-- [paypal]Adding PayPal means of payment as sub-module.
+- [oney] Adding FacilyPay Oney means of payment as sub-module.
+- [paypal] Adding PayPal means of payment as sub-module.
 - Ability to enable / disable module logs from module admin panel.
 - Risk controls taken into account (suspected orders moved to "Fraud suspected" status).
 
 1.3, 2013-12-03:
-- [cofinoga]Adding 3x CB Cofinoga means of payment as sub-module.
+- [cofinoga] Adding 3x CB Cofinoga means of payment as sub-module.
 - Ability to pay backend orders with this payment module.
 - Ability to make refunds for payments generating one PayZen transaction.
 
@@ -157,8 +172,8 @@
 - Compliance with Zend and Magento standards.
 - Compatibility with Magento CE from 1.4 to 1.7 versions.
 - Taking into account of multi brand payments.
-- [multi]Adding payment in installments sub-module.
-- [gift]Adding gift card sub-module.
+- [multi] Adding payment in installments sub-module.
+- [gift] Adding gift card sub-module.
 - Adding selective 3DS according to order amount.
 - Ability to choose payment card in merchant website.
 - Ability to enter card data in merchant website.

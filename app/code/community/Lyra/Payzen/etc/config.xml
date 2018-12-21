@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -10,11 +10,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 -->
 
@@ -22,7 +22,7 @@
     <!-- version -->
     <modules>
         <Lyra_Payzen>
-            <version>1.9.1</version>
+            <version>1.9.2</version>
         </Lyra_Payzen>
     </modules>
 
@@ -110,7 +110,7 @@
                     </sha1>
                     <sha256>
                         <code>SHA-256</code>
-                        <name>SHA-256</name>
+                        <name>HMAC-SHA-256</name>
                     </sha256>
                 </sign_algos>
 
@@ -118,11 +118,11 @@
                 <validation_modes>
                     <general>
                         <code>-1</code>
-                        <name>PayZen general configuration</name>
+                        <name><![CDATA[PayZen general configuration]]></name>
                     </general>
                     <default>
                         <code></code>
-                        <name>Back Office configuration</name>
+                        <name><![CDATA[PayZen Back Office configuration]]></name>
                     </default>
                     <automatic>
                         <code>0</code>
@@ -343,7 +343,7 @@
 
         <payment>
             <groups>
-                <payzen>PayZen</payzen>
+                <payzen><![CDATA[PayZen]]></payzen>
             </groups>
         </payment>
     </global>
@@ -478,10 +478,10 @@
             <payzen>
                 <developed_by>Lyra Network</developed_by>
                 <contact_email>support@payzen.eu</contact_email>
-                <module_version>1.9.1</module_version>
+                <module_version>1.9.2</module_version>
                 <gateway_version>V2</gateway_version>
                 <enable_logs>1</enable_logs>
-                <title>PayZen</title>
+                <title><![CDATA[PayZen]]></title>
 
                 <site_id>12345678</site_id>
                 <key_test>1111111111111111</key_test>
@@ -565,8 +565,8 @@
                 <group>payzen</group>
 
                 <active>0</active>
-                <allowspecific>1</allowspecific>
-                <specificcountry>FR</specificcountry>
+                <allowspecific>0</allowspecific>
+                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
                 <title backend_model="payzen/field_translatable">Pay with Choozeo</title>
                 <sort_order>4</sort_order>
                 <module_logo>choozeo.png</module_logo>
@@ -578,8 +578,8 @@
                 <group>payzen</group>
 
                 <active>0</active>
-                <allowspecific>1</allowspecific>
-                <specificcountry>FR</specificcountry>
+                <allowspecific>0</allowspecific>
+                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
                 <title backend_model="payzen/field_translatable">Pay with FacilyPay Oney</title>
                 <sort_order>5</sort_order>
                 <module_logo>oney.png</module_logo>
@@ -597,7 +597,7 @@
                 <active>0</active>
                 <allowspecific>1</allowspecific>
                 <specificcountry>FR</specificcountry>
-                <title backend_model="payzen/field_translatable">Pay with FullCB</title>
+                <title backend_model="payzen/field_translatable">Pay with Full CB</title>
                 <sort_order>6</sort_order>
                 <module_logo>fullcb.png</module_logo>
                 <payment_action>authorize</payment_action>

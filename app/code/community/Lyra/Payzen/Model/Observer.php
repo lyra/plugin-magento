@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Observer
@@ -52,8 +52,8 @@ class Lyra_Payzen_Model_Observer
             $session->setPayzenCanSendNewEmail($flag); // flag that allows sending new order email
 
             $session->setQuoteId($observer->getQuote()->getId())
-                    ->setLastSuccessQuoteId($observer->getQuote()->getId())
-                    ->setLastRealOrderId($order->getIncrementId());
+                ->setLastSuccessQuoteId($observer->getQuote()->getId())
+                ->setLastRealOrderId($order->getIncrementId());
 
             session_write_close();
 
@@ -112,8 +112,8 @@ class Lyra_Payzen_Model_Observer
                             $groupedMethods[$method['group']]['value'][$code] = $item;
                         } else {
                             $groupedMethods[$method['group']] = array(
-                                    'label' => $method['group'],
-                                    'value' => array($code => $item)
+                                'label' => $method['group'],
+                                'value' => array($code => $item)
                             );
                         }
                     } else {
@@ -121,7 +121,8 @@ class Lyra_Payzen_Model_Observer
                     }
                 }
 
-                $block->addColumnAfter('payment_method', array(
+                $block->addColumnAfter(
+                    'payment_method', array(
                         'header' => $this->_getHelper()->__('Payment Method'),
                         'index' => 'payment_method',
                         'type' => 'options',
@@ -129,7 +130,8 @@ class Lyra_Payzen_Model_Observer
                         'options' => $methods,
                         'option_groups' => $groupedMethods,
                         'filter_index' => version_compare(Mage::getVersion(), '1.4.1.1', '<') ? '_table_payment_method.value' : 'payment.method'
-                ), 'status');
+                    ), 'status'
+                );
 
                 $block->sortColumnsByOrder();
                 $this->_updateGridCollection($block);
@@ -149,6 +151,7 @@ class Lyra_Payzen_Model_Observer
                     $methods[$code] = $title;
                 }
             }
+
             $column->setData('option_groups', $groupedMethods);
             $column->setData('options', $methods);
         }
@@ -164,20 +167,24 @@ class Lyra_Payzen_Model_Observer
             $methodAttrId = $paymentCollection->getEntity()->getAttribute('method')->getAttributeId();
 
             $collection->getSelect()
-                ->joinLeft(array('_table_payment' => $collection->getTable('sales_order_entity')),
+                ->joinLeft(
+                    array('_table_payment' => $collection->getTable('sales_order_entity')),
                     '`_table_payment`.`parent_id` = `e`.`entity_id` AND `_table_payment`.`entity_type_id` = ' . $entityTypeId,
-                    array())
+                    array()
+                )
 
-                ->joinLeft(array('_table_payment_method' => $collection->getTable('sales_order_entity_varchar')),
+                ->joinLeft(
+                    array('_table_payment_method' => $collection->getTable('sales_order_entity_varchar')),
                     '(`_table_payment_method`.`entity_id` = `_table_payment`.`entity_id` AND `_table_payment_method`.`attribute_id` = ' . $methodAttrId . ')',
-                    array('payment_method' => 'value'));
+                    array('payment_method' => 'value')
+                );
         } else {
             $paymentTable = $collection->getTable('sales/order_payment');
 
             $collection->getSelect()->joinLeft(
-                    array('payment' => $paymentTable),
-                    '(payment.parent_id = main_table.entity_id AND payment.entity_id = (SELECT min(p.entity_id) FROM ' . $paymentTable . ' p WHERE p.parent_id = main_table.entity_id))',
-                    array('payment_method' => 'method')
+                array('payment' => $paymentTable),
+                '(payment.parent_id = main_table.entity_id AND payment.entity_id = (SELECT min(p.entity_id) FROM ' . $paymentTable . ' p WHERE p.parent_id = main_table.entity_id))',
+                array('payment_method' => 'method')
             );
         }
 
@@ -265,6 +272,7 @@ class Lyra_Payzen_Model_Observer
         foreach ($quote->getItemsCollection() as $item) {
             $quote->removeItem($item->getId());
         }
+
         $quote->getShippingAddress()->removeAllShippingRates();
         $quote->setCouponCode('');
 
@@ -333,11 +341,13 @@ class Lyra_Payzen_Model_Observer
                     case 'payzen_to_validate':
                         $message = $this->_getHelper()->__('Are you sure you want to validate this order in PayZen gateway ?');
 
-                        $block->addButton('payzen_validate_payment', array(
+                        $block->addButton(
+                            'payzen_validate_payment', array(
                                 'label'     => $this->_getHelper()->__('Validate payment'),
                                 'onclick'   => "confirmSetLocation('{$message}', '{$block->getUrl('adminhtml/payzen_payment/validate')}')",
                                 'class'     => 'go'
-                        ));
+                            )
+                        );
 
                         // break omitted intentionally
 
@@ -368,7 +378,8 @@ class Lyra_Payzen_Model_Observer
 
         $block = Mage::app()->getLayout()->getMessagesBlock();
         if ((ini_get('suhosin.post.max_vars') && ini_get('suhosin.post.max_vars') < $preferedMaxInputVars)
-                || (ini_get('suhosin.request.max_vars') && ini_get('suhosin.request.max_vars') < $preferedMaxInputVars)) {
+            || (ini_get('suhosin.request.max_vars') && ini_get('suhosin.request.max_vars') < $preferedMaxInputVars)
+        ) {
             $block->addWarning($this->_getHelper()->__('Warning, please increase the suhosin patch for PHP post and request limits to save module configurations correctly. Recommended value is %s.', $preferedMaxInputVars));
         } elseif (ini_get('max_input_vars') && ini_get('max_input_vars') < $preferedMaxInputVars) {
             $block->addWarning($this->_getHelper()->__('Warning, please increase the value of the max_input_vars directive in php.ini to save module configurations correctly. Recommended value is %s.', $preferedMaxInputVars));

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 ?>
 
@@ -30,7 +30,7 @@
             <?php if (count($availCards) == 1) {?>
                 <input type="hidden" id="payzen_choozeo_card_type_<?php echo $option['code']; ?>" name="payment[payzen_choozeo_cc_type]" value="<?php echo $option['code']; ?>" >
             <?php } else { ?>
-                <input type="radio" class="radio" id="payzen_choozeo_card_type_<?php echo $option['code']; ?>" name="payment[payzen_choozeo_cc_type]" value="<?php echo $option['code']; ?>"<?php if ($first) { ?> checked="checked"<?php } ?> >
+                <input type="radio" class="radio" id="payzen_choozeo_card_type_<?php echo $option['code']; ?>" name="payment[payzen_choozeo_cc_type]" value="<?php echo $option['code']; ?>"<?php echo ($first ? ' checked="checked"' : ''); ?>>
             <?php } ?>
 
                 <label for="payzen_choozeo_card_type_<?php echo $option['code']; ?>">

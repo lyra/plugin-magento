@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
@@ -57,8 +57,8 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
     /**
      * Assign data to info model instance
      *
-     * @param   mixed $data
-     * @return  Mage_Payment_Model_Info
+     * @param  mixed $data
+     * @return Mage_Payment_Model_Info
      */
     public function assignData($data)
     {
@@ -72,12 +72,12 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
         $option = $this->_getOption($data->getPayzenMultiOption());
 
         $info->setAdditionalData($option ? serialize($option) : null)
-                ->setCcType($data->getPayzenMultiCcType())
-                ->setCcLast4(null)
-                ->setCcNumber(null)
-                ->setCcCid(null)
-                ->setCcExpMonth(null)
-                ->setCcExpYear(null);
+            ->setCcType($data->getPayzenMultiCcType())
+            ->setCcLast4(null)
+            ->setCcNumber(null)
+            ->setCcCid(null)
+            ->setCcExpMonth(null)
+            ->setCcExpYear(null);
 
         return $this;
     }
@@ -105,7 +105,7 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
     /**
      * Return available payment options to be displayed on payment method list page.
      *
-     * @param double $amount a given amount
+     * @param  double $amount a given amount
      * @return array[string][array] An array "$code => $option" of availables options
      */
     public function getAvailableOptions($amount = null)
@@ -120,7 +120,8 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
                 }
 
                 if ((! $amount || ! $value['minimum'] || $amount > $value['minimum'])
-                    && (! $amount || ! $value['maximum'] || $amount < $value['maximum'])) {
+                    && (! $amount || ! $value['maximum'] || $amount < $value['maximum'])
+                ) {
                     // option will be available
                     $options[$code] = $value;
                 }
@@ -138,6 +139,7 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
         } else {
             $amount = $info->getQuote()->getBaseGrandTotal();
         }
+
         $options = $this->getAvailableOptions($amount);
 
         if ($code && $options[$code]) {

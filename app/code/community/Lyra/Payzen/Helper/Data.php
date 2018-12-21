@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
@@ -46,8 +46,8 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Shortcut method to get general PayZen module configuration.
      *
-     * @param string $field
-     * @param int $storeId
+     * @param  string $field
+     * @param  int    $storeId
      * @return string configuration parameter value
      */
     public function getCommonConfigData($field, $storeId = null)
@@ -62,7 +62,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Returns a configuration parameter from xml files.
      *
-     * @param $name the name of the parameter to retrieve
+     * @param  $name the name of the parameter to retrieve
      * @return array code=>name
      */
     public function getConfigArray($name = '')
@@ -78,9 +78,9 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     *  Return user's IP Address.
+     * Return user's IP Address.
      *
-     *  @return string
+     * @return string
      */
     public function getIpAddress()
     {
@@ -90,7 +90,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Returns a configuration parameter from xml files.
      *
-     * @param $name the name of the parameter to retrieve
+     * @param  $name the name of the parameter to retrieve
      * @return array code=>name
      */
     public function getConfigGroupTitle($group)
@@ -106,9 +106,9 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Returns the complete URL matching the $url argument.
      *
-     * @param string $url magento path
-     * @param int $storeId the ID of the store
-     * @param bool $admin true if this is an admin call
+     * @param string $url     magento path
+     * @param int    $storeId the ID of the store
+     * @param bool   $admin   true if this is an admin call
      *
      * @return string the complete url
      */
@@ -180,7 +180,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Return true if file exists. Uses Varien_Io_File API.
      *
-     * @param $fileName
+     * @param  $fileName
      * @return bool
      */
     public function fileExists($fileName)
@@ -218,6 +218,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Check if server has requirements to do WS operations.
+     *
      * @throws Lyra_Payzen_Model_WsException
      */
     public function checkWsRequirements()
@@ -250,7 +251,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         $currentMethod = $this->_getCallerMethod();
 
         $log  = '';
-        $log .= 'PayZen 1.9.1';
+        $log .= 'PayZen 1.9.2';
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.1 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * NOTICE OF LICENSE
  *
@@ -9,11 +9,11 @@
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/osl-3.0.php
  *
+ * @category  Payment
+ * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
  * @copyright 2014-2018 Lyra Network and contributors
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  payment
- * @package   payzen
  */
 
 $optionDetails = $this->getOptionDetails();
@@ -21,7 +21,7 @@ $optionDetails = $this->getOptionDetails();
 $date = time();
 ?>
 
-<table class="payzen_fullcb_review payzen_review" style="padding : 15px;<?php if (! $this->getFirst()) {?> display: none; <?php }?>" id="payzen_fullcb_review_<?php echo $optionDetails->getOptionCode(); ?>">
+<table class="payzen_fullcb_review payzen_review" style="padding : 15px;<?php echo (! $this->getFirst() ? ' display: none;' : ''); ?>" id="payzen_fullcb_review_<?php echo $optionDetails->getOptionCode(); ?>">
     <tbody>
         <tr>
             <td>
@@ -39,7 +39,7 @@ $date = time();
                             <td colspan="2"><hr style="margin: 0px;" /></td>
                         </tr>
                         <tr>
-                            <td><?php echo Mage::helper('payzen')->__('Total amount :' ); ?></td>
+                            <td><?php echo Mage::helper('payzen')->__('Total amount :'); ?></td>
                             <td><strong><?php echo $optionDetails->getFundingTotal(); ?></strong></td>
                         </tr>
                     </tbody>
@@ -57,7 +57,8 @@ $date = time();
                             <td><strong><?php echo $optionDetails->getFirstPayment(); ?></strong></td>
                         </tr>
                         <?php
-                        for ($i=1; $i <= $optionDetails->getCount(); $i++) {
+                        $count = $optionDetails->getCount();
+                        for ($i=1; $i <= $count; $i++) {
                             $date = strtotime('+30 days', $date);
                         ?>
                         <tr>
