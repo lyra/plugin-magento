@@ -1,6 +1,6 @@
 # PayZen for Magento
 
-PayZen for Magento is an open source plugin that links e-commerce websites based on Magento to PayZen secured payment gateway developped by [Lyra Network](https://www.lyra-network.com/).
+PayZen for Magento is an open source plugin that links e-commerce websites based on Magento to PayZen secured payment gateway developed by [Lyra Network](https://www.lyra-network.com/).
 
 Namely, it enables the following payment methods :
 * PayZen - Standard credit card payment
@@ -21,12 +21,12 @@ In order to deactivate the module: php bin/magento module:disable --clear-static
 ## Configuration
 
 - In Magento 2 administration interface, browse to "STORES > Configuration" menu
-- Click on "Payment Methods" link under "SALES" section
+- Click on "Payment Methods" link under the "SALES" section
 - Expand PayZen payment method to enter your gateway credentials
-- Refresh invalidated Magento cache afeter config saved. 
+- Refresh invalidated Magento cache after config saved. 
 
 ## License
 
-Each PayZen payment module source file included in this distribution is licensed under Open Software License (OSL 3.0).
+Each PayZen payment module source file included in this distribution is licensed under the Open Software License (OSL 3.0).
 
 Please see LICENSE.txt for the full text of the OSL 3.0 license. It is also available through the world-wide-web at this URL: https://opensource.org/licenses/osl-3.0.php.
