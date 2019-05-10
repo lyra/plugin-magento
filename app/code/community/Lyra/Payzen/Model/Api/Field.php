@@ -1,25 +1,17 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 if (! class_exists('Lyra_Payzen_Model_Api_Field', false)) {
 
     /**
-     * Class representing a form field to send to the payment platform.
+     * Class representing a form field to send to the payment gateway.
      */
     class Lyra_Payzen_Model_Api_Field
     {
@@ -114,7 +106,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Field', false)) {
         public function setValue($value)
         {
             $value = ($value === null) ? null : (string) $value;
-            // we save value even if invalid but we return "false" as warning
+            // We save value even if invalid but we return "false" as warning.
             $this->value = $value;
 
             return $this->isValid();

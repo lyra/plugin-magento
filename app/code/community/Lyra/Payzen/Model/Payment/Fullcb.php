@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstract
@@ -27,15 +19,15 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
 
     protected  function _setExtraFields($order)
     {
-        // override with FullCb specific params
+        // Override with Full CB specific params.
         $this->_payzenRequest->set('cust_status', 'PRIVATE');
         $this->_payzenRequest->set('validation_mode', '0');
         $this->_payzenRequest->set('capture_delay', '0');
 
-        // override with selected Full CB payment card
+        // Override with selected Full CB payment card.
         $info = $this->getInfoInstance();
 
-        // set choosen option if any
+        // Set choosen option if any.
         if ($info->getAdditionalData() && ($option = @unserialize($info->getAdditionalData()))) {
             $this->_payzenRequest->set('payment_cards', $option['code']);
         } else {
@@ -55,7 +47,7 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
 
         $option = $this->_getOption($data->getPayzenFullcbOption());
 
-        // init all payment data
+        // Init all payment data.
         $info->setAdditionalData($option ? serialize($option) : null)
             ->setCcType(null)
             ->setCcLast4(null)
@@ -111,7 +103,7 @@ class Lyra_Payzen_Model_Payment_Fullcb extends Lyra_Payzen_Model_Payment_Abstrac
             if ((! $amount || ! $value['amount_min'] || $amount > $value['amount_min'])
                 && (! $amount || ! $value['amount_max'] || $amount < $value['amount_max'])
             ) {
-                // option will be available
+                // Option will be available.
                 $availOptions[$code] = $value;
             }
         }

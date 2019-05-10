@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Field_Gift_AddedCards extends Lyra_Payzen_Model_Field_Array
@@ -49,18 +41,18 @@ class Lyra_Payzen_Model_Field_Gift_AddedCards extends Lyra_Payzen_Model_Field_Ar
                     $this->_throwError('Card name', $i);
                 }
 
-                // load latest logo value
+                // Load latest logo value.
                 if (Mage::helper('payzen')->fileExists($uploadDir . strtolower($card['code'] . '.png'))) {
                     $cards[$key]['logo'] = strtolower($card['code'] . '.png');
                 }
 
-                // process file upload
+                // Process file upload.
                 if (is_array($_FILES) && ! empty($_FILES)) {
                     $file = array();
                     $file['tmp_name'] = $_FILES['groups']['tmp_name'][$this->getGroupId()]['fields'][$this->getField()]['value'][$key]['logo'];
                     $file['name'] = $_FILES['groups']['name'][$this->getGroupId()]['fields'][$this->getField()]['value'][$key]['logo'];
 
-                    if ($file['tmp_name'] && $file['name']) { // is there any file uploaded for the current card
+                    if ($file['tmp_name'] && $file['name']) { // Is there any file uploaded for the current card.
                         if (! class_exists('Mage_Core_Model_File_Validator_Image')) {
                             Mage::helper('payzen')->log('For security reasons, please install Magento SUPEE-9767 security patch to be able to use the module image uploader.');
                             Mage::helper('payzen')->log('See more details here : https://magento.com/security/patches/supee-9767');
@@ -85,7 +77,7 @@ class Lyra_Payzen_Model_Field_Gift_AddedCards extends Lyra_Payzen_Model_Field_Ar
                                     $cards[$key]['logo'] = $result['file'];
                                 }
                             } catch (Exception $e) {
-                                // upload errors
+                                // Upload errors.
                                 $this->_throwError('Card logo', $i, $e->getMessage());
                             }
                         }

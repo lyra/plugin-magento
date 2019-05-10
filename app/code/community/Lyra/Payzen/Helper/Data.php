@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
@@ -44,7 +36,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     );
 
     /**
-     * Shortcut method to get general PayZen module configuration.
+     * Shortcut method to get general module configuration.
      *
      * @param  string $field
      * @param  int    $storeId
@@ -95,7 +87,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getConfigGroupTitle($group)
     {
-        // get group title
+        // Get group title.
         $config = Mage::getModel('core/config_base');
         $config->loadFile(Mage::getConfig()->getModuleDir('etc', 'Lyra_Payzen').DS.'system.xml');
         $node = $config->getNode('sections/payment/groups/'.$group);
@@ -129,17 +121,6 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $result;
-    }
-
-    /**
-     * Return current checkout quote.
-     *
-     * @return \Magento\Quote\Model\Quote
-     */
-    public function getCheckoutQuote()
-    {
-        $sessionClass = $this->isAdmin() ? 'adminhtml/session_quote' : 'checkout/session';
-        return Mage::getSingleton($sessionClass)->getQuote();
     }
 
     /**
@@ -211,7 +192,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         if (defined('Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW')) {
             return Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
         } else {
-            // for Magento 1.4.0.x
+            // For magento 1.4.0.x
             return 'payment_review';
         }
     }
@@ -225,13 +206,13 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     {
         if (! extension_loaded('soap')) {
             throw new Lyra_Payzen_Model_WsException(
-                'SOAP extension for PHP must be enabled on the server in order to use PayZen web services.'
+                'SOAP extension for PHP must be enabled on the server in order to use gateway web services.'
             );
         }
 
         if (! extension_loaded('openssl')) {
             throw new Lyra_Payzen_Model_WsException(
-                'OPENSSL extension for PHP must be enabled on the server in order to use PayZen web services.'
+                'OPENSSL extension for PHP must be enabled on the server in order to use gateway web services.'
             );
         }
     }
@@ -251,7 +232,7 @@ class Lyra_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         $currentMethod = $this->_getCallerMethod();
 
         $log  = '';
-        $log .= 'PayZen 1.9.2';
+        $log .= 'PayZen '. $this->getCommonConfigData('plugin_version');
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

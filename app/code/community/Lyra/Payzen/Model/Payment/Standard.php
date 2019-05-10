@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstract
@@ -28,22 +20,22 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         $info = $this->getInfoInstance();
 
         if (! $this->_getHelper()->isAdmin() && ($this->isLocalCcType() || $this->isLocalCcInfo())) {
-            // set payment_cards
+            // Set payment_cards.
             $this->_payzenRequest->set('payment_cards', $info->getCcType());
 
             if ($info->getCcType() === 'BANCONTACT') {
-                // may not disable 3-DS for Bancontact Mistercash
+                // May not disable 3DS for Bancontact Mistercash.
                 $this->_payzenRequest->set('threeds_mpi', null);
             }
         } else {
-            // payment_cards is given as csv by magento
+            // Payment_cards is given as csv by Magento.
             $paymentCards = explode(',', $this->getConfigData('payment_cards'));
             $paymentCards = in_array('', $paymentCards) ? '' : implode(';', $paymentCards);
 
             if ($paymentCards && $this->getConfigData('use_oney_in_standard')) {
                 $testMode = $this->_payzenRequest->get('ctx_mode') == 'TEST';
 
-                // add FacilyPay Oney payment cards
+                // Add FacilyPay Oney payment cards.
                 $paymentCards .= ';' . ($testMode ? 'ONEY_SANDBOX' : 'ONEY');
             }
 
@@ -51,17 +43,17 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         }
 
         if ($this->_getHelper()->isAdmin()) {
-            // set payment_src to MOTO for backend payments
+            // Set payment_src to MOTO for backend payments.
             $this->_payzenRequest->set('payment_src', 'MOTO');
             return;
         }
 
         $session = Mage::getSingleton('payzen/session');
         if ($this->isIframeMode() && ! $session->getPayzenOneclickPayment() /* no iframe in 1-Click */) {
-            // iframe enabled and this is not 1-Click
+            // Iframe enabled and this is not 1-Click.
             $this->_payzenRequest->set('action_mode', 'IFRAME');
 
-            // enable automatic redirection
+            // Enable automatic redirection.
             $this->_payzenRequest->set('redirect_enabled', '1');
             $this->_payzenRequest->set('redirect_success_timeout', '0');
             $this->_payzenRequest->set('redirect_error_timeout', '0');
@@ -78,14 +70,14 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $customer->load($order->getCustomerId());
 
             if ($this->isIdentifierPayment($customer)) {
-                // customer has an identifier and wants to use it
+                // Customer has an identifier and wants to use it.
                 $this->_getHelper()->log('Customer ' . $customer->getEmail() . ' has an identifier and chose to use it for payment.' . $customer->getPayzenIdentifier());
                 $this->_payzenRequest->set('identifier', $customer->getPayzenIdentifier());
             } else {
-                if ($this->isLocalCcInfo() && $info->getAdditionalData()) { // additional_data is used to stock cc_register flag
-                    // customer wants to register card data
+                if ($this->isLocalCcInfo() && $info->getAdditionalData()) { // Additional_data is used to stock cc_register flag.
+                    // Customer wants to register card data.
                     if ($customer->getPayzenIdentifier()) {
-                        // customer has already an identifier
+                        // Customer has already an identifier.
                         $this->_getHelper()->log('Customer ' . $customer->getEmail() . ' has an identifier and chose to update it with new card info.');
                         $this->_payzenRequest->set('identifier', $customer->getPayzenIdentifier());
                         $this->_payzenRequest->set('page_action', 'REGISTER_UPDATE_PAY');
@@ -94,7 +86,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                         $this->_payzenRequest->set('page_action', 'REGISTER_PAY');
                     }
                 } elseif (! $this->isLocalCcInfo()) {
-                    // card data entry on payment page, let's ask customer for data registration
+                    // Card data entry on payment page, let's ask customer for data registration.
                     $this->_getHelper()->log('Customer ' . $customer->getEmail() . ' will be asked for card data registration on payment page.');
                     $this->_payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
                 }
@@ -119,7 +111,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         $this->_payzenRequest->set('expiry_year', $info->getCcExpYear());
         $this->_payzenRequest->set('expiry_month', $info->getCcExpMonth());
 
-        // override action_mode
+        // Override action_mode.
         $this->_payzenRequest->set('action_mode', 'SILENT');
     }
 
@@ -138,10 +130,10 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
      */
     public function getAvailableCcTypes()
     {
-        // all cards
+        // All cards.
         $allCards = Lyra_Payzen_Model_Api_Api::getSupportedCardTypes();
 
-        // selected cards from module configuration
+        // Selected cards from module configuration.
         $cards = $this->getConfigData('payment_cards');
 
         if (! empty($cards)) {
@@ -175,7 +167,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             return false;
         }
 
-        // no 1-Click
+        // No 1-Click.
         if (! $this->getConfigData('one_click_active')) {
             return false;
         }
@@ -186,12 +178,12 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
         $session = Mage::getSingleton('customer/session');
 
-        // customer not logged in
+        // Customer not logged in.
         if (! $session->isLoggedIn()) {
             return false;
         }
 
-        // customer has not PayZen identifier
+        // Customer has not gateway identifier.
         $customer = $session->getCustomer();
         if (! $customer || ! $customer->getPayzenIdentifier()) {
             return false;
@@ -204,7 +196,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
     {
         $info = $this->getInfoInstance();
 
-        // payment by identifier
+        // Payment by identifier.
         return $customer->getPayzenIdentifier()
             && $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER);
     }
@@ -231,16 +223,16 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                 ->setCcExpMonth(null)
                 ->setCcExpYear(null)
                 ->setAdditionalData(null)
-                ->setAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER, true); // payment by identifier
+                ->setAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER, true); // Payment by identifier.
         } else {
-            // set card info
+            // Set card info.
             $info->setCcType($data->getPayzenStandardCcType())
                 ->setCcLast4(substr($data->getPayzenStandardCcNumber(), -4))
                 ->setCcNumber($data->getPayzenStandardCcNumber())
                 ->setCcCid($data->getPayzenStandardCcCvv())
                 ->setCcExpMonth($data->getPayzenStandardCcExpMonth())
                 ->setCcExpYear($data->getPayzenStandardCcExpYear())
-                ->setAdditionalData($data->getPayzenStandardCcRegister()) // wether to register data
+                ->setAdditionalData($data->getPayzenStandardCcRegister()) // Wether to register data.
                 ->setAdditionalInformation(Lyra_Payzen_Helper_Payment::IDENTIFIER, false);
         }
 
@@ -282,7 +274,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
         parent::initialize($paymentAction, $stateObject);
 
         if ($this->_getHelper()->isAdmin() && $this->_getHelper()->isCurrentlySecure()) {
-            // do instant payment by WS
+            // Do instant payment by WS.
             $stateObjectResult = $this->_doInstantPayment($this->getInfoInstance());
 
             $stateObject->setState($stateObjectResult->getState());
@@ -327,33 +319,33 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
             $timestamp = time();
 
-            // common request generation
+            // Common request generation.
             $commonRequest = new \Lyra\Payzen\Model\Api\Ws\CommonRequest();
             $commonRequest->setPaymentSource('MOTO');
             $commonRequest->setSubmissionDate(new DateTime("@$timestamp"));
 
-            // amount in current order currency
+            // Amount in current order currency.
             $amount = $order->getGrandTotal();
 
-            // retrieve currency
+            // Retrieve currency.
             $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
             if ($currency == null) {
-                // if currency is not supported, use base currency
+                // If currency is not supported, use base currency.
                 $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
 
                 // ... and order total in base currency
                 $amount = $order->getBaseGrandTotal();
             }
 
-            // payment request generation
+            // Payment request generation.
             $paymentRequest = new \Lyra\Payzen\Model\Api\Ws\PaymentRequest();
             $paymentRequest->setTransactionId(Lyra_Payzen_Model_Api_Api::generateTransId($timestamp));
             $paymentRequest->setAmount($currency->convertAmountToInteger($amount));
             $paymentRequest->setCurrency($currency->getNum());
 
-            $captureDelay = $this->getConfigData('capture_delay', $storeId); // get sub-module specific param
+            $captureDelay = $this->getConfigData('capture_delay', $storeId); // Get submodule specific param.
             if (! is_numeric($captureDelay)) {
-                // get general param
+                // Get general param.
                 $captureDelay = $this->_getHelper()->getCommonConfigData('capture_delay', $storeId);
             }
 
@@ -363,9 +355,9 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                 );
             }
 
-            $validationMode = $this->getConfigData('validation_mode', $storeId); // get sub-module specific param
+            $validationMode = $this->getConfigData('validation_mode', $storeId); // Get submodule specific param.
             if ($validationMode === '-1') {
-                // get general param
+                // Get general param.
                 $validationMode = $this->_getHelper()->getCommonConfigData('validation_mode', $storeId);
             }
 
@@ -373,11 +365,11 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                 $paymentRequest->setManualValidation($validationMode);
             }
 
-            // order request generation
+            // Order request generation.
             $orderRequest = new \Lyra\Payzen\Model\Api\Ws\OrderRequest();
             $orderRequest->setOrderId($order->getIncrementId());
 
-            // card request generation
+            // Card request generation.
             $cardRequest = new \Lyra\Payzen\Model\Api\Ws\CardRequest();
             $info = $this->getInfoInstance();
             $cardRequest->setNumber($info->getCcNumber());
@@ -386,7 +378,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $cardRequest->setExpiryMonth($info->getCcExpMonth());
             $cardRequest->setExpiryYear($info->getCcExpYear());
 
-            // billing details generation
+            // Billing details generation.
             $billingDetailsRequest = new \Lyra\Payzen\Model\Api\Ws\BillingDetailsRequest();
             $billingDetailsRequest->setReference($order->getCustomerId());
 
@@ -408,7 +400,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $billingDetailsRequest->setState($order->getBillingAddress()->getRegion());
             $billingDetailsRequest->setCountry($order->getBillingAddress()->getCountryId());
 
-            // language
+            // Language.
             $currentLang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
             if (Lyra_Payzen_Model_Api_Api::isSupportedLanguage($currentLang)) {
                 $language = $currentLang;
@@ -418,11 +410,11 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
 
             $billingDetailsRequest->setLanguage($language);
 
-            // shipping details generation
+            // Shipping details generation.
             $shippingDetailsRequest = new \Lyra\Payzen\Model\Api\Ws\ShippingDetailsRequest();
 
             $address = $order->getShippingAddress();
-            if (is_object($address)) { // deliverable order
+            if (is_object($address)) { // Deliverable order.
                 $shippingDetailsRequest->setFirstName($address->getFirstname());
                 $shippingDetailsRequest->setLastName($address->getLastname());
                 $shippingDetailsRequest->setPhoneNumber($address->getTelephone());
@@ -434,17 +426,17 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                 $shippingDetailsRequest->setCountry($address->getCountryId());
             }
 
-            // extra details generation
+            // Extra details generation.
             $extraDetailsRequest = new \Lyra\Payzen\Model\Api\Ws\ExtraDetailsRequest();
             $extraDetailsRequest->setIpAddress($this->_getHelper()->getIpAddress());
 
-            // customer request generation
+            // Customer request generation.
             $customerRequest = new \Lyra\Payzen\Model\Api\Ws\CustomerRequest();
             $customerRequest->setBillingDetails($billingDetailsRequest);
             $customerRequest->setShippingDetails($shippingDetailsRequest);
             $customerRequest->setExtraDetails($extraDetailsRequest);
 
-            // create payment object generation
+            // Create payment object generation.
             $createPayment = new \Lyra\Payzen\Model\Api\Ws\CreatePayment();
             $createPayment->setCommonRequest($commonRequest);
             $createPayment->setPaymentRequest($paymentRequest);
@@ -452,7 +444,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
             $createPayment->setCardRequest($cardRequest);
             $createPayment->setCustomerRequest($customerRequest);
 
-            // do createPayment WS call
+            // Do createPayment WS call.
             $requestId = $wsApi->setHeaders();
             $createPaymentResponse = $wsApi->createPayment($createPayment);
 
@@ -465,13 +457,13 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                 )
             );
 
-            // check operation type (0: debit, 1 refund)
+            // Check operation type (0: debit, 1 refund).
             $transType = $createPaymentResponse->getCreatePaymentResult()->getPaymentResponse()->getOperationType();
             if ($transType != 0) {
                 throw new Exception("Unexpected transaction type returned ($transType).");
             }
 
-            // update authorized amount
+            // Update authorized amount.
             $payment->setAmountAuthorized($order->getTotalDue());
             $payment->setBaseAmountAuthorized($order->getBaseTotalDue());
 
@@ -484,20 +476,20 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
                 $createPaymentResponse->getCreatePaymentResult()->getFraudManagementResponse()
             );
 
-            // retrieve new order state and status
+            // Retrieve new order state and status.
             $stateObject = $this->_getPaymentHelper()->nextOrderState($wrapper, $order);
             $this->_getHelper()->log("Order #{$order->getId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
 
             $order->setState($stateObject->getState(), $stateObject->getStatus(), $wrapper->getMessage());
-            if ($stateObject->getState() == Mage_Sales_Model_Order::STATE_HOLDED) { // for Magento 1.4.0.x
+            if ($stateObject->getState() == Mage_Sales_Model_Order::STATE_HOLDED) { // For magento 1.4.0.x
                 $stateObject->setState($stateObject->getBeforeState());
                 $stateObject->setStatus($stateObject->getBeforeStatus());
             }
 
-            // save gateway responses
+            // Save gateway responses.
             $this->_getPaymentHelper()->updatePaymentInfo($order, $wrapper);
 
-            // try to create invoice
+            // Try to create invoice.
             $this->_getPaymentHelper()->createInvoice($order);
 
             $stateObject->setIsNotified(true);
@@ -550,7 +542,7 @@ class Lyra_Payzen_Model_Payment_Standard extends Lyra_Payzen_Model_Payment_Abstr
      */
     public function isLocalCcInfo()
     {
-        return $this->_getHelper()->isCurrentlySecure() // this is a double check, it's also done on backend side
+        return $this->_getHelper()->isCurrentlySecure() // This is a double check, it's also done on backend side.
             && $this->getConfigData('card_info_mode') == 3;
     }
 

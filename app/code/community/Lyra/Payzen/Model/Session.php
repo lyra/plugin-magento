@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Session extends Mage_Checkout_Model_Session
@@ -25,7 +17,7 @@ class Lyra_Payzen_Model_Session extends Mage_Checkout_Model_Session
     }
 
     /**
-     * Get PayZen 1-Click quote instance by current session
+     * Get gateway 1-Click quote instance by current session
      *
      * @return Mage_Sales_Model_Quote
      */
@@ -59,13 +51,13 @@ class Lyra_Payzen_Model_Session extends Mage_Checkout_Model_Session
             }
 
             if (! $this->getQuoteId()) {
-                // logged in customer
+                // Logged in customer.
                 $customer = Mage::getSingleton('customer/session')->getCustomer();
 
-                // set default customer shipping and billing address
+                // Set default customer shipping and billing address.
                 $quote->assignCustomer($customer);
 
-                // load the last passed order if any
+                // Load the last passed order if any.
                 $orders = Mage::getModel('sales/order')->getCollection();
                 if (version_compare(Mage::getVersion(), '1.4.1.1', '<')) {
                     $orders->addAttributeToSelect('shipping_method');
@@ -79,7 +71,7 @@ class Lyra_Payzen_Model_Session extends Mage_Checkout_Model_Session
                 $order = $orders->getFirstItem();
 
                 if ($order && $order->getId()) {
-                    // last used shipping address
+                    // Last used shipping address.
                     if ($order->getShippingAddress()) {
                         $address = Mage::getModel('customer/address')->load($order->getShippingAddress()->getCustomerAddressId());
                         if ($address && $address->getId()) {
@@ -87,14 +79,14 @@ class Lyra_Payzen_Model_Session extends Mage_Checkout_Model_Session
                         }
                     }
 
-                    // last used shipping method
+                    // Last used shipping method.
                     if ($order->getShippingMethod()) {
                         $quote->getShippingAddress()->setShippingMethod($order->getShippingMethod());
                     }
                 }
             }
 
-            // do not activate quote until the PayZen 1-Click button is clicked
+            // Do not activate quote until the 1-Click button is clicked.
             $quote->setIsActive(false);
 
             $quote->setStore(Mage::app()->getStore());

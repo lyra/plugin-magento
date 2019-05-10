@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Controller_Action
@@ -47,7 +39,7 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
 
         $this->getAdminSession()->getMessages(true);
 
-        // retrieve order to validate
+        // Retrieve order to validate.
         $id = $this->getRequest()->getParam('order_id');
         $order = Mage::getModel('sales/order')->load($id);
         if (! $order->getId()) {
@@ -73,7 +65,7 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
      */
     public function redirectBack($msg)
     {
-        // clear all messages from session
+        // Clear all messages from session.
         $this->getCheckout()->getMessages(true);
         $this->getAdminSession()->getMessages(true);
 
@@ -90,7 +82,7 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
      */
     public function redirectError($order)
     {
-        // clear all messages from session
+        // Clear all messages from session.
         $this->getCheckout()->getMessages(true);
         $this->getAdminSession()->getMessages(true);
 
@@ -109,27 +101,26 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
      */
     public function redirectResponse($order, $case, $checkUrlWarn = false)
     {
-        // clear all messages in session
+        // Clear all messages in session.
         $this->getCheckout()->getMessages(true);
         $this->getAdminSession()->getMessages(true);
 
         $storeId = $order->getStore()->getId();
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
             if (Lyra_Payzen_Helper_Data::$pluginFeatures['prodfaq']) {
-                // display going to production message
+                // Display going to production message.
                 $message = $this->__('<b>GOING INTO PRODUCTION :</b> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
-                $message .= '<a href="https://payzen.io/en-EN/faq/how-to-switch-my-shop-to-production-mode.html" target="_blank">https://payzen.io/en-EN/faq/how-to-switch-my-shop-to-production-mode.html</a>';
                 $this->getAdminSession()->addNotice($message);
             }
 
             if ($checkUrlWarn) {
-                // order not validated by notification URL, in TEST mode, user is webmaster
-                // so display a warning about notification URL not working
+                // Order not validated by notification URL, in TEST mode, user is webmaster.
+                // So display a warning about notification URL not working.
 
                 if ($this->_getDataHelper()->isMaintenanceMode()) {
                     $message = $this->__('The shop is in maintenance mode.The automatic notification cannot work.');
                 } else {
-                    $message = $this->__('The automatic validation hasn\'t worked. Have you correctly set up the notification URL in your PayZen Back Office ?');
+                    $message = $this->__('The automatic validation hasn\'t worked. Have you correctly set up the notification URL in your PayZen Back Office?');
                     $message .= '<br /><br />';
                     $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
@@ -188,7 +179,7 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
     }
 
     /**
-     * Return PayZen data helper.
+     * Return data helper.
      *
      * @return Lyra_Payzen_Helper_Data
      */
@@ -198,7 +189,7 @@ class Lyra_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminhtml_Cont
     }
 
     /**
-     * Return PayZen payment helper.
+     * Return payment helper.
      *
      * @return Mage_Payzen_Helper_Payment
      */

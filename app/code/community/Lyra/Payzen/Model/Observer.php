@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Observer
@@ -21,26 +13,26 @@ class Lyra_Payzen_Model_Observer
     public function doPaymentRedirect($observer)
     {
         if (! $this->_getHelper()->isAdmin()) {
-            // not an admin-passed order, do nothing
+            // Not an admin-passed order, do nothing.
             return;
         }
 
         $order = $observer->getOrder();
 
         if (! $order || $order->getId() <= 0) {
-            // order creation failed
+            // Order creation failed.
             return;
         }
 
         $method = $order->getPayment()->getMethodInstance();
 
         if ($method instanceof Lyra_Payzen_Model_Payment_Standard && $this->_getHelper()->isCurrentlySecure()) {
-            // use WS instead
+            // Use WS instead.
             return;
         }
 
         if ($method instanceof Lyra_Payzen_Model_Payment_Abstract) {
-            // backend payment with redirection
+            // Backend payment with redirection.
 
             $flag = false;
             if ($data = Mage::app()->getRequest()->getPost('order')) {
@@ -49,7 +41,7 @@ class Lyra_Payzen_Model_Observer
 
             $session = Mage::getSingleton('adminhtml/session_quote');
 
-            $session->setPayzenCanSendNewEmail($flag); // flag that allows sending new order email
+            $session->setPayzenCanSendNewEmail($flag); // Flag that allows sending new order email.
 
             $session->setQuoteId($observer->getQuote()->getId())
                 ->setLastSuccessQuoteId($observer->getQuote()->getId())
@@ -67,11 +59,11 @@ class Lyra_Payzen_Model_Observer
         $payment = $observer->getDataObject();
 
         if ($payment->getMethod() != 'payzen_multi') {
-            // not payzen multiple payment, do nothing
+            // Not multiple payment, do nothing.
             return;
         }
 
-        // retreive selected option
+        // Retreive selected option.
         $option = @unserialize($payment->getAdditionalData());
         if (isset($option) && is_array($option)) {
             $payment->setMethod('payzen_multi_' . $option['count'] . 'x');
@@ -95,16 +87,16 @@ class Lyra_Payzen_Model_Observer
                         continue;
                     }
 
-                    // use method codes and titles only
+                    // Use method codes and titles only.
                     $title = $code;
                     if (isset($method['title']) && ! empty($method['title'])) {
                         $title = Mage::helper('payment')->__($method['title']) . " ($code)";
                     }
 
-                    // for simple display
+                    // For simple display.
                     $methods[$code] = $title;
 
-                    // for grouped display
+                    // For grouped display.
                     $item = array('value' => $code, 'label' => $title);
 
                     if (isset($method['group'])) {
@@ -137,7 +129,7 @@ class Lyra_Payzen_Model_Observer
                 $this->_updateGridCollection($block);
             }
 
-            // case of multi virtual methods
+            // Case of multi virtual methods.
             $column = $block->getColumn('payment_method');
             $groupedMethods = $column->getData('option_groups');
             $methods = $column->getData('options');
@@ -188,19 +180,19 @@ class Lyra_Payzen_Model_Observer
             );
         }
 
-        // clear collection
+        // Clear collection.
         $collection->clear();
 
         $this->_addPaymentMethodFilter($block);
         $this->_addPaymentMethodOrder($block);
 
-        // reload collection
+        // Reload collection.
         $collection->load();
     }
 
     protected function _addPaymentMethodFilter($block)
     {
-        $data = $block->getParam($block->getVarNameFilter(), null); // load filter params from request
+        $data = $block->getParam($block->getVarNameFilter(), null); // Load filter params from request.
 
         if (is_string($data)) {
             $data = Mage::helper('adminhtml')->prepareFilterString($data);
@@ -226,10 +218,10 @@ class Lyra_Payzen_Model_Observer
 
     protected function _addPaymentMethodOrder($block)
     {
-        $columnId = $block->getParam($block->getVarNameSort(), null); // load sort column from request
+        $columnId = $block->getParam($block->getVarNameSort(), null); // Load sort column from request.
 
-        if ($columnId == 'payment_method') { // only override if sort column is ours
-            $dir = $block->getParam($block->getVarNameDir(), null); // load sort dir from request
+        if ($columnId == 'payment_method') { // Only override if sort column is ours.
+            $dir = $block->getParam($block->getVarNameDir(), null); // Load sort dir from request.
             $dir = (strtoupper($dir) == 'DESC') ? 'DESC' : 'ASC';
 
             $column = $block->getColumn('payment_method');
@@ -261,14 +253,14 @@ class Lyra_Payzen_Model_Observer
     protected function _oneclickQuoteProcess($data)
     {
         if (! Mage::getModel('payzen/payment_standard')->isOneclickAvailable()) {
-            // no 1-Click payment
+            // No 1-Click payment.
             return;
         }
 
         $session = Mage::getSingleton('payzen/session');
         $quote = $session->getQuote();
 
-        // remove all 1-Click quote items to refresh it
+        // Remove all 1-Click quote items to refresh it.
         foreach ($quote->getItemsCollection() as $item) {
             $quote->removeItem($item->getId());
         }
@@ -276,7 +268,7 @@ class Lyra_Payzen_Model_Observer
         $quote->getShippingAddress()->removeAllShippingRates();
         $quote->setCouponCode('');
 
-        // fill with current viewed element
+        // Fill with current viewed element.
         if ($data instanceof Mage_Catalog_Model_Product) {
             try {
                 $result = $quote->addProduct($data);
@@ -295,7 +287,7 @@ class Lyra_Payzen_Model_Observer
 
                 $product = $item->getProduct();
 
-                // retrieve all item options
+                // Retrieve all item options.
                 $option = $item->getOptionByCode('info_buyRequest');
                 $request = new Varien_Object(
                     $option ? unserialize($option->getValue()) : array('product_id' => $product->getId())
@@ -309,7 +301,7 @@ class Lyra_Payzen_Model_Observer
                 }
             }
 
-            // set coupon code if any
+            // Set coupon code if any.
             $quote->setCouponCode($data->getCouponCode());
         }
 
@@ -339,7 +331,7 @@ class Lyra_Payzen_Model_Observer
             if ($order && $order->getPayment() && stripos($order->getPayment()->getMethod(), 'payzen_') === 0) {
                 switch ($order->getStatus()) {
                     case 'payzen_to_validate':
-                        $message = $this->_getHelper()->__('Are you sure you want to validate this order in PayZen gateway ?');
+                        $message = $this->_getHelper()->__('Are you sure you want to validate this order in PayZen gateway?');
 
                         $block->addButton(
                             'payzen_validate_payment', array(
@@ -349,7 +341,7 @@ class Lyra_Payzen_Model_Observer
                             )
                         );
 
-                        // break omitted intentionally
+                        // Break omitted intentionally.
 
                     case 'payment_review':
                         $block->removeButton('accept_payment');
@@ -368,13 +360,13 @@ class Lyra_Payzen_Model_Observer
             return;
         }
 
-        // response content
+        // Response content.
         $output = Mage::app()->getLayout()->getOutput();
 
         $preferedMaxInputVars = 0;
         $preferedMaxInputVars += substr_count($output, 'name="groups[');
         $preferedMaxInputVars += substr_count($output, 'name="config_state[');
-        $preferedMaxInputVars += 100; // to take account of dynamically created inputs
+        $preferedMaxInputVars += 100; // To take account of dynamically created inputs.
 
         $block = Mage::app()->getLayout()->getMessagesBlock();
         if ((ini_get('suhosin.post.max_vars') && ini_get('suhosin.post.max_vars') < $preferedMaxInputVars)

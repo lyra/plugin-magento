@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
@@ -45,7 +37,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     {
         $this->_getDataHelper()->log('Start =================================================');
         if ($this->getRequest()->getParam('mode', null) === 'cancel') {
-            // load order
+            // Load order.
             $lastIncrementId = $this->getCheckout()->getLastRealOrderId();
             $order = Mage::getModel('sales/order');
             $order->loadByIncrementId($lastIncrementId);
@@ -123,7 +115,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     }
 
     /**
-     * Action called when customer click PayZen 1-Click payment button.
+     * Action called when customer click 1-Click payment button.
      */
     public function oneclickPaymentAction()
     {
@@ -131,17 +123,17 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
         try {
             $this->_getDataHelper()->log(
-                'Update PayZen 1-Click quote data (products, shipping address, shipping method).'
+                'Update 1-Click quote data (products, shipping address, shipping method).'
             );
             $oneClickQuote = $this->_updateOneclickQuote();
 
-            // reload billing address
-            $this->_getDataHelper()->log('Refresh PayZen 1-Click quote billing address.');
+            // Reload billing address.
+            $this->_getDataHelper()->log('Refresh 1-Click quote billing address.');
             $customerAddressId = $oneClickQuote->getBillingAddress()->getCustomerAddressId();
             $customerAddress = Mage::getModel('customer/address')->load($customerAddressId);
             $oneClickQuote->getBillingAddress()->importCustomerAddress($customerAddress)->setSaveInAddressBook(0);
 
-            $this->_getDataHelper()->log('Add payment info to PayZen 1-Click quote.');
+            $this->_getDataHelper()->log('Add payment info to 1-Click quote.');
             if (! $oneClickQuote->isVirtual() && $oneClickQuote->getShippingAddress()) {
                 $oneClickQuote->getShippingAddress()->setPaymentMethod('payzen_standard');
             } else {
@@ -151,30 +143,30 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
             $data = array('method' => 'payzen_standard', 'payzen_standard_use_identifier' => 1);
             $oneClickQuote->getPayment()->importData($data);
 
-            $this->_getDataHelper()->log('Save PayZen 1-Click quote after total recollection.');
+            $this->_getDataHelper()->log('Save 1-Click quote after total recollection.');
             $oneClickQuote->collectTotals()->setIsActive(true)->save();
 
-            // reload PayZen 1-Click quote
+            // Reload 1-Click quote.
             $this->getPayzenSession()->unsetQuote();
             $oneClickQuote = $this->getPayzenSession()->getQuote();
 
             if ($this->getCheckout()->getQuoteId()) {
-                // save current quote ID to reload it farther
+                // Save current quote ID to reload it farther.
                 $this->getPayzenSession()->setPayzenInitialQuoteId($this->getCheckout()->getQuoteId());
                 $this->getCheckout()->getQuote()->setIsActive(false)->save();
             }
 
-            // save PayZen 1-Click quote to checkout session
+            // Save 1-Click quote to checkout session.
             $this->getPayzenSession()->setPayzenOneclickPayment(true)
                 ->setPayzenOneclickBackUrl($this->_getRefererUrl());
             $this->getCheckout()->replaceQuote($oneClickQuote);
 
-            $this->_getDataHelper()->log('Create order from PayZen 1-Click quote.');
+            $this->_getDataHelper()->log('Create order from 1-Click quote.');
             $service = Mage::getModel('sales/service_quote', $oneClickQuote);
             $order = $service->submit();
 
             $this->_getDataHelper()->log(
-                'Set PayZen 1-Click payment information to session and redirect to payment page.'
+                'Set 1-Click payment information to session and redirect to payment page.'
             );
             $this->getCheckout()->setLastSuccessQuoteId($this->getCheckout()->getQuoteId())
                 ->setLastRealOrderId($order->getIncrementId());
@@ -183,15 +175,15 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
             $this->_redirectUrl($redirectUrl);
         } catch (Mage_Core_Exception $e) {
             $this->_getDataHelper()->log(
-                'Error when trying to pay with PayZen 1-Click. ' . $e->getMessage(),
+                'Error when trying to pay with 1-Click. ' . $e->getMessage(),
                 Zend_Log::WARN
             );
 
-            // disable PayZen 1-Click quote
+            // Disable 1-Click quote.
             $oneClickQuote = $this->getPayzenSession()->getQuote();
             $oneClickQuote->setIsActive(false)->setReservedOrderId(null)->save();
 
-            // restore initial checkout quote
+            // Restore initial checkout quote.
             if ($this->getPayzenSession()->getPayzenInitialQuoteId()) {
                 $quote = Mage::getModel('sales/quote')->load(
                     (int) $this->getPayzenSession()->getPayzenInitialQuoteId(true)
@@ -206,7 +198,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
             $this->getPayzenSession()->unsPayzenOneclickPayment()
                 ->unsPayzenOneclickBackUrl();
 
-            // use core/session instance to be able to show messages from all pages
+            // Use core/session instance to be able to show messages from all pages.
             if ($this->getCoreSession()->getUseNotice(true)) {
                 $this->getCoreSession()->addNotice($e->getMessage());
             } else {
@@ -251,7 +243,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                 ->load((int) $productId);
 
             if ($product->getId()) {
-                // remove all 1-Click quote items to refresh it
+                // Remove all 1-Click quote items to refresh it.
                 foreach ($oneClickQuote->getItemsCollection() as $item) {
                     $oneClickQuote->removeItem($item->getId());
                 }
@@ -268,7 +260,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                     $result = $oneClickQuote->addProduct($product, $request);
 
                     if (is_string($result)) {
-                        // error message
+                        // Error message.
                         $this->getCoreSession()->setUseNotice(true);
                         Mage::throwException($result);
                     }
@@ -280,7 +272,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
                     );
                 }
 
-                // related products
+                // Related products.
                 $productIds = $this->getRequest()->getParam('related_product');
                 if (! empty($productIds)) {
                     $productIds = explode(',', $productIds);
@@ -352,7 +344,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
      */
     public function redirectBack($msg)
     {
-        // clear all messages from session
+        // Clear all messages from session.
         $this->getCheckout()->getMessages(true);
         $this->getCoreSession()->getMessages(true);
 
@@ -367,7 +359,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
      */
     public function redirectError($order)
     {
-        // clear all messages in session
+        // Clear all messages in session.
         $this->getCheckout()->getMessages(true);
         $this->getCoreSession()->getMessages(true);
 
@@ -384,26 +376,26 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
      */
     public function redirectResponse($order, $case, $checkUrlWarn = false)
     {
-        // clear all messages in session
+        // Clear all messages in session.
         $this->getCheckout()->getMessages(true);
         $this->getCoreSession()->getMessages(true);
 
         $storeId = $order->getStore()->getId();
         if ($this->_getDataHelper()->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
             if (Lyra_Payzen_Helper_Data::$pluginFeatures['prodfaq']) {
-                // display going to production message
+                // Display going to production message.
                 $message = $this->__('<b>GOING INTO PRODUCTION :</b> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
                 $this->getCoreSession()->addNotice($message);
             }
 
             if ($checkUrlWarn) {
-                // order not validated by notification URL, in TEST mode, user is webmaster
-                // so display a warning about notification URL not working
+                // Order not validated by notification URL, in TEST mode, user is webmaster.
+                // So display a warning about notification URL not working.
 
                 if ($this->_getDataHelper()->isMaintenanceMode()) {
                     $message = $this->__('The shop is in maintenance mode.The automatic notification cannot work.');
                 } else {
-                    $message = $this->__('The automatic validation has not worked. Have you correctly set up the notification URL in your PayZen Back Office ?');
+                    $message = $this->__('The automatic validation has not worked. Have you correctly set up the notification URL in your PayZen Back Office?');
                     $message .= '<br /><br />';
                     $message .= $this->__('For understanding the problem, please read the documentation of the module :<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
@@ -412,7 +404,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
             }
         }
 
-        // was this a PayZen 1-click payment ?
+        // Was this a 1-Click payment?
         $oneclick = $this->getPayzenSession()->getPayzenOneclickPayment(true);
 
         if ($case === Lyra_Payzen_Helper_Payment::SUCCESS) {
@@ -448,7 +440,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
 
                 $this->getPayzenSession()->unsPayzenInitialQuoteId();
 
-                // in case of 1-Click payment , redirect to referer URL
+                // In case of 1-Click payment , redirect to referer URL.
                 $this->_getDataHelper()->log(
                     "Redirecting to referer URL (product view or cart page) for order #{$order->getId()}."
                 );
@@ -489,7 +481,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     }
 
     /**
-     * Get PayZen 1-Click checkout session namespace.
+     * Get 1-Click checkout session namespace.
      *
      * @return Lyra_Payzen_Model_Session
      */
@@ -519,7 +511,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     }
 
     /**
-     * Return PayZen data helper.
+     * Return data helper.
      *
      * @return Lyra_Payzen_Helper_Data
      */
@@ -529,7 +521,7 @@ class Lyra_Payzen_PaymentController extends Mage_Core_Controller_Front_Action
     }
 
     /**
-     * Return PayZen payment helper.
+     * Return payment helper.
      *
      * @return Mage_Payzen_Helper_Payment
      */

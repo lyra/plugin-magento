@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
@@ -22,6 +14,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
     const CUST_ID_REGEX = '#^[a-zA-Z0-9]{1,8}$#u';
 
     const PRODUCT_REF_REGEX = '#^[a-zA-Z0-9]{1,64}$#u';
+    const CART_MAX_NB_PRODUCTS = 85;
 
     public static $address_regex = array(
         'oney' => array(
@@ -57,7 +50,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     public function checkCustormers($scope, $scopeId)
     {
-        // check customer IDs
+        // Check customer IDs.
         $collection = Mage::getModel('customer/customer')->getCollection();
 
         if ($scope == 'websites') {
@@ -76,11 +69,11 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $customer->setData($args['row']);
 
         if (! preg_match(self::CUST_ID_REGEX, $customer->getId())) {
-            // a customer id doesn't match PayZen rules
+            // A customer ID doesn't match gateway rules.
 
             $msg = '';
             $msg .= $this->_getHelper()->__(
-                'Customer ID &laquo; %s &raquo; does not match PayZen specifications.',
+                'Customer ID &laquo; %s &raquo; does not match gateway specifications.',
                 $customer->getId()
             );
             $msg .= ' ';
@@ -95,15 +88,15 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     public function checkOrders($scope, $scopeId)
     {
-        // check order IDs
+        // Check order IDs.
         if ($scope == 'stores') {
-            // store context
+            // Store context.
             $incrementId = Mage::getSingleton('eav/config')->getEntityType('order')
                 ->fetchNewIncrementId($scopeId);
 
             $this->_checkOrderId($incrementId);
         } else {
-            // general and website context
+            // General and website context.
             $stores = Mage::app()->getStores();
 
             foreach ($stores as $store) {
@@ -121,11 +114,11 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
     protected function _checkOrderId($orderId)
     {
         if (! preg_match(self::ORDER_ID_REGEX, $orderId)) {
-            // the potential next order id doesn't match PayZen rules
+            // The potential next order ID doesn't match gateway rules.
 
             $msg = '';
             $msg .= $this->_getHelper()->__(
-                'The next order ID  &laquo; %s &raquo; does not match PayZen specifications.',
+                'The next order ID  &laquo; %s &raquo; does not match gateway specifications.',
                 $orderId
             ) . ' ';
             $msg .= $this->_getHelper()->__(
@@ -139,7 +132,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     public function checkProducts($scope, $scopeId)
     {
-        // check products' IDs and labels
+        // Check products' IDs and labels.
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->addAttributeToSelect('name');
 
@@ -159,11 +152,11 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $product->setData($args['row']);
 
         if (! preg_match(self::PRODUCT_REF_REGEX, $product->getId())) {
-            // product id doesn't match PayZen rules
+            // Product ID doesn't match gateway rules.
 
             $msg = '';
             $msg .= $this->_getHelper()->__(
-                'Product reference &laquo; %s &raquo; does not match PayZen specifications.',
+                'Product reference &laquo; %s &raquo; does not match gateway specifications.',
                 $product->getId()
             );
             $msg .= ' ';
@@ -188,7 +181,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $matches = array();
 
         if (preg_match('#^(pointsrelais[a-z0-9]*)_.+$#i', $methodCode, $matches)) {
-            // Modial Relay carrier create shipping methods dynamically (after WS call)
+            // Modial Relay carrier create shipping methods dynamically (after WS call).
             $methodCode = $matches[1] . '_pointsrelais';
         }
 
@@ -207,7 +200,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     public function toPayzenCategory($categoryIds)
     {
-        // commmon category if any
+        // Commmon category if any.
         $commonCategory = $this->_getHelper()->getCommonConfigData('common_category');
         if ($commonCategory != 'CUSTOM_MAPPING') {
             return $commonCategory;
@@ -233,82 +226,85 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         return null;
     }
 
-    public function setCartData($order, &$payzenRequest)
+    public function setCartData($order, &$payzenRequest, $needsCartData = false)
     {
         $notAllowed = '#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ ]#ui';
 
-        // used currency
+        // Used currency.
         $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByNumCode($payzenRequest->get('currency'));
 
         $subtotal = 0;
 
-        // load all products in the shopping cart
-        foreach ($order->getAllItems() as $item) {
-            // check to avoid sending the whole hierarchy of a configurable product
-            if (! $item->getParentItem()) {
-                $product = $item->getProduct();
-                if (! $product) {
-                    // load product instance
-                    $product = Mage::getModel('catalog/product')->load($item->getProductId());
-                }
-
-                $label = $item->getName();
-
-                // concat product label with one or two of its category names to make it clearer
-                $categoryIds = $product->getCategoryIds();
-                if (is_array($categoryIds) && ! empty($categoryIds)) {
-                    if (isset($categoryIds[1]) && $categoryIds[1]) {
-                        $category = Mage::getModel('catalog/category')->load($categoryIds[1]);
-                        $label = $category->getName() . ' I ' . $label;
+        // Load all products in the shopping cart.
+        $items = $order->getAllItems();
+        if (count($items) <= self::CART_MAX_NB_PRODUCTS || $needsCartData) {
+            foreach ($items as $item) {
+                // Check to avoid sending the whole hierarchy of a configurable product.
+                if (! $item->getParentItem()) {
+                    $product = $item->getProduct();
+                    if (! $product) {
+                        // Load product instance.
+                        $product = Mage::getModel('catalog/product')->load($item->getProductId());
                     }
 
-                    if ($categoryIds[0]) {
-                        $category = Mage::getModel('catalog/category')->load($categoryIds[0]);
-                        $label = $category->getName() . ' I ' . $label;
+                    $label = $item->getName();
+
+                    // Concat product label with one or two of its category names to make it clearer.
+                    $categoryIds = $product->getCategoryIds();
+                    if (is_array($categoryIds) && ! empty($categoryIds)) {
+                        if (isset($categoryIds[1]) && $categoryIds[1]) {
+                            $category = Mage::getModel('catalog/category')->load($categoryIds[1]);
+                            $label = $category->getName() . ' I ' . $label;
+                        }
+
+                        if ($categoryIds[0]) {
+                            $category = Mage::getModel('catalog/category')->load($categoryIds[0]);
+                            $label = $category->getName() . ' I ' . $label;
+                        }
                     }
+
+                    $priceInCents = $currency->convertAmountToInteger($item->getPrice());
+                    $qty = (int) $item->getQtyOrdered();
+
+                    $payzenRequest->addProduct(
+                        preg_replace($notAllowed, ' ', $label),
+                        $priceInCents,
+                        $qty,
+                        $item->getProductId(),
+                        $this->toPayzenCategory($categoryIds)
+                    );
+
+                    $subtotal += $priceInCents * $qty;
                 }
-
-                $priceInCents = $currency->convertAmountToInteger($item->getPrice());
-                $qty = (int) $item->getQtyOrdered();
-
-                $payzenRequest->addProduct(
-                    preg_replace($notAllowed, ' ', $label),
-                    $priceInCents,
-                    $qty,
-                    $item->getProductId(),
-                    $this->toPayzenCategory($categoryIds)
-                );
-
-                $subtotal += $priceInCents * $qty;
             }
         }
 
-        $payzenRequest->set('insurance_amount', 0); // by default, shipping insurance amount is not available in Magento
+        $payzenRequest->set('insurance_amount', 0); // By default, shipping insurance amount is not available in magento.
         $payzenRequest->set('shipping_amount', $currency->convertAmountToInteger($order->getShippingAmount()));
 
-        // recalculate tax_amount to avoid rounding problems
+        // Recalculate tax_amount to avoid rounding problems.
         $taxAmount = $payzenRequest->get('amount') - $subtotal - $payzenRequest->get('shipping_amount')
             - $payzenRequest->get('insurance_amount');
-        if ($taxAmount <= 0) { // when order is discounted
+        if ($taxAmount <= 0) { // When order is discounted.
             $taxAmount = $currency->convertAmountToInteger($order->getTaxAmount());
         }
 
         $payzenRequest->set('tax_amount', $taxAmount);
 
-        // VAT amount for colombian payment means
+        // Vat amount for colombian payment means.
         $payzenRequest->set('totalamount_vat', $taxAmount);
     }
 
     public function setAdditionalShippingData($order, &$payzenRequest, $useOney = false)
     {
-        // by default, clients are protected
+        // By default, clients are protected.
         $payzenRequest->set('cust_status', 'PRIVATE');
         $payzenRequest->set('ship_to_status', 'PRIVATE');
 
         $notAllowedCharsRegex = "#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]#ui";
 
-        if ($order->getIsVirtual() || ! $order->getShippingMethod()) { // there is no shipping method
-            // set store name after illegal characters replacement
+        if ($order->getIsVirtual() || ! $order->getShippingMethod()) { // There is no shipping method.
+            // Set store name after illegal characters replacement.
             $payzenRequest->set(
                 'ship_to_delivery_company_name',
                 preg_replace($notAllowedCharsRegex, ' ', Mage::app()->getStore()->getFrontendName())
@@ -318,14 +314,14 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         } else {
             $shippingMethod = $this->toPayzenCarrier($order->getShippingMethod());
 
-            // delivery point name
+            // Delivery point name.
             $name = '';
 
             switch ($shippingMethod['type']) {
                 case 'RELAY_POINT':
                 case 'RECLAIM_IN_STATION':
 
-                    if (strpos($shippingMethod['code'], 'pointsrelais') === 0 && $order->getShippingAddress()->getCompany()) { // Modial Relay ColisDrive or relay point
+                    if (strpos($shippingMethod['code'], 'pointsrelais') === 0 && $order->getShippingAddress()->getCompany()) { // Modial Relay ColisDrive or relay point.
                         $name = $order->getShippingAddress()->getCompany();
                     } else {
                         $name = $order->getShippingDescription();
@@ -336,15 +332,15 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                             $name = str_replace($carrierName . ' - ', '', $name);
                         }
 
-                        $name = substr($name, 0, strpos($name, '<')); // remove HTML elements
+                        $name = substr($name, 0, strpos($name, '<')); // Remove html elements.
                     }
 
-                    // break intentionally omitted
+                    // Break intentionally omitted.
 
                 case 'RECLAIM_IN_SHOP':
 
                     if ($useOney) {
-                        // modify address to send it to Oney server
+                        // Modify address to send it to Oney server.
                         $address = '';
                         $address .= $name;
                         $address .= $order->getShippingAddress()->getStreet(1);
@@ -354,10 +350,10 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                         $payzenRequest->set('ship_to_street', $address);
                         $payzenRequest->set('ship_to_zip', $order->getShippingAddress()->getPostcode());
                         $payzenRequest->set('ship_to_city', $order->getShippingAddress()->getCity());
-                        $payzenRequest->set('ship_to_street2', null); // not sent to FacilyPay Oney
-                        $payzenRequest->set('ship_to_state', null); // not sent to FacilyPay Oney
+                        $payzenRequest->set('ship_to_street2', null); // Not sent to facilypay oney.
+                        $payzenRequest->set('ship_to_state', null); // Not sent to facilypay oney.
 
-                        // send FR even address is in DOM-TOM unless form is rejected
+                        // Send fr even address is in DOM-TOM unless form is rejected.
                         $payzenRequest->set('cust_country', 'FR');
                         $payzenRequest->set('ship_to_country', 'FR');
                     }
@@ -366,30 +362,30 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                         $name = substr($order->getShippingDescription(), 0, 55);
                     }
 
-                    // send delivery point name, address, postcode and city in field ship_to_delivery_company_name
+                    // Send delivery point name, address, postcode and city in field ship_to_delivery_company_name.
                     $name .= $order->getShippingAddress()->getStreet(1);
                     $name .= $order->getShippingAddress()->getStreet(2) ?
                         ' ' . $order->getShippingAddress()->getStreet(2) : '';
                     $name .= ' ' . $order->getShippingAddress()->getPostcode();
                     $name .= ' ' . $order->getShippingAddress()->getCity();
 
-                    // delete not allowed chars
+                    // Delete not allowed chars.
                     $name = preg_replace($notAllowedCharsRegex, ' ', $name);
                     $payzenRequest->set('ship_to_delivery_company_name', $name);
                     break;
 
                 default :
                     if ($useOney) {
-                        // modify address to send it to Oney server
+                        // Modify address to send it to oney server.
                         $address = '';
                         $address .= $order->getShippingAddress()->getStreet(1);
                         $address .= $order->getShippingAddress()->getStreet(2) ?
                             ' ' . $order->getShippingAddress()->getStreet(2) : '';
 
                         $payzenRequest->set('ship_to_street', $address);
-                        $payzenRequest->set('ship_to_street2', null); // not sent to FacilyPay Oney
+                        $payzenRequest->set('ship_to_street2', null); // Not sent to facilypay oney.
 
-                        // send FR even address is in DOM-TOM unless form is rejected
+                        // Send fr even address is in DOM-TOM unless form is rejected.
                         $payzenRequest->set('cust_country', 'FR');
                         $payzenRequest->set('ship_to_country', 'FR');
                     }
@@ -415,7 +411,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
         $regex = self::$address_regex[$payment];
 
-        // specific validation regular expressions
+        // Specific validation regular expressions.
         $nameRegex = $regex['name'];
         $phoneRegex = $regex['phone'];
         $cityRegex = $regex['city'];
@@ -423,11 +419,11 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $countryRegex = $regex['country'];
         $zipRegex = $regex['zip'];
 
-        // error messages
+        // Error messages.
         $invalidMsg = 'The field %s of your %s is invalid.';
         $emptyMsg = 'The field %s of your %s is mandatory.';
 
-        // address type
+        // Address type.
         $addressType = ($address->getAddressType() === 'billing') ? 'billing address' : 'delivery address';
 
         if (! $address->getLastname()) {
@@ -463,7 +459,7 @@ class Lyra_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     protected function _throwException($msg, $field, $addressType)
     {
-        // translate
+        // Translate.
         $field = $this->_getHelper()->__($field);
         $addressType = $this->_getHelper()->__($addressType);
 

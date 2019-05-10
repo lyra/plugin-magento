@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
@@ -65,19 +57,19 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
     {
         $allResults = @unserialize($this->getInfo()->getAdditionalInformation(Lyra_Payzen_Helper_Payment::ALL_RESULTS));
 
-        // backward compatibility
+        // Backward compatibility.
         if (! is_array($allResults) || empty($allResults)) {
             $allResults = @unserialize($this->getInfo()->getCcStatusDescription());
 
             if (! is_array($allResults) || empty($allResults)) {
-                // description is stored as litteral string
+                // Description is stored as litteral string.
                 return $this->getInfo()->getCcStatusDescription();
             }
 
             $allResults = array_combine(array('result', 'extra_result', 'auth_result', 'warranty_result'), $allResults);
         }
 
-        // description is stored as serialized array
+        // Description is stored as serialized array.
         $keys = array('result', 'auth_result', 'warranty_result');
 
         $labels = array();
@@ -87,8 +79,8 @@ class Lyra_Payzen_Block_Info extends Mage_Payment_Block_Info
                 continue;
             }
 
-            if ($key === 'result' && $allResults[$key] == '30') { // append form error if any
-                $label .= ' ' . PayzenResponse::extraMessage($allResults['extra_result']);
+            if ($key === 'result' && $allResults[$key] == '30') { // Append form error if any.
+                $label .= ' ' . Lyra_Payzen_Model_Api_Response::extraMessage($allResults['extra_result']);
             }
 
             $labels[] = $label;

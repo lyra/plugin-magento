@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
@@ -29,10 +21,10 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
     {
         $testMode = $this->_payzenRequest->get('ctx_mode') == 'TEST';
 
-        // override with FacilyPay Oney payment cards
+        // Override with FacilyPay Oney payment cards.
         $this->_payzenRequest->set('payment_cards', $testMode ? 'ONEY_SANDBOX' : 'ONEY');
 
-        // set choosen option if any
+        // Set choosen option if any.
         $info = $this->getInfoInstance();
         if ($info->getAdditionalData() && ($option = @unserialize($info->getAdditionalData()))) {
             $this->_payzenRequest->set('payment_option_code', $option['code']);
@@ -56,7 +48,7 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
 
         $option = $this->_getOption($data->getPayzenOneyOption());
 
-        // init all payment data
+        // Init all payment data.
         $info->setAdditionalData($option ? serialize($option) : null)
             ->setCcType(null)
             ->setCcLast4(null)
@@ -88,14 +80,14 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
             }
 
             if ((! $value['minimum'] || ($amount > $value['minimum'])) && (! $value['maximum'] || ($amount < $value['maximum']))) {
-                // option will be available
+                // Option will be available.
                 $c = is_numeric($value['count']) ? $value['count'] : 1;
                 $r = is_numeric($value['rate']) ? $value['rate'] : 0;
 
-                // get final option description
+                // Get final option description.
                 $search = array('%c', '%r');
                 $replace = array($c, $r . ' %');
-                $value['label'] = str_replace($search, $replace, $value['label']); // label to display on payment page
+                $value['label'] = str_replace($search, $replace, $value['label']); // Label to display on payment page.
 
                 $options[$code] = $value;
             }
@@ -151,41 +143,41 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
             return $checkResult;
         }
 
-        // check shipping country, billing country is checked in parent::isAvailable method.
+        // Check shipping country, billing country is checked in parent::isAvailable method.
         if (! $this->canUseForCountry($quote->getShippingAddress()->getCountry())) {
             return false;
         }
 
         if ($quote->getCustomerId() && ! preg_match(Lyra_Payzen_Helper_Util::CUST_ID_REGEX, $quote->getCustomerId())) {
-            // customer id doesn't match FacilyPay Oney rules
+            // Customer id doesn't match FacilyPay Oney rules.
 
-            $msg = 'Customer ID "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
+            $msg = 'Customer ID "%s" does not match gateway specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
             $this->_getHelper()->log(sprintf($msg, $quote->getCustomerId(), Lyra_Payzen_Helper_Util::CUST_ID_REGEX), Zend_Log::WARN);
             return false;
         }
 
         if (! $quote->getReservedOrderId()) {
-            $quote->reserveOrderId(); // guess order id
+            $quote->reserveOrderId(); // Guess order id.
         }
 
         if (! preg_match(Lyra_Payzen_Helper_Util::ORDER_ID_REGEX, $quote->getReservedOrderId())) {
-            // order id doesn't match FacilyPay Oney rules
+            // Order id doesn't match FacilyPay Oney rules.
 
-            $msg = 'The order ID "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
+            $msg = 'The order ID "%s" does not match gateway specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
             $this->_getHelper()->log(sprintf($msg, $quote->getReservedOrderId(), Lyra_Payzen_Helper_Util::ORDER_ID_REGEX), Zend_Log::WARN);
             return false;
         }
 
         foreach ($quote->getAllItems() as $item) {
-            // check to avoid sending the whole hierarchy of a configurable product
+            // Check to avoid sending the whole hierarchy of a configurable product.
             if ($item->getParentItem()) {
                 continue;
             }
 
             if (! preg_match(Lyra_Payzen_Helper_Util::PRODUCT_REF_REGEX, $item->getProductId())) {
-                // product id doesn't match FacilyPay Oney rules
+                // Product id doesn't match FacilyPay Oney rules.
 
-                $msg = 'Product reference "%s" does not match PayZen specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
+                $msg = 'Product reference "%s" does not match gateway specifications. The regular expression for this field is %s. FacilyPay Oney means of payment cannot be used.';
                 $this->_getHelper()->log(sprintf($msg, $item->getProductId(), Lyra_Payzen_Helper_Util::PRODUCT_REF_REGEX), Zend_Log::WARN);
                 return false;
             }
@@ -194,7 +186,7 @@ class Lyra_Payzen_Model_Payment_Oney extends Lyra_Payzen_Model_Payment_Abstract
         if (! $quote->isVirtual() && $quote->getShippingAddress()->getShippingMethod()) {
             $shippingMethod = Mage::helper('payzen/util')->toPayzenCarrier($quote->getShippingAddress()->getShippingMethod());
             if (! $shippingMethod) {
-                // selected shipping method is not mapped in configuration panel
+                // Selected shipping method is not mapped in configuration panel.
 
                 $this->_getHelper()->log('Shipping method "' . $quote->getShippingAddress()->getShippingMethod() . '" is not correctly mapped in module configuration panel. Module is not displayed.', Zend_Log::WARN);
                 return false;

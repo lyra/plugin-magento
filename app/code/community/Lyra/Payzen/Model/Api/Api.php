@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 if (! class_exists('Lyra_Payzen_Model_Api_Api', false)) {
@@ -66,7 +58,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Api', false)) {
         }
 
         /**
-         * Returns an array of languages accepted by the PayZen payment platform.
+         * Returns an array of languages accepted by the payment gateway.
          *
          * @return array[string][string]
          */
@@ -107,7 +99,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Api', false)) {
         }
 
         /**
-         * Return the list of currencies recognized by the PayZen platform.
+         * Return the list of currencies recognized by the payment gateway.
          *
          * @return array[int][Lyra_Payzen_Model_Api_Currency]
          */
@@ -210,7 +202,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Api', false)) {
         }
 
         /**
-         * Returns an array of card types accepted by the PayZen payment platform.
+         * Returns an array of card types accepted by the payment gateway.
          *
          * @return array[string][string]
          */
@@ -228,9 +220,9 @@ if (! class_exists('Lyra_Payzen_Model_Api_Api', false)) {
                 'BIZZBEE_CDX_SB' => 'Carte cadeau BizzBee - Sandbox', 'BOULANGER' => 'Carte enseigne Boulanger',
                 'BOULANGER_SB' => 'Carte enseigne Boulanger - Sandbox', 'BRICE_CDX' => 'Carte cadeau Brice',
                 'BRICE_CDX_SB' => 'Carte cadeau Brice - Sandbox', 'COFINOGA' => 'Carte Cofinoga Be Smart',
-                'CONECS' => 'Titre-Restaurant Dématérialisé Conecs', 'CONECS_APETIZ' => 'Titre-Restaurant Dématérialisé Apetiz',
-                'CONECS_CHQ_DEJ' => 'Titre-Restaurant Dématérialisé Chèque Déjeuner',
-                'CONECS_SODEXO' => 'Titre-Restaurant Dématérialisé Sodexo', 'CONECS_EDENRED' => 'Ticket Restaurant',
+                'CONECS' => 'Titre-Restaurant Dématérialisé Conecs', 'APETIZ' => 'Titre-Restaurant Dématérialisé Apetiz',
+                'CHQ_DEJ' => 'Titre-Restaurant Dématérialisé Chèque Déjeuner',
+                'SODEXO' => 'Titre-Restaurant Dématérialisé Sodexo', 'EDENRED' => 'Ticket Restaurant',
                 'DINERS' => 'Carte Diners Club', 'DISCOVER' => 'Carte Discover', 'E_CV' => 'e-Chèque-Vacances', 'ECCARD' => 'Euro-Cheque card',
                 'EDENRED_EC' => 'Ticket Eco Chèque Edenred', 'EDENRED_TC' => 'Ticket Culture Edenred',
                 'EDENRED_TR' => 'Ticket Restaurant Edenred', 'ELV' => 'Prélèvement Bancaire Hobex',
@@ -255,9 +247,9 @@ if (! class_exists('Lyra_Payzen_Model_Api_Api', false)) {
         }
 
         /**
-         * Compute a PayZen signature. Parameters must be in UTF-8.
+         * Compute the signature. Parameters must be in UTF-8.
          *
-         * @param array[string][string] $parameters payment platform request/response parameters
+         * @param array[string][string] $parameters payment gateway request/response parameters
          * @param string $key shop certificate
          * @param string $algo signature algorithm
          * @param boolean $hashed set to false to get the unhashed signature
@@ -292,7 +284,7 @@ if (! class_exists('Lyra_Payzen_Model_Api_Api', false)) {
 
         /**
          * PHP is not yet a sufficiently advanced technology to be indistinguishable from magic...
-         * so don't use magic_quotes, they mess up with the platform response analysis.
+         * so don't use magic_quotes, they mess up with the gateway response analysis.
          *
          * @param array $potentially_quoted_data
          * @return mixed

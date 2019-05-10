@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
@@ -27,7 +19,7 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
     protected function _setExtraFields($order)
     {
         if ($this->_getHelper()->isAdmin()) {
-            // set payment_src to MOTO for backend payments
+            // Set payment_src to MOTO for backend payments.
             $this->_payzenRequest->set('payment_src', 'MOTO');
         }
 
@@ -36,14 +28,14 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
         if (! $this->_getHelper()->isAdmin() && ($this->getConfigData('card_info_mode') == 2)) {
             $this->_payzenRequest->set('payment_cards', $info->getCcType());
         } else {
-            // payment_cards is given as csv by magento
+            // payment_cards is given as csv by Magento.
             $paymentCards = explode(',', $this->getConfigData('payment_cards'));
             $paymentCards = in_array('', $paymentCards) ? '' : implode(';', $paymentCards);
 
             $this->_payzenRequest->set('payment_cards', $paymentCards);
         }
 
-        // set mutiple payment option
+        // Set mutiple payment option.
         $option = unserialize($info->getAdditionalData());
 
         $amount = $this->_payzenRequest->get('amount');
@@ -68,7 +60,7 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
 
         $info = $this->getInfoInstance();
 
-        // load option informations
+        // Load option informations.
         $option = $this->_getOption($data->getPayzenMultiOption());
 
         $info->setAdditionalData($option ? serialize($option) : null)
@@ -122,7 +114,7 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
                 if ((! $amount || ! $value['minimum'] || $amount > $value['minimum'])
                     && (! $amount || ! $value['maximum'] || $amount < $value['maximum'])
                 ) {
-                    // option will be available
+                    // Option will be available.
                     $options[$code] = $value;
                 }
             }
@@ -156,10 +148,10 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
      */
     public function getAvailableCcTypes()
     {
-        // all cards
+        // All cards.
         $allCards = Mage::getModel('payzen/source_multi_paymentCards')->getMultiCards();
 
-        // selected cards from module configuration
+        // Selected cards from module configuration.
         $cards = $this->getConfigData('payment_cards');
         $cards = ! empty($cards) ? explode(',', $cards) : array();
 
@@ -168,7 +160,7 @@ class Lyra_Payzen_Model_Payment_Multi extends Lyra_Payzen_Model_Payment_Abstract
         if (empty($cards)) {
             $availCards = $allCards;
         } else {
-            // get card labels
+            // Get card labels.
             foreach ($allCards as $code => $name) {
                 if (in_array($code, $cards)) {
                     $availCards[$code] = $name;

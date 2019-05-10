@@ -1,19 +1,12 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
- *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
+ * PayZen V2-Payment Module version 1.9.3 for Magento 1.4-1.9. Support contact : support@payzen.eu.
  *
  * @category  Payment
  * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright 2014-2019 Lyra Network and contributors
+ * @license   
  */
 
 namespace Lyra\Payzen\Model\Api\Ws;
@@ -54,6 +47,26 @@ class CardRequest
      * @var string $paymentToken
      */
     private $paymentToken = null;
+
+    /**
+     * @var string $cardHolderName
+     */
+    private $cardHolderName = null;
+
+    /**
+     * @var string $proofOfIdType
+     */
+    private $proofOfIdType = null;
+
+    /**
+     * @var string $proofOfIdNumber
+     */
+    private $proofOfIdNumber = null;
+
+    /**
+     * @var string $walletPayload
+     */
+    private $walletPayload = null;
 
     /**
      * @return string
@@ -154,7 +167,7 @@ class CardRequest
             return null;
         } else {
             try {
-                return \DateTime::createFromFormat(\DateTime::ATOM, $this->cardHolderBirthDay);
+                return new \DateTime($this->cardHolderBirthDay);
             } catch (\Exception $e) {
                 return false;
             }
@@ -190,6 +203,78 @@ class CardRequest
     public function setPaymentToken($paymentToken)
     {
         $this->paymentToken = $paymentToken;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCardHolderName()
+    {
+        return $this->cardHolderName;
+    }
+
+    /**
+     * @param string $cardHolderName
+     * @return CardRequest
+     */
+    public function setCardHolderName($cardHolderName)
+    {
+        $this->cardHolderName = $cardHolderName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProofOfIdType()
+    {
+        return $this->proofOfIdType;
+    }
+
+    /**
+     * @param string $proofOfIdType
+     * @return CardRequest
+     */
+    public function setProofOfIdType($proofOfIdType)
+    {
+        $this->proofOfIdType = $proofOfIdType;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProofOfIdNumber()
+    {
+        return $this->proofOfIdNumber;
+    }
+
+    /**
+     * @param string $proofOfIdNumber
+     * @return CardRequest
+     */
+    public function setProofOfIdNumber($proofOfIdNumber)
+    {
+        $this->proofOfIdNumber = $proofOfIdNumber;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWalletPayload()
+    {
+        return $this->walletPayload;
+    }
+
+    /**
+     * @param string $walletPayload
+     * @return CardRequest
+     */
+    public function setWalletPayload($walletPayload)
+    {
+        $this->walletPayload = $walletPayload;
         return $this;
     }
 }

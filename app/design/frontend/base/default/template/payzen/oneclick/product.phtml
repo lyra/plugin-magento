@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 $product = $this->getProduct();
@@ -51,7 +43,7 @@ if ($product->isSaleable() && $this->isOneclickAvailable()) :
             payzenOneclickInsert.defer();
 
             if (typeof spConfig != 'undefined') {
-                // override Product.Config to fire option:change event
+                // Override Product.Config to fire option:change event.
                 spConfig.reloadPrice = function() {
                     $$('.price').invoke('fire', 'option:change');
                     return Product.Config.prototype.reloadPrice.call(this);
@@ -59,20 +51,20 @@ if ($product->isSaleable() && $this->isOneclickAvailable()) :
             }
 
             if (typeof opConfig != 'undefined') {
-                // override Product.Options to fire option:change event
+                // Override Product.Options to fire option:change event.
                 opConfig.reloadPrice = function() {
                     $$('.price').invoke('fire', 'option:change');
                     return Product.Options.prototype.reloadPrice.call(this);
                 };
             }
 
-            // if selected option changes, update shipping methods
+            // If selected option changes, update shipping methods.
             Event.observe($$('.price').first(), 'option:change', payzenUpdateShippingBlock);
 
-            // if product quantity changes, update shipping methods
+            // If product quantity changes, update shipping methods.
             Event.observe($('qty'), 'change', payzenUpdateShippingBlock);
 
-            // if any related product is checked or unchecked, update shipping methods
+            // If any related product is checked or unchecked, update shipping methods.
             if ($$('.related-checkbox').length) {
                 $$('.related-checkbox').each(function(elem) {
                     Event.observe(elem, 'change', payzenUpdateShippingBlock);

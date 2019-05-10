@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 class Lyra_Payzen_Model_Field_Standard_UseOney extends Mage_Core_Model_Config_Data
@@ -24,15 +16,15 @@ class Lyra_Payzen_Model_Field_Standard_UseOney extends Mage_Core_Model_Config_Da
     {
         $this->message = '';
 
-        if ($this->getValue() /* propose FacilyPay Oney in one-time payment enabled */) {
-            $data = $this->getGroups('payzen_oney'); // get data of FacilyPay Oney config group
+        if ($this->getValue() /* propose FacilyPay Oney in standard payment enabled */) {
+            $data = $this->getGroups('payzen_oney'); // Get data of FacilyPay Oney config group.
             $oneyActive = isset($data['fields']['oney_active']['value']) && $data['fields']['oney_active']['value'];
 
             if ($oneyActive) {
                 $this->setValue(0);
             } else {
                 try {
-                    // check Oney requirements
+                    // Check Oney requirements.
                     Mage::helper('payzen/util')->checkOneyRequirements($this->getScope(), $this->getScopeId());
                 } catch (Mage_Core_Exception $e) {
                     $this->setValue(0);

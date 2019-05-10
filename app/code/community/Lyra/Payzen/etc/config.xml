@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
 <config>
-    <!-- version -->
+    <!-- Version. -->
     <modules>
         <Lyra_Payzen>
-            <version>1.9.2</version>
+            <version>1.9.3</version>
         </Lyra_Payzen>
     </modules>
 
@@ -87,7 +79,7 @@
             </order>
         </sales>
 
-        <!-- admin parameter options -->
+        <!-- Admin parameter options. -->
         <payment>
             <payzen>
                 <!-- context mode values -->
@@ -102,7 +94,7 @@
                     </production>
                 </ctx_modes>
 
-                <!-- signature algo values -->
+                <!-- Signature algo values. -->
                 <sign_algos>
                     <sha1>
                         <code>SHA-1</code>
@@ -114,7 +106,7 @@
                     </sha256>
                 </sign_algos>
 
-                <!-- validation mode values -->
+                <!-- Validation mode values. -->
                 <validation_modes>
                     <general>
                         <code>-1</code>
@@ -134,7 +126,7 @@
                     </manual>
                 </validation_modes>
 
-                <!-- return mode values -->
+                <!-- Return mode values. -->
                 <return_modes>
                     <get>
                         <code>GET</code>
@@ -146,7 +138,7 @@
                     </post>
                 </return_modes>
 
-                <!-- default gift cards -->
+                <!-- Default gift cards. -->
                 <gift_cards>
                     <illicado>
                         <code>ILLICADO</code>
@@ -170,7 +162,7 @@
                     </alinea_cdx_sb>
                 </gift_cards>
 
-                <!-- card info modes -->
+                <!-- Card info modes. -->
                 <card_info_modes>
                     <action1>
                         <code>1</code>
@@ -190,7 +182,7 @@
                     </action4>
                 </card_info_modes>
 
-                <!-- card register modes -->
+                <!-- Card register modes. -->
                 <card_register_modes>
                     <unchecked>
                         <code>1</code>
@@ -221,7 +213,7 @@
                     </both>
                 </one_click_locations>
 
-                <!-- PayZen product categories -->
+                <!-- Gateway product categories. -->
                 <product_categories>
                     <food_and_grocery>
                         <code>FOOD_AND_GROCERY</code>
@@ -289,7 +281,7 @@
                     </telephony>
                 </product_categories>
 
-                <!-- card info modes -->
+                <!-- Card info modes. -->
                 <multi_card_info_modes>
                     <action1>
                         <code>1</code>
@@ -301,7 +293,7 @@
                     </action2>
                 </multi_card_info_modes>
 
-                <!-- SEPA Direct Debit mandate modes -->
+                <!-- SEPA Direct Debit mandate modes. -->
                 <mandate_modes>
                     <payment>
                         <code>PAYMENT</code>
@@ -357,7 +349,7 @@
             </updates>
         </layout>
 
-        <!-- translation for admin -->
+        <!-- Translation for admin area. -->
         <translate>
             <modules>
                 <Lyra_Payzen>
@@ -411,7 +403,7 @@
         </events>
     </adminhtml>
 
-    <!-- controllers mapping -->
+    <!-- Controllers mapping. -->
     <frontend>
         <layout>
             <updates>
@@ -472,14 +464,15 @@
         </routers>
     </admin>
 
-    <!-- default configuration values -->
+    <!-- Default configuration values. -->
     <default>
         <payment>
             <payzen>
                 <developed_by>Lyra Network</developed_by>
-                <contact_email>support@payzen.eu</contact_email>
-                <module_version>1.9.2</module_version>
+                <support_email>support@payzen.eu</support_email>
+                <plugin_version>1.9.3</plugin_version>
                 <gateway_version>V2</gateway_version>
+                <cms_identifier>Magento_1.4-1.9</cms_identifier>
                 <enable_logs>1</enable_logs>
                 <title><![CDATA[PayZen]]></title>
 
@@ -490,15 +483,16 @@
                 <sign_algo>SHA-256</sign_algo>
                 <notify_url>payzen/payment/check</notify_url>
                 <platform_url>https://secure.payzen.eu/vads-payment/</platform_url>
+                <wsdl_url>https://secure.payzen.eu/vads-ws/v5?wsdl</wsdl_url>
 
                 <language>fr</language>
                 <validation_mode></validation_mode>
 
                 <redirect_enabled>0</redirect_enabled>
                 <redirect_success_timeout>5</redirect_success_timeout>
-                <redirect_success_message backend_model="payzen/field_translatable">Redirection to shop in a few seconds...</redirect_success_message>
+                <redirect_success_message>Redirection to shop in a few seconds...</redirect_success_message>
                 <redirect_error_timeout>5</redirect_error_timeout>
-                <redirect_error_message backend_model="payzen/field_translatable">Redirection to shop in a few seconds...</redirect_error_message>
+                <redirect_error_message>Redirection to shop in a few seconds...</redirect_error_message>
                 <return_mode>GET</return_mode>
                 <registered_order_status>processing</registered_order_status>
                 <capture_auto>1</capture_auto>
@@ -512,7 +506,7 @@
 
                 <active>1</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay by credit card</title>
+                <title>Payment by credit card</title>
                 <sort_order>1</sort_order>
                 <module_logo>standard.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -523,10 +517,10 @@
 
                 <card_info_mode>1</card_info_mode>
                 <one_click_active>0</one_click_active>
-                <one_click_title backend_model="payzen/field_translatable">Buy now</one_click_title>
+                <one_click_title>Buy now</one_click_title>
                 <one_click_location>BOTH</one_click_location>
                 <card_register_mode>1</card_register_mode>
-                <card_register_message backend_model="payzen/field_translatable"><![CDATA[Check this box to register your card data and to do payments in one click. <b>Card data will be stored on the secured server of the payment gateway.</b>]]></card_register_message>
+                <card_register_message><![CDATA[Check this box to register your card data and to do payments in one click. <b>Card data will be stored on the secured server of the payment gateway.</b>]]></card_register_message>
             </payzen_standard>
 
             <payzen_multi>
@@ -535,7 +529,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay by credit card in installments</title>
+                <title>Payment by credit card in installments</title>
                 <sort_order>2</sort_order>
                 <module_logo>multi.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -552,7 +546,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay by gift card</title>
+                <title>Payment by gift card</title>
                 <sort_order>3</sort_order>
                 <module_logo>gift.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -567,7 +561,7 @@
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
-                <title backend_model="payzen/field_translatable">Pay with Choozeo</title>
+                <title>Payment with Choozeo without fees</title>
                 <sort_order>4</sort_order>
                 <module_logo>choozeo.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -580,7 +574,7 @@
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
-                <title backend_model="payzen/field_translatable">Pay with FacilyPay Oney</title>
+                <title>Payment with FacilyPay Oney</title>
                 <sort_order>5</sort_order>
                 <module_logo>oney.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -597,7 +591,7 @@
                 <active>0</active>
                 <allowspecific>1</allowspecific>
                 <specificcountry>FR</specificcountry>
-                <title backend_model="payzen/field_translatable">Pay with Full CB</title>
+                <title>Payment with Full CB</title>
                 <sort_order>6</sort_order>
                 <module_logo>fullcb.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -611,7 +605,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay with SEPA</title>
+                <title>Payment with SEPA</title>
                 <sort_order>7</sort_order>
                 <module_logo>sdd.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -625,7 +619,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay with PayPal</title>
+                <title>Payment with PayPal</title>
                 <sort_order>8</sort_order>
                 <module_logo>paypal.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -639,7 +633,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay with SOFORT Banking</title>
+                <title>Payment with SOFORT Banking</title>
                 <sort_order>9</sort_order>
                 <module_logo>sofort_banking.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -651,7 +645,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay with PostFinance</title>
+                <title>Payment with PostFinance</title>
                 <sort_order>10</sort_order>
                 <module_logo>postfinance.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -665,7 +659,7 @@
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
-                <title backend_model="payzen/field_translatable">Pay with Giropay</title>
+                <title>Payment with Giropay</title>
                 <sort_order>11</sort_order>
                 <module_logo>giropay.png</module_logo>
                 <payment_action>authorize</payment_action>
@@ -680,7 +674,7 @@
                 <active>0</active>
                 <allowspecific>1</allowspecific>
                 <specificcountry>NL</specificcountry>
-                <title backend_model="payzen/field_translatable">Pay with iDEAL</title>
+                <title>Payment with iDEAL</title>
                 <sort_order>12</sort_order>
                 <module_logo>ideal.png</module_logo>
                 <payment_action>authorize</payment_action>

@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * PayZen V2-Payment Module version 1.9.2 for Magento 1.4-1.9. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
@@ -30,7 +22,7 @@
                     <show_in_store>1</show_in_store>
 
                     <fields>
-                        <!-- =============== module information (version, contact, ...) ================= -->
+                        <!-- =============== Module information (version, contact, ...). ================= -->
                         <module_information translate="label">
                             <label><![CDATA[MODULE INFORMATION]]></label>
                             <frontend_type>label</frontend_type>
@@ -43,7 +35,7 @@
 
                         <developed_by translate="label">
                             <label><![CDATA[Developed by]]></label>
-                            <comment><![CDATA[<a href="http://www.lyra-network.com" target="_blank">www.lyra-network.com</a>]]></comment>
+                            <comment><![CDATA[<a href="https://www.lyra.com" target="_blank">https://www.lyra.com</a>]]></comment>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_label</frontend_model>
                             <config_path>payment/payzen/developed_by</config_path>
@@ -53,27 +45,27 @@
                             <show_in_store>1</show_in_store>
                         </developed_by>
 
-                        <contact_email translate="label">
+                        <support_email translate="label">
                             <label><![CDATA[Contact us]]></label>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_label</frontend_model>
-                            <config_path>payment/payzen/contact_email</config_path>
+                            <config_path>payment/payzen/support_email</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </contact_email>
+                        </support_email>
 
-                        <module_version translate="label">
+                        <plugin_version translate="label">
                             <label><![CDATA[Module version]]></label>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_label</frontend_model>
-                            <config_path>payment/payzen/module_version</config_path>
+                            <config_path>payment/payzen/plugin_version</config_path>
                             <sort_order>13</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </module_version>
+                        </plugin_version>
 
                         <gateway_version translate="label">
                             <label><![CDATA[Gateway version]]></label>
@@ -110,7 +102,7 @@
                             <show_in_store>1</show_in_store>
                         </enable_logs>
 
-                        <!-- ================================== gateway access ================================== -->
+                        <!-- ================================== Gateway access. ================================== -->
                         <gateway_access translate="label">
                             <label><![CDATA[PAYMENT GATEWAY ACCESS]]></label>
                             <frontend_type>label</frontend_type>
@@ -125,6 +117,7 @@
                             <label><![CDATA[Store identifier]]></label>
                             <comment><![CDATA[The identifier provided by PayZen.]]></comment>
                             <frontend_type>text</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sensitive</frontend_model>
                             <config_path>payment/payzen/site_id</config_path>
                             <sort_order>21</sort_order>
                             <show_in_default>1</show_in_default>
@@ -133,8 +126,8 @@
                         </site_id>
 
                         <key_test translate="label,comment">
-                            <label><![CDATA[Certificate in test mode]]></label>
-                            <comment><![CDATA[Certificate provided by PayZen for test mode (available in PayZen Back Office).]]></comment>
+                            <label><![CDATA[Key in test mode]]></label>
+                            <comment><![CDATA[Key provided by PayZen for test mode (available in PayZen Back Office).]]></comment>
                             <frontend_type>text</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_keyTest</frontend_model>
                             <config_path>payment/payzen/key_test</config_path>
@@ -145,9 +138,10 @@
                         </key_test>
 
                         <key_prod translate="label,comment">
-                            <label><![CDATA[Certificate in production mode]]></label>
-                            <comment><![CDATA[Certificate provided by PayZen (available in PayZen Back Office after enabling production mode).]]></comment>
+                            <label><![CDATA[Key in production mode]]></label>
+                            <comment><![CDATA[Key provided by PayZen (available in PayZen Back Office after enabling production mode).]]></comment>
                             <frontend_type>text</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sensitive</frontend_model>
                             <config_path>payment/payzen/key_prod</config_path>
                             <sort_order>23</sort_order>
                             <show_in_default>1</show_in_default>
@@ -204,7 +198,7 @@
                             <show_in_store>1</show_in_store>
                         </platform_url>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -266,7 +260,7 @@
                         </validation_mode>
 
 
-                        <!-- ================================ payment page customize ================================== -->
+                        <!-- ================================ Payment page customize. ================================== -->
                         <payment_page_customize translate="label">
                             <label><![CDATA[PAYMENT PAGE CUSTOMIZE]]></label>
                             <frontend_type>label</frontend_type>
@@ -313,7 +307,7 @@
                         </shop_url>
 
 
-                        <!--  ================================== 3DS enabling ================================== -->
+                        <!--  ================================== 3DS enabling. ================================== -->
                         <selective_3ds translate="label">
                             <label><![CDATA[SELECTIVE 3DS]]></label>
                             <frontend_type>label</frontend_type>
@@ -336,7 +330,7 @@
                             <show_in_store>1</show_in_store>
                         </custgroup_threeds_min_amount>
 
-                        <!-- ================================== return options ================================== -->
+                        <!-- ================================== Return options. ================================== -->
                         <return_options translate="label">
                             <label><![CDATA[RETURN TO SHOP]]></label>
                             <frontend_type>label</frontend_type>
@@ -377,7 +371,6 @@
                             <label><![CDATA[Redirection message on success]]></label>
                             <comment><![CDATA[Message displayed on the payment page prior to redirection after a successful payment.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen/redirect_success_message</config_path>
                             <sort_order>63</sort_order>
                             <show_in_default>1</show_in_default>
@@ -406,7 +399,6 @@
                             <label><![CDATA[Redirection message on failure]]></label>
                             <comment><![CDATA[Message displayed on the payment page prior to redirection after a declined payment.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen/redirect_error_message</config_path>
                             <sort_order>65</sort_order>
                             <show_in_default>1</show_in_default>
@@ -456,7 +448,7 @@
                             </depends>
                         </capture_auto>
 
-                        <!-- ================ options used by risk assessment module and/or FacilyPay Oney payment ============== -->
+                        <!-- ================ Options used by risk assessment module and/or FacilyPay Oney payment. ============== -->
                         <additional_options translate="label,comment">
                             <label><![CDATA[ADDITIONAL OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -495,7 +487,7 @@
 
                         <ship_options translate="label,comment">
                             <label><![CDATA[Shipping options]]></label>
-                            <comment><![CDATA[Define the PayZen information about the used shipping methods.<br /><b>Name: </b>The name of the shipping method (use 127 alphanumeric characters, accentuated characters and these special characters: space, slash, hyphen, apostrophe).<br /><b>Type: </b>The carrier type.<br /><b>Rapidity: </b>Select the delivery rapidity.<br /><b>Delay: </b>Select the delivery delay if speed is &laquo; Priority &raquo;.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
+                            <comment><![CDATA[Define the PayZen information about the used shipping methods.<br /><b>Name: </b>The name of the shipping method (use 127 alphanumeric characters, accentuated characters and these special characters: space, slash, hyphen, apostrophe).<br /><b>Type: </b>The carrier type.<br /><b>Rapidity: </b>Select the delivery rapidity.<br /><b>Delay: </b>Select the delivery delay if rapidity is &laquo; Priority &raquo;.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
                             <frontend_model>payzen/adminhtml_system_config_field_shipOptions</frontend_model>
                             <backend_model>payzen/field_shipOptions</backend_model>
                             <config_path>payment/payzen/ship_options</config_path>
@@ -509,14 +501,14 @@
 
 
                 <payzen_standard translate="label">
-                    <label><![CDATA[PayZen - One-time payment]]></label>
+                    <label><![CDATA[PayZen - Standard payment]]></label>
                     <sort_order>101</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <standard_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -543,7 +535,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_standard/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -576,7 +567,7 @@
                             <show_in_store>1</show_in_store>
                         </standard_module_logo>
 
-                        <!-- ========================== amount restriction parameters =========================== -->
+                        <!-- ========================== Amount Restriction parameters. =========================== -->
                         <standard_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -589,6 +580,7 @@
 
                         <standard_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_standard/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -626,7 +618,7 @@
                             <show_in_store>1</show_in_store>
                         </standard_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <standard_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -677,7 +669,7 @@
 
                         <standard_use_oney_in_standard translate="label,comment">
                             <label><![CDATA[Propose FacilyPay Oney]]></label>
-                            <comment><![CDATA[Select &laquo; Yes &raquo; if you want to propose FacilyPay Oney in one-time payment. Attention, you must ensure that you have a FacilyPay Oney contract.]]></comment>
+                            <comment><![CDATA[Select &laquo; Yes &raquo; if you want to propose FacilyPay Oney in standard payment. Attention, you must ensure that you have a FacilyPay Oney contract.]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <backend_model>payzen/field_standard_useOney</backend_model>
@@ -689,7 +681,7 @@
                             <show_in_store>1</show_in_store>
                         </standard_use_oney_in_standard>
 
-                        <!-- ================================== payment options ================================== -->
+                        <!-- ================================= Payment options. ================================== -->
                         <standard_advanced_options translate="label">
                             <label><![CDATA[ADVANCED OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -729,7 +721,6 @@
                             <label><![CDATA[1-Click button text]]></label>
                             <comment><![CDATA[The text to display on the PayZen 1-Click payment button.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_standard/one_click_title</config_path>
                             <sort_order>43</sort_order>
                             <show_in_default>1</show_in_default>
@@ -775,7 +766,6 @@
                             <label><![CDATA[Card data registration message]]></label>
                             <comment><![CDATA[Message displayed on your website to invite buyers to register their card data.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_standard/card_register_message</config_path>
                             <sort_order>46</sort_order>
                             <show_in_default>1</show_in_default>
@@ -801,7 +791,7 @@
                     <show_in_store>1</show_in_store>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <multi_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -828,7 +818,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_multi/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -861,7 +850,7 @@
                             <show_in_store>1</show_in_store>
                         </multi_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <multi_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -874,6 +863,7 @@
 
                         <multi_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_multi/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -911,7 +901,7 @@
                             <show_in_store>1</show_in_store>
                         </multi_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <multi_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -960,7 +950,7 @@
                             <show_in_store>1</show_in_store>
                         </multi_payment_cards>
 
-                        <!-- ================================== payment options ================================== -->
+                        <!-- ================================== Payment options. ================================== -->
                         <multi_advanced_options translate="label">
                             <label><![CDATA[ADVANCED OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -983,7 +973,7 @@
                             <show_in_store>1</show_in_store>
                         </multi_card_info_mode>
 
-                        <!-- ================================== multi payment options ================================== -->
+                        <!-- ================================== Multi payment options. ================================== -->
                         <multi_custom_options translate="label">
                             <label><![CDATA[PAYMENT OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1019,7 +1009,7 @@
                     <show_in_store>1</show_in_store>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <gift_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1046,7 +1036,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_gift/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1079,7 +1068,7 @@
                             <show_in_store>1</show_in_store>
                         </gift_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <gift_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1092,6 +1081,7 @@
 
                         <gift_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_gift/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -1129,7 +1119,7 @@
                             <show_in_store>1</show_in_store>
                         </gift_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <gift_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -1163,7 +1153,7 @@
                             <show_in_store>1</show_in_store>
                         </gift_validation_mode>
 
-                        <!-- ================================== gift payment options ================================== -->
+                        <!-- ================================== Gift payment options. ================================== -->
                         <gift_custom_options translate="label">
                             <label><![CDATA[PAYMENT OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1214,7 +1204,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <choozeo_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1241,7 +1231,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_choozeo/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1274,7 +1263,7 @@
                             <show_in_store>1</show_in_store>
                         </choozeo_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <choozeo_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1287,6 +1276,7 @@
 
                         <choozeo_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_choozeo/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -1324,7 +1314,7 @@
                             <show_in_store>1</show_in_store>
                         </choozeo_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <choozeo_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -1346,7 +1336,7 @@
                             <show_in_store>1</show_in_store>
                         </choozeo_capture_delay>
 
-                        <!-- ================================== multi payment options ================================== -->
+                        <!-- ================================== Payment options. ================================== -->
                         <choozeo_custom_options translate="label">
                             <label><![CDATA[PAYMENT OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1383,7 +1373,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <oney_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1411,7 +1401,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_oney/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1444,7 +1433,7 @@
                             <show_in_store>1</show_in_store>
                         </oney_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <oney_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1457,6 +1446,7 @@
 
                         <oney_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_oney/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -1494,7 +1484,7 @@
                             <show_in_store>1</show_in_store>
                         </oney_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <oney_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -1528,7 +1518,7 @@
                             <show_in_store>1</show_in_store>
                         </oney_validation_mode>
 
-                        <!-- ================================== oney payment options ================================== -->
+                        <!-- ================================== Oney payment options. ================================== -->
                         <oney_custom_options translate="label">
                             <label><![CDATA[PAYMENT OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1580,7 +1570,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <fullcb_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1607,7 +1597,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_fullcb/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1640,7 +1629,7 @@
                             <show_in_store>1</show_in_store>
                         </fullcb_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <fullcb_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1675,7 +1664,7 @@
                             <show_in_store>1</show_in_store>
                         </fullcb_custgroup_amount_restrictions>
 
-                        <!-- ================================== oney payment options ================================== -->
+                        <!-- ================================== Payment options. ================================== -->
                         <fullcb_custom_options translate="label">
                             <label><![CDATA[PAYMENT OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1726,7 +1715,7 @@
                     <show_in_store>1</show_in_store>
                     <frontend_class>complex</frontend_class>
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <sepa_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1753,7 +1742,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_sepa/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1786,7 +1774,7 @@
                             <show_in_store>1</show_in_store>
                         </sepa_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <sepa_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1799,6 +1787,7 @@
 
                         <sepa_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_sepa/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -1836,7 +1825,7 @@
                             <show_in_store>1</show_in_store>
                         </sepa_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <sepa_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -1870,7 +1859,7 @@
                             <show_in_store>1</show_in_store>
                         </sepa_validation_mode>
 
-                        <!-- ================================== payment options ================================== -->
+                        <!-- ================================== Payment options. ================================== -->
                         <sepa_advanced_options translate="label">
                             <label><![CDATA[PAYMENT OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1907,7 +1896,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <paypal_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1934,7 +1923,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_paypal/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1967,7 +1955,7 @@
                             <show_in_store>1</show_in_store>
                         </paypal_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <paypal_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -1980,6 +1968,7 @@
 
                         <paypal_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_paypal/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -2017,7 +2006,7 @@
                             <show_in_store>1</show_in_store>
                         </paypal_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <paypal_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -2065,7 +2054,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <sofort_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -2092,7 +2081,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_sofort/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -2125,7 +2113,7 @@
                             <show_in_store>1</show_in_store>
                         </sofort_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <sofort_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -2138,6 +2126,7 @@
 
                         <sofort_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_sofort/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -2189,7 +2178,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <postfinance_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -2216,7 +2205,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_postfinance/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -2249,7 +2237,7 @@
                             <show_in_store>1</show_in_store>
                         </postfinance_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
                         <postfinance_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -2262,6 +2250,7 @@
 
                         <postfinance_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_postfinance/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -2299,7 +2288,7 @@
                             <show_in_store>1</show_in_store>
                         </postfinance_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <postfinance_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -2347,7 +2336,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <giropay_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -2374,7 +2363,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_giropay/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -2407,7 +2395,7 @@
                             <show_in_store>1</show_in_store>
                         </giropay_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount restriction parameters. ======================== -->
                         <giropay_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -2420,6 +2408,7 @@
 
                         <giropay_allowspecific translate="label">
                             <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                             <frontend_type>allowspecific</frontend_type>
                             <config_path>payment/payzen_giropay/allowspecific</config_path>
                             <sort_order>21</sort_order>
@@ -2457,7 +2446,7 @@
                             <show_in_store>1</show_in_store>
                         </giropay_custgroup_amount_restrictions>
 
-                        <!-- ================================== payment page ================================== -->
+                        <!-- ================================== Payment page. ================================== -->
                         <giropay_payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
@@ -2505,7 +2494,7 @@
                     <frontend_class>complex</frontend_class>
 
                     <fields>
-                        <!-- ================================== module settings ================================== -->
+                        <!-- ================================== Module settings. ================================== -->
                         <ideal_display_options translate="label">
                             <label><![CDATA[DISPLAY OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
@@ -2532,7 +2521,6 @@
                             <label><![CDATA[Method title]]></label>
                             <comment><![CDATA[Method title to display on payment means page.]]></comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>payzen/field_translatable</backend_model>
                             <config_path>payment/payzen_ideal/title</config_path>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
@@ -2565,7 +2553,7 @@
                             <show_in_store>1</show_in_store>
                         </ideal_module_logo>
 
-                        <!-- ============================ amount restriction parameters ======================== -->
+                        <!-- ============================ Amount restriction parameters. ======================== -->
                         <ideal_restrictions translate="label">
                             <label><![CDATA[RESTRICTIONS]]></label>
                             <frontend_type>label</frontend_type>
