@@ -29,7 +29,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
     protected $_payzenRequest = null;
 
     protected $_currencies = array();
-    protected $currentCurrency = null;
+    protected $currentCurrencyCode = null;
 
     public function __construct()
     {
@@ -684,13 +684,13 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
     public function canUseForCurrency($baseCurrencyCode)
     {
         // Check selected currency support.
-        if ($this->currentCurrency) {
+        if ($this->currentCurrencyCode) {
             // If submodule support specific currencies, check quote currency over them.
             if (is_array($this->_currencies) && ! empty($this->_currencies)) {
-                return in_array($this->currencyCode, $this->_currencies);
+                return in_array($this->currentCurrencyCode, $this->_currencies);
             }
 
-            $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByAlphaCode($this->currencyCode);
+            $currency = Lyra_Payzen_Model_Api_Api::findCurrencyByAlphaCode($this->currentCurrencyCode);
             if ($currency) {
                 return true;
             }
@@ -702,7 +702,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             return true;
         }
 
-        $this->_getHelper()->log("Could not find numeric codes for selected ($this->currencyCode) and base ($baseCurrencyCode) currencies.");
+        $this->_getHelper()->log("Could not find numeric codes for selected ($this->currentCurrencyCode) and base ($baseCurrencyCode) currencies.");
         return false;
     }
 
@@ -717,7 +717,7 @@ abstract class Lyra_Payzen_Model_Payment_Abstract extends Mage_Payment_Model_Met
             return false;
         }
 
-        $this->currentCurrency = $quote ? $quote->getQuoteCurrencyCode() : null;
+        $this->currentCurrencyCode = $quote ? $quote->getQuoteCurrencyCode() : null;
 
         $amount = $quote ? $quote->getBaseGrandTotal() : null;
         if (! $amount) {

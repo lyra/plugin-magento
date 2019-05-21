@@ -16,10 +16,10 @@ class Lyra_Payzen_Model_Payment_Multix extends Lyra_Payzen_Model_Payment_Multi
     /**
      * Check method for processing with base currency
      *
-     * @param  string $currencyCode
+     * @param  string $baseCurrencyCode
      * @return boolean
      */
-    public function canUseForCurrency($currencyCode)
+    public function canUseForCurrency($baseCurrencyCode)
     {
         // This is a fictive payment method, allways return false to avoid method proposal.
         return false;
