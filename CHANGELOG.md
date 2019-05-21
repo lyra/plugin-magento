@@ -1,3 +1,6 @@
+1.9.4, 2019-05-20:
+- Bug fix: regression relative to currency check management.
+
 1.9.3, 2019-05-13:
 - Bug fix: fatal error on order view occurring when there is a format error in payment form.
 - Bug fix: translations broken and performance decrease.
