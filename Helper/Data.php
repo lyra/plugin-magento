@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Helper;
 
@@ -30,11 +22,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const METHOD_CHOOZEO = 'payzen_choozeo';
 
+    const METHOD_SEPA = 'payzen_sepa';
+
     const METHOD_GIFT = 'payzen_gift';
 
     const METHOD_ONEY = 'payzen_oney';
 
     const METHOD_PAYPAL = 'payzen_paypal';
+
+    const METHOD_FULLCB = 'payzen_fullcb';
 
     const METHOD_SOFORT = 'payzen_sofort';
 
@@ -49,9 +45,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'prodfaq' => true,
         'restrictmulti' => false,
         'shatwo' => true,
+        'embedded' => true,
 
         'multi' => true,
-        'choozeo' => false
+        'gift' => true,
+        'choozeo' => false,
+        'fullcb' => true,
+        'sepa' => true,
+        'paypal' => true
     ];
 
     /**
@@ -156,7 +157,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Shortcut method to get general PayZen module configuration.
+     * Shortcut method to get general module configuration.
      *
      * @param string $field
      * @param int|string|null|\Magento\Store\Model\Store $storeId
@@ -324,7 +325,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         // $path is as payment_[lang]/payzen/payzen_[group]/payzen_[sub_group]
         $parts = explode('/', $path);
-        $parentPath = 'payment/' . $parts[1] . '/' . $parts[2]; // we need the second level group
+        $parentPath = 'payment/' . $parts[1] . '/' . $parts[2]; // We need the second level group.
 
         return __($this->configStructure->getElement($parentPath)->getLabel())->render();
     }
@@ -353,7 +354,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getMultiPaymentModelConfig()
     {
-        // retrieve DB connection
+        // Retrieve DB connection.
         $connection = $this->resourceConfig->getConnection();
 
         $select = $connection->select()
@@ -414,9 +415,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $currentMethod = $this->getCallerMethod();
+        $version = $this->getCommonConfigData('plugin_version');
 
         $log = '';
-        $log .= 'PayZen 2.3.2';
+        $log .= 'payzen ' . $version;
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

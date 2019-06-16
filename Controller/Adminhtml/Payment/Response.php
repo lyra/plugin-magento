@@ -1,35 +1,24 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Adminhtml\Payment;
 
 use Lyranetwork\Payzen\Helper\Payment;
+use Lyranetwork\Payzen\Model\ResponseException;
 
-class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payzen\Api\ResponseActionInterface
+class Response extends \Magento\Backend\App\Action
 {
+
     /**
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
-
-    /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
-     */
-    protected $quoteRepository;
 
     /**
      * @var \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor
@@ -38,26 +27,37 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
-     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Lyranetwork\Payzen\Helper\Data $dataHelper,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
     ) {
-        $this->dataHelper = $dataHelper;
-        $this->quoteRepository = $quoteRepository;
         $this->responseProcessor = $responseProcessor;
+        $this->dataHelper = $responseProcessor->getDataHelper();
 
         parent::__construct($context);
     }
 
     public function execute()
     {
-        return $this->responseProcessor->execute($this);
+        // Empty order model.
+        $order = null;
+
+        try {
+            $params = $this->getRequest()->getParams();
+            $data = $this->responseProcessor->prepareResponse($params);
+
+            $order = $data['order'];
+            $response = $data['response'];
+
+            $result = $this->responseProcessor->execute($order, $response);
+
+            return $this->redirectResponse($order, $result['case'], $result['warn']);
+        } catch (ResponseException $e) {
+            $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);
+            return $this->redirectError($order);
+        }
     }
 
     /**
@@ -65,13 +65,13 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
      *
      * @param \Magento\Sales\Model\Order $order
      */
-    public function redirectError($order)
+    private function redirectError($order = null)
     {
-        // clear all messages in session
+        // Clear all messages in session.
         $this->messageManager->getMessages(true);
         $this->messageManager->addError(__('An error has occurred during the payment process.'));
 
-        $this->dataHelper->log("Redirecting to order creation page for order #{$order->getId()}.");
+        $this->dataHelper->log('Redirecting to order creation page.' . ($order ? " Order #{$order->getId()}." : ''));
 
         /**
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
@@ -89,28 +89,28 @@ class Response extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
      * @param string $case
      * @param bool $checkUrlWarn
      */
-    public function redirectResponse($order, $case, $checkUrlWarn = false)
+    private function redirectResponse($order, $case, $checkUrlWarn = false)
     {
         /**
          * @var Magento\Backend\Model\Session\Quote $checkout
          */
         $checkout = $this->dataHelper->getCheckout();
 
-        // clear all messages in session
+        // Clear all messages in session.
         $this->messageManager->getMessages(true);
 
         $storeId = $order->getStore()->getId();
-        if ($this->dataHelper->getCommonConfigData('ctx_mode', $storeId) == 'TEST') {
+        if ($this->dataHelper->getCommonConfigData('ctx_mode', $storeId) === 'TEST') {
             $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
             if ($features['prodfaq']) {
-                // display going to production message
+                // Display going to production message.
                 $message = __('<u><p>GOING INTO PRODUCTION:</u></p> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
                 $this->messageManager->addNotice($message);
             }
 
             if ($checkUrlWarn) {
-                // order not validated by notification URL, in TEST mode, user is webmaster
-                // so display a warning about notification URL not working
+                // Order not validated by notification URL. In TEST mode, user is webmaster.
+                // So display a warning about notification URL not working.
 
                 if ($this->dataHelper->isMaintenanceMode()) {
                     $message = __('The shop is in maintenance mode.The automatic notification cannot work.');

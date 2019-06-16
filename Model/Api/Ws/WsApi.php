@@ -1,19 +1,12 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
- *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
+ * PayZen V2-Payment Module version 2.4.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * @category  Payment
  * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright 2014-2019 Lyra Network and contributors
+ * @license   
  */
 
 namespace Lyranetwork\Payzen\Model\Api\Ws;
@@ -22,39 +15,138 @@ class WsApi extends \SoapClient
 {
     const HEADER_NAMESPACE = 'http://v5.ws.vads.lyra.com/Header/';
     const DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
-    const TIMEOUT = 30; // in seconds
+    const TIMEOUT = 30; // In seconds.
 
     /**
      * @var array $classes The defined classes
      */
     private static $classes = array(
-        'refundPayment', 'commonRequest', 'paymentRequest', 'queryRequest', 'refundPaymentResponse',
-        'refundPaymentResult', 'commonResponse', 'paymentResponse', 'orderResponse', 'extInfo', 'cardResponse',
-        'authorizationResponse', 'captureResponse', 'customerResponse', 'billingDetailsResponse',
-        'shippingDetailsResponse', 'extraDetailsResponse', 'markResponse', 'threeDSResponse',
-        'authenticationRequestData', 'authenticationResultData', 'extraResponse', 'fraudManagementResponse',
-        'riskControl', 'riskAnalysis', 'riskAssessments', 'wsResponse', 'capturePayment', 'settlementRequest',
-        'capturePaymentResponse', 'capturePaymentResult', 'createTokenFromTransaction',
-        'createTokenFromTransactionResponse', 'createTokenFromTransactionResult', 'subscriptionResponse',
-        'shoppingCartResponse', 'cartItemInfo', 'reactivateToken', 'reactivateTokenResponse', 'reactivateTokenResult',
-        'duplicatePayment', 'orderRequest', 'duplicatePaymentResponse', 'duplicatePaymentResult',
-        'verifyThreeDSEnrollment', 'cardRequest', 'techRequest', 'threeDSRequest', 'mpiExtensionRequest',
-        'verifyThreeDSEnrollmentResponse', 'verifyThreeDSEnrollmentResult', 'validatePayment',
-        'validatePaymentResponse', 'validatePaymentResult', 'cancelPayment', 'cancelPaymentResponse',
-        'cancelPaymentResult', 'checkThreeDSAuthentication', 'checkThreeDSAuthenticationResponse',
-        'checkThreeDSAuthenticationResult', 'getPaymentUuid', 'legacyTransactionKeyRequest', 'getPaymentUuidResponse',
-        'legacyTransactionKeyResult', 'updatePayment', 'updatePaymentResponse', 'updatePaymentResult',
-        'updatePaymentDetails', 'shoppingCartRequest', 'updatePaymentDetailsResponse',
-        'updatePaymentDetailsResult', 'createPayment', 'customerRequest', 'billingDetailsRequest',
-        'shippingDetailsRequest', 'extraDetailsRequest', 'createPaymentResponse', 'createPaymentResult',
-        'createSubscription', 'subscriptionRequest', 'createSubscriptionResponse', 'createSubscriptionResult',
-        'getSubscriptionDetails', 'getSubscriptionDetailsResponse', 'getSubscriptionDetailsResult', 'tokenResponse',
-        'updateSubscription', 'updateSubscriptionResponse', 'updateSubscriptionResult', 'cancelToken',
-        'cancelTokenResponse', 'cancelTokenResult', 'createToken', 'createTokenResponse', 'createTokenResult',
-        'findPayments', 'findPaymentsResponse', 'findPaymentsResult', 'transactionItem', 'getPaymentDetails',
-        'getPaymentDetailsResponse', 'getPaymentDetailsResult', 'updateToken', 'updateTokenResponse',
-        'updateTokenResult', 'cancelSubscription', 'cancelSubscriptionResponse', 'cancelSubscriptionResult',
-        'getTokenDetails', 'getTokenDetailsResponse', 'getTokenDetailsResult'
+        'cancelCapturedPayment',
+        'commonRequest',
+        'queryRequest',
+        'cancelCapturedPaymentResponse',
+        'cancelCapturedPaymentResult',
+        'commonResponse',
+        'wsResponse',
+        'capturePayment',
+        'settlementRequest',
+        'capturePaymentResponse',
+        'capturePaymentResult',
+        'createTokenByIban',
+        'ibanRequest',
+        'customerRequest',
+        'billingDetailsRequest',
+        'shippingDetailsRequest',
+        'extraDetailsRequest',
+        'createTokenByIbanResponse',
+        'createTokenByIbanResult',
+        'paymentResponse',
+        'orderResponse',
+        'extInfo',
+        'cardResponse',
+        'authorizationResponse',
+        'captureResponse',
+        'customerResponse',
+        'billingDetailsResponse',
+        'shippingDetailsResponse',
+        'extraDetailsResponse',
+        'markResponse',
+        'threeDSResponse',
+        'authenticationRequestData',
+        'authenticationResultData',
+        'extraResponse',
+        'subscriptionResponse',
+        'fraudManagementResponse',
+        'riskControl',
+        'riskAnalysis',
+        'riskAssessments',
+        'shoppingCartResponse',
+        'cartItemInfo',
+        'reactivateToken',
+        'reactivateTokenResponse',
+        'reactivateTokenResult',
+        'duplicatePayment',
+        'paymentRequest',
+        'orderRequest',
+        'duplicatePaymentResponse',
+        'duplicatePaymentResult',
+        'cancelPayment',
+        'cancelPaymentResponse',
+        'cancelPaymentResult',
+        'cancelRefund',
+        'cancelRefundResponse',
+        'cancelRefundResult',
+        'checkThreeDSAuthentication',
+        'threeDSRequest',
+        'mpiExtensionRequest',
+        'checkThreeDSAuthenticationResponse',
+        'checkThreeDSAuthenticationResult',
+        'updatePayment',
+        'updatePaymentResponse',
+        'updatePaymentResult',
+        'updatePaymentDetails',
+        'shoppingCartRequest',
+        'updatePaymentDetailsResponse',
+        'updatePaymentDetailsResult',
+        'getPaymentDetails',
+        'extendedResponseRequest',
+        'getPaymentDetailsResponse',
+        'getPaymentDetailsResult',
+        'tokenResponse',
+        'updateToken',
+        'cardRequest',
+        'tokenRequest',
+        'updateTokenResponse',
+        'updateTokenResult',
+        'updateRefund',
+        'updateRefundResponse',
+        'updateRefundResult',
+        'cancelSubscription',
+        'cancelSubscriptionResponse',
+        'cancelSubscriptionResult',
+        'refundPayment',
+        'refundPaymentResponse',
+        'refundPaymentResult',
+        'createTokenFromTransaction',
+        'createTokenFromTransactionResponse',
+        'createTokenFromTransactionResult',
+        'verifyThreeDSEnrollment',
+        'techRequest',
+        'verifyThreeDSEnrollmentResponse',
+        'verifyThreeDSEnrollmentResult',
+        'validatePayment',
+        'validatePaymentResponse',
+        'validatePaymentResult',
+        'getPaymentUuid',
+        'legacyTransactionKeyRequest',
+        'getPaymentUuidResponse',
+        'legacyTransactionKeyResult',
+        'createPayment',
+        'createPaymentResponse',
+        'createPaymentResult',
+        'createSubscription',
+        'subscriptionRequest',
+        'createSubscriptionResponse',
+        'createSubscriptionResult',
+        'getSubscriptionDetails',
+        'getSubscriptionDetailsResponse',
+        'getSubscriptionDetailsResult',
+        'updateSubscription',
+        'updateSubscriptionResponse',
+        'updateSubscriptionResult',
+        'cancelToken',
+        'cancelTokenResponse',
+        'cancelTokenResult',
+        'createToken',
+        'createTokenResponse',
+        'createTokenResult',
+        'findPayments',
+        'findPaymentsResponse',
+        'findPaymentsResult',
+        'transactionItem',
+        'getTokenDetails',
+        'getTokenDetailsResponse',
+        'getTokenDetailsResult'
     );
 
     private $shopId;
@@ -62,10 +154,10 @@ class WsApi extends \SoapClient
     private $key;
 
     /**
-     * @param string $wsdl The WSDL file to use
-     * @param array $options An array of config values
+     * @param string $wsdl The WSDL file URI to use.
+     * @param array $options An array of config values.
      */
-    public function __construct(array $options = array(), $wsdl = 'https://secure.payzen.eu/vads-ws/v5?wsdl')
+    public function __construct($wsdl, array $options = array())
     {
         foreach (self::$classes as $class) {
             if (!isset($options['classmap'][$class])) {
@@ -114,8 +206,8 @@ class WsApi extends \SoapClient
     public function genUuid()
     {
         if ($data = $this->genRandomBytes()) {
-            $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 100
-            $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6 & 7 to 10
+            $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // Set version to 100.
+            $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // Set bits 6 & 7 to 10.
 
             return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
         } else {
@@ -136,16 +228,16 @@ class WsApi extends \SoapClient
     private function genRandomBytes()
     {
         if (function_exists('random_bytes')) {
-            // PHP 7 code
+            // PHP 7 code.
             try {
                 return random_bytes(16);
             } catch(\Exception $e) {
-                // try something else below
+                // Try something else below.
             }
         }
 
         if (function_exists('openssl_random_pseudo_bytes')) {
-            // PHP 5.3 code but needs OpenSSL library
+            // PHP 5.3 code but needs OpenSSL library.
             return openssl_random_pseudo_bytes(16);
         }
 
@@ -160,7 +252,7 @@ class WsApi extends \SoapClient
         $timestamp = gmdate(self::DATE_FORMAT);
         $authToken = $this->getAuthToken($requestId, $timestamp);
 
-        // create headers for shopId, requestId, timestamp, mode and authToken
+        // Create headers for shopId, requestId, timestamp, mode and authToken.
         $headers = array();
 
         $headers[] = new \SOAPHeader(self::HEADER_NAMESPACE, 'shopId', $this->shopId);
@@ -169,7 +261,7 @@ class WsApi extends \SoapClient
         $headers[] = new \SOAPHeader(self::HEADER_NAMESPACE, 'mode', $this->mode);
         $headers[] = new \SOAPHeader(self::HEADER_NAMESPACE, 'authToken', $authToken);
 
-        // set headers to soap client
+        // Set headers to soap client.
         $this->__setSoapHeaders($headers);
 
         return $requestId;
@@ -177,13 +269,13 @@ class WsApi extends \SoapClient
 
     public function getJsessionId()
     {
-        // retrieve header of the last response
+        // Retrieve header of the last response.
         $header = $this->__getLastResponseHeaders();
 
         $matches = array();
         if (!preg_match('#JSESSIONID=([A-Za-z0-9\._]+)#', $header, $matches)) {
-            // no session created by platform
-            throw new \SoapFault('PayzenSID', 'No session ID returned by platform.' . $header);
+            // No session created by gateway.
+            throw new \SoapFault('PayzenSID', 'No session ID returned by gateway.' . $header);
         }
 
         return $matches[1];
@@ -196,7 +288,7 @@ class WsApi extends \SoapClient
 
     public function checkAuthenticity()
     {
-        // retrieve SOAP header to check response authenticity
+        // Retrieve SOAP header to check response authenticity.
         $dom = new \DOMDocument();
         $dom->loadXML($this->__getLastResponse(), LIBXML_NOWARNING);
 
@@ -239,12 +331,12 @@ class WsApi extends \SoapClient
     }
 
     /**
-     * @param RefundPayment $parameters
-     * @return RefundPaymentResponse
+     * @param CancelCapturedPayment $parameters
+     * @return CancelCapturedPaymentResponse
      */
-    public function refundPayment(RefundPayment $parameters)
+    public function cancelCapturedPayment(CancelCapturedPayment $parameters)
     {
-        return $this->__soapCall('refundPayment', array($parameters));
+        return $this->__soapCall('cancelCapturedPayment', array($parameters));
     }
 
     /**
@@ -257,12 +349,12 @@ class WsApi extends \SoapClient
     }
 
     /**
-     * @param CreateTokenFromTransaction $parameters
-     * @return CreateTokenFromTransactionResponse
+     * @param CreateTokenByIban $parameters
+     * @return CreateTokenByIbanResponse
      */
-    public function createTokenFromTransaction(CreateTokenFromTransaction $parameters)
+    public function createTokenByIban(CreateTokenByIban $parameters)
     {
-        return $this->__soapCall('createTokenFromTransaction', array($parameters));
+        return $this->__soapCall('createTokenByIban', array($parameters));
     }
 
     /**
@@ -284,24 +376,6 @@ class WsApi extends \SoapClient
     }
 
     /**
-     * @param VerifyThreeDSEnrollment $parameters
-     * @return VerifyThreeDSEnrollmentResponse
-     */
-    public function verifyThreeDSEnrollment(VerifyThreeDSEnrollment $parameters)
-    {
-        return $this->__soapCall('verifyThreeDSEnrollment', array($parameters));
-    }
-
-    /**
-     * @param ValidatePayment $parameters
-     * @return ValidatePaymentResponse
-     */
-    public function validatePayment(ValidatePayment $parameters)
-    {
-        return $this->__soapCall('validatePayment', array($parameters));
-    }
-
-    /**
      * @param CancelPayment $parameters
      * @return CancelPaymentResponse
      */
@@ -311,21 +385,21 @@ class WsApi extends \SoapClient
     }
 
     /**
+     * @param CancelRefund $parameters
+     * @return CancelRefundResponse
+     */
+    public function cancelRefund(CancelRefund $parameters)
+    {
+        return $this->__soapCall('cancelRefund', array($parameters));
+    }
+
+    /**
      * @param CheckThreeDSAuthentication $parameters
      * @return CheckThreeDSAuthenticationResponse
      */
     public function checkThreeDSAuthentication(CheckThreeDSAuthentication $parameters)
     {
         return $this->__soapCall('checkThreeDSAuthentication', array($parameters));
-    }
-
-    /**
-     * @param GetPaymentUuid $parameters
-     * @return GetPaymentUuidResponse
-     */
-    public function getPaymentUuid(GetPaymentUuid $parameters)
-    {
-        return $this->__soapCall('getPaymentUuid', array($parameters));
     }
 
     /**
@@ -344,6 +418,87 @@ class WsApi extends \SoapClient
     public function updatePaymentDetails(UpdatePaymentDetails $parameters)
     {
         return $this->__soapCall('updatePaymentDetails', array($parameters));
+    }
+
+    /**
+     * @param GetPaymentDetails $parameters
+     * @return GetPaymentDetailsResponse
+     */
+    public function getPaymentDetails(GetPaymentDetails $parameters)
+    {
+        return $this->__soapCall('getPaymentDetails', array($parameters));
+    }
+
+    /**
+     * @param UpdateToken $parameters
+     * @return UpdateTokenResponse
+     */
+    public function updateToken(UpdateToken $parameters)
+    {
+        return $this->__soapCall('updateToken', array($parameters));
+    }
+
+    /**
+     * @param UpdateRefund $parameters
+     * @return UpdateRefundResponse
+     */
+    public function updateRefund(UpdateRefund $parameters)
+    {
+        return $this->__soapCall('updateRefund', array($parameters));
+    }
+
+    /**
+     * @param CancelSubscription $parameters
+     * @return CancelSubscriptionResponse
+     */
+    public function cancelSubscription(CancelSubscription $parameters)
+    {
+        return $this->__soapCall('cancelSubscription', array($parameters));
+    }
+
+    /**
+     * @param RefundPayment $parameters
+     * @return RefundPaymentResponse
+     */
+    public function refundPayment(RefundPayment $parameters)
+    {
+        return $this->__soapCall('refundPayment', array($parameters));
+    }
+
+    /**
+     * @param CreateTokenFromTransaction $parameters
+     * @return CreateTokenFromTransactionResponse
+     */
+    public function createTokenFromTransaction(CreateTokenFromTransaction $parameters)
+    {
+        return $this->__soapCall('createTokenFromTransaction', array($parameters));
+    }
+
+    /**
+     * @param VerifyThreeDSEnrollment $parameters
+     * @return VerifyThreeDSEnrollmentResponse
+     */
+    public function verifyThreeDSEnrollment(VerifyThreeDSEnrollment $parameters)
+    {
+        return $this->__soapCall('verifyThreeDSEnrollment', array($parameters));
+    }
+
+    /**
+     * @param ValidatePayment $parameters
+     * @return ValidatePaymentResponse
+     */
+    public function validatePayment(ValidatePayment $parameters)
+    {
+        return $this->__soapCall('validatePayment', array($parameters));
+    }
+
+    /**
+     * @param GetPaymentUuid $parameters
+     * @return GetPaymentUuidResponse
+     */
+    public function getPaymentUuid(GetPaymentUuid $parameters)
+    {
+        return $this->__soapCall('getPaymentUuid', array($parameters));
     }
 
     /**
@@ -407,33 +562,6 @@ class WsApi extends \SoapClient
     public function findPayments(FindPayments $parameters)
     {
         return $this->__soapCall('findPayments', array($parameters));
-    }
-
-    /**
-     * @param GetPaymentDetails $parameters
-     * @return GetPaymentDetailsResponse
-     */
-    public function getPaymentDetails(GetPaymentDetails $parameters)
-    {
-        return $this->__soapCall('getPaymentDetails', array($parameters));
-    }
-
-    /**
-     * @param UpdateToken $parameters
-     * @return UpdateTokenResponse
-     */
-    public function updateToken(UpdateToken $parameters)
-    {
-        return $this->__soapCall('updateToken', array($parameters));
-    }
-
-    /**
-     * @param CancelSubscription $parameters
-     * @return CancelSubscriptionResponse
-     */
-    public function cancelSubscription(CancelSubscription $parameters)
-    {
-        return $this->__soapCall('cancelSubscription', array($parameters));
     }
 
     /**

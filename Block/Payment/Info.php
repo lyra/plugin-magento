@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Payment;
 
@@ -66,10 +58,10 @@ class Info extends \Magento\Payment\Block\Info
         );
 
         if (! is_array($allResults) || empty($allResults)) {
-            // description is stored as litteral string
+            // Description is stored as litteral string.
             return $this->getInfo()->getCcStatusDescription();
         } else {
-            // description is stored as serialized array
+            // Description is stored as serialized array.
             $keys = [
                 'result',
                 'auth_result',
@@ -83,7 +75,7 @@ class Info extends \Magento\Payment\Block\Info
                     continue;
                 }
 
-                if ($key === 'result' && $allResults[$key] == '30') { // append form error if any
+                if ($key === 'result' && $allResults[$key] == '30') { // Append form error if any.
                     $label .= ' ' . PayzenResponse::extraMessage($allResults['extra_result']);
                 }
 
@@ -136,23 +128,40 @@ class Info extends \Magento\Payment\Block\Info
         return $html;
     }
 
-    public function getTransactionsDetailsHtml()
+    public function getMultiPaymentDetailsHtml($backend = true)
     {
         $collection = $this->trsCollectionFactory->create();
         $collection->addPaymentIdFilter($this->getInfo());
         $collection->load();
+
+        $userChoice = $this->getInfo()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE);
 
         $html = '';
 
         foreach ($collection as $item) {
             $html .= '<hr />';
 
-            $html .= '<b>' . __('Sequence Number') . ': </b>' . substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
+            $sequenceNumber = substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
+
+            $html .= '<b>' . __('Sequence Number') . ': </b>' . $sequenceNumber;
             $html .= '<br />';
 
             $info = $item->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
             foreach ($info as $key => $value) {
-                $html .= __($key) . ': ' . $value;
+                if (! $backend && in_array($key, ['Card Number', 'Expiration Date'])) {
+                    continue;
+                }
+
+                $html .= '<b>' . __($key) . ': </b>' . $value;
+
+                if ($backend && ($key === 'Means of payment') && isset($userChoice[$sequenceNumber])) {
+                    if ($userChoice[$sequenceNumber] === true) {
+                        $html .= ' ' . __('(card brand chosen by buyer)');
+                    } elseif ($userChoice[$sequenceNumber] === false) {
+                        $html .= ' ' . __('(default card brand used)');
+                    }
+                }
+
                 $html .= '<br />';
             }
         }

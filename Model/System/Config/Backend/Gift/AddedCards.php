@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend\Gift;
 
@@ -96,16 +88,15 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
      */
     public function beforeSave()
     {
-        $data = $this->getGroups($this->getGroupId()); // get data of gift config group
-        $cards = $data['fields'][$this->getField()]['value'];
+        $value  = $this->getValue();
 
-        if (! is_array($cards) || empty($cards)) {
+        if (! is_array($value) || empty($value)) {
             $this->setValue([]);
             return parent::beforeSave();
         }
 
         $i = 0;
-        foreach ($cards as $key => $card) {
+        foreach ($value as $key => $card) {
             $i ++;
 
             if (empty($card)) {
@@ -115,44 +106,44 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
             $this->checkCode($card['code'], $i);
             $this->checkName($card['name'], $i);
 
-            $uploadDir = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA)->getAbsolutePath('payzen/gc/');
+            $uploadDir = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA)->getAbsolutePath('payzen/images/cc/');
 
-            // load latest logo value
+            // Load latest logo value.
             if ($this->dataHelper->fileExists($uploadDir . strtolower($card['code']) . '.png')) {
-                $cards[$key]['logo'] = strtolower($card['code']) . '.png';
+                $value[$key]['logo'] = strtolower($card['code']) . '.png';
             }
 
-            // process file upload
-            $tmpName = $this->requestData->getTmpName($this->getPath());
-            $name = $this->requestData->getName($this->getPath());
-            if ($tmpName && isset($tmpName[$key]['logo'])) {
+            // Process file upload).
+            $name = $card['logo']['name'];
+            $tmpName = $card['logo']['tmp_name'];
+
+            if ($name && $tmpName) { // Is there any file uploaded for the current card.
                 $file = [];
-                $file['tmp_name'] = $tmpName[$key]['logo'];
-                $file['name'] = $name[$key]['logo'];
+                $file['tmp_name'] = $tmpName;
+                $file['name'] = $name;
 
-                if ($file['tmp_name'] && $file['name']) { // is there any file uploaded for the current card
-                    try {
-                        $uploader = $this->uploaderFactory->create($file);
-                        $uploader->setAllowedExtensions([
-                            'png'
-                        ]);
-                        $uploader->setAllowRenameFiles(false);
-                        $uploader->setAllowCreateFolders(true);
-                        $uploader->addValidateCallback('gift_card_logo', $this->adapterFactory->create(), 'validateUploadFile');
+                try {
+                    $uploader = $this->uploaderFactory->create(['fileId' => $file]);
+                    $uploader->setAllowedExtensions([
+                        'png'
+                    ]);
+                    $uploader->setAllowRenameFiles(false);
+                    $uploader->setAllowCreateFolders(true);
+                    $uploader->addValidateCallback('gift_card_logo', $this->adapterFactory->create(), 'validateUploadFile');
 
-                        $result = $uploader->save($uploadDir, strtolower($card['code']) . '.png');
+                    $result = $uploader->save($uploadDir, strtolower($card['code']) . '.png');
 
-                        if (key_exists('file', $result) && ! empty($result['file'])) {
-                            $cards[$key]['logo'] = $result['file'];
-                        }
-                    } catch (\Exception $e) {
-                        // upload errors
-                        $this->throwException('Card logo', $i, $e->getMessage());
+                    if (key_exists('file', $result) && ! empty($result['file'])) {
+                       $value[$key]['logo'] = $result['file'];
                     }
+                } catch (\Exception $e) {
+                    // Upload errors.
+                    $this->throwException('Card logo', $i, $e->getMessage());
                 }
             }
         }
-        $this->setValue($cards);
+
+        $this->setValue($value);
 
         return parent::beforeSave();
     }

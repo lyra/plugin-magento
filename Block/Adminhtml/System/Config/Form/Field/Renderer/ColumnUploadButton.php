@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Renderer;
 
@@ -24,24 +16,38 @@ class ColumnUploadButton extends \Magento\Framework\View\Element\AbstractBlock
 
     /**
      *
-     * @var \Magento\Framework\UrlInterface
+     * @var\Magento\Store\Model\StoreManagerInterface
      */
-    protected $url;
+    protected $storeManager;
 
     /**
      *
      * @param \Magento\Framework\View\Element\Context $context
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param array $data
      */
-    public function __construct(\Magento\Framework\View\Element\Context $context, array $data = [])
-    {
-        $this->url = $context->getUrlBuilder();
-
+    public function __construct(
+        \Magento\Framework\View\Element\Context $context,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        array $data = []
+    ) {
         parent::__construct($context, $data);
+
+        $this->storeManager = $storeManager;
     }
 
     protected function _toHtml()
     {
+        // Get a frontend store object to compute upload URL.
+        $store = $this->storeManager->getDefaultStoreView();
+
+        if (! $store) { // If no default store, retrieve any other.
+            foreach ($this->storeManager->getStores() as $aStore) {
+                $store = $aStore;
+                break;
+            }
+        }
+
         $column = $this->getColumn();
 
         $html = '<div' . ($column['style'] ? ' style="' . $column['style'] . '"' : '') . '>';
@@ -51,10 +57,11 @@ class ColumnUploadButton extends \Magento\Framework\View\Element\AbstractBlock
         if ($column['size']) {
             $html .= ' size="' . $column['size'] . '"';
         }
+
         $html .= '/>';
 
-        $src = $this->url->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'payzen/gift/<%- logo %>?' . time();
-        $html .= '<img style="margin-left: 10px; vertical-align: middle; height: 18px;" alt="<%- code %>" src="' . $src . '" title="<%- name %>}" >';
+        $src = $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'payzen/images/cc/<%- logo %>?' . time();
+        $html .= '<img style="margin-left: 10px; vertical-align: middle; height: 18px;" alt="<%- code %>" src="' . $src . '" title="<%- name %>" >';
 
         $html .= '</div>';
 

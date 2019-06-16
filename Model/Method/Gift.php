@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
@@ -21,18 +13,16 @@ class Gift extends Payzen
 {
 
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_GIFT;
-
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Gift::class;
 
     protected $_canRefund = false;
-
     protected $_canRefundInvoicePartial = false;
 
     protected function setExtraFields($order)
     {
         $info = $this->getInfoInstance();
 
-        // override payment_cards
+        // Override payment_cards.
         $this->payzenRequest->set('payment_cards', $info->getCcType());
     }
 
@@ -44,15 +34,12 @@ class Gift extends Payzen
      */
     public function assignData(\Magento\Framework\DataObject $data)
     {
-        // reset payment method specific data
-        $this->resetData();
-
         parent::assignData($data);
 
         $info = $this->getInfoInstance();
 
-        $payzenData = $this->extractPayzenData($data);
-        $info->setCcType($payzenData->getData('payzen_gift_gc_type'));
+        $payzenData = $this->extractPaymentData($data);
+        $info->setCcType($payzenData->getData('payzen_gift_cc_type'));
 
         return $this;
     }
@@ -77,9 +64,9 @@ class Gift extends Payzen
      *
      * @return array[string][string]
      */
-    public function getAvailableGcTypes()
+    public function getAvailableCcTypes()
     {
-        // get selected values from module configuration
+        // Get selected values from module configuration.
         $cards = $this->getConfigData('gift_cards');
         if (empty($cards)) {
             return [];
@@ -88,11 +75,12 @@ class Gift extends Payzen
         $cards = explode(',', $cards);
 
         $availCards = [];
-        foreach ($this->getSupportedGcTypes() as $code => $label) {
+        foreach ($this->getSupportedCcTypes() as $code => $label) {
             if (in_array($code, $cards)) {
                 $availCards[$code] = $label;
             }
         }
+
         return $availCards;
     }
 
@@ -101,11 +89,18 @@ class Gift extends Payzen
      *
      * @return array[string][string]
      */
-    public function getSupportedGcTypes()
+    public function getSupportedCcTypes()
     {
-        $options = $this->_getHelper()->getConfigArray('gift_cards'); // the default gift cards
+        // The default gift cards.
+        $options = [
+            'ILLICADO'      => 'Carte Illicado',
+            'ILLICADO_SB'   => 'Carte Illicado (Sandbox)',
+            'TRUFFAUT_CDX'  => 'Carte Cadeau Truffaut',
+            'ALINEA_CDX'    => 'Carte Cadeau Alinéa',
+            'ALINEA_CDX_SB' => 'Carte Cadeau Alinéa (Sandbox)'
+        ];
 
-        $addedCards = $this->dataHelper->unserialize($this->getConfigData('added_gift_cards')); // the user-added gift cards
+        $addedCards = $this->dataHelper->unserialize($this->getConfigData('added_gift_cards')); // The user-added gift cards.
         if (is_array($addedCards) && ! empty($addedCards)) {
             foreach ($addedCards as $value) {
                 if (empty($value)) {

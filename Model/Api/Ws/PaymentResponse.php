@@ -1,19 +1,12 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
- *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
+ * PayZen V2-Payment Module version 2.4.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * @category  Payment
  * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright 2014-2019 Lyra Network and contributors
+ * @license   
  */
 
 namespace Lyranetwork\Payzen\Model\Api\Ws;
@@ -91,9 +84,34 @@ class PaymentResponse
     private $paymentType = null;
 
     /**
+     * @var string $nsu
+     */
+    private $nsu = null;
+
+    /**
      * @var int $paymentError
      */
     private $paymentError = null;
+
+    /**
+     * @var string $wallet
+     */
+    private $wallet = null;
+
+    /**
+     * @var int $preTaxAmount
+     */
+    private $preTaxAmount = null;
+
+    /**
+     * @var string $taxRate
+     */
+    private $taxRate = null;
+
+    /**
+     * @var int $taxAmount
+     */
+    private $taxAmount = null;
 
     /**
      * @return string
@@ -194,7 +212,7 @@ class PaymentResponse
             return null;
         } else {
             try {
-                return \DateTime::createFromFormat(\DateTime::ATOM, $this->expectedCaptureDate);
+                return new \DateTime($this->expectedCaptureDate);
             } catch (\Exception $e) {
                 return false;
             }
@@ -260,7 +278,7 @@ class PaymentResponse
             return null;
         } else {
             try {
-                return \DateTime::createFromFormat(\DateTime::ATOM, $this->creationDate);
+                return new \DateTime($this->creationDate);
             } catch (\Exception $e) {
                 return false;
             }
@@ -372,6 +390,24 @@ class PaymentResponse
     }
 
     /**
+     * @return string
+     */
+    public function getNsu()
+    {
+        return $this->nsu;
+    }
+
+    /**
+     * @param string $nsu
+     * @return PaymentResponse
+     */
+    public function setNsu($nsu)
+    {
+        $this->nsu = $nsu;
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getPaymentError()
@@ -386,6 +422,78 @@ class PaymentResponse
     public function setPaymentError($paymentError)
     {
         $this->paymentError = $paymentError;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWallet()
+    {
+        return $this->wallet;
+    }
+
+    /**
+     * @param string $wallet
+     * @return PaymentResponse
+     */
+    public function setWallet($wallet)
+    {
+        $this->wallet = $wallet;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPreTaxAmount()
+    {
+        return $this->preTaxAmount;
+    }
+
+    /**
+     * @param int $preTaxAmount
+     * @return PaymentResponse
+     */
+    public function setPreTaxAmount($preTaxAmount)
+    {
+        $this->preTaxAmount = $preTaxAmount;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTaxRate()
+    {
+        return $this->taxRate;
+    }
+
+    /**
+     * @param string $taxRate
+     * @return PaymentResponse
+     */
+    public function setTaxRate($taxRate)
+    {
+        $this->taxRate = $taxRate;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTaxAmount()
+    {
+        return $this->taxAmount;
+    }
+
+    /**
+     * @param int $taxAmount
+     * @return PaymentResponse
+     */
+    public function setTaxAmount($taxAmount)
+    {
+        $this->taxAmount = $taxAmount;
         return $this;
     }
 }

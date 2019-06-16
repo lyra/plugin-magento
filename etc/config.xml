@@ -1,20 +1,12 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
@@ -22,8 +14,10 @@
     <default>
         <payzen>
             <general>
-                <module_version>2.3.2</module_version>
-                <platform_version>V2</platform_version>
+                <support_email>support@payzen.eu</support_email>
+                <plugin_version>2.4.0</plugin_version>
+                <gateway_version>V2</gateway_version>
+                <cms_identifier>Magento2.x</cms_identifier>
                 <enable_logs>1</enable_logs>
 
                 <site_id>12345678</site_id>
@@ -31,8 +25,12 @@
                 <key_prod>2222222222222222</key_prod>
                 <ctx_mode>TEST</ctx_mode>
                 <sign_algo>SHA-256</sign_algo>
-                <platform_url>https://secure.payzen.eu/vads-payment/</platform_url>
+                <gateway_url>https://secure.payzen.eu/vads-payment/</gateway_url>
+                <wsdl_url>https://secure.payzen.eu/vads-payment/</wsdl_url>
                 <notify_url>payzen/payment/check</notify_url>
+
+                <rest_url>https://api.payzen.eu/api-payment/</rest_url>
+                <static_url>https://api.payzen.eu/static/</static_url>
 
                 <language>fr</language>
                 <validation_mode></validation_mode>
@@ -47,44 +45,49 @@
                 <registered_order_status>processing</registered_order_status>
                 <capture_auto>1</capture_auto>
 
-                <oney_contract>0</oney_contract>
+                <send_cart_detail>1</send_cart_detail>
                 <common_category>FOOD_AND_GROCERY</common_category>
             </general>
         </payzen>
 
         <payment>
-            <payzen_standard>
+            <payzen_standard translate="title">
                 <model>Lyranetwork\Payzen\Model\Method\Standard</model>
                 <group>payzen</group>
+                <payment_action>authorize</payment_action>
 
                 <active>1</active>
-                <allowspecific>0</allowspecific>
-                <title>Paiement par carte bancaire</title>
+                <title>Payment by credit card</title>
                 <sort_order>1</sort_order>
                 <module_logo>standard-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
+
+                <allowspecific>0</allowspecific>
 
                 <validation_mode>-1</validation_mode>
                 <payment_cards></payment_cards>
 
                 <card_info_mode>1</card_info_mode>
                 <oneclick_active>0</oneclick_active>
-                <oneclick_title>Acheter maintenant</oneclick_title>
-                <oneclick_location>BOTH</oneclick_location>
-                <card_register_mode>1</card_register_mode>
-                <card_register_message><![CDATA[Cochez cette case pour enregistrer les données de votre carte et effectuer des paiements en un clic. <b>Les données de la carte seront enregistrées sur le serveur sécurisé de la plateforme de paiement.</b>]]></card_register_message>
+
+                <rest_private_key_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <rest_private_key_prod backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <rest_return_key_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <rest_return_key_prod backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <notify_url>payzen/payment_rest/check</notify_url>
+                <rest_theme>material</rest_theme>
             </payzen_standard>
 
             <payzen_multi>
                 <model>Lyranetwork\Payzen\Model\Method\Multi</model>
                 <group>payzen</group>
+                <payment_action>authorize</payment_action>
 
                 <active>0</active>
-                <allowspecific>0</allowspecific>
-                <title>Paiement par carte bancaire en plusieurs fois</title>
+                <title>Payment by credit card in installments</title>
                 <sort_order>2</sort_order>
                 <module_logo>multi-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
+
+                <allowspecific>0</allowspecific>
 
                 <validation_mode>-1</validation_mode>
                 <payment_cards></payment_cards>
@@ -92,93 +95,82 @@
                 <card_info_mode>1</card_info_mode>
             </payzen_multi>
 
-            <payzen_choozeo>
-                <model>Lyranetwork\Payzen\Model\Method\Choozeo</model>
-                <group>payzen</group>
-
-                <active>0</active>
-                <allowspecific>0</allowspecific>
-                <title>Paiement Choozeo</title>
-                <sort_order>3</sort_order>
-                <module_logo>choozeo-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
-            </payzen_choozeo>
-
-            <!--
             <payzen_gift>
                 <model>Lyranetwork\Payzen\Model\Method\Gift</model>
                 <group>payzen</group>
+                <payment_action>authorize</payment_action>
 
                 <active>0</active>
-                <allowspecific>0</allowspecific>
-                <title>Paiement par carte cadeau</title>
+                <title>Payment by gift card</title>
                 <sort_order>3</sort_order>
                 <module_logo>gift-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
+
+                <allowspecific>0</allowspecific>
 
                 <validation_mode>-1</validation_mode>
             </payzen_gift>
 
-            <payzen_oney>
-                <model>Lyranetwork\Payzen\Model\Method\Oney</model>
+            <payzen_choozeo>
+                <model>Lyranetwork\Payzen\Model\Method\Choozeo</model>
                 <group>payzen</group>
+                <payment_action>authorize</payment_action>
 
                 <active>0</active>
+                <title>Payment with Choozeo without fees</title>
+                <sort_order>4</sort_order>
+                <module_logo>choozeo-logo.png</module_logo>
+
+                <allowspecific>1</allowspecific>
+                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
+                <specificcountry_display>France</specificcountry_display>
+            </payzen_choozeo>
+
+            <payzen_fullcb>
+                <model>Lyranetwork\Payzen\Model\Method\Fullcb</model>
+                <group>payzen</group>
+                <payment_action>authorize</payment_action>
+
+                <active>0</active>
+                <title>Payment with Full CB</title>
+                <sort_order>5</sort_order>
+                <module_logo>fullcb-logo.png</module_logo>
+
                 <allowspecific>1</allowspecific>
                 <specificcountry>FR</specificcountry>
                 <specificcountry_display>France</specificcountry_display>
-                <title>FacilyPay Oney</title>
-                <sort_order>5</sort_order>
-                <module_logo>oney-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
-
-                <validation_mode>-1</validation_mode>
 
                 <enable_payment_options>0</enable_payment_options>
-            </payzen_oney>
+            </payzen_fullcb>
+
+            <payzen_sepa>
+                <model>Lyranetwork\Payzen\Model\Method\Sepa</model>
+                <group>payzen</group>
+                <payment_action>authorize</payment_action>
+
+                <active>0</active>
+                <title>Payment with SEPA</title>
+                <sort_order>6</sort_order>
+                <module_logo>sepa-logo.png</module_logo>
+
+                <allowspecific>0</allowspecific>
+
+                <mandate_mode>PAYMENT</mandate_mode>
+            </payzen_sepa>
 
             <payzen_paypal>
                 <model>Lyranetwork\Payzen\Model\Method\Paypal</model>
                 <group>payzen</group>
+                <payment_action>authorize</payment_action>
 
                 <active>0</active>
-                <allowspecific>0</allowspecific>
-                <title>Paiement PayPal</title>
-                <sort_order>6</sort_order>
+                <title>Payment with PayPal</title>
+                <sort_order>7</sort_order>
                 <module_logo>paypal-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
+
+                <allowspecific>0</allowspecific>
 
                 <validation_mode>-1</validation_mode>
             </payzen_paypal>
-
-            <payzen_sofort>
-                <model>Lyranetwork\Payzen\Model\Method\Sofort</model>
-                <group>payzen</group>
-
-                <active>0</active>
-                <allowspecific>0</allowspecific>
-                <title>Paiement Sofort Banking</title>
-                <sort_order>6</sort_order>
-                <module_logo>sofort-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
-
-                <validation_mode>-1</validation_mode>
-            </payzen_sofort>
-
-            <payzen_postfinance>
-                <model>Lyranetwork\Payzen\Model\Method\Postfinance</model>
-                <group>payzen</group>
-
-                <active>0</active>
-                <allowspecific>0</allowspecific>
-                <title>Paiement PostFinance</title>
-                <sort_order>7</sort_order>
-                <module_logo>postfinance-logo.png</module_logo>
-                <payment_action>authorize</payment_action>
-
-                <validation_mode>-1</validation_mode>
-            </payzen_postfinance>
-            -->
         </payment>
     </default>
 </config>

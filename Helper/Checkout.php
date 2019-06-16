@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Helper;
 
@@ -103,7 +95,7 @@ class Checkout
 
     public function checkCustormers($scope, $scopeId)
     {
-        // check customer IDs
+        // Check customer IDs.
         $collection = $this->customerCollectionFactory->create();
 
         if ($scope == 'websites') {
@@ -115,7 +107,7 @@ class Checkout
 
         foreach ($collection as $customer) {
             if (! preg_match(self::CUST_ID_REGEX, $customer->getId())) {
-                // a customer id doesn't match PayZen rules
+                // A customer ID doesn't match gateway rules.
 
                 $msg = '';
                 $msg .= __(
@@ -131,16 +123,16 @@ class Checkout
 
     public function checkOrders($scope, $scopeId)
     {
-        // check order IDs
+        // Check order IDs.
         if ($scope == 'stores') {
-            // store context
+            // Store context.
             $incrementId = $this->eavConfig->getEntityType(\Magento\Sales\Model\Order::ENTITY)->fetchNewIncrementId(
                 $scopeId
             );
 
             $this->checkOrderId($incrementId);
         } else {
-            // general and website context
+            // General and website context.
             $stores = $this->storeManager->getStores();
 
             foreach ($stores as $store) {
@@ -159,7 +151,7 @@ class Checkout
     private function checkOrderId($orderId)
     {
         if (! preg_match(self::ORDER_ID_REGEX, $orderId)) {
-            // the potential next order id doesn't match PayZen rules
+            // The potential next order id doesn't match gateway rules.
 
             $msg = '';
             $msg .= __(
@@ -174,7 +166,7 @@ class Checkout
 
     public function checkProducts($scope, $scopeId)
     {
-        // check products' IDs and labels
+        // Check products' IDs and labels.
         $collection = $this->productCollectionFactory->create();
         $collection->addAttributeToSelect('name');
 
@@ -187,7 +179,7 @@ class Checkout
 
         foreach ($collection as $product) {
             if (! preg_match(self::PRODUCT_REF_REGEX, $product->getId())) {
-                // product id doesn't match PayZen rules
+                // Product id doesn't match gateway rules.
 
                 $msg = '';
                 $msg .= __(
@@ -225,7 +217,7 @@ class Checkout
 
     public function toPayzenCategory($categoryIds)
     {
-        // commmon category if any
+        // Commmon category if any.
         $commonCategory = $this->dataHelper->getCommonConfigData('common_category');
         if ($commonCategory != 'CUSTOM_MAPPING') {
             return $commonCategory;
@@ -248,20 +240,20 @@ class Checkout
     {
         $notAllowed = '#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ ]#ui';
 
-        // used currency
+        // Used currency.
         $currency = PayzenApi::findCurrencyByNumCode($payzenRequest->get('currency'));
 
         $subtotal = 0;
 
-        // load all products in the shopping cart
+        // Load all products in the shopping cart.
         foreach ($order->getAllItems() as $item) {
-            // check to avoid sending the whole hierarchy of a configurable product
+            // Check to avoid sending the whole hierarchy of a configurable product.
             if (! $item->getParentItem()) {
                 $product = $item->getProduct();
 
                 $label = $item->getName();
 
-                // concat product label with one or two of its category names to make it clearer
+                // Concat product label with one or two of its category names to make it clearer.
                 $categoryIds = $product->getCategoryIds();
                 if (is_array($categoryIds) && ! empty($categoryIds)) {
                     if (isset($categoryIds[1]) && $categoryIds[1]) {
@@ -290,32 +282,32 @@ class Checkout
             }
         }
 
-        $payzenRequest->set('insurance_amount', 0); // by default, shipping insurance amount is not available in Magento
+        $payzenRequest->set('insurance_amount', 0); // By default, shipping insurance amount is not available in Magento.
         $payzenRequest->set('shipping_amount', $currency->convertAmountToInteger($order->getShippingAmount()));
 
-        // recalculate tax_amount to avoid rounding problems
+        // Recalculate tax_amount to avoid rounding problems.
         $taxAmount = $payzenRequest->get('amount') - $subtotal - $payzenRequest->get('shipping_amount') -
              $payzenRequest->get('insurance_amount');
-        if ($taxAmount <= 0) { // when order is discounted
+        if ($taxAmount <= 0) { // When order is discounted.
             $taxAmount = $currency->convertAmountToInteger($order->getTaxAmount());
         }
 
         $payzenRequest->set('tax_amount', $taxAmount);
 
-        // VAT amount for colombian payment means
+        // VAT amount for colombian payment means.
         $payzenRequest->set('totalamount_vat', $taxAmount);
     }
 
     public function setOneyData($order, &$payzenRequest)
     {
-        // by default, clients are private
+        // By default, clients are private.
         $payzenRequest->set('cust_status', 'PRIVATE');
         $payzenRequest->set('ship_to_status', 'PRIVATE');
 
         $notAllowedCharsRegex = "#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]#ui";
 
         if ($order->getIsVirtual() || ! $order->getShippingMethod()) {
-            // there is no shipping mean set store name after illegal characters replacement
+            // There is no shipping mean set store name after illegal characters replacement.
 
             $storeId = $this->dataHelper->getCheckoutStoreId();
             $payzenRequest->set(
@@ -332,9 +324,9 @@ class Checkout
                 case 'RECLAIM_IN_SHOP':
                 case 'RELAY_POINT':
                 case 'RECLAIM_IN_STATION':
-                    // it's recommended to put a specific logic here
+                    // It's recommended to put a specific logic here.
 
-                    $address = ''; // initialize with selected SHOP/RELAY POINT/STATION name
+                    $address = ''; // Initialize with selected SHOP/RELAY POINT/STATION name.
                     $address .= $order->getShippingAddress()->getStreet(1);
                     $address .= $order->getShippingAddress()->getStreet(2) ? ' ' .
                          $order->getShippingAddress()->getStreet(2) : '';
@@ -343,15 +335,15 @@ class Checkout
                     $payzenRequest->set('ship_to_zip', $order->getShippingAddress()->getPostcode());
                     $payzenRequest->set('ship_to_city', $order->getShippingAddress()->getCity());
                     $payzenRequest->set('ship_to_country', 'FR');
-                    $payzenRequest->set('ship_to_street2', null); // not sent to FacilyPay Oney
+                    $payzenRequest->set('ship_to_street2', null); // Not sent to FacilyPay Oney.
                     $payzenRequest->set('ship_to_state', null);
                     $payzenRequest->set('ship_to_phone_num', null);
 
-                    // add postcode and city to send them in ship_to_delivery_company_name
+                    // Add postcode and city to send them in ship_to_delivery_company_name.
                     $address .= ' ' . $order->getShippingAddress()->getPostcode();
                     $address .= ' ' . $order->getShippingAddress()->getCity();
 
-                    // delete not allowed chars
+                    // Delete not allowed chars.
                     $address = preg_replace($notAllowedCharsRegex, ' ', $address);
                     $method = $shippingMethod['oney_label'] . ' ' . $address;
                     $payzenRequest->set('ship_to_delivery_company_name', $method);
@@ -363,7 +355,7 @@ class Checkout
                          $order->getShippingAddress()->getStreet(2) : '';
 
                     $payzenRequest->set('ship_to_street', $address);
-                    $payzenRequest->set('ship_to_street2', null); // not sent to FacilyPay Oney
+                    $payzenRequest->set('ship_to_street2', null); // Not sent to FacilyPay Oney.
 
                     $payzenRequest->set('ship_to_delivery_company_name', $shippingMethod['oney_label']);
                     break;
@@ -380,7 +372,7 @@ class Checkout
             return;
         }
 
-        // oney validation regular expressions
+        // Oney validation regular expressions.
         $nameRegex = "#^[A-ZÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,63}$#ui";
         $phoneRegex = "#^[0-9]{10}$#";
         $cityRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,127}$#ui";
@@ -388,7 +380,7 @@ class Checkout
         $countryRegex = "#^FR$#i";
         $zipRegex = "#^[0-9]{5}$#";
 
-        // address type
+        // Address type.
         $addressType = ($address->getAddressType() === 'billing') ? 'billing address' : 'delivery address';
 
         $this->checkFieldValidity($address->getLastname(), $nameRegex, 'Last Name', $addressType);
@@ -403,7 +395,7 @@ class Checkout
 
     private function checkFieldValidity($field, $regex, $fieldName, $addressType, $mandatory = true)
     {
-        // error messages
+        // Error messages.
         $invalidMsg = 'The field %1 of your %2 is invalid.';
         $emptyMsg = 'The field %1 of your %2 is mandatory.';
 
@@ -418,7 +410,7 @@ class Checkout
 
     private function throwException($msg, $field, $addressType)
     {
-        // translate
+        // Translate.
         $field = __($field);
         $addressType = __($addressType);
 

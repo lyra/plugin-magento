@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized;
 
@@ -56,12 +48,12 @@ class ConfigArraySerialized extends \Magento\Config\Model\Config\Backend\Seriali
     {
         $config = $this->getFieldConfig();
 
-        // translate field and column names
+        // Translate field and column names.
         $field = __($config['label'])->render();
         $column = __($column)->render();
         $group = $this->dataHelper->getGroupTitle($config['path']);
 
-        // main message
+        // Main message.
         $msg = __(
             'The field &laquo; %1 &raquo; is invalid: please check column &laquo; %2 &raquo; of the option %3 in section &laquo; %4 &raquo;.',
             $field,
@@ -74,7 +66,7 @@ class ConfigArraySerialized extends \Magento\Config\Model\Config\Backend\Seriali
             $msg .= "\n" . __($extraMsg)->render();
         }
 
-        // throw exception
+        // Throw exception.
         throw new \Magento\Framework\Exception\LocalizedException(__($msg));
     }
 }

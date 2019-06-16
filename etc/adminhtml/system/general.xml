@@ -1,20 +1,12 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
@@ -36,23 +28,22 @@
                 <config_path>payzen/general/developed_by</config_path>
             </field>
 
-            <field id="contact_email" translate="label" type="label" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="support_email" translate="label" type="label" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Contact us]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <comment><![CDATA[<a href="mailto:support@payzen.eu">support@payzen.eu</a>]]></comment>
-                <config_path>payzen/general/contact_email</config_path>
+                <config_path>payzen/general/support_email</config_path>
             </field>
 
-            <field id="module_version" translate="label" type="label" sortOrder="113" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="plugin_version" translate="label" type="label" sortOrder="113" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Module version]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <config_path>payzen/general/module_version</config_path>
+                <config_path>payzen/general/plugin_version</config_path>
             </field>
 
-            <field id="platform_version" translate="label" type="label" sortOrder="114" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="gateway_version" translate="label" type="label" sortOrder="114" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Gateway version]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <config_path>payzen/general/platform_version</config_path>
+                <config_path>payzen/general/gateway_version</config_path>
             </field>
 
             <field id="reset_module" translate="label button_label comment" sortOrder="115" showInDefault="1" showInWebsite="0" showInStore="0">
@@ -79,19 +70,21 @@
             <field id="site_id" translate="label comment" type="text" sortOrder="121" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Store identifier]]></label>
                 <comment><![CDATA[The identifier provided by PayZen.]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
                 <config_path>payzen/general/site_id</config_path>
             </field>
 
             <field id="key_test" translate="label comment" type="text" sortOrder="122" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Certificate in test mode]]></label>
-                <comment><![CDATA[Certificate provided by PayZen for test mode (available in PayZen Back Office).]]></comment>
+                <label><![CDATA[Key in test mode]]></label>
+                <comment><![CDATA[Key provided by PayZen for test mode (available in PayZen Back Office).]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\KeyTest</frontend_model>
                 <config_path>payzen/general/key_test</config_path>
             </field>
 
             <field id="key_prod" translate="label comment" type="text" sortOrder="123" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Certificate in production mode]]></label>
-                <comment><![CDATA[Certificate provided by PayZen (available in PayZen Back Office after enabling production mode).]]></comment>
+                <label><![CDATA[Key in production mode]]></label>
+                <comment><![CDATA[Key provided by PayZen (available in PayZen Back Office after enabling production mode).]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
                 <config_path>payzen/general/key_prod</config_path>
             </field>
 
@@ -118,10 +111,10 @@
                 <config_path>payzen/general/notify_url</config_path>
             </field>
 
-            <field id="platform_url" translate="label comment" type="text" sortOrder="127" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="gateway_url" translate="label comment" type="text" sortOrder="127" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Payment page URL]]></label>
                 <comment><![CDATA[Link to the payment page.]]></comment>
-                <config_path>payzen/general/platform_url</config_path>
+                <config_path>payzen/general/gateway_url</config_path>
             </field>
         </group>
 
@@ -271,19 +264,26 @@
             </field>
         </group>
 
-        <group id="payzen_additional_options" translate="label comment" type="text" sortOrder="17" showInDefault="1" showInWebsite="0" showInStore="1">
+        <group id="payzen_additional_options" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="0" showInStore="1">
             <label><![CDATA[ADDITIONAL OPTIONS]]></label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="common_category" translate="label comment" type="select" sortOrder="171" showInDefault="1" showInWebsite="0" showInStore="1">
+            <field id="send_cart_detail" translate="label comment" type="select" sortOrder="171" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Send shopping cart details]]></label>
+                <comment><![CDATA[If you disable this option, the shopping cart details will not be sent to the gateway. Attention, in some cases, this option has to be enabled. For more information, refer to the module documentation.]]></comment>
+                <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                <config_path>payzen/general/send_cart_detail</config_path>
+            </field>
+
+            <field id="common_category" translate="label comment" type="select" sortOrder="172" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label><![CDATA[Category mapping]]></label>
                 <comment><![CDATA[Use the same category for all products.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\Category</source_model>
                 <config_path>payzen/general/common_category</config_path>
             </field>
 
-            <field id="category_mapping" translate="label comment" sortOrder="172" showInDefault="1" showInWebsite="0" showInStore="1">
+            <field id="category_mapping" translate="label comment" sortOrder="173" showInDefault="1" showInWebsite="0" showInStore="1">
                 <comment><![CDATA[Match each product category with a PayZen category.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CategoryMapping</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CategoryMapping</backend_model>
@@ -293,7 +293,7 @@
                 </depends>
             </field>
 
-            <!-- <field id="ship_options" translate="label comment" sortOrder="173" showInDefault="1" showInWebsite="0" showInStore="1">
+             <!--  field id="ship_options" translate="label comment" sortOrder="173" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label><![CDATA[FacilyPay Oney shipping options]]></label>
                 <comment><![CDATA[Define the FacilyPay Oney information about all shipping methods.<br /><b>FacilyPay Oney label: </b>The label of the shipping method (use 55 alphanumeric characters, accentuated characters and these special characters: space, slash, hyphen, apostrophe).<br /><b>Type: </b>The delivery type of shipping method.<br /><b>Speed: </b>Select whether the delivery is STANDARD or EXPRESS.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ShipOptions</frontend_model>
@@ -302,7 +302,7 @@
                 <depends>
                     <field id="oney_contract">1</field>
                 </depends>
-            </field> -->
+            </field -->
         </group>
     </group>
 </include>

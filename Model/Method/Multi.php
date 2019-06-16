@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
@@ -21,11 +13,9 @@ class Multi extends Payzen
 {
 
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_MULTI;
-
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Multi::class;
 
     protected $_canRefund = false;
-
     protected $_canRefundInvoicePartial = false;
 
     /**
@@ -45,6 +35,11 @@ class Multi extends Payzen
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param \Lyranetwork\Payzen\Model\Api\PayzenRequest $payzenRequest
+     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
+     * @param \Magento\Sales\Model\Order\Payment\Transaction $transaction
+     * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param  \Magento\Framework\App\Response\Http $redirect
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
@@ -52,6 +47,7 @@ class Multi extends Payzen
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
+     * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Lyranetwork\Payzen\Model\System\Config\Source\MultiPaymentCard $multiCardPayment
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
@@ -67,6 +63,11 @@ class Multi extends Payzen
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         \Lyranetwork\Payzen\Model\Api\PayzenRequestFactory $payzenRequestFactory,
+        \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory,
+        \Magento\Sales\Model\Order\Payment\Transaction $transaction,
+        \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource,
+        \Magento\Framework\UrlInterface $urlBuilder,
+        \Magento\Framework\App\Response\Http $redirect,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
@@ -74,6 +75,7 @@ class Multi extends Payzen
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
+        \Magento\Backend\Model\Auth\Session $authSession,
         \Lyranetwork\Payzen\Model\System\Config\Source\MultiPaymentCard $multiCardPayment,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -91,6 +93,11 @@ class Multi extends Payzen
             $logger,
             $localeResolver,
             $payzenRequestFactory,
+            $payzenResponseFactory,
+            $transaction,
+            $transactionResource,
+            $urlBuilder,
+            $redirect,
             $dataHelper,
             $paymentHelper,
             $checkoutHelper,
@@ -98,6 +105,7 @@ class Multi extends Payzen
             $messageManager,
             $dirReader,
             $dataObjectFactory,
+            $authSession,
             $resource,
             $resourceCollection,
             $data
@@ -106,7 +114,7 @@ class Multi extends Payzen
 
     protected function setExtraFields($order)
     {
-        // set payment_src to MOTO for backend payments
+        // Set payment_src to MOTO for backend payments.
         if ($this->dataHelper->isBackend()) {
             $this->payzenRequest->set('payment_src', 'MOTO');
         }
@@ -116,14 +124,14 @@ class Multi extends Payzen
         if ($this->isLocalCcType() && $info->getCcType()) {
             $this->payzenRequest->set('payment_cards', $info->getCcType());
         } else {
-            // payment_cards is given as csv by magento
+            // Payment_cards is given as csv by magento.
             $paymentCards = explode(',', $this->getConfigData('payment_cards'));
             $paymentCards = in_array('', $paymentCards) ? '' : implode(';', $paymentCards);
 
             $this->payzenRequest->set('payment_cards', $paymentCards);
         }
 
-        // set mutiple payment option
+        // Set mutiple payment option.
         $option = @unserialize($info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION));
 
         $amount = $this->payzenRequest->get('amount');
@@ -142,16 +150,13 @@ class Multi extends Payzen
      */
     public function assignData(\Magento\Framework\DataObject $data)
     {
-        // reset payment method specific data
-        $this->resetData();
-
         parent::assignData($data);
 
         $info = $this->getInfoInstance();
 
-        $payzenData = $this->extractPayzenData($data);
+        $payzenData = $this->extractPaymentData($data);
 
-        // load option informations
+        // Load option informations.
         $option = $this->getOption($payzenData->getData('payzen_multi_option'));
 
         $info->setCcType($payzenData->getData('payzen_multi_cc_type'))
@@ -201,7 +206,7 @@ class Multi extends Payzen
 
                 if ((! $amount || ! $value['minimum'] || $amount > $value['minimum']) &&
                      (! $amount || ! $value['maximum'] || $amount < $value['maximum'])) {
-                    // option will be available
+                    // Option will be available.
                     $options[$code] = $value;
                 }
             }
@@ -235,10 +240,14 @@ class Multi extends Payzen
      */
     public function getAvailableCcTypes()
     {
-        // all cards
+        if (! $this->isLocalCcType()) {
+            return null;
+        }
+
+        // All cards.
         $allCards = $this->multiCardPayment->toOptionArray();
 
-        // selected cards from module configuration
+        // Selected cards from module configuration.
         $cards = $this->getConfigData('payment_cards');
         $cards = ! empty($cards) ? explode(',', $cards) : [];
 
@@ -267,6 +276,16 @@ class Multi extends Payzen
             return false;
         }
 
-        return $this->getConfigData('card_info_mode') == 2;
+        return $this->getEntryMode() == 2;
+    }
+
+    /**
+     * Return card selection mode.
+     *
+     * @return int
+     */
+    public function getEntryMode()
+    {
+        return $this->getConfigData('card_info_mode');
     }
 }

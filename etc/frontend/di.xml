@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
@@ -24,23 +16,25 @@
             <argument name="methodCodes" xsi:type="array">
                 <item name="payzen_standard" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD</item>
                 <item name="payzen_multi" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_MULTI</item>
+                <item name="payzen_gift" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_GIFT</item>
                 <item name="payzen_choozeo" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_CHOOZEO</item>
+                <item name="payzen_fullcb" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_FULLCB</item>
+                <item name="payzen_sepa" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_SEPA</item>
+                <item name="payzen_paypal" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_PAYPAL</item>
             </argument>
         </arguments>
     </type>
 
-    <virtualType name="PayzenStandardConfigProvider" type="Lyranetwork\Payzen\Model\PayzenConfigProvider">
-        <arguments>
-            <argument name="methodCode" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD</argument>
-        </arguments>
-    </virtualType>
-
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="payzen_standard_config_provider" xsi:type="object">PayzenStandardConfigProvider</item>
+                <item name="payzen_standard_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\StandardConfigProvider</item>
                 <item name="payzen_multi_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\MultiConfigProvider</item>
+                <item name="payzen_gift_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\GiftConfigProvider</item>
                 <item name="payzen_choozeo_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\ChoozeoConfigProvider</item>
+                <item name="payzen_fullcb_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\FullcbConfigProvider</item>
+                <item name="payzen_sepa_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\SepaConfigProvider</item>
+                <item name="payzen_paypal_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\PaypalConfigProvider</item>
             </argument>
         </arguments>
     </type>

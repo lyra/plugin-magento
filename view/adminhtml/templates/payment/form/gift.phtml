@@ -1,0 +1,55 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+?>
+
+<fieldset class="admin__fieldset payment-method"
+          id="payment_form_<?php echo $block->escapeHtml($block->getMethodCode()); ?>"
+          style="display: none;">
+    <?php
+    $cards = $block->getAvailableCcTypes();
+
+    $oneCard = count($cards) === 1;
+    $first = true;
+
+    foreach ($cards as $code => $label) {
+    ?>
+        <div class="admin__field" style="margin-bottom: 1rem !important; margin-top: 1rem !important; display: inline-block;">
+            <div class="admin__field-control">
+
+            <?php if ($oneCard) { ?>
+                <input type="hidden"
+                       id="payzen_gift_cc_type_<?php echo $block->escapeHtml($code); ?>"
+                       value="<?php echo $block->escapeHtml($code); ?>"
+                       name="payment[payzen_gift_cc_type]"
+                       disabled="disabled" />
+            <?php } else { ?>
+                <input class="radio validate-one-required-by-name"
+                       type="radio"
+                       <?php if ($first) { ?> checked="checked"<?php } ?>
+                       id="payzen_gift_cc_type_<?php echo $block->escapeHtml($code); ?>"
+                       value="<?php echo $block->escapeHtml($code); ?>"
+                       name="payment[payzen_gift_cc_type]"
+                       disabled="disabled" />
+            <?php
+                $first = false;
+            }
+            ?>
+
+                <label for="payzen_gift_cc_type_<?php echo $block->escapeHtml($code); ?>" class="admin__field-label">
+                    <img alt="<?php echo $block->escapeHtml($label); ?>"
+                         src="<?php echo $block->escapeHtml($block->getCcTypeImageSrc($code)); ?>"
+                         title="<?php echo $block->escapeHtml($label); ?>"
+                         class="payment-icon"
+                         style="max-height: 35px; max-width: 90px;" />
+                </label>
+            </div>
+        </div>
+    <?php } ?>
+</fieldset>

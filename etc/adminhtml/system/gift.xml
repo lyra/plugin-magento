@@ -1,20 +1,12 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
@@ -52,6 +44,7 @@
                 <label><![CDATA[Logo]]></label>
                 <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
                 <config_path>payment/payzen_gift/module_logo</config_path>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Logo</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>
                 <upload_dir config="system/filesystem/media" scope_info="0">payzen/images</upload_dir>
                 <base_url type="media" scope_info="0">payzen/images</base_url>
@@ -64,6 +57,7 @@
 
             <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="421" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Restrict to some countries]]></label>
+                <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                 <config_path>payment/payzen_gift/allowspecific</config_path>
                 <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
             </field>
@@ -93,13 +87,13 @@
 
             <field id="capture_delay" translate="label comment" type="text" sortOrder="431" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Capture delay]]></label>
-                <comment><![CDATA[The number of days before the bank capture. Enter value only if different from PayZen general configuration.]]></comment>
+                <comment><![CDATA[The number of days before the bank capture. Enter value only if different from PayZen general configuration. This setting is considered only if the buyer uses another CC to complete the payment.]]></comment>
                 <config_path>payment/payzen_gift/capture_delay</config_path>
             </field>
 
             <field id="validation_mode" translate="label comment" type="select" sortOrder="432" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Validation mode]]></label>
-                <comment><![CDATA[If manual is selected, you will have to confirm payments manually in your PayZen Back Office.]]></comment>
+                <comment><![CDATA[If manual is selected, you will have to confirm payments manually in your PayZen Back Office. This setting is considered only if the buyer uses another CC to complete the payment.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ValidationMode</source_model>
                 <config_path>payment/payzen_gift/validation_mode</config_path>
             </field>

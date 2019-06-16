@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
 
@@ -37,38 +29,38 @@ class RedirectProcessor
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\Registry $coreRegistry
      */
-    public function __construct(\Lyranetwork\Payzen\Helper\Data $dataHelper, \Magento\Framework\Registry $coreRegistry)
-    {
+    public function __construct(
+        \Lyranetwork\Payzen\Helper\Data $dataHelper,
+        \Magento\Framework\Registry $coreRegistry
+    ) {
         $this->dataHelper = $dataHelper;
         $this->coreRegistry = $coreRegistry;
     }
 
-    public function execute(\Lyranetwork\Payzen\Api\RedirectActionInterface $controller)
+    public function execute(\Magento\Sales\Model\Order $order)
     {
-        try {
-            $order = $controller->getAndCheckOrder();
+        // Add history comment and save it.
+        $order->addStatusHistoryComment(__('Client sent to PayZen gateway.'), false)
+            ->setIsCustomerNotified(false)
+            ->save();
 
-            // add history comment and save it
-            $order->addStatusHistoryComment(__('Client sent to PayZen gateway.'), false)
-                ->setIsCustomerNotified(false)
-                ->save();
+        $method = $order->getPayment()->getMethodInstance();
+        $this->coreRegistry->register(
+            \Lyranetwork\Payzen\Block\Constants::PARAMS_REGISTRY_KEY,
+            $method->getFormFields($order)
+        );
 
-            $method = $order->getPayment()->getMethodInstance();
-            $this->coreRegistry->register(
-                \Lyranetwork\Payzen\Block\Constants::PARAMS_REGISTRY_KEY,
-                $method->getFormFields($order)
-            );
-            $this->coreRegistry->register(
-                \Lyranetwork\Payzen\Block\Constants::URL_REGISTRY_KEY,
-                $method->getPlatformUrl()
-            );
+        $this->coreRegistry->register(
+            \Lyranetwork\Payzen\Block\Constants::URL_REGISTRY_KEY,
+            $method->getGatewayUrl()
+        );
 
-            // redirect to gateway
-            $this->dataHelper->log("Client {$order->getCustomerEmail()} sent to payment page for order #{$order->getId()}.");
+        // Log action before redirect.
+        $this->dataHelper->log("Client {$order->getCustomerEmail()} sent to payment page for order #{$order->getId()}.");
+    }
 
-            return $controller->forward();
-        } catch (\Lyranetwork\Payzen\Model\OrderException $e) {
-            return $controller->back($e->getMessage());
-        }
+    public function getDataHelper()
+    {
+        return $this->dataHelper;
     }
 }

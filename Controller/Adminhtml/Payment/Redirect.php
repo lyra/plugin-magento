@@ -1,25 +1,17 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Adminhtml\Payment;
 
 use Lyranetwork\Payzen\Model\OrderException;
 
-class Redirect extends \Magento\Backend\App\Action implements \Lyranetwork\Payzen\Api\RedirectActionInterface
+class Redirect extends \Magento\Backend\App\Action
 {
     /**
      * @var \Lyranetwork\Payzen\Helper\Data
@@ -43,42 +35,48 @@ class Redirect extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Sales\Api\OrderRepositoryInterface
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
     ) {
-        $this->dataHelper = $dataHelper;
         $this->redirectProcessor = $redirectProcessor;
         $this->resultPageFactory = $resultPageFactory;
         $this->orderRepository = $orderRepository;
+        $this->dataHelper = $redirectProcessor->getDataHelper();
 
         parent::__construct($context);
     }
 
     public function execute()
     {
-        return $this->redirectProcessor->execute($this);
+        try {
+            $order = $this->getAndCheckOrder();
+
+            $this->redirectProcessor->execute($order);
+
+            return $this->forward();
+        } catch (\Lyranetwork\Payzen\Model\OrderException $e) {
+            return $this->back($e->getMessage());
+        }
     }
 
     /**
      * Get order to pay from session and check it (amount, already processed, ...).
      */
-    public function getAndCheckOrder()
+    private function getAndCheckOrder()
     {
-        // clear all messages in session
+        // Clear all messages in session.
         $this->messageManager->getMessages(true);
 
         $id = $this->getRequest()->getParam('order_id');
 
-        // check that there is an order to pay
+        // Check that there is an order to pay.
         try {
             $order = $this->orderRepository->get($id);
         } catch (\Exception $e) {
@@ -87,15 +85,15 @@ class Redirect extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
             throw new OrderException('Order not found in session.');
         }
 
-        // check that there is products in cart
-        if ($order->getTotalDue() == 0) {
+        // Check that there is products in cart.
+        if (! $order->getTotalDue()) {
             $this->dataHelper->log("Payment attempt with no amount. [Order = {$order->getId()}]"
                 . " [IP = {$this->dataHelper->getIpAddress()}].");
             throw new OrderException('Order total is empty.');
         }
 
-        // check that order is not processed yet
-        if (!$this->dataHelper->getCheckout()->getLastSuccessQuoteId()) {
+        // Check that order is not processed yet.
+        if (! $this->dataHelper->getCheckout()->getLastSuccessQuoteId()) {
             $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getId()}]"
                 . " [IP = {$this->dataHelper->getIpAddress()}].");
             throw new OrderException('Order payment already processed.');
@@ -109,9 +107,9 @@ class Redirect extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
     /**
      * Redirect to checkout initial page (when payment cannot be done).
      */
-    public function back($msg)
+    private function back($msg)
     {
-        // clear all messages in session
+        // Clear all messages in session.
         $this->messageManager->getMessages(true);
         $this->messageManager->addError($msg);
 
@@ -129,7 +127,7 @@ class Redirect extends \Magento\Backend\App\Action implements \Lyranetwork\Payze
     /**
      * Display redirection page.
      */
-    public function forward()
+    private function forward()
     {
         $resultPage = $this->resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->set(__('Payment gateway redirection'));

@@ -1,23 +1,16 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
 
 use Lyranetwork\Payzen\Helper\Payment;
+use Lyranetwork\Payzen\Model\ResponseException;
 
 class ResponseProcessor
 {
@@ -65,22 +58,92 @@ class ResponseProcessor
         $this->payzenResponseFactory = $payzenResponseFactory;
     }
 
-    public function execute(\Lyranetwork\Payzen\Api\ResponseActionInterface $controller)
+    public function execute(
+        \Magento\Sales\Model\Order $order,
+        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+    ) {
+        $this->dataHelper->log("Request authenticated for order #{$order->getId()}.");
+
+        if ($order->getStatus() === 'pending_payment') {
+            // Order waiting for payment.
+            $this->dataHelper->log("Order #{$order->getId()} is waiting payment.");
+            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $response->getLogMessage());
+
+            if ($response->isAcceptedPayment()) {
+                $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by client return !" .
+                     " This means the notification URL did not work.", \Psr\Log\LogLevel::WARNING);
+
+                // Save order and optionally create invoice.
+                $this->paymentHelper->registerOrder($order, $response);
+
+                // Display success page.
+                return [
+                    'case' => Payment::SUCCESS,
+                    'warn' => true // Notification URL warn in TEST mode.
+                ];
+            } else {
+                $this->dataHelper->log("Payment for order #{$order->getId()} has failed.");
+
+                // Cancel order.
+                $this->paymentHelper->cancelOrder($order, $response);
+
+                // Redirect to cart page.
+                $case = $response->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
+                return [
+                    'case' => $case,
+                    'warn' => false
+                ];
+            }
+        } else {
+            // Payment already processed.
+            $this->dataHelper->log("Order #{$order->getId()} has already been processed.");
+
+            $storeId = $this->dataHelper->getCheckoutStoreId();
+            $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $storeId);
+            $successStatuses = [
+                $acceptedStatus,
+                'complete', // Virtual orders.
+                'payment_review', // Pending payments.
+                'fraud', // Fraud status is taken as successful because it's just a suspicion.
+                'payzen_to_validate', // Payment will be OK after manual validation.
+                'payzen_pending_transfer' // For SEPA payments.
+            ];
+
+            if ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
+                $this->dataHelper->log("Order #{$order->getId()} is confirmed.");
+
+                return [
+                    'case' => Payment::SUCCESS,
+                    'warn' => false
+                ];
+            } elseif ($order->isCanceled() && ! $response->isAcceptedPayment()) {
+                $this->dataHelper->log("Order #{$order->getId()} cancelation is confirmed.");
+
+                $case = $response->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
+                return [
+                    'case' => $case,
+                    'warn' => false
+                ];
+            } else {
+                // Error case, the payment result and the order status do not match.
+                $msg = "Invalid payment result received for already saved order #{$order->getId()}.";
+                $msg .= " Payment result: {$response->getTransStatus()}, order status : {$order->getStatus()}.";
+
+                throw new ResponseException($msg);
+            }
+        }
+    }
+
+    public function prepareResponse($params)
     {
-        $request = $controller->getRequest()->getParams();
+        $order = $this->findOrder($params);
 
-        // loading order
-        $orderId = key_exists('vads_order_id', $request) ? $request['vads_order_id'] : 0;
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($orderId);
-
-        // get store id from order
         $storeId = $order->getStore()->getId();
 
-        // load API response
-        $payzenResponse = $this->payzenResponseFactory->create(
+        // Load response API.
+        $response = $this->payzenResponseFactory->create(
             [
-                'params' => $request,
+                'params' => $params,
                 'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
                 'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
                 'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId),
@@ -88,90 +151,50 @@ class ResponseProcessor
             ]
         );
 
-        $this->dataHelper->log($this->dataHelper->getCommonConfigData('sign_algo', $storeId));
+        if (! $response->isAuthentified()) {
+            // Authentification failed.
+            $msg = "{$this->dataHelper->getIpAddress()} tries to access payzen/payment/response page without valid signature with parameters: " . json_encode($params);
+            $msg .= "\n";
+            $msg .= 'Signature algorithm selected in module settings must be the same as one selected in PayZen Back Office.';
 
-        if (! $payzenResponse->isAuthentified()) {
-            // authentification failed
-            $this->dataHelper->log(
-                "{$this->dataHelper->getIpAddress()} tries to access payzen/payment/response page without valid signature with parameters: " . json_encode($request),
-                \Psr\Log\LogLevel::ERROR
-            );
-
-            $this->dataHelper->log(
-                'Signature algorithm selected in module settings must be the same as one selected in PayZen Back Office.',
-                \Psr\Log\LogLevel::ERROR
-            );
-
-            return $controller->redirectError($order);
+            throw new ResponseException($msg);
         }
 
-        $this->dataHelper->log("Request authenticated for order #{$order->getId()}.");
+        return [
+            'response' => $response,
+            'order' => $order
+        ];
+    }
 
+    private function findOrder($params)
+    {
+        $orderId = key_exists('vads_order_id', $params) ? $params['vads_order_id'] : null;
         if (! $orderId) {
-            $this->dataHelper->log(
-                "Order ID not returned. Payment result: " . $payzenResponse->getLogMessage(),
-                \Psr\Log\LogLevel::ERROR
-            );
-            return $controller->redirectError($order);
+            throw new ResponseException('Order ID is empty. Content: ' . json_encode($params));
         }
 
-        if ($order->getStatus() == 'pending_payment') {
-            // order waiting for payment
-            $this->dataHelper->log("Order #{$order->getId()} is waiting payment.");
-            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $payzenResponse->getLogMessage());
-
-            if ($payzenResponse->isAcceptedPayment()) {
-                $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by client return !" .
-                     " This means the notification URL did not work.", \Psr\Log\LogLevel::WARNING);
-
-                // save order and optionally create invoice
-                $this->paymentHelper->registerOrder($order, $payzenResponse);
-
-                // display success page
-                return $controller->redirectResponse(
-                    $order,
-                    Payment::SUCCESS,
-                    true /* notification url warn in TEST mode */
-                );
-            } else {
-                $this->dataHelper->log("Payment for order #{$order->getId()} has failed.");
-
-                // cancel order
-                $this->paymentHelper->cancelOrder($order, $payzenResponse);
-
-                // redirect to cart page
-                $case = $payzenResponse->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
-                return $controller->redirectResponse($order, $case /* is success ? */);
-            }
-        } else {
-            // payment already processed
-            $this->dataHelper->log("Order #{$order->getId()} has already been processed.");
-
-            $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $storeId);
-            $successStatuses = [
-            $acceptedStatus,
-            'complete' /* case of virtual orders */,
-            'payment_review' /* case of pending payments like Oney */,
-            'fraud' /* fraud status is taken as successful because it's just a suspicion */,
-            'payzen_to_validate' /* payment will be done after manual validation */
-            ];
-
-            if ($payzenResponse->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
-                $this->dataHelper->log("Order #{$order->getId()} is confirmed.");
-                return $controller->redirectResponse($order, Payment::SUCCESS);
-            } elseif ($order->isCanceled() && ! $payzenResponse->isAcceptedPayment()) {
-                $this->dataHelper->log("Order #{$order->getId()} cancelation is confirmed.");
-
-                $case = $payzenResponse->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
-                return $controller->redirectResponse($order, $case);
-            } else {
-                // error case, the client returns with an error code but the payment has already been accepted
-                $this->dataHelper->log(
-                    "Order #{$order->getId()} has been validated but we receive a payment error code !",
-                    \Psr\Log\LogLevel::ERROR
-                );
-                return $controller->redirectError($order);
-            }
+        // Load order.
+        $order = $this->orderFactory->create();
+        $order->loadByIncrementId($orderId);
+        if (! $order->getId()) {
+            throw new ResponseException("Order not found with ID #{$orderId}.");
         }
+
+        return $order;
+    }
+
+    public function getDataHelper()
+    {
+        return $this->dataHelper;
+    }
+
+    public function getOrderFactory()
+    {
+        return $this->orderFactory;
+    }
+
+    public function getPayzenResponseFactory()
+    {
+        return $this->payzenResponseFactory;
     }
 }

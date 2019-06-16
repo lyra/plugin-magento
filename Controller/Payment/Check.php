@@ -1,23 +1,17 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Payment;
 
-class Check extends \Magento\Framework\App\Action\Action implements \Lyranetwork\Payzen\Api\CheckActionInterface
+use Lyranetwork\Payzen\Model\ResponseException;
+
+class Check extends \Magento\Framework\App\Action\Action
 {
 
     /**
@@ -51,10 +45,30 @@ class Check extends \Magento\Framework\App\Action\Action implements \Lyranetwork
 
     public function execute()
     {
-        return $this->checkProcessor->execute($this);
+        if (! $this->getRequest()->isPost()) {
+            return;
+        }
+
+        try {
+            $params = $this->getRequest()->getParams();
+            $data = $this->prepareResponse($params);
+
+            $order = $data['order'];
+            $response = $data['response'];
+
+            $case = $this->checkProcessor->execute($order, $response);
+            return $this->renderResponse($response->getOutputForGateway($case));
+        } catch (ResponseException $e) {
+            return $this->renderResponse($e->getMessage());
+        }
     }
 
-    public function renderResponse($text)
+    protected function prepareResponse($params)
+    {
+        return $this->checkProcessor->prepareResponse($params);
+    }
+
+    protected function renderResponse($text)
     {
         $rawResult = $this->rawResultFactory->create();
         $rawResult->setContents($text);

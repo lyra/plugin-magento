@@ -1,74 +1,68 @@
 <?xml version="1.0"?>
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="payzen_paypal" translate="label" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+    <group id="payzen_paypal" translate="label" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
         <label><![CDATA[PAYPAL PAYMENT]]></label>
         <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset\Dependant</frontend_model>
         <attribute type="expanded">0</attribute>
         <attribute type="feature">paypal</attribute>
 
-        <group id="payzen_display_options" translate="label" type="text" sortOrder="71" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label><![CDATA[BASIC SETTINGS]]></label>
+        <group id="payzen_display_options" translate="label" type="text" sortOrder="81" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[DISPLAY OPTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="active" translate="label comment" type="select" sortOrder="711" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="active" translate="label comment" type="select" sortOrder="811" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Activation]]></label>
                 <comment><![CDATA[Enables / disables this payment method.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>payment/payzen_paypal/active</config_path>
             </field>
 
-            <field id="title" translate="label comment" type="text" sortOrder="712" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="title" translate="label comment" type="text" sortOrder="812" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Method title]]></label>
                 <comment><![CDATA[Method title to display on payment means page.]]></comment>
                 <config_path>payment/payzen_paypal/title</config_path>
             </field>
 
-            <field id="sort_order" translate="label comment" type="text" sortOrder="713" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="sort_order" translate="label comment" type="text" sortOrder="813" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Sort order]]></label>
                 <comment><![CDATA[In the payment methods list.]]></comment>
                 <config_path>payment/payzen_paypal/sort_order</config_path>
             </field>
 
-            <field id="module_logo" translate="label comment" type="image" sortOrder="714" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="module_logo" translate="label comment" type="image" sortOrder="814" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Logo]]></label>
                 <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
                 <config_path>payment/payzen_paypal/module_logo</config_path>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Logo</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>
                 <upload_dir config="system/filesystem/media" scope_info="0">payzen/images</upload_dir>
                 <base_url type="media" scope_info="0">payzen/images</base_url>
             </field>
         </group>
 
-        <group id="payzen_restrictions" translate="label" type="text" sortOrder="72" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_restrictions" translate="label" type="text" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[RESTRICTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="721" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="821" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Restrict to some countries]]></label>
+                <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
                 <config_path>payment/payzen_paypal/allowspecific</config_path>
                 <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
             </field>
 
-            <field id="specificcountry" translate="label comment" type="multiselect" sortOrder="722" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="specificcountry" translate="label comment" type="multiselect" sortOrder="822" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Authorized countries]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
                 <config_path>payment/payzen_paypal/specificcountry</config_path>
@@ -78,7 +72,7 @@
                 </depends>
             </field>
 
-            <field id="custgroup_amount_restriction" translate="label comment" sortOrder="723" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="custgroup_amount_restriction" translate="label comment" sortOrder="823" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Customer group amount restriction]]></label>
                 <comment><![CDATA[Define amount restriction for each customer group.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CustgroupOptions</frontend_model>
@@ -87,17 +81,17 @@
             </field>
         </group>
 
-        <group id="payzen_payment_page" translate="label" type="text" sortOrder="73" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_payment_page" translate="label" type="text" sortOrder="83" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[PAYMENT PAGE]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="capture_delay" translate="label comment" type="text" sortOrder="731" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="capture_delay" translate="label comment" type="text" sortOrder="831" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Capture delay]]></label>
                 <comment><![CDATA[The number of days before the bank capture. Enter value only if different from PayZen general configuration.]]></comment>
                 <config_path>payment/payzen_paypal/capture_delay</config_path>
             </field>
 
-            <field id="validation_mode" translate="label comment" type="select" sortOrder="732" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="validation_mode" translate="label comment" type="select" sortOrder="832" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Validation mode]]></label>
                 <comment><![CDATA[If manual is selected, you will have to confirm payments manually in your PayZen Back Office.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ValidationMode</source_model>

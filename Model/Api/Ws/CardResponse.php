@@ -1,19 +1,12 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
- *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
+ * PayZen V2-Payment Module version 2.4.0 for Magento 2.x. Support contact : support@payzen.eu.
  *
  * @category  Payment
  * @package   Payzen
  * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright 2014-2019 Lyra Network and contributors
+ * @license   
  */
 
 namespace Lyranetwork\Payzen\Model\Api\Ws;
@@ -51,6 +44,11 @@ class CardResponse
     private $bankCode = null;
 
     /**
+     * @var string $bankLabel
+     */
+    private $bankLabel = null;
+
+    /**
      * @var int $expiryMonth
      */
     private $expiryMonth = null;
@@ -59,6 +57,21 @@ class CardResponse
      * @var int $expiryYear
      */
     private $expiryYear = null;
+
+    /**
+     * @var string $cardHolderName
+     */
+    private $cardHolderName = null;
+
+    /**
+     * @var string $proofOfIdType
+     */
+    private $proofOfIdType = null;
+
+    /**
+     * @var string $proofOfIdNumber
+     */
+    private $proofOfIdNumber = null;
 
     /**
      * @return string
@@ -169,6 +182,24 @@ class CardResponse
     }
 
     /**
+     * @return string
+     */
+    public function getBankLabel()
+    {
+        return $this->bankLabel;
+    }
+
+    /**
+     * @param string $bankLabel
+     * @return CardResponse
+     */
+    public function setBankLabel($bankLabel)
+    {
+        $this->bankLabel = $bankLabel;
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getExpiryMonth()
@@ -201,6 +232,60 @@ class CardResponse
     public function setExpiryYear($expiryYear)
     {
         $this->expiryYear = $expiryYear;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCardHolderName()
+    {
+        return $this->cardHolderName;
+    }
+
+    /**
+     * @param string $cardHolderName
+     * @return CardResponse
+     */
+    public function setCardHolderName($cardHolderName)
+    {
+        $this->cardHolderName = $cardHolderName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProofOfIdType()
+    {
+        return $this->proofOfIdType;
+    }
+
+    /**
+     * @param string $proofOfIdType
+     * @return CardResponse
+     */
+    public function setProofOfIdType($proofOfIdType)
+    {
+        $this->proofOfIdType = $proofOfIdType;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProofOfIdNumber()
+    {
+        return $this->proofOfIdNumber;
+    }
+
+    /**
+     * @param string $proofOfIdNumber
+     * @return CardResponse
+     */
+    public function setProofOfIdNumber($proofOfIdNumber)
+    {
+        $this->proofOfIdNumber = $proofOfIdNumber;
         return $this;
     }
 }

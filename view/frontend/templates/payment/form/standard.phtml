@@ -1,23 +1,15 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 $oneClickActive = $block->getConfigData('oneclick_active'); // 1-Click enabled ?
-$customer = $block->getLoggedCustomer(); // logged in customer
+$customer = $block->getCurrentCustomer(); // Logged in customer.
 ?>
 
 <ul class="form-list"
@@ -26,9 +18,9 @@ $customer = $block->getLoggedCustomer(); // logged in customer
 <?php
 if ($block->isLocalCcType()) :
     $cards = $block->getAvailableCcTypes();
-    $single = (count($cards) == 1);
+    $single = count($cards) === 1;
 
-    // show card logos as radio buttons
+    // Show card logos as radio buttons.
     $amexCards = '';
     $cbCards = '';
     $otherCards = '';
@@ -38,27 +30,27 @@ if ($block->isLocalCcType()) :
         $html = '<div class="payzen-card">';
 
         if ($single) {
-            $html .= '<input type="hidden" id="payzen_standard_cc_type_'.$block->escapeHtml($code)
-                .'" value="'.$block->escapeHtml($code).'" name="payment[payzen_standard_cc_type]"/>' ;
+            $html .= '<input type="hidden" id="payzen_standard_cc_type_' . $block->escapeHtml($code)
+                . '" value="' . $block->escapeHtml($code) . '" name="payment[payzen_standard_cc_type]"/>' ;
         } else {
-            $html .= '<input type="radio" class="radio" id="payzen_standard_cc_type_'.$block->escapeHtml($code)
-                .'"'.($first ? ' checked="checked"' : '').' value="'
-                .$block->escapeHtml($code).'" name="payment[payzen_standard_cc_type]"/>' ;
+            $html .= '<input type="radio" class="radio" id="payzen_standard_cc_type_' . $block->escapeHtml($code)
+                . '"' . ($first ? ' checked="checked"' : '') . ' value="'
+                . $block->escapeHtml($code) . '" name="payment[payzen_standard_cc_type]"/>' ;
         }
 
         $first = false;
 
-        $html .= '<label for="payzen_standard_cc_type_'.$block->escapeHtml($code).'">
-                    <img alt="'.$block->escapeHtml($label).'"
-                         src="'.$block->escapeHtml($block->getCcTypeImageSrc($code)).'"
+        $html .= '<label for="payzen_standard_cc_type_' . $block->escapeHtml($code) . '">
+                    <img alt="' . $block->escapeHtml($label) . '"
+                         src="' . $block->escapeHtml($block->getCcTypeImageSrc($code)) . '"
                          title="' . $block->escapeHtml($label) . '" />
                   </label>';
         $html .= '</div>';
 
         $network = $block->getCcTypeNetwork($code);
-        if ($network == 'AMEX') {
+        if ($network === 'AMEX') {
             $amexCards .= $html;
-        } elseif ($network == 'CB') {
+        } elseif ($network === 'CB') {
             $cbCards .= $html;
         } else {
             $otherCards .= $html;
@@ -76,7 +68,7 @@ if ($block->isLocalCcType()) :
     }
 endif;
 
-if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?>
+if ($oneClickActive && $customer && $customer->getCustomAttribute('payzen_identifier')) : ?>
         <li class="payzen-standard-cc-block">
             <?php echo $block->escapeHtml(__('You will enter payment data after order confirmation.')); ?>
         </li>
@@ -87,15 +79,15 @@ if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?
         <li class="payzen-standard-cc-block">
             <a class="payzen-payment-link" href="javascript: void(0);"
                 onclick="javascript: payzenUpdatePaymentBlock('id');">
-                <?php echo $block->escapeHtml(__('Click here to pay with your registered card.')); ?>
+                <?php echo $block->escapeHtml(__('Click here to pay with your registered means of payment.')); ?>
             </a>
         </li>
 
-        <!-- payment with registered card block -->
+        <!-- Payment with registered card block. -->
         <li class="payzen-standard-id-block">
             <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
             <span>
-                <?php echo $block->escapeHtml(__('You will pay with your registered card. No data entry is needed.')); ?>
+                <?php echo $block->escapeHtml(__('You will pay with your registered means of payment %s. No data entry is needed.')); ?>
             </span>
         </li>
 
@@ -112,12 +104,12 @@ if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?
 <?php endif; ?>
 </ul>
 
-<?php if ($oneClickActive && $customer && $customer->getData('payzen_identifier')) : ?>
+<?php if ($oneClickActive && $customer && $customer->getCustomAttribute('payzen_identifier')) : ?>
 <script>
     require([
         'prototype'
     ], function() {
-        // display payment by identifier block when PayZen standard payment is selected
+        // Display payment by identifier block when standard payment is selected.
         Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
         Event.observe('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
 

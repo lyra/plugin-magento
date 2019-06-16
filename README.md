@@ -1,14 +1,19 @@
-# PayZen for Magento
+# PayZen for Magento 2
 
-PayZen for Magento is an open source plugin that links e-commerce websites based on Magento to PayZen secured payment gateway developed by [Lyra Network](https://www.lyra-network.com/).
+PayZen for Magento 2 is an open source plugin that links e-commerce websites based on Magento to PayZen secure payment gateway developed by [Lyra Network](https://www.lyra-network.com/).
 
 Namely, it enables the following payment methods :
-* PayZen - Standard credit card payment
-* PayZen - Credit card payment in installments
+* PayZen - Standard payment
+* [mutli] PayZen - Payment in installments
+* [gift] PayZen - Gift card payment
+* [fullcb] PayZen - Full CB payment
+* [sepa] PayZen - SEPA payment
+* [paypal] PayZen - PayPal payment
 
 ## Installation & upgrade
 
-- Create app/code/Lyranetwork/Payzen folder if not exists.
+- Remove app/code/Lyranetwork/Payzen folder if already exists.
+- Create a new app/code/Lyranetwork/Payzen folder.
 - Unzip module in your Magento 2 app/code/Lyranetwork/Payzen folder.
 - Open command line and change to Magento installation root directory.
 - Enable module: php bin/magento module:enable --clear-static-content Lyranetwork_Payzen
@@ -20,9 +25,9 @@ In order to deactivate the module: php bin/magento module:disable --clear-static
 
 ## Configuration
 
-- In Magento 2 administration interface, browse to "STORES > Configuration" menu
-- Click on "Payment Methods" link under the "SALES" section
-- Expand PayZen payment method to enter your gateway credentials
+- In Magento 2 administration interface, browse to "STORES > Configuration" menu.
+- Click on "Payment Methods" link under the "SALES" section.
+- Expand PayZen payment method to enter your gateway credentials.
 - Refresh invalidated Magento cache after config saved. 
 
 ## License

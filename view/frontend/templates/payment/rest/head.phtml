@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+?>
+
+<script src="<?php echo $block->escapeUrl($block->getStaticUrl()); ?>js/krypton-client/V4.0/stable/kr-payment-form.min.js"
+
+<?php
+if ($panLabel = $block->getPlaceholder('pan')) {
+?>
+        kr-placeholder-pan="<?php echo $block->escapeUrl($panLabel); ?>"
+<?php
+}
+
+if ($expiryLabel = $block->getPlaceholder('expiry')) {
+?>
+        kr-placeholder-expiry="<?php echo $block->escapeUrl($expiryLabel); ?>"
+<?php
+}
+
+if ($cvvLabel = $block->getPlaceholder('cvv')) {
+?>
+        kr-placeholder-security-code="<?php echo $block->escapeUrl($cvvLabel); ?>"
+<?php
+}
+?>
+        kr-public-key="<?php echo $block->escapeUrl($block->getPublicKey()); ?>"
+        kr-post-url-success="<?php echo $block->escapeUrl($block->getReturnUrl()); ?>"
+        kr-post-url-refused="<?php echo $block->escapeUrl($block->getReturnUrl()); ?>"
+        kr-language="<?php echo $block->escapeUrl($block->getLanguage()); ?>"></script>
+
+<link rel="stylesheet" href="<?php echo $block->escapeUrl($block->getStaticUrl()); ?>js/krypton-client/V4.0/ext/<?php echo $block->escapeUrl($block->getTheme()); ?>-reset.css">
+<script src="<?php echo $block->escapeUrl($block->getStaticUrl()); ?>js/krypton-client/V4.0/ext/<?php echo $block->escapeUrl($block->getTheme()); ?>.js"></script>

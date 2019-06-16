@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Helper;
 
@@ -22,25 +14,28 @@ use Lyranetwork\Payzen\Model\Api\PayzenApi;
 class Payment
 {
 
-    // key to save if payment is by identifier
+    // Key to save if payment is by identifier.
     const IDENTIFIER = 'payzen_identifier';
 
-    // key to save choosen multi option
+    // Key to save choosen multi option.
     const MULTI_OPTION = 'payzen_multi_option';
 
-    // key to save choosen Choozeo option
+    // Key to save choosen Choozeo option.
     const CHOOZEO_OPTION = 'payzen_choozeo_option';
 
-    // key to save choosen Oney option
+    // Key to save choosen Oney option.
     const ONEY_OPTION = 'payzen_oney_option';
 
-    // key to save risk control results
+    // Key to save choosen Full CB option.
+    const FULLCB_OPTION = 'payzen_fullcb_option';
+
+    // Key to save risk control results.
     const RISK_CONTROL = 'payzen_risk_control';
 
-    // key to save risk assessment results
+    // Key to save risk assessment results.
     const RISK_ASSESSMENT = 'payzen_risk_assessment';
 
-    // key to save risk assessment results
+    // Key to save risk assessment results.
     const ALL_RESULTS = 'payzen_all_results';
 
     const TRANS_UUID = 'payzen_trans_uuid';
@@ -79,7 +74,13 @@ class Payment
      *
      * @var \Magento\Customer\Model\CustomerFactory
      */
-    protected $customerFactory;
+     protected $customerFactory;
+
+     /**
+      *
+      * @var \Magento\Customer\Model\ResourceModel\CustomerFactory
+      */
+     protected $customerResourceFactory;
 
     /**
      *
@@ -114,6 +115,7 @@ class Payment
      * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
      * @param \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface $transactionManager
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+     * @param \Magento\Customer\Model\ResourceModel\CustomerFactory $customerResourceFactory
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
@@ -125,6 +127,7 @@ class Payment
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
         \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface $transactionManager,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
+        \Magento\Customer\Model\ResourceModel\CustomerFactory $customerResourceFactory,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
@@ -135,6 +138,7 @@ class Payment
         $this->transactionRepository = $transactionRepository;
         $this->transactionManager = $transactionManager;
         $this->customerFactory = $customerFactory;
+        $this->customerResourceFactory = $customerResourceFactory;
         $this->orderSender = $orderSender;
         $this->dataHelper = $dataHelper;
         $this->dataObjectFactory = $dataObjectFactory;
@@ -155,11 +159,11 @@ class Payment
 
         $this->dataHelper->log("Saving payment for order #{$order->getId()}.");
 
-        // update authorized amount
+        // Update authorized amount.
         $order->getPayment()->setAmountAuthorized($order->getTotalDue());
         $order->getPayment()->setBaseAmountAuthorized($order->getBaseTotalDue());
 
-        // retrieve new order state and status
+        // Retrieve new order state and status.
         $stateObject = $this->nextOrderState($order, $response);
 
         $this->dataHelper->log("Order #{$order->getId()}, new state: {$stateObject->getState()}," .
@@ -168,13 +172,13 @@ class Payment
             ->setStatus($stateObject->getStatus())
             ->addStatusHistoryComment($response->getMessage());
 
-        // save gateway responses
+        // Save gateway responses.
         $this->updatePaymentInfo($order, $response);
 
-        // try to save PayZen identifier if any
+        // Try to save gateway identifier if any.
         $this->saveIdentifier($order, $response);
 
-        // try to create invoice
+        // Try to create invoice.
         $this->createInvoice($order);
 
         $this->dataHelper->log("Saving confirmed order #{$order->getId()} and sending e-mail if not disabled.");
@@ -186,7 +190,7 @@ class Payment
     }
 
     /**
-     * Get new order state and status according to PayZen response.
+     * Get new order state and status according to gateway response.
      *
      * @param \Magento\Sales\Model\Order $order
      * @param \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
@@ -206,10 +210,15 @@ class Payment
             $newStatus = 'payment_review';
             $newState = \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW;
         } else {
-            $newStatus = $this->dataHelper->getCommonConfigData(
-                'registered_order_status',
-                $order->getStore()->getId()
-            );
+            if ($this->isSepa($response)) {
+                // Pending funds transfer order state.
+                $newStatus = 'payzen_pending_transfer';
+            } else {
+                $newStatus = $this->dataHelper->getCommonConfigData(
+                    'registered_order_status',
+                    $order->getStore()->getId()
+                );
+            }
 
             $processingStatuses = $this->orderConfig->getStateStatuses(
                 \Magento\Sales\Model\Order::STATE_PROCESSING,
@@ -236,7 +245,7 @@ class Payment
 
     public function updatePaymentInfo(\Magento\Sales\Model\Order $order, \Lyranetwork\Payzen\Model\Api\PayzenResponse $response)
     {
-        // set common payment information
+        // Set common payment information.
         $order->getPayment()
             ->setCcTransId($response->get('trans_id'))
             ->setCcType($response->get('card_brand'))
@@ -246,7 +255,7 @@ class Payment
             ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID, $response->get('trans_uuid'));
 
         if ($response->isCancelledPayment()) {
-            // no more data to save
+            // No more data to save.
             return;
         }
 
@@ -257,30 +266,32 @@ class Payment
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE, $userChoice);
         }
 
-        // save risk control result if any
+        // Save risk control result if any.
         $riskControl = $response->getRiskControl();
         if (! empty($riskControl)) {
             $order->getPayment()->setAdditionalInformation(self::RISK_CONTROL, serialize($riskControl));
         }
 
-        // save risk assessment result if any
+        // Save risk assessment result if any.
         $riskAssessment = $response->getRiskAssessment();
         if (! empty($riskAssessment)) {
             $order->getPayment()->setAdditionalInformation(self::RISK_ASSESSMENT, serialize($riskAssessment));
         }
 
-        // set is_fraud_detected flag
+        // Set is_fraud_detected flag.
         $order->getPayment()->setIsFraudDetected($response->isSuspectedFraud());
 
-        if ($response->get('card_brand') == 'MULTI') { // multi brand
+        if ($response->get('card_brand') == 'MULTI') { // Multi brand.
             $data = json_decode($response->get('payment_seq'));
             $transactions = $data->{'transactions'};
 
             $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
 
-            // save transaction details to sales_payment_transaction
+            $userChoice = [];
+
+            // Save transaction details to sales_payment_transaction.
             foreach ($transactions as $trs) {
-                // save transaction details to sales_payment_transaction
+                // Save transaction details to sales_payment_transaction.
                 $expiry = '';
                 if (! empty($trs->{'expiry_month'}) && ! empty($trs->{'expiry_year'})) {
                     $expiry = str_pad($trs->{'expiry_month'}, 2, '0', STR_PAD_LEFT) . ' / ' . $trs->{'expiry_year'};
@@ -288,7 +299,7 @@ class Payment
 
                 $transactionId = $response->get('trans_id') . '-' . $trs->{'sequence_number'};
 
-                // save paid amount
+                // Save paid amount.
                 $amount = round($currency->convertAmountToFloat($trs->{'amount'}), $currency->getDecimals());
 
                 $amountDetail = $amount . ' ' . $currency->getAlpha3();
@@ -308,43 +319,51 @@ class Payment
                 $transactionType = $this->convertTransactionType($trs->{'trans_status'});
 
                 $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
+
+                if (isset($trs->{'brand_management'}) && ! empty($trs->{'brand_management'})) {
+                    $brandInfo = json_decode($trs->{'brand_management'});
+
+                    $userChoice[$trs->{'sequence_number'}] = (isset($brandInfo->userChoice) && $brandInfo->userChoice);
+                }
             }
+
+            $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE, $userChoice);
         } else {
-            // 3DS authentication result
+            // 3DS authentication result.
             $threedsCavv = '';
             if ($response->get('threeds_status') === 'Y') {
                 $threedsCavv = $response->get('threeds_cavv');
             }
 
-            // save payment infos to sales_flat_order_payment
+            // Save payment infos to sales_flat_order_payment.
             $order->getPayment()
                 ->setCcExpMonth($response->get('expiry_month'))
                 ->setCcExpYear($response->get('expiry_year'))
                 ->setCcNumberEnc($response->get('card_number'))
                 ->setCcSecureVerify($threedsCavv);
 
-            // save transaction details to sales_payment_transaction
+            // Save transaction details to sales_payment_transaction.
             $expiry = '';
             if ($response->get('expiry_month') && $response->get('expiry_year')) {
                 $expiry = str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' .
                      $response->get('expiry_year');
             }
 
-            // Magento transaction type
+            // Magento transaction type.
             $transactionType = $this->convertTransactionType($response->getTransStatus());
 
             $timestamp = strtotime($response->get('presentation_date') . ' UTC');
             $date = new \DateTime();
 
-            // total payment amount
+            // Total payment amount.
             $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
             $totalAmount = (int) $response->get('amount');
 
-            // get choosen payment option if any
+            // Get choosen payment option if any.
             $option = @unserialize($order->getPayment()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION));
 
             if ($response->get('sequence_number') == 1 && (stripos($order->getPayment()->getMethod(), 'payzen_multi') === 0)
-                && is_array($option) && !empty($option)) {
+                && is_array($option) && ! empty($option)) {
                 $count = (int) $option['count'];
 
                 if (isset($option['first']) && $option['first']) {
@@ -353,7 +372,7 @@ class Payment
                     $firstAmount = round($totalAmount / $count);
                 }
 
-                // installment amount, double cast to avoid rounding
+                // Installment amount, double cast to avoid rounding.
                 $installmentAmount = (int) (string) (($totalAmount - $firstAmount) / ($count - 1));
 
                 for ($i = 1; $i <= $count; $i++) {
@@ -381,7 +400,7 @@ class Payment
 
                     if (($rate = $response->get('change_rate')) && $response->get('effective_currency') &&
                         ($response->get('currency') !== $response->get('effective_currency'))) {
-                        // effective amount
+                        // Effective amount.
                         $effectiveCurrency = PayzenApi::findCurrencyByNumCode($response->get('effective_currency'));
 
                         $effectiveAmount = round(
@@ -412,7 +431,7 @@ class Payment
                     $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
                 }
             } else {
-                // save transaction details to sales_payment_transaction
+                // Save transaction details to sales_payment_transaction.
                 $transactionId = $response->get('trans_id') . '-' . $response->get('sequence_number');
 
                 $floatAmount = round($currency->convertAmountToFloat($totalAmount), $currency->getDecimals());
@@ -420,7 +439,7 @@ class Payment
 
                 if ($response->get('effective_currency') &&
                     ($response->get('currency') !== $response->get('effective_currency'))) {
-                    // effective amount
+                    // Effective amount.
                     $effectiveCurrency = PayzenApi::findCurrencyByNumCode($response->get('effective_currency'));
 
                     $effectiveAmount = round(
@@ -454,7 +473,7 @@ class Payment
             }
         }
 
-        // skip automatic transaction creation
+        // Skip automatic transaction creation.
         $order->getPayment()
             ->setTransactionId(null)
             ->setSkipTransactionCreation(true);
@@ -475,37 +494,77 @@ class Payment
         )) {
             $customer = $this->customerFactory->create()->load($order->getCustomerId());
 
+            $customerData = $customer->getDataModel();
+            $customerData->setId($customer->getId());
+
             $this->dataHelper->log("Identifier for customer #{$customer->getId()} successfully created" .
                  ' or updated on payment gateway. Let us save it to customer entity.');
 
-            $customer->setData('payzen_identifier', $response->get('identifier'));
-            $customer->save();
+            $customerData->setCustomAttribute('payzen_identifier', $response->get('identifier'));
 
-            $this->dataHelper->log("Identifier for customer #{$customer->getId()}" .
-                ' successfully saved to customer entity.');
+            // Mask all card digits except the last 4 ones.
+            $number = $response->get('card_number');
+            $masked = '';
+
+            $matches = [];
+            if (preg_match('#^([A-Z]{2}[0-9]{2}[A-Z0-9]{10,30})(_[A-Z0-9]{8,11})?$#i', $number, $matches)) {
+                // IBAN(_BIC).
+                $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . ' / ' : ''; // BIC
+
+                $iban = $matches[1];
+                $masked .= substr($iban, 0, 4) . str_repeat('X', strlen($iban) - 8) . substr($iban, -4);
+            } elseif (strlen($number) > 4) {
+                $masked = str_repeat('X', strlen($number) - 4) . substr($number, -4);
+
+                if ($response->get('expiry_month') && $response->get('expiry_year')) {
+                    // Format card expiration data.
+                    $masked .= ' (';
+                    $masked .= str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT);
+                    $masked .= '/';
+                    $masked .= $response->get('expiry_year');
+                    $masked .= ')';
+                }
+            }
+
+            $customerData->setCustomAttribute('payzen_masked_pan', $masked);
+
+            try {
+                $customer->updateData($customerData);
+
+                $customerResource = $this->customerResourceFactory->create();
+                $customerResource->saveAttribute($customer, 'payzen_identifier');
+                $customerResource->saveAttribute($customer, 'payzen_masked_pan');
+
+                $this->dataHelper->log("Identifier for customer #{$customer->getId()} successfully saved to customer entity.");
+            } catch (\Exception $e) {
+                $this->dataHelper->log(
+                    "Identifier for customer #{$customer->getId()} couldn't be saved to customer entity. Error occurred with code {$e->getCode()}: {$e->getMessage()}.",
+                    \Psr\Log\LogLevel::ERROR
+                );
+            }
         }
     }
 
     public function createInvoice(\Magento\Sales\Model\Order $order)
     {
-        // flag that is true if automatically create invoice
+        // Flag that is true if automatically create invoice.
         $autoCapture = $this->dataHelper->getCommonConfigData('capture_auto', $order->getStore()->getId());
 
         if (! $autoCapture || $order->getStatus() != 'processing' || ! $order->canInvoice()) {
-            // creating invoice not allowed
+            // Creating invoice not allowed.
             return;
         }
 
         $this->dataHelper->log("Creating invoice for order #{$order->getId()}.");
 
-        // convert order to invoice
+        // Convert order to invoice.
         $invoice = $order->prepareInvoice();
         $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
         $invoice->setTransactionId($order->getPayment()->getLastTransId());
         $invoice->register()->save();
         $order->addRelatedObject($invoice);
 
-        // add history entry
+        // Add history entry.
         $order->addStatusHistoryComment(__('Invoice %1 was created.', $invoice->getIncrementId()));
     }
 
@@ -524,7 +583,7 @@ class Payment
 
         $order->registerCancellation($response->getMessage());
 
-        // save gateway responses
+        // Save gateway responses.
         $this->updatePaymentInfo($order, $response);
         $order->save();
 
@@ -582,8 +641,13 @@ class Payment
         return $txn;
     }
 
+    public function isSepa($response)
+    {
+        return $response->get('card_brand') == 'SDD';
+    }
+
     /**
-     * Convert PayZen transaction status to magento transaction type.
+     * Convert gateway transaction status to magento transaction type.
      *
      * @param string $payzenType
      * @return string

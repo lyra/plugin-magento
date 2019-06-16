@@ -1,31 +1,26 @@
-.payzen-iframe.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 50;
-    background: #000 none repeat scroll 0 0;
-    opacity: 0.65; /* Safari, Opera */
-    filter: alpha(opacity=65); /* IE */
-    -moz-opacity: 0.65; /* FireFox */
-}
-
-.payzen-iframe.warning {
+#payzen_iframe {
     position: relative;
     width: 100%;
-    text-align: center;
-    background: #ffffff none repeat scroll 0 0;
-    z-index: 100;
-}
-
-.payzen-iframe.iframe {
-    position: relative;
-    width: 100%;
-    min-height: 440px;
+    min-height: 530px;
     border: 0 none;
-    background: #ffffff none repeat scroll 0 0;
-    z-index: 100;
+    margin-bottom: -5px !important;
+}
+
+.payzen-standard-cc-block {
+    display:none;
+}
+
+ul.payzen-identifier {
+    list-style-type: none;
+    display: initial;
+}
+
+a.payzen-payment-link {
+    color: #39C;
+    text-decoration: none;
+    font-family: Georgia,Times,"Times New Roman",serif;
+    font-style: italic;
+    font-size: 16px;
 }
 
 .payzen-multi fieldset div.field {
@@ -36,4 +31,28 @@
 .payzen-choozeo fieldset div.field {
     float: left;
     width: 50%;
+}
+
+.payzen_review .small {
+    font-size: 10px;
+}
+
+.payzen_review {
+    margin-top: 10px;
+    margin-left: 20px;
+    border: 1px solid black;
+    font-size: 13px !important;
+    width: 50%;
+}
+
+.payzen_review thead tr {
+    border-bottom: 1px solid black;
+}
+
+.payzen_review td.amount {
+    font-weight: bold;
+}
+
+.payzen_review td, .payzen_review th {
+    padding: 5px 5px;
 }

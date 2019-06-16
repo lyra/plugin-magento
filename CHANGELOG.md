@@ -1,17 +1,35 @@
+2.4.0, 2019-03-18:
+- Bug fix: consider UNDER_VERIFICATION as a success status for refund transactions.
+- Fix IPN URL CSRF verification for compatibility with Magento 2.3.x versions.
+- [embedded] Added payment with embedded fields option using REST API.
+- [gift] Added Gift submodule.
+- [fullcb] Added Full CB submodule.
+- [paypal] Added PayPal submodule.
+- [sepa] Added SEPA submodule.
+- Possibility to enable payment by alias.
+- Added backend buttons to refuse or accept orders in case of suspected fraud.
+- Added backend button to validate payment of pending orders.
+- Improve payment in iframe mode display.
+- Possibility to not send cart data when not mandatory.
+- Send Magento user name and IP to gateway for backend WS operations.
+- Added specific error message for chargebacks refund.
+- Fix some plugin translations.
+- Do not send cart if it contains too much different items (more than 85).
+
 2.3.2, 2018-12-24:
 - Bug fix: get the correct means of payment when selection on site is enabled.
-- [paypal]Bug fix: error when refunding a PayPal payment.
+- [paypal] Bug fix: error when refunding a PayPal payment.
 - Fix new signature algorithm name (HMAC-SHA-256).
 - Send Magento phone number as vads\_cell\_phone (required for some payment means).
 - Update payment means logos.
 - Improve iframe mode interface.
 - Save transaction UUID in order payment details.
 - Added Spanish translation.
-- [prodfaq]Fix notice about shifting the shop to production mode.
+- [prodfaq] Fix notice about shifting the shop to production mode.
 - Improve error message after a failed payment.
 
 2.3.1, 2018-07-06:
-- [shatwo]Enable HMAC-SHA-256 signature algorithm by default.
+- [shatwo] Enable HMAC-SHA-256 signature algorithm by default.
 - Ignore spaces at the beginning and the end of certificates on return signature processing.
 
 2.3.0, 2018-05-23:
@@ -24,7 +42,7 @@
 2.1.4, 2018-03-08:
 - Bug fix: Check value type in logo uploader to avoid a PHP warning during import data from configuration files.
 - Bug fix: Added the component load order in etc/module.xml to avoid an exception during Magento installation using comand-line interface.
-- [technical]Manage enabled/disabled features by plugin variant.
+- [technical] Manage enabled/disabled features by plugin variant.
 
 2.1.3, 2017-10-16:
 - Compatibility with Magento 2.2 version (method signature, namespace use, JSON unserialize and layout init).
@@ -35,19 +53,19 @@
 - Possibility to select payment card type on merchant website (for both standard payment and payment in installments).
 - Save both converted and original paid amounts in Magento transaction details.
 - Use of protected variables (instead of private) to facilitate module code extension.
-- [multi]Register details about all payment installments.
+- [multi] Register details about all payment installments.
 
 2.1.1, 2017-01-13:
 - Bug fix: correction of an error when returning to store using browser backward button.
-- [multi]Bug fix: selected payment in installments option is not considered since Magento 2.1.3.
+- [multi] Bug fix: selected payment in installments option is not considered since Magento 2.1.3.
 - Update module structure and code to fulfill Magento marketplace requirements.
 - Using "lyranetwork" as vendor name instead of "lyra" (already used in Magento Marketplace).
-- [giropay]Upgrade supported card types list.
+- [giropay] Upgrade supported card types list.
 
 2.1.0, 2016-11-05:
 - Bug fix: error relative to CMS version detection since Magento V 2.1.
 - Bug fix: notify URL is not displayed correctly in module backend since Magento V 2.1.
-- [multi]Bug fix: multiple payment sub-module dos not work since Magento V 2.1 (selected payment option is not considered in frontend).
+- [multi] Bug fix: multiple payment submodule dos not work since Magento V 2.1 (selected payment option is not considered in frontend).
 - Remove control over certificate format modified on the gateway.
 - Possibility to refund payments from Magento backend via WS.
 - Backend payments in MOTO mode.
@@ -55,16 +73,16 @@
 
 2.0.1, 2016-06-02:
 - Bug fix: correction of an error in backend order creation page when module is enabled.
-- Bug fix: use of _scope parameter (instead of _store) in store URLs to redirect to the correct store (in multistore mode).
+- Bug fix: use of \_scope parameter (instead of \_store) in store URLs to redirect to the correct store (in multistore mode).
 - Bug fix: error occures when saving module settings without resfreshing cache (if asked by Magento).
-- Bug fix: capture delay in sub-modules not considered if equals 0.
-- [multi]Bug fix: payment in installments did not work (always processed as single).
-- Dispatch event order_cancel_after after order cancellation.
+- Bug fix: capture delay in submodules not considered if equals 0.
+- [multi] Bug fix: payment in installments did not work (always processed as single).
+- Dispatch event order\_cancel\_after after order cancellation.
 - Check if current quote currency is supported before to check base currency.
 - Improve logging system and log request format errors.
 - Update german language file.
 - Improve of label fields display on admin panel.
-- [multi]Do not delete virtual multi payment methods (payzen_multi_Nx) to avoid errors when viewing orders paid with these methods.
+- [multi] Do not delete virtual multi payment methods (\_\_vads\_multi\_Nx) to avoid errors when viewing orders paid with these methods.
 
 2.0.0, 2016-03-10:
 - New PayZen payment module for magento 2.

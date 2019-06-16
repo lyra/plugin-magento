@@ -1,24 +1,16 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 
 /**
- * Custom renderer for the PayZen FacilyPay Oney shipping options field.
+ * Custom renderer for the FacilyPay Oney shipping options field.
  */
 class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
@@ -134,7 +126,7 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
         if ($savedMethods && is_array($savedMethods) && ! empty($savedMethods)) {
             foreach ($savedMethods as $id => $method) {
                 if (key_exists($method['code'], $allMethods)) {
-                    // update magento method title
+                    // Update magento method title.
                     $method['title'] = $allMethods[$method['code']];
                     $value[$id] = $method;
 
@@ -143,13 +135,13 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
             }
         }
 
-        // add not saved yet methods
+        // Add not saved yet methods.
         if ($allMethods && is_array($allMethods) && ! empty($allMethods)) {
             foreach ($allMethods as $code => $name) {
                 $value[uniqid('_' . $code . '_')] = [
                     'code' => $code,
                     'title' => $name,
-                    'oney_label' => $this->checkoutHelper->cleanShippingMethod($name), // to match Oney restrictions
+                    'oney_label' => $this->checkoutHelper->cleanShippingMethod($name), // To match Oney restrictions.
                     'type' => 'PACKAGE_DELIVERY_COMPANY',
                     'speed' => 'STANDARD',
                     'mark' => true
@@ -170,13 +162,13 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
             $store = $this->getElement()->getScopeId();
         }
 
-        // list of all configured carriers
+        // List of all configured carriers.
         $carriers = $this->shippingConfig->getAllCarriers($store);
 
         foreach ($carriers as $carrierCode => $carrierModel) {
             $carrierModel->setStore($store);
 
-            // filter carriers to get active ones on current scope
+            // Filter carriers to get active ones on current scope.
             if (! $carrierModel->isActive()) {
                 continue;
             }
@@ -194,14 +186,14 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
                     $title = '[' . $carrierTitle . '] ';
                     if (is_string($methodTitle) && ! empty($methodTitle)) {
                         $title .= $methodTitle;
-                    } else { // non standard method title
+                    } else { // Non standard method title.
                         $title .= $methodCode;
                     }
 
                     $allMethods[$code] = $title;
                 }
             } catch (\Exception $e) {
-                // just this shipping method
+                // Just this shipping method.
                 continue;
             }
         }

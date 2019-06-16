@@ -1,19 +1,11 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
@@ -21,10 +13,7 @@ class Standard extends Payzen
 {
 
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD;
-
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Standard::class;
-
-    protected $_canSaveCc = true;
 
     /**
      *
@@ -49,6 +38,11 @@ class Standard extends Payzen
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param \Lyranetwork\Payzen\Model\Api\PayzenRequest $payzenRequest
+     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
+     * @param \Magento\Sales\Model\Order\Payment\Transaction $transaction
+     * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\App\Response\Http $redirect
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
@@ -56,6 +50,7 @@ class Standard extends Payzen
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
+     * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
@@ -72,6 +67,11 @@ class Standard extends Payzen
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         \Lyranetwork\Payzen\Model\Api\PayzenRequestFactory $payzenRequestFactory,
+        \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory,
+        \Magento\Sales\Model\Order\Payment\Transaction $transaction,
+        \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource,
+        \Magento\Framework\UrlInterface $urlBuilder,
+        \Magento\Framework\App\Response\Http $redirect,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
@@ -79,6 +79,7 @@ class Standard extends Payzen
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
+        \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
@@ -99,6 +100,11 @@ class Standard extends Payzen
             $logger,
             $localeResolver,
             $payzenRequestFactory,
+            $payzenResponseFactory,
+            $transaction,
+            $transactionResource,
+            $urlBuilder,
+            $redirect,
             $dataHelper,
             $paymentHelper,
             $checkoutHelper,
@@ -106,6 +112,7 @@ class Standard extends Payzen
             $messageManager,
             $dirReader,
             $dataObjectFactory,
+            $authSession,
             $resource,
             $resourceCollection,
             $data
@@ -117,27 +124,30 @@ class Standard extends Payzen
         $info = $this->getInfoInstance();
 
         if ($this->isLocalCcType()) {
-            // set payment_cards
+            // Set payment_cards.
             $this->payzenRequest->set('payment_cards', $info->getCcType());
         } else {
-            // payment_cards is given as csv by magento
+            // Payment_cards is given as csv by magento.
             $paymentCards = explode(',', $this->getConfigData('payment_cards'));
             $paymentCards = in_array('', $paymentCards) ? '' : implode(';', $paymentCards);
 
             $this->payzenRequest->set('payment_cards', $paymentCards);
         }
 
-        // set payment_src to MOTO for backend payments
+        // Set payment_src to MOTO for backend payments.
         if ($this->dataHelper->isBackend()) {
             $this->payzenRequest->set('payment_src', 'MOTO');
             return;
         }
 
         if ($this->isIframeMode()) {
-            // iframe enabled
+            // Iframe enabled.
             $this->payzenRequest->set('action_mode', 'IFRAME');
 
-            // enable automatic redirection
+            // Hide logos below payment fields.
+            $this->payzenRequest->set('theme_config', $this->payzenRequest->get('theme_config') . '3DS_LOGOS=false;');
+
+            // Enable automatic redirection.
             $this->payzenRequest->set('redirect_enabled', '1');
             $this->payzenRequest->set('redirect_success_timeout', '0');
             $this->payzenRequest->set('redirect_error_timeout', '0');
@@ -147,16 +157,21 @@ class Standard extends Payzen
         }
 
         if ($this->getConfigData('oneclick_active') && $order->getCustomerId()) {
-            // 1-Click enabled and customer logged-in
+            // 1-Click enabled and customer logged-in.
             $customer = $this->customerRepository->getById($order->getCustomerId());
 
-            if ($customer->getData('payzen_identifier') && $info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::IDENTIFIER)) {
-                // customer has an identifier and wants to use it
-                $this->dataHelper->log('Customer ' . $customer->getEmail() . ' has an identifier and chose to use it for payment.');
-                $this->payzenRequest->set('identifier', $customer->getData('payzen_identifier'));
+            if ($customer->getCustomAttribute('payzen_identifier')) {
+                // Customer has an identifier.
+                $this->payzenRequest->set('identifier', $customer->getCustomAttribute('payzen_identifier')->getValue());
+
+                if (! $info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::IDENTIFIER)) {
+                    // Customer choose to not use alias.
+                    $this->payzenRequest->set('page_action', 'REGISTER_UPDATE_PAY');
+                }
             } else {
-                // bank data acquisition on payment page, let's ask customer for data registration
-                $this->dataHelper->log('Customer ' . $customer->getEmail() . ' will be asked for card data registration on payment page.');
+                // Bank data acquisition on payment page, let's ask customer for data registration.
+                $this->dataHelper->log('Customer ' . $customer->getEmail() .
+                     ' will be asked for card data registration on payment page.');
                 $this->payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
             }
         }
@@ -180,10 +195,14 @@ class Standard extends Payzen
      */
     public function getAvailableCcTypes()
     {
-        // all cards
+        if (! $this->isLocalCcType()) {
+            return null;
+        }
+
+        // All cards.
         $allCards = \Lyranetwork\Payzen\Model\Api\PayzenApi::getSupportedCardTypes();
 
-        // selected cards from module configuration
+        // Selected cards from module configuration.
         $cards = $this->getConfigData('payment_cards');
 
         if (! empty($cards)) {
@@ -215,7 +234,7 @@ class Standard extends Payzen
             return false;
         }
 
-        // no 1-Click
+        // No 1-Click.
         if (! $this->getConfigData('oneclick_active')) {
             return false;
         }
@@ -224,14 +243,12 @@ class Standard extends Payzen
             return false;
         }
 
-        // customer not logged in
-        if (! $this->customerSession->isLoggedIn()) {
+        if ($this->getEntryMode() == 4) {
             return false;
         }
 
-        // customer has not PayZen identifier
-        $customer = $this->customerSession->getCustomer();
-        if (! $customer || ! $customer->getData('payzen_identifier')) {
+        // Customer has not gateway identifier.
+        if (! $this->getCurrentCustomer() || ! $this->getCurrentCustomer()->getCustomAttribute('payzen_identifier')) {
             return false;
         }
 
@@ -246,18 +263,15 @@ class Standard extends Payzen
      */
     public function assignData(\Magento\Framework\DataObject $data)
     {
-        // reset payment method specific data
-        $this->resetData();
-
         parent::assignData($data);
 
         $info = $this->getInfoInstance();
 
-        $payzenData = $this->extractPayzenData($data);
+        $payzenData = $this->extractPaymentData($data);
 
         $info->setCcType($payzenData->getData('payzen_standard_cc_type'));
 
-        // wether to do a payment by identifier
+        // Wether to do a payment by identifier.
         $info->setAdditionalInformation(
             \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER,
             $payzenData->getData('payzen_standard_use_identifier')
@@ -277,7 +291,7 @@ class Standard extends Payzen
             return false;
         }
 
-        return $this->getConfigData('card_info_mode') == 3;
+        return $this->getEntryMode() == 3;
     }
 
     /**
@@ -291,6 +305,181 @@ class Standard extends Payzen
             return false;
         }
 
-        return $this->getConfigData('card_info_mode') == 2;
+        return $this->getEntryMode() == 2;
+    }
+
+    /**
+     * Return card selection mode.
+     *
+     * @return int
+     */
+    public function getEntryMode()
+    {
+        return $this->getConfigData('card_info_mode');
+    }
+
+    /**
+     * Return logged in customer model data.
+     *
+     * @return int
+     */
+    public function getCurrentCustomer()
+    {
+        // Customer not logged in.
+        if (! $this->customerSession->isLoggedIn()) {
+            return false;
+        }
+
+        // Customer has not gateway identifier.
+        $customer = $this->customerSession->getCustomer();
+        if (! $customer || ! $customer->getId()) {
+            return false;
+        }
+
+        return $customer->getDataModel();
+    }
+
+    public function getRestApiFormToken()
+    {
+        $quote = $this->dataHelper->getCheckoutQuote();
+
+        if (! $quote || ! $quote->getId()) {
+            $this->dataHelper->log('Cannot create form token. Empty quote passed.', \Psr\Log\LogLevel::WARNING);
+            return false;
+        }
+
+        // Amount in current order currency.
+        $amount = $quote->getGrandTotal();
+
+        // Currency.
+        $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getOrderCurrencyCode());
+        if ($currency == null) {
+            // If currency is not supported, use base currency,.
+            $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
+
+            // ... and order total in base currency.
+            $amount = $quote->getBaseGrandTotal();
+        }
+
+        // Check if capture_delay and validation_mode are overriden in standard submodule.
+        $captureDelay = is_numeric($this->getConfigData('capture_delay')) ? $this->getConfigData('capture_delay') :
+            $this->dataHelper->getCommonConfigData('capture_delay');
+
+        $validationMode = ($this->getConfigData('validation_mode') !== '-1') ? $this->getConfigData('validation_mode') :
+            $this->dataHelper->getCommonConfigData('validation_mode');
+
+        // Activate 3DS?
+        $strongAuth = 'AUTO';
+        $threedsMinAmount = $this->dataHelper->getCommonConfigData('threeds_min_amount');
+        if ($threedsMinAmount && $quote->getTotalDue() < $threedsMinAmount) {
+            $strongAuth = 'DISABLED';
+        }
+
+        // Version.
+        $cmsParam = $this->dataHelper->getCommonConfigData('cms_identifier') . '_'
+            . $this->dataHelper->getCommonConfigData('plugin_version');
+        $cmsVersion = $this->productMetadata->getVersion(); // Will return the Magento version.
+
+        $billingAddress = $quote->getBillingAddress();
+
+        $data = [
+            'orderId' => $quote->getReservedOrderId(),
+            'customer' => [
+                'email' => $quote->getCustomerEmail(),
+                'reference' => $quote->getCustomer()->getId(),
+                'billingDetails' => [
+                    'language' => strtoupper($this->getPaymentLanguage()),
+                    'title' => $billingAddress->getPrefix() ? $billingAddress->getPrefix() : null,
+                    'firstName' => $billingAddress->getFirstname(),
+                    'lastName' => $billingAddress->getLastname(),
+                    'address' => implode(' ', $billingAddress->getStreet()),
+                    'zipCode' => $billingAddress->getPostcode(),
+                    'city' => $billingAddress->getCity(),
+                    'state' => $billingAddress->getRegion(),
+                    'phoneNumber' => $billingAddress->getTelephone(),
+                    'cellPhoneNumber' => $billingAddress->getTelephone(),
+                    'country' => $billingAddress->getCountryId()
+                ]
+            ],
+            'transactionOptions' => [
+                'cardOptions' => [
+                    'captureDelay' => $captureDelay,
+                    'manualValidation' => $validationMode ? 'YES' : 'NO',
+                    'paymentSource' => 'EC'
+                ]
+            ],
+            'contrib' => $cmsParam . '/' . $cmsVersion . '/' . PHP_VERSION,
+            'strongAuthenticationState' => $strongAuth,
+            'currency' => $currency->getAlpha3(),
+            'amount' => $currency->convertAmountToInteger($amount),
+            'metadata' => [
+                'quote_id' => $quote->getId()
+            ]
+        ];
+
+        // Set shipping info.
+        if (($shippingAddress = $quote->getShippingAddress()) && is_object($shippingAddress)) {
+            $data['customer']['shippingDetails'] = array(
+                'firstName' => $shippingAddress->getFirstname(),
+                'lastName' => $shippingAddress->getLastname(),
+                'address' => $shippingAddress->getStreetLine(1),
+                'address2' => $shippingAddress->getStreetLine(2),
+                'zipCode' => $shippingAddress->getPostcode(),
+                'city' => $shippingAddress->getCity(),
+                'state' => $shippingAddress->getregion(),
+                'phoneNumber' => $shippingAddress->gettelephone(),
+                'country' => $shippingAddress->getCountryId()
+            );
+        }
+
+        // Set the maximum attempts number in case of failed payment.
+        if ($this->getConfigData('rest_attempts')) {
+            $data['transactionOptions']['cardOptions']['retry'] = $this->getConfigData('rest_attempts');
+        }
+
+        try {
+            // Perform our request.
+            $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
+                $this->dataHelper->getCommonConfigData('rest_url'),
+                $this->dataHelper->getCommonConfigData('site_id'),
+                $this->getRestPrivateKey()
+            );
+
+            $response = $client->post('V4/Charge/CreatePayment', json_encode($data));
+
+            if ($response['status'] !== 'SUCCESS') {
+                $this->dataHelper->log(
+                    "Error while creating payment form token for quote #{$quote->getId()}: "
+                        . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').',
+                    \Psr\Log\LogLevel::WARNING
+                );
+
+                if (isset($response['answer']['detailedErrorMessage']) && ! empty($response['answer']['detailedErrorMessage'])) {
+                    $this->dataHelper->log(
+                        'Detailed message: ' . $response['answer']['detailedErrorMessage']
+                            .' ('.$response['answer']['detailedErrorCode'].').',
+                        \Psr\Log\LogLevel::WARNING
+                    );
+                }
+
+                return false;
+            } else {
+                $this->dataHelper->log("Form token created successfully for quote #{$quote->getId()}.");
+
+                // Payment form token created successfully.
+                return $response['answer']['formToken'];
+            }
+        } catch (\Exception $e) {
+            $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);
+            return false;
+        }
+    }
+
+    private function getRestPrivateKey()
+    {
+        $mode = $this->dataHelper->getCommonConfigData('ctx_mode');
+
+        $key = ($mode === 'PRODUCTION') ? 'rest_private_key_prod' : 'rest_private_key_test';
+        return $this->getConfigData($key);
     }
 }

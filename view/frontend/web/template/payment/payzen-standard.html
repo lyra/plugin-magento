@@ -1,19 +1,11 @@
 <!--
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 
@@ -24,7 +16,7 @@
                class="radio"
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {for: getCode()}" class="label">
-            <!-- PayZen standard logo -->
+            <!-- Standard logo. -->
             <img data-bind="attr: {src: getModuleLogoUrl()}"
                  class="payment-icon"
                  alt="PayZen"
@@ -45,10 +37,52 @@
             <!--/ko-->
         </div>
 
-        <fieldset class="fieldset payment method payzen-form" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 20px;">
-        <!-- ko if: (getEntryMode() == 2) -->
-            <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
-        <!--/ko-->
+        <fieldset class="fieldset payment method payzen-form" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 10px;">
+            <!-- ko if: (getEntryMode() == 2) && !isOneClick() -->
+                <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
+            <!--/ko-->
+
+            <!-- ko if: (getEntryMode() == 4) && getRestFormToken() -->
+                <!-- ko template: { name: 'Lyranetwork_Payzen/payment/rest', data: $parent, afterRender: function(elts) { $data.initRestEvents(elts); } } --><!-- /ko -->
+            <!--/ko-->
+
+            <!-- ko if: isOneClick() -->
+                <ul class="payzen-identifier">
+                    <li class="payzen-standard-cc-block payzen-block">
+                        <!-- ko if: (getEntryMode() == 2) -->
+                            <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
+                        <!--/ko-->
+
+                        <span data-bind="i18n: 'You will enter payment data after order confirmation.'"></span>
+                    </li>
+
+                    <li class="payzen-standard-cc-block payzen-block">
+                        <span data-bind="i18n: 'OR'"></span>
+                    </li>
+
+                    <li class="payzen-standard-cc-block payzen-block">
+                        <a data-bind="click: function() { payzenUseIdentifier(1); updatePaymentBlock('id'); return true; }"
+                           class="payzen-payment-link" href="javascript: void(0);">
+                            <span data-bind="i18n: 'Click here to pay with your registered means of payment.'"></span>
+                        </a>
+                    </li>
+
+                    <li class="payzen-standard-id-block payzen-block" >
+                        <span data-bind="html: $t('You will pay with your registered means of payment %s. No data entry is needed.').replace('%s', '<b>' + getMaskedPan() + '</b>')"></span>
+                    </li>
+
+                    <li class="payzen-standard-id-block payzen-block">
+                        <span data-bind="i18n: 'OR'"></span>
+                    </li>
+
+                    <li class="payzen-standard-id-block payzen-block">
+                        <a data-bind="click: function() { payzenUseIdentifier(0); updatePaymentBlock('cc'); return true; }"
+                           class="payzen-payment-link" href="javascript: void(0);">
+                            <span data-bind="i18n: 'Click here to pay with another means of payment.'"></span>
+                        </a>
+                    </li>
+                </ul>
+            <!--/ko-->
         </fieldset>
 
         <div class="checkout-agreements-block payzen-form">
@@ -61,7 +95,7 @@
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"
-                        data-bind="click: placeOrder,
+                        data-bind="click: placeOrderClick,
                                    attr: {title: $t('Pay with PayZen')},
                                    css: {disabled: !isPlaceOrderActionAllowed()},
                                    enable: (getCode() == isChecked())"
@@ -72,7 +106,7 @@
         </div>
 
         <!-- ko if: (getEntryMode() == 3) -->
-            <!-- ko template: 'Lyranetwork_Payzen/payment/iframe' --><!-- /ko -->
+            <!-- ko template: { name: 'Lyranetwork_Payzen/payment/iframe', data: $parent, afterRender: function(elts) { $data.initIframeEvents(elts); } } --><!-- /ko -->
         <!--/ko-->
     </div>
 </div>

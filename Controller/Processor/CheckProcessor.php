@@ -1,23 +1,16 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
 
 use \Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Lyranetwork\Payzen\Model\ResponseException;
 
 class CheckProcessor
 {
@@ -74,125 +67,85 @@ class CheckProcessor
         $this->payzenResponseFactory = $payzenResponseFactory;
     }
 
-    public function execute(\Lyranetwork\Payzen\Api\CheckActionInterface $controller)
-    {
-        if (! $controller->getRequest()->isPost()) {
-            return;
-        }
-
-        $post = $controller->getRequest()->getParams();
-
-        // loading order
-        $orderId = key_exists('vads_order_id', $post) ? $post['vads_order_id'] : 0;
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($orderId);
-
-        // get store id from order
-        $storeId = $order->getStore()->getId();
-
-        // init app with correct store id
-        $this->storeManager->setCurrentStore($storeId);
-
-        // load API response
-        $payzenResponse = $this->payzenResponseFactory->create(
-            [
-                'params' => $post,
-                'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
-                'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
-                'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId),
-                'algo' => $this->dataHelper->getCommonConfigData('sign_algo', $storeId)
-            ]
-        );
-
-        if (! $payzenResponse->isAuthentified()) {
-            // authentification failed
-            $this->dataHelper->log(
-                "{$this->dataHelper->getIpAddress()} tries to access payzen/payment/check page without valid signature with parameters: " . json_encode($post),
-                \Psr\Log\LogLevel::ERROR
-            );
-
-            $this->dataHelper->log(
-                'Signature algorithm selected in module settings must be the same as one selected in PayZen Back Office.',
-                \Psr\Log\LogLevel::ERROR
-            );
-
-            return $controller->renderResponse($payzenResponse->getOutputForPlatform('auth_fail'));
-        }
-
+    public function execute(
+        \Magento\Sales\Model\Order $order,
+        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+    ) {
         $this->dataHelper->log("Request authenticated for order #{$order->getId()}.");
 
         $reviewStatuses = [
             'payment_review',
             'payzen_to_validate',
-            'fraud'
+            'fraud',
+            'payzen_pending_transfer'
         ];
 
         if ($order->getStatus() == 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
-            // order waiting for payment
+            // Order waiting for payment.
             $this->dataHelper->log("Order #{$order->getId()} is waiting payment update.");
-            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $payzenResponse->getLogMessage());
+            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $response->getLogMessage());
 
-            if ($payzenResponse->isAcceptedPayment()) {
+            if ($response->isAcceptedPayment()) {
                 $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by notification URL.");
 
-                $stateObject = $this->paymentHelper->nextOrderState($order, $payzenResponse);
+                $stateObject = $this->paymentHelper->nextOrderState($order, $response);
                 if ($order->getStatus() == $stateObject->getStatus()) {
-                    // payment status is unchanged display notification url confirmation message
-                    return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ok_already_done'));
+                    // Payment status is unchanged display notification url confirmation message.
+                    return 'payment_ok_already_done';
                 } else {
-                    // save order and optionally create invoice
-                    $this->paymentHelper->registerOrder($order, $payzenResponse);
+                    // Save order and optionally create invoice.
+                    $this->paymentHelper->registerOrder($order, $response);
 
-                    // display notification url confirmation message
-                    return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ok'));
+                    // Display notification URL confirmation message.
+                    return 'payment_ok';
                 }
             } else {
                 $this->dataHelper->log("Payment for order #{$order->getId()} has been invalidated by notification URL.");
 
-                // cancel order
-                $this->paymentHelper->cancelOrder($order, $payzenResponse);
+                // Cancel order.
+                $this->paymentHelper->cancelOrder($order, $response);
 
-                // display notification url failure message
-                return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ko'));
+                // Display notification URL failure message.
+                return 'payment_ko';
             }
         } else {
-            // payment already processed
+            // Payment already processed.
 
-            $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $storeId);
+            $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $order->getStore()->getId());
             $successStatuses = [
                 $acceptedStatus,
-                'complete' /* case of virtual orders */
+                'complete' // Case of virtual orders.
             ];
 
-            if ($payzenResponse->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
+            if ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
                 $this->dataHelper->log("Order #{$order->getId()} is confirmed.");
 
-                if ($payzenResponse->get('operation_type') == 'CREDIT') {
-                    // this is a refund: create credit memo ?
+                if ($response->get('operation_type') == 'CREDIT') {
+                    // This is a refund: create credit memo?
 
                     $expiry = '';
-                    if ($payzenResponse->get('expiry_month') && $payzenResponse->get('expiry_year')) {
-                        $expiry = str_pad($payzenResponse->get('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' .
-                             $payzenResponse->get('expiry_year');
+                    if ($response->get('expiry_month') && $response->get('expiry_year')) {
+                        $expiry = str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' .
+                             $response->get('expiry_year');
                     }
 
-                    $transactionId = $payzenResponse->get('trans_id') . '-' . $payzenResponse->get('sequence_number');
+                    $transactionId = $response->get('trans_id') . '-' . $response->get('sequence_number');
 
-                    // save paid amount
-                    $currency = PayzenApi::findCurrencyByNumCode($payzenResponse->get('currency'));
+                    // Save paid amount.
+                    $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
                     $amount = round(
-                        $currency->convertAmountToFloat($payzenResponse->get('amount')),
+                        $currency->convertAmountToFloat($response->get('amount')),
                         $currency->getDecimals()
                     );
 
                     $amountDetail = $amount . ' ' . $currency->getAlpha3();
 
-                    if ($payzenResponse->get('effective_currency') &&
-                         ($payzenResponse->get('currency') !== $payzenResponse->get('effective_currency'))) {
-                        $effectiveCurrency = PayzenApi::findCurrencyByNumCode($payzenResponse->get('effective_currency'));
+                    if ($response->get('effective_currency') &&
+                        ($response->get('currency') !== $response->get('effective_currency'))) {
+                        $effectiveCurrency = PayzenApi::findCurrencyByNumCode($response->get('effective_currency'));
 
                         $effectiveAmount = round(
-                            $effectiveCurrency->convertAmountToFloat($payzenResponse->get('effective_amount')),
+                            $effectiveCurrency->convertAmountToFloat($response->get('effective_amount')),
                             $effectiveCurrency->getDecimals()
                         );
 
@@ -203,10 +156,10 @@ class CheckProcessor
                         'Transaction Type' => 'CREDIT',
                         'Amount' => $amountDetail,
                         'Transaction ID' => $transactionId,
-                        'Transaction UUID' => $payzenResponse->get('trans_uuid'),
-                        'Transaction Status' => $payzenResponse->get('trans_status'),
-                        'Means of payment' => $payzenResponse->get('card_brand'),
-                        'Card Number' => $payzenResponse->get('card_number'),
+                        'Transaction UUID' => $response->get('trans_uuid'),
+                        'Transaction Status' => $response->get('trans_status'),
+                        'Means of payment' => $response->get('card_brand'),
+                        'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
                         '3DS Certificate' => ''
                     ];
@@ -220,24 +173,108 @@ class CheckProcessor
                         $additionalInfo
                     );
                 } else {
-                    // update transaction info
-                    $this->paymentHelper->updatePaymentInfo($order, $payzenResponse);
+                    // Update transaction info.
+                    $this->paymentHelper->updatePaymentInfo($order, $response);
                 }
 
                 $order->save();
 
-                return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ok_already_done'));
-            } elseif ($order->isCanceled() && ! $payzenResponse->isAcceptedPayment()) {
+                return 'payment_ok_already_done';
+            } elseif ($order->isCanceled() && ! $response->isAcceptedPayment()) {
                 $this->dataHelper->log("Order #{$order->getId()} cancelation is confirmed.");
-                return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ko_already_done'));
+                return 'payment_ko_already_done';
             } else {
-                // error case, the client returns with an error code but the payment already has been accepted
-                $this->dataHelper->log(
-                    "Order #{$order->getId()} has been validated but we receive a payment error code !",
-                    \Psr\Log\LogLevel::ERROR
-                );
-                return $controller->renderResponse($payzenResponse->getOutputForPlatform('payment_ko_on_order_ok'));
+                // Error case, the payment result and the order status do not match.
+                $msg = "Invalid payment result received for already saved order #{$order->getId()}.";
+                $msg .= " Payment result: {$response->getTransStatus()}, order status : {$order->getStatus()}.";
+                $this->dataHelper->log($msg, \Psr\Log\LogLevel::ERROR);
+
+                return 'payment_ko_on_order_ok';
             }
         }
+    }
+
+    public function prepareResponse($params)
+    {
+        // Loading order.
+        $order = $this->findOrder($params);
+
+        // Get store id from order.
+        $storeId = $order->getStore()->getId();
+
+        // Init app with correct store ID.
+        $this->storeManager->setCurrentStore($storeId);
+
+        // Load API response.
+        $response = $this->payzenResponseFactory->create(
+            [
+                'params' => $params,
+                'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
+                'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
+                'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId),
+                'algo' => $this->dataHelper->getCommonConfigData('sign_algo', $storeId)
+            ]
+        );
+
+        if (! $response->isAuthentified()) {
+            // Authentification failed.
+            $this->dataHelper->log(
+                "{$this->dataHelper->getIpAddress()} tries to access payzen/payment/check page without valid signature with parameters: " . json_encode($params),
+                \Psr\Log\LogLevel::ERROR
+            );
+
+            $this->dataHelper->log(
+                'Signature algorithm selected in module settings must be the same as one selected in PayZen Back Office.',
+                \Psr\Log\LogLevel::ERROR
+            );
+
+            throw new ResponseException($response->getOutputforGateway('auth_fail'));
+        }
+
+        return [
+            'response' => $response,
+            'order' => $order
+        ];
+    }
+
+    private function findOrder($params)
+    {
+        // Load order.
+        $orderId = key_exists('vads_order_id', $params) ? $params['vads_order_id'] : null;
+        if (! $orderId) {
+            $this->dataHelper->log('Order ID is empty. Content: ' . json_encode($params), \Psr\Log\LogLevel::ERROR);
+            throw new ResponseException('<span style="display:none">KO-Invalid IPN request received.'."\n".'</span>');
+        }
+
+        // Loading order.
+        $order = $this->orderFactory->create();
+        $order->loadByIncrementId($orderId);
+
+        if (! $order->getId()) {
+            $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
+            throw new ResponseException('<span style="display:none">KO-Order not found.' . "\n" . '</span>');
+        }
+
+        return $order;
+    }
+
+    public function getDataHelper()
+    {
+        return $this->dataHelper;
+    }
+
+    public function getStoreManager()
+    {
+        return $this->storeManager;
+    }
+
+    public function getOrderFactory()
+    {
+        return $this->orderFactory;
+    }
+
+    public function getPayzenResponseFactory()
+    {
+        return $this->payzenResponseFactory;
     }
 }

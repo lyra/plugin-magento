@@ -1,24 +1,16 @@
 <?php
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 
 /**
- * Custom renderer for the PayZen FacilyPay Oney shipping options field.
+ * Custom renderer for the restriction by customer group option field.
  */
 class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
@@ -34,6 +26,12 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config
      * @var bool
      */
     protected $staticTable = true;
+
+    /**
+     *
+     * @var array
+     */
+    protected $_default = [];
 
     /**
      *
@@ -102,7 +100,7 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config
         if (! empty($savedGroups)) {
             foreach ($savedGroups as $id => $savedGroup) {
                 if (key_exists($savedGroup['code'], $groups)) {
-                    // refresh group title
+                    // Refresh group title.
                     $savedGroups[$id]['title'] = $groups[$savedGroup['code']];
                     if ($savedGroup['code'] === 'all') {
                         $savedGroups[$id]['all'] = true;
@@ -113,17 +111,20 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config
             }
         }
 
-        // add not saved yet groups
+        // Add not saved yet groups.
         foreach ($groups as $code => $title) {
+           $min = (($code === 'all') && isset($this->_default['amount_min'])) ? $this->_default['amount_min'] : '';
+           $max = (($code === 'all') && isset($this->_default['amount_max'])) ? $this->_default['amount_max'] : '';
+
             $group = [
                 'code' => $code,
                 'title' => $title,
-                'amount_min' => '',
-                'amount_max' => ''
+                'amount_min' => $min,
+                'amount_max' => $max
             ];
 
             if ($code === 'all') {
-                // add all groups entry
+                // Add all groups entry.
                 $group['all'] = true;
                 $savedGroups = array_merge([
                     uniqid('_all_') => $group

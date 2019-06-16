@@ -1,18 +1,10 @@
 /**
- * PayZen V2-Payment Module version 2.3.2 for Magento 2.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
  *
- * NOTICE OF LICENSE
- *
- * This source file is licensed under the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/licenses/osl-3.0.php
- *
- * @category  Payment
- * @package   Payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2018 Lyra Network and contributors
- * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
 /*browser:true*/
@@ -27,29 +19,38 @@ define(
         return Component.extend({
             defaults: {
                 template: 'Lyranetwork_Payzen/payment/payzen-multi',
-                payzenMultiOption: window.checkoutConfig.payment.payzen_multi.availableOptions[0]['key'],
+                payzenMultiOption: window.checkoutConfig.payment.payzen_multi.availableOptions ?
+                    window.checkoutConfig.payment.payzen_multi.availableOptions[0]['key'] : null,
                 payzenCcType: window.checkoutConfig.payment.payzen_multi.availableCcTypes ?
                     window.checkoutConfig.payment.payzen_multi.availableCcTypes[0]['value'] : null
             },
 
             initObservable: function () {
-                this._super().observe('payzenMultiOption');
+                this._super();
+                this.observe('payzenCcType');
+                this.observe('payzenMultiOption');
+
                 return this;
             },
 
             getData: function () {
                 var data = this._super();
+
+                if (this.getEntryMode() == 2) {
+                    data['additional_data']['payzen_multi_cc_type'] = this.payzenCcType();
+                }
+
                 data['additional_data']['payzen_multi_option'] = this.payzenMultiOption();
 
                 return data;
             },
 
-            getAvailableOptions: function () {
-                return window.checkoutConfig.payment.payzen_multi.availableOptions;
-            },
-
             showLabel: function () {
                 return true;
+            },
+
+            getAvailableOptions: function () {
+                return window.checkoutConfig.payment.payzen_multi.availableOptions;
             }
         });
     }
