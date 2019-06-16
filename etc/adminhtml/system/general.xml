@@ -24,7 +24,7 @@
             <field id="developed_by" translate="label" type="label" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Developed by]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <comment><![CDATA[<a href="http://www.lyra-network.com" target="_blank">Lyra Network</a>]]></comment>
+                <comment><![CDATA[<a href="https://www.lyra.com/" target="_blank">Lyra Network</a>]]></comment>
                 <config_path>payzen/general/developed_by</config_path>
             </field>
 

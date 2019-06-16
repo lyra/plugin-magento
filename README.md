@@ -1,6 +1,6 @@
 # PayZen for Magento 2
 
-PayZen for Magento 2 is an open source plugin that links e-commerce websites based on Magento to PayZen secure payment gateway developed by [Lyra Network](https://www.lyra-network.com/).
+PayZen for Magento 2 is an open source plugin that links e-commerce websites based on Magento to PayZen secure payment gateway developed by [Lyra Network](https://www.lyra.com/).
 
 Namely, it enables the following payment methods :
 * PayZen - Standard payment
