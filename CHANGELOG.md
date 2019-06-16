@@ -1,4 +1,4 @@
-2.4.0, 2019-03-18:
+2.4.0, 2019-06-17:
 - Bug fix: consider UNDER_VERIFICATION as a success status for refund transactions.
 - Fix IPN URL CSRF verification for compatibility with Magento 2.3.x versions.
 - [embedded] Added payment with embedded fields option using REST API.
