@@ -39,15 +39,11 @@ class UpgradeData implements UpgradeDataInterface
      */
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
+        // Prepare database for install.
+        $setup->startSetup();
+
         if (version_compare($context->getVersion(), '2.4.0', '<')) {
-            // Prepare database for install.
-            $setup->startSetup();
-
-            /**
-             * Add gateway masked PAN attribute to the customer entity.
-             */
             $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
-
             $customerSetup->updateAttribute(
                 Customer::ENTITY,
                 'payzen_identifier',
@@ -57,6 +53,9 @@ class UpgradeData implements UpgradeDataInterface
                 ]
             );
 
+            /**
+             * Add gateway masked PAN attribute to the customer entity.
+             */
             $customerSetup->addAttribute(
                 Customer::ENTITY,
                 'payzen_masked_pan',
@@ -82,36 +81,79 @@ class UpgradeData implements UpgradeDataInterface
             /**
              * Add new gateway statuses.
              */
-            $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
+            $connection = $setup->getConnection();
 
-            if ($features['sepa']) {
-                $connection = $setup->getConnection();
+            // Pending status for SEPA payment.
+            $select = $connection->select()
+                ->from($setup->getTable('sales_order_status'), 'COUNT(*)')
+                ->where('status = ?', 'payzen_pending_transfer');
+            $count = (int) $connection->fetchOne($select);
 
-                // Pending status for SEPA payment.
-                $select = $connection->select()
-                    ->from($setup->getTable('sales_order_status'), 'COUNT(*)')
-                    ->where('status = ?', 'payzen_pending_transfer');
-                $count = (int) $connection->fetchOne($select);
+            if ($count == 0) {
+                $connection->insert(
+                    $setup->getTable('sales_order_status'),
+                    [
+                        'status' => 'payzen_pending_transfer',
+                        'label' => 'Pending funds transfer'
+                    ]
+                );
 
-                if ($count == 0) {
-                    $connection->insert(
-                        $setup->getTable('sales_order_status'),
-                        [
-                            'status' => 'payzen_pending_transfer',
-                            'label' => 'Pending funds transfert'
-                        ]
-                    );
-
-                    $connection->insert(
-                        $setup->getTable('sales_order_status_state'),
-                        [
-                            'status' => 'payzen_pending_transfer',
-                            'state' => 'processing',
-                            'is_default' => 0
-                        ]
-                    );
-                }
+                $connection->insert(
+                    $setup->getTable('sales_order_status_state'),
+                    [
+                        'status' => 'payzen_pending_transfer',
+                        'state' => 'processing',
+                        'is_default' => 0
+                    ]
+                );
             }
+        }
+
+        if (version_compare($context->getVersion(), '2.4.1', '<')) {
+            $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
+            $customerSetup->addAttribute(
+                Customer::ENTITY,
+                'payzen_sepa_identifier',
+                [
+                    'type' => 'varchar',
+                    'input' => 'text',
+                    'label' => 'PayZen SEPA identifier',
+
+                    'global' => 1,
+                    'visible' => 1,
+                    'searchable' => 0,
+                    'filterable' => 0,
+                    'comparable' => 0,
+                    'visible_on_front' => 0,
+                    'required' => 0,
+                    'user_defined' => 0,
+                    'default' => '',
+                    'source' => null,
+                    'system' => 0
+                ]
+            );
+
+            $customerSetup->addAttribute(
+                Customer::ENTITY,
+                'payzen_sepa_iban_bic',
+                [
+                    'type' => 'varchar',
+                    'input' => 'text',
+                    'label' => 'PayZen SEPA IBAN/BIC',
+
+                    'global' => 1,
+                    'visible' => 1,
+                    'searchable' => 0,
+                    'filterable' => 0,
+                    'comparable' => 0,
+                    'visible_on_front' => 0,
+                    'required' => 0,
+                    'user_defined' => 0,
+                    'default' => '',
+                    'source' => null,
+                    'system' => 0
+                ]
+            );
         }
     }
 }

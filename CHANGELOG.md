@@ -1,3 +1,7 @@
+2.4.1, 2019-07-01:
+- Bug fix: wrong WSDL URL since v2.4.0.
+- [SEPA] Save SEPA aliases separately from CB payment aliases.
+
 2.4.0, 2019-06-17:
 - Bug fix: consider UNDER_VERIFICATION as a success status for refund transactions.
 - Fix IPN URL CSRF verification for compatibility with Magento 2.3.x versions.
