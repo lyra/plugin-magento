@@ -176,7 +176,12 @@ class Payment
         $this->updatePaymentInfo($order, $response);
 
         // Try to save gateway identifier if any.
-        $this->saveIdentifier($order, $response);
+        $method = $order->getPayment()->getMethodInstance();
+        if ($method instanceof \Lyranetwork\Payzen\Model\Method\Sepa)  {
+            $this->saveSepaIdentifier($order, $response);
+        } else {
+            $this->saveIdentifier($order, $response);
+        }
 
         // Try to create invoice.
         $this->createInvoice($order);
@@ -483,7 +488,6 @@ class Payment
         \Magento\Sales\Model\Order $order,
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
     ) {
-
         if (! $order->getCustomerId()) {
             return;
         }
@@ -502,31 +506,8 @@ class Payment
 
             $customerData->setCustomAttribute('payzen_identifier', $response->get('identifier'));
 
-            // Mask all card digits except the last 4 ones.
-            $number = $response->get('card_number');
-            $masked = '';
-
-            $matches = [];
-            if (preg_match('#^([A-Z]{2}[0-9]{2}[A-Z0-9]{10,30})(_[A-Z0-9]{8,11})?$#i', $number, $matches)) {
-                // IBAN(_BIC).
-                $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . ' / ' : ''; // BIC
-
-                $iban = $matches[1];
-                $masked .= substr($iban, 0, 4) . str_repeat('X', strlen($iban) - 8) . substr($iban, -4);
-            } elseif (strlen($number) > 4) {
-                $masked = str_repeat('X', strlen($number) - 4) . substr($number, -4);
-
-                if ($response->get('expiry_month') && $response->get('expiry_year')) {
-                    // Format card expiration data.
-                    $masked .= ' (';
-                    $masked .= str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT);
-                    $masked .= '/';
-                    $masked .= $response->get('expiry_year');
-                    $masked .= ')';
-                }
-            }
-
-            $customerData->setCustomAttribute('payzen_masked_pan', $masked);
+            // Mask card number and save it to customer entity.
+            $customerData->setCustomAttribute('payzen_masked_pan', $this->maskPan($response));
 
             try {
                 $customer->updateData($customerData);
@@ -543,6 +524,76 @@ class Payment
                 );
             }
         }
+    }
+
+    public function saveSepaIdentifier(
+        \Magento\Sales\Model\Order $order,
+        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+    ) {
+        if (! $order->getCustomerId()) {
+            return;
+        }
+
+        if ($response->get('identifier') && (
+            $response->get('identifier_status') == 'CREATED' /* page_action REGISTER_PAY or ASK_REGISTER_PAY */ ||
+            $response->get('identifier_status') == 'UPDATED' /* page_action REGISTER_UPDATE_PAY */
+        )) {
+            $customer = $this->customerFactory->create()->load($order->getCustomerId());
+
+            $customerData = $customer->getDataModel();
+            $customerData->setId($customer->getId());
+
+            $this->dataHelper->log("Identifier for customer #{$customer->getId()} successfully created" .
+                ' or updated on payment gateway. Let us save it to customer entity.');
+
+            $customerData->setCustomAttribute('payzen_sepa_identifier', $response->get('identifier'));
+
+            // Mask IBAN and save it to customer entity.
+            $customerData->setCustomAttribute('payzen_sepa_iban_bic', $this->maskPan($response));
+
+            try {
+                $customer->updateData($customerData);
+
+                $customerResource = $this->customerResourceFactory->create();
+                $customerResource->saveAttribute($customer, 'payzen_sepa_identifier');
+                $customerResource->saveAttribute($customer, 'payzen_sepa_iban_bic');
+
+                $this->dataHelper->log("Identifier for customer #{$customer->getId()} successfully saved to customer entity.");
+            } catch (\Exception $e) {
+                $this->dataHelper->log(
+                    "Identifier for customer #{$customer->getId()} couldn't be saved to customer entity. Error occurred with code {$e->getCode()}: {$e->getMessage()}.",
+                    \Psr\Log\LogLevel::ERROR
+                );
+            }
+        }
+    }
+
+    private function maskPan($response)
+    {
+        $number = $response->get('card_number');
+        $masked = '';
+
+        $matches = [];
+        if (preg_match('#^([A-Z]{2}[0-9]{2}[A-Z0-9]{10,30})(_[A-Z0-9]{8,11})?$#i', $number, $matches)) {
+            // IBAN(_BIC).
+            $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . ' / ' : ''; // BIC
+
+            $iban = $matches[1];
+            $masked .= substr($iban, 0, 4) . str_repeat('X', strlen($iban) - 8) . substr($iban, -4);
+        } elseif (strlen($number) > 4) {
+            $masked = str_repeat('X', strlen($number) - 4) . substr($number, -4);
+
+            if ($response->get('expiry_month') && $response->get('expiry_year')) {
+                // Format card expiration data.
+                $masked .= ' (';
+                $masked .= str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT);
+                $masked .= '/';
+                $masked .= $response->get('expiry_year');
+                $masked .= ')';
+            }
+        }
+
+        return $masked;
     }
 
     public function createInvoice(\Magento\Sales\Model\Order $order)

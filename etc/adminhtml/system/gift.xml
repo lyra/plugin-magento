@@ -18,7 +18,7 @@
         <attribute type="feature">gift</attribute>
 
         <group id="payzen_display_options" translate="label" type="text" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label><![CDATA[BASIC SETTINGS]]></label>
+            <label><![CDATA[DISPLAY OPTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="active" translate="label comment" type="select" sortOrder="411" showInDefault="1" showInWebsite="1" showInStore="1">
