@@ -104,9 +104,6 @@ class Token extends \Magento\Framework\App\Action\Action
         $quote = $this->dataHelper->getCheckoutQuote();
         $this->setCheckoutMethod($quote);
 
-        // Reserve order ID.
-        $quote->reserveOrderId();
-
         $quote->collectTotals();
         $this->quoteRepository->save($quote);
 

@@ -382,6 +382,11 @@ class Standard extends Payzen
 
         $billingAddress = $quote->getBillingAddress();
 
+        if (! $quote->getReservedOrderId()) {
+            // Reserve order ID and save quote.
+            $quote->reserveOrderId()->save();
+        }
+
         $data = [
             'orderId' => $quote->getReservedOrderId(),
             'customer' => [
