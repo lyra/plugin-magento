@@ -155,5 +155,8 @@ class UpgradeData implements UpgradeDataInterface
                 ]
             );
         }
+
+        // Prepare database after install.
+        $setup->endSetup();
     }
 }

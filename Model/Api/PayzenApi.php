@@ -229,7 +229,7 @@ if (! class_exists('PayzenApi', false)) {
                 'EDENRED_TR' => 'Ticket Restaurant Edenred', 'ELV' => 'Prélèvement Bancaire Hobex',
                 'EPS' => 'EPS Online Überweisung', 'EPS_GIROPAY' => 'EPS Online Überweisung',
                 'FULLCB_3X' => 'Paiement en 3x sans frais par BNPP PF', 'FULLCB_4X' => 'Paiement en 4x sans frais par BNPP PF',
-                'GIROPAY' => 'Giropay', 'IDEAL' => 'iDEAL', 'ILLICADO' => 'Cartes Cadeau Illicado',
+                'GOOGLEPAY' => 'Google Pay', 'GIROPAY' => 'Giropay', 'IDEAL' => 'iDEAL', 'ILLICADO' => 'Cartes Cadeau Illicado',
                 'ILLICADO_SB' => 'Cartes Cadeau Illicado - Sandbox - Sandbox', 'JCB' => 'JCB',
                 'JOUECLUB_CDX' => 'Carte cadeau JouéClub', 'JOUECLUB_CDX_SB' => 'Carte cadeau JouéClub - Sandbox',
                 'KLARNA' => 'Klarna Internet Banking', 'LEROY-MERLIN' => 'Carte enseigne Leroy-Merlin',

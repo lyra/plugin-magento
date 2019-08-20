@@ -10,6 +10,7 @@
 namespace Lyranetwork\Payzen\Controller\Payment\Rest;
 
 use Lyranetwork\Payzen\Model\ResponseException;
+use Magento\Framework\DataObject;
 
 class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
 {
@@ -109,8 +110,23 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         $order->loadByIncrementId($quote->getReservedOrderId());
 
         if (! $order->getId()) {
-            $order = $this->quoteManagement->submit($quote);
+            $this->getOnepageForQuote($quote)->saveOrder();
 
+            // Dispatch save order event.
+            $result = new DataObject();
+            $result->setData('success', true);
+            $result->setData('error', false);
+
+            $this->_eventManager->dispatch(
+                'checkout_controller_onepage_saveOrder',
+                [
+                    'result' => $result,
+                    'action' => $this
+                ]
+            );
+
+            // Load newly created order.
+            $order->loadByIncrementId($quote->getReservedOrderId());
             if (! $order->getId()) {
                 throw new ResponseException("Order cannot be created for quote #{$quoteId}.");
             }
@@ -134,5 +150,13 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
             'response' => $response,
             'order' => $order
         ];
+    }
+
+    private function getOnepageForQuote($quote)
+    {
+        $onepage = $this->_objectManager->get(\Magento\Checkout\Model\Type\Onepage::class);
+        $onepage->setQuote($quote);
+
+        return $onepage;
     }
 }

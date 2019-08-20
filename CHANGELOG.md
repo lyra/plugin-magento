@@ -1,3 +1,7 @@
+2.4.2, 2019-08-08:
+- Bug fix: Order increment ID not sent on some REST payments.
+- Bug fix: Error at the end of the payment by REST API in guest mode.
+
 2.4.1, 2019-07-01:
 - Bug fix: wrong WSDL URL since v2.4.0.
 - [SEPA] Save SEPA aliases separately from CB payment aliases.
