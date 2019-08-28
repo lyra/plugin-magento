@@ -64,7 +64,7 @@ if (Mage::helper('payzen')->isCurrentlySecure()) : // Admin backend secured, use
     foreach ($cards as $code => $label) {
         $html = '<div class="payzen-card">';
 
-        if ($count == 1) {
+        if ($count === 1) {
             $html .= '<input type="hidden" id="payzen_standard_cc_type_' . $code . '" value="' . $code . '" name="payment[payzen_standard_cc_type]"/>' ;
         } else {
             $html .= '<input type="radio" class="radio" id="payzen_standard_cc_type_' . $code . '"' . ($first ? ' checked="checked"' : '') . ' value="' . $code . '" name="payment[payzen_standard_cc_type]"/>' ;
@@ -83,9 +83,9 @@ if (Mage::helper('payzen')->isCurrentlySecure()) : // Admin backend secured, use
         $html .= '</label></div>';
 
         $network = $this->getCcTypeNetwork($code);
-        if ($network == 'AMEX') {
+        if ($network === 'AMEX') {
             $amexCards .= $html;
-        } elseif ($network == 'CB') {
+        } elseif ($network === 'CB') {
             $cbCards .= $html;
         } else {
             $otherCards .= $html;

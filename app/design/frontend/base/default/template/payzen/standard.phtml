@@ -14,7 +14,7 @@ $customer = Mage::getSingleton('customer/session')->getCustomer(); // Logged in 
 
 <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display:none;">
 <?php
-if ($this->isLocalCcType() || $this->isLocalCcInfo()) :
+if ($this->isLocalCcType()) :
     $cards = $this->getAvailableCcTypes();
 
     // Show card logos as radio buttons.
@@ -28,10 +28,10 @@ if ($this->isLocalCcType() || $this->isLocalCcInfo()) :
     foreach ($cards as $code => $label) {
         $html = '<div class="payzen-card">';
 
-        if ($count == 1) {
-            $html .= '<input type="hidden" id="payzen_standard_cc_type_' . $code . '" value="' . $code . '" name="payment[payzen_standard_cc_type]"/>' ;
+        if ($count === 1) {
+            $html .= '<input type="hidden" id="payzen_standard_cc_type_' . $code . '" value="' . $code . '" name="payment[payzen_standard_cc_type]" disabled="disabled">' ;
         } else {
-            $html .= '<input type="radio" class="radio" id="payzen_standard_cc_type_' . $code . '"' . ($first ? ' checked="checked"' : '') . ' value="' . $code . '" name="payment[payzen_standard_cc_type]"/>' ;
+            $html .= '<input type="radio" class="radio" id="payzen_standard_cc_type_' . $code . '"' . ($first ? ' checked="checked"' : '') . ' value="' . $code . '" name="payment[payzen_standard_cc_type]" disabled="disabled">' ;
         }
 
         $first = false;
@@ -47,9 +47,9 @@ if ($this->isLocalCcType() || $this->isLocalCcInfo()) :
         $html .= '</label></div>';
 
         $network = $this->getCcTypeNetwork($code);
-        if ($network == 'AMEX') {
+        if ($network === 'AMEX') {
             $amexCards .= $html;
-        } elseif ($network == 'CB') {
+        } elseif ($network === 'CB') {
             $cbCards .= $html;
         } else {
             $otherCards .= $html;
@@ -61,83 +61,7 @@ if ($this->isLocalCcType() || $this->isLocalCcInfo()) :
     if ($otherCards != '') echo '<li class="payzen-standard-cc-block">' . $otherCards . '</li>';
 endif;
 
-if ($this->isLocalCcInfo()) :
-    $dater = Mage::getSingleton('core/date');
-?>
-    <li class="payzen-standard-cc-block">
-        <div class="input-box">
-            <label class="required" for="payzen_standard_cc_number"><?php echo Mage::helper('payzen')->__('Card Number'); ?><em>*</em></label><br/>
-            <input class="input-text required-entry validate-payzen-standard-cc-number" autocomplete="off" maxlength="19" type="text" name="payment[payzen_standard_cc_number]" id="payzen_standard_cc_number" style="width: 200px;" />
-        </div>
-    </li>
-    <li class="payzen-standard-cc-block">
-        <div class="input-box">
-            <label class="required" for="payzen_standard_cc_exp_month"><?php echo Mage::helper('payzen')->__('Expiration Date'); ?><em>*</em></label><br/>
-            <div class="v-fix">
-                <select class="month required-entry validate-payzen-standard-cc-exp" name="payment[payzen_standard_cc_exp_month]" id="payzen_standard_cc_exp_month" style="width: 95px;" >
-                    <?php foreach (range(1, 12) as $month) : ?>
-                        <option value="<?php echo $month; ?>"><?php echo str_pad($month, 2, '0', STR_PAD_LEFT); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="v-fix">
-                <select class="year required-entry" name="payment[payzen_standard_cc_exp_year]" id="payzen_standard_cc_exp_year" style="width: 100px;">
-                    <?php foreach (range($dater->date('Y'), $dater->date('Y') + 9) as $year) : ?>
-                        <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-        </div>
-    </li>
-    <li class="payzen-standard-cc-block">
-        <div class="input-box">
-            <label class="required" for="payzen_standard_cc_cvv"><?php echo Mage::helper('payzen')->__('CVV'); ?><em>*</em></label><br/>
-            <input class="input-text required-entry validate-payzen-standard-cc-cvv" autocomplete="off" maxlength="4" type="text" name="payment[payzen_standard_cc_cvv]" id="payzen_standard_cc_cvv" style="width: 60px;" />
-            <a href="#" class="cvv-what-is-this"><?php echo Mage::helper('payzen')->__('Help?'); ?></a>
-        </div>
-    </li>
-
-    <?php
-    if ($oneClickActive && $customer) :
-        $cardRegisterMode = $this->getConfigData('card_register_mode');
-    ?>
-        <li class="payzen-standard-cc-block">
-        <?php if ($cardRegisterMode == 1 /* register disabled by default */ || $cardRegisterMode == 2 /* register enabled by default */) : ?>
-            <div class="payzen-register-message">
-                <input type="checkbox" value="1" class="checkbox"<?php if ($cardRegisterMode == 2) echo ' checked="checked"'; ?> name="payment[payzen_standard_cc_register]" id="payzen_standard_cc_register" />
-                <label style="float: none !important; cursor: pointer;" for="payzen_standard_cc_register"><?php echo $this->getConfigData('card_register_message') ?></label>
-            </div>
-        <?php else : /* register enabled but hidden */ ?>
-            <input type="hidden" value="1" name="payment[payzen_standard_cc_register]" />
-        <?php endif; ?>
-        </li>
-
-        <?php if ($customer->getPayzenIdentifier()) : ?>
-        <li class="payzen-standard-cc-block">
-            <span class="or"><?php echo Mage::helper('payzen')->__('OR') ?></span>
-        </li>
-
-        <li class="payzen-standard-cc-block">
-            <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('id');"><?php echo Mage::helper('payzen')->__('Click here to pay with your registered means of payment.') ?></a>
-        </li>
-
-        <!-- Payment with registered card block. -->
-        <li class="payzen-standard-id-block">
-            <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
-            <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
-        </li>
-
-        <li class="payzen-standard-id-block">
-            <span class="or"><?php echo Mage::helper('payzen')->__('OR') ?></span>
-        </li>
-
-        <li class="payzen-standard-id-block">
-            <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('cc');"><?php echo Mage::helper('payzen')->__('Click here to pay with another means of payment.') ?></a>
-        </li>
-        <?php endif; ?>
-    <?php endif; ?>
-
-<?php elseif ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
+if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
     <li class="payzen-standard-cc-block"><?php echo Mage::helper('payzen')->__('You will enter payment data after order confirmation.') ?></li>
 
     <li class="payzen-standard-cc-block">
@@ -145,12 +69,12 @@ if ($this->isLocalCcInfo()) :
     </li>
 
     <li class="payzen-standard-cc-block">
-        <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('id');"><?php echo Mage::helper('payzen')->__('Click here to pay with your registered means of payment.') ?></a>
+        <a class="payzen-payment-link" href="javascript: void(0);" onclick="payzenUpdatePaymentBlock('id');"><?php echo Mage::helper('payzen')->__('Click here to pay with your registered means of payment.') ?></a>
     </li>
 
     <!-- Payment with registered card block. -->
     <li class="payzen-standard-id-block">
-        <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" />
+        <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" disabled="disabled">
         <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
     </li>
 
@@ -159,48 +83,13 @@ if ($this->isLocalCcInfo()) :
     </li>
 
     <li class="payzen-standard-id-block">
-        <a class="payzen-payment-link" href="javascript: void(0);" onclick="javascript: payzenUpdatePaymentBlock('cc');"><?php echo Mage::helper('payzen')->__('Click here to pay with another means of payment.') ?></a>
+        <a class="payzen-payment-link" href="javascript: void(0);" onclick="payzenUpdatePaymentBlock('cc');"><?php echo Mage::helper('payzen')->__('Click here to pay with another means of payment.') ?></a>
     </li>
 <?php endif;?>
 </ul>
 
 <script type="text/javascript">
 //<![CDATA[
-<?php if ($this->isLocalCcInfo()) : ?>
-    Translator.add(
-            'Incorrect credit card number.',
-            "<?php echo Mage::helper('payzen')->__('Incorrect credit card number.') ?>"
-    );
-    Translator.add(
-            'Incorrect credit card CVV.',
-            "<?php echo Mage::helper('payzen')->__('Incorrect credit card CVV.') ?>"
-    );
-    Translator.add(
-            'Incorrect credit card expiration date.',
-            "<?php echo Mage::helper('payzen')->__('Incorrect credit card expiration date.') ?>"
-    );
-
-    Validation.addAllThese([
-            ['validate-payzen-standard-cc-exp', 'Incorrect credit card expiration date.', function(v, elm) {
-                    var ccExpMonth = v;
-                    var ccExpYear = $('payzen_standard_cc_exp_year').value;
-                    var currentTime = new Date();
-                    var currentMonth = currentTime.getMonth() + 1;
-                    var currentYear = currentTime.getFullYear();
-                    if (ccExpMonth < currentMonth && ccExpYear == currentYear) {
-                        return false;
-                    }
-                    return true;
-            }],
-            ['validate-payzen-standard-cc-number', 'Incorrect credit card number.', function(v) {
-                return /^\d{13,19}$/.test(v);
-            }],
-            ['validate-payzen-standard-cc-cvv', 'Incorrect credit card CVV.', function(v) {
-                return /^\d{3,4}$/.test(v);
-            }]
-    ]);
-<?php endif; ?>
-
 <?php if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
     // Display payment by identifier block when standard payment is selected.
     Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);

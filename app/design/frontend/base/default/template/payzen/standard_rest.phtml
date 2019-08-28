@@ -1,0 +1,359 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+$oneClickActive = $this->getConfigData('one_click_active'); // 1-Click enabled ?
+$customer = Mage::getSingleton('customer/session')->getCustomer(); // Logged-in customer.
+$isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
+?>
+
+<ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none;">
+<?php if ($isOneclick): ?>
+    <li class="payzen-standard-id-block">
+        <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" disabled="disabled">
+        <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '') ?></span>
+    </li>
+<?php endif;?>
+
+    <li class="payzen-standard-cc-block payzen-standard-id-block" id="payzen_standard_rest_wrapper">
+        <div class="kr-embedded">
+            <div class="kr-pan"></div>
+            <div class="kr-expiry"></div>
+            <div class="kr-security-code"></div>
+
+            <div style="display: none;">
+                <button type="button" id="payzen_rest_hidden_button" class="kr-payment-button"></button>
+            </div>
+
+            <div class="kr-form-error"></div>
+        </div>
+    </li>
+
+<?php if ($isOneclick): ?>
+    <li class="payzen-standard-cc-block">
+        <span class="or"><?php echo Mage::helper('payzen')->__('OR') ?></span>
+    </li>
+
+    <li class="payzen-standard-cc-block">
+        <a class="payzen-payment-link" href="javascript: void(0);" onclick='payzenLoadRestScript(true);'><?php echo Mage::helper('payzen')->__('Click here to pay with your registered means of payment.') ?></a>
+    </li>
+
+    <li class="payzen-standard-id-block">
+        <span class="or"><?php echo Mage::helper('payzen')->__('OR') ?></span>
+    </li>
+
+    <li class="payzen-standard-id-block">
+        <a class="payzen-payment-link" href="javascript: void(0);" onclick='payzenLoadRestScript(false);'><?php echo Mage::helper('payzen')->__('Click here to pay with another means of payment.') ?></a>
+    </li>
+<?php endif; ?>
+</ul>
+
+<script type="text/javascript">
+//<![CDATA[
+    window.FORM_TOKEN = '<?php echo $this->getFormToken(); ?>';
+
+<?php if ($isOneclick): ?>
+    window.IDENTIFIER_FORM_TOKEN = '<?php echo $this->getIdentifierFormToken(); ?>';
+
+    window.payzenUpdatePaymentBlock = function(isOneclick) {
+        $$('ul#payment_form_payzen_standard li').invoke('hide');
+        $$('ul#payment_form_payzen_standard li input').invoke('disable');
+
+        var blockName = isOneclick ? 'id' : 'cc';
+        $$('li.payzen-standard-' + blockName + '-block').invoke('show');
+        $$('li.payzen-standard-' + blockName + '-block input').invoke('enable');
+    };
+<?php endif; ?>
+
+    window.payzenLoadRestScript = function(isOneclick) {
+        var paymentToken = FORM_TOKEN;
+
+        if (typeof IDENTIFIER_FORM_TOKEN !== 'undefined') {
+            // 1-Click available.
+            paymentToken = isOneclick ? IDENTIFIER_FORM_TOKEN : FORM_TOKEN;
+            payzenUpdatePaymentBlock(isOneclick);
+        }
+
+        if (!KR.vueReady) {
+            KR.setFormToken(paymentToken);
+        } else {
+            KR.removeForms();
+
+            $('payzen_standard_rest_wrapper').update(
+                '<div class="kr-embedded" kr-form-token="' + paymentToken + '">' +
+                '    <div class="kr-pan"></div>' +
+                '    <div class="kr-expiry"></div>' +
+                '    <div class="kr-security-code"></div>' +
+
+                '    <div style="display: none;">' +
+                '        <button type="button" id="payzen_rest_hidden_button" class="kr-payment-button"></button>' +
+                '    </div>' +
+
+                '    <div class="kr-form-error"></div>' +
+                '</div>');
+        }
+
+        payzenInitRestEvents.delay(0.2);
+    };
+
+    window.payzenInitRestEvents = function() {
+        KR.onError(function(e) {
+            // Not recoverable error, reload page after a while.
+            if (PAYZEN_RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
+                setTimeout(function() {
+                    window.location.reload();
+                }, 4000);
+            }
+
+            var msg = '';
+            if (PAYZEN_DEFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
+                msg = e.errorMessage + (e.errorMessage.endsWith('.') ? '' : '.');
+            } else {
+                msg = payzenTranslate(e.errorCode);
+            }
+
+            var errorElt = $$('#payzen_standard_rest_wrapper .kr-form-error').first();
+            errorElt.update('<span style="color: red;"><span>' + msg + '</span></span>');
+
+            if (typeof checkout !== 'undefined') { // Default Magento checkout.
+                checkout.setLoadWaiting(false, false);
+                checkout.gotoSection('payment', true);
+            } else {
+                $('onestepcheckout-place-order-loading').hide();
+                $('onestepcheckout-button-place-order').disabled = false;
+                $('onestepcheckout-button-place-order').addClassName('onestepcheckout-btn-checkout');
+                $('onestepcheckout-button-place-order').removeClassName('place-order-loader');
+            }
+        });
+
+        KR.onFocus(function(e) {
+            var errorElt = $$('#payzen_standard_rest_wrapper .kr-form-error').first();
+            errorElt.update('');
+        });
+    };
+
+    var payzenSelectedMethod = function() {
+        var method = null;
+        var options = document.getElementsByName('payment[method]');
+        for (var i = 0; i < options.length; i++) {
+            if ($(options[i].id).checked) {
+                // Selected payment method.
+                method = options[i].value;
+                break;
+            }
+        }
+
+        return method;
+    };
+
+    var payzenDoLoadRestScript = function() {
+        var isOneclick = typeof IDENTIFIER_FORM_TOKEN !== 'undefined';
+
+        if (payzenSelectedMethod() === 'payzen_standard') {
+            // Load script immediately.
+            payzenLoadRestScript.defer(isOneclick);
+        } else {
+            // Load script after method is selected.
+            Event.observe($('p_method_payzen_standard'), 'change', function() {
+                payzenLoadRestScript(isOneclick);
+            });
+        }
+    };
+
+    var payzenUpdateFormToken = function(params, resetLoaderCallback) {
+        var request = new Ajax.Request(
+            "<?php echo $this->getUrl('payzen/payment/restCheckOrder', array('_secure' => true)) ?>",
+            {
+                method: 'post',
+                parameters: params || {},
+                onSuccess: function(transport) {
+                    if (transport && transport.responseText) {
+                        try {
+                            response = eval('(' + transport.responseText + ')');
+                        } catch (e) {
+                            response = {};
+                        }
+
+                        if (response.success) {
+                            // Update form token and call REST API to do payment.
+                            if (response.formToken) {
+                                KR.setFormToken(response.formToken);
+                            }
+
+                            $('payzen_rest_hidden_button').click();
+                        } else {
+                            if (typeof resetLoaderCallback === 'function') {
+                                resetLoaderCallback.call();
+                            }
+
+                            var msg = response.error_messages;
+                            if (typeof(msg) === 'object') {
+                                msg = msg.join("\n");
+                            }
+
+                            if (msg) {
+                                console.log(msg);
+                            }
+                        }
+                    }
+                },
+                onFailure: function() {
+                    location.href = "<?php echo $this->getUrl('checkout/cart', array('_secure' => true)) ?>";
+                }
+            }
+        );
+    };
+
+    if (typeof checkout !== 'undefined') { // Default Magento checkout.
+        payzenDoLoadRestScript();
+        checkout.updateFormToken = payzenUpdateFormToken.bind({});
+    } else {
+        Event.observe(window, 'load', function() {
+            var placeOrderBtn = $('onestepcheckout-button-place-order');
+
+            if (placeOrderBtn) { // OneStepCheckout.
+                payzenDoLoadRestScript();
+
+                placeOrderBtn.onclick = function(e) {
+                    if (payzenSelectedMethod() === 'payzen_standard') {
+                        KR.validateForm().then(({KR, result}) => {
+                            var validator = new Validation('one-step-checkout-form');
+
+                            // Validate email address.
+                            if ($('email-error-message') && $('email-error-message').innerHTML) {
+                                console.log('<?php echo $this->__('Invalid email address!')?>');
+                                return;
+                            }
+
+                            if (validator.validate()) {
+                                // Show loading message.
+                                $('onestepcheckout-place-order-loading').show();
+
+                                placeOrderBtn.disabled = true;
+                                placeOrderBtn.removeClassName('onestepcheckout-btn-checkout');
+                                placeOrderBtn.addClassName('place-order-loader');
+
+                                payzenUpdateFormToken({ skip_agreement: 1 }, function() {
+                                    $('onestepcheckout-place-order-loading').hide();
+
+                                    placeOrderBtn.disabled = false;
+                                    placeOrderBtn.addClassName('onestepcheckout-btn-checkout');
+                                    placeOrderBtn.removeClassName('place-order-loader');
+                                });
+                            }
+                          }).catch(({KR, result}) => {
+                              return result.doOnError();
+                          });
+                    } else {
+                        oscPlaceOrder(placeOrderBtn);
+                    }
+                };
+            }
+        });
+    }
+
+    var PAYZEN_DEFAULT_MESSAGES = ['CLIENT_300', 'CLIENT_304', 'CLIENT_502', 'PSP_539']; // Use default messages for these errors.
+    var PAYZEN_RECOVERABLE_ERRORS = [
+        'CLIENT_300', 'CLIENT_304', 'CLIENT_502',
+        'PSP_539', 'CLIENT_001', 'CLIENT_101',
+        'CLIENT_301', 'CLIENT_302', 'CLIENT_303',
+        'PSP_003', 'PSP_108', 'ACQ_001'
+    ];
+
+    // Translate error message.
+    var payzenTranslate = function(code) {
+        var lang = '<?php echo $this->getLanguage(); ?>';
+        var messages = PAYZEN_ERROR_MESSAGES.hasOwnProperty(lang) ? PAYZEN_ERROR_MESSAGES[lang] : PAYZEN_ERROR_MESSAGES['en'];
+
+        if (!messages.hasOwnProperty(code)) {
+            var index = code.lastIndexOf('_');
+            code = code.substring(0, index + 1) + '999';
+        }
+
+        return messages[code];
+    };
+
+    var PAYZEN_ERROR_MESSAGES = {
+        fr: {
+            CLIENT_001: 'Le paiement est refusé. Essayez de payer avec une autre carte.',
+            CLIENT_101: 'Le paiement est annulé.',
+            CLIENT_301: 'Le numéro de carte est invalide. Vérifiez le numéro et essayez à nouveau.',
+            CLIENT_302: 'La date d\'expiration est invalide. Vérifiez la date et essayez à nouveau.',
+            CLIENT_303: 'Le code de sécurité CVV est invalide. Vérifiez le code et essayez à nouveau.',
+            CLIENT_999: 'Une erreur technique est survenue. Merci de réessayer plus tard.',
+
+            INT_999: 'Une erreur technique est survenue. Merci de réessayer plus tard.',
+
+            PSP_003: 'Le paiement est refusé. Essayez de payer avec une autre carte.',
+            PSP_099: 'Trop de tentatives ont été effectuées. Merci de réessayer plus tard.',
+            PSP_108: 'Le formulaire a expiré. Veuillez rafraîchir la page.',
+            PSP_999: 'Une erreur est survenue durant le processus de paiement.',
+
+            ACQ_001: 'Le paiement est refusé. Essayez de payer avec une autre carte.',
+            ACQ_999: 'Une erreur est survenue durant le processus de paiement.'
+        },
+
+        en: {
+            CLIENT_001: 'Payment is refused. Try to pay with another card.',
+            CLIENT_101: 'Payment is cancelled.',
+            CLIENT_301: 'The card number is invalid. Please check the number and try again.',
+            CLIENT_302: 'The expiration date is invalid. Please check the date and try again.',
+            CLIENT_303: 'The card security code (CVV) is invalid. Please check the code and try again.',
+            CLIENT_999: 'A technical error has occurred. Please try again later.',
+
+            INT_999: 'A technical error has occurred. Please try again later.',
+
+            PSP_003: 'Payment is refused. Try to pay with another card.',
+            PSP_099: 'Too many attempts. Please try again later.',
+            PSP_108: 'The form has expired. Please refresh the page.',
+            PSP_999: 'An error has occurred during the payment process.',
+
+            ACQ_001: 'Payment is refused. Try to pay with another card.',
+            ACQ_999: 'An error has occurred during the payment process.'
+        },
+
+        de: {
+            CLIENT_001: 'Die Zahlung wird abgelehnt. Versuchen Sie, mit einer anderen Karte zu bezahlen.',
+            CLIENT_101: 'Die Zahlung wird storniert.',
+            CLIENT_301: 'Die Kartennummer ist ungültig. Bitte überprüfen Sie die Nummer und versuchen Sie es erneut.',
+            CLIENT_302: 'Das Verfallsdatum ist ungültig. Bitte überprüfen Sie das Datum und versuchen Sie es erneut.',
+            CLIENT_303: 'Der Kartenprüfnummer (CVC) ist ungültig. Bitte überprüfen Sie den Nummer und versuchen Sie es erneut.',
+            CLIENT_999: 'Ein technischer Fehler ist aufgetreten. Bitte Versuchen Sie es später erneut.',
+
+            INT_999: 'Ein technischer Fehler ist aufgetreten. Bitte Versuchen Sie es später erneut.',
+
+            PSP_003: 'Die Zahlung wird abgelehnt. Versuchen Sie, mit einer anderen Karte zu bezahlen.',
+            PSP_099: 'Zu viele Versuche. Bitte Versuchen Sie es später erneut.',
+            PSP_108: 'Das Formular ist abgelaufen. Bitte aktualisieren Sie die Seite.',
+            PSP_999: 'Ein Fehler ist während dem Zahlungsvorgang unterlaufen.',
+
+            ACQ_001: 'Die Zahlung wird abgelehnt. Versuchen Sie, mit einer anderen Karte zu bezahlen.',
+            ACQ_999: 'Ein Fehler ist während dem Zahlungsvorgang unterlaufen.'
+        },
+
+        es: {
+            CLIENT_001: 'El pago es rechazado. Intenta pagar con otra tarjeta.',
+            CLIENT_101: 'Se cancela el pago.',
+            CLIENT_301: 'El número de tarjeta no es válido. Por favor, compruebe el número y vuelva a intentarlo.',
+            CLIENT_302: 'La fecha de caducidad no es válida. Por favor, compruebe la fecha y vuelva a intentarlo.',
+            CLIENT_303: 'El código de seguridad de la tarjeta (CVV) no es válido. Por favor revise el código y vuelva a intentarlo.',
+            CLIENT_999: 'Ha ocurrido un error técnico. Por favor, inténtelo de nuevo más tarde.',
+
+            INT_999: 'Ha ocurrido un error técnico. Por favor, inténtelo de nuevo más tarde.',
+
+            PSP_003: 'El pago es rechazado. Intenta pagar con otra tarjeta.',
+            PSP_099: 'Demasiados intentos. Por favor, inténtelo de nuevo más tarde.',
+            PSP_108: 'El formulario ha expirado. Por favor, actualice la página.',
+            PSP_999: 'Ocurrió un error en el proceso de pago.',
+
+            ACQ_001: 'El pago es rechazado. Intenta pagar con otra tarjeta.',
+            ACQ_999: 'Ocurrió un error en el proceso de pago.'
+        }
+    };
+//]]>
+</script>

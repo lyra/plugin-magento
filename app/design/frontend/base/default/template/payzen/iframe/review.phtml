@@ -1,0 +1,105 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+?>
+
+<script type="text/javascript">
+//<![CDATA[
+    Review.prototype.nextStep = function(transport) {
+        if (transport) {
+            var response = transport.responseJSON || transport.responseText.evalJSON(true) || {};
+
+            if (response.redirect) {
+                this.isSuccess = true;
+
+                if (payment && payment.currentMethod === 'payzen_standard') {
+                    // Disallow checkout sections modification.
+                    var headers = $$('#' + checkout.accordion.container.readAttribute('id') + ' .section');
+                    headers.each(function(header) {
+                        header.removeClassName('allow');
+                    });
+
+                    // Disallow checkout sections modification from progress block.
+                    var progressModifiers = $$('#checkout-progress-wrapper .changelink');
+                    progressModifiers.each(function(modifier) {
+                        modifier.remove();
+                    });
+
+                    // Disable all screen but iframe.
+                    $('payzen_iframe_actions').insert({
+                        before: '<div id="payzen_overlay"></div>'
+                    });
+
+                    $('checkout-review-table-wrapper').hide(); // Hide order summary.
+                    $('checkout-review-submit').hide(); // Hide submit buttons.
+
+                    $$('.payzen-iframe').invoke('show');
+
+                    // Redirect to payment gateway.
+                    $('payzen_iframe').writeAttribute('src', response.redirect);
+                } else {
+                    location.href = encodeURI(response.redirect);
+                }
+
+                return;
+            }
+
+            if (response.success) {
+                this.isSuccess = true;
+                location.href = encodeURI(this.successUrl);
+            } else{
+                var msg = response.error_messages;
+                if (Object.isArray(msg)) {
+                    msg = msg.join("\n").stripTags().toString();
+                }
+                if (msg) {
+                    alert(msg);
+                }
+            }
+
+            if (response.update_section) {
+                $('checkout-'+response.update_section.name+'-load').update(response.update_section.html);
+            }
+
+            if (response.goto_section) {
+                checkout.gotoSection(response.goto_section, true);
+            }
+        }
+    };
+
+    if (typeof review !== 'undefined') {
+        review.onSave = Review.prototype.nextStep.bindAsEventListener(review);
+    }
+
+    Event.observe($$('#payzen_iframe_actions a').first(), 'click', function() {
+        $('payzen_overlay').remove();
+        $$('.payzen-iframe').invoke('hide');
+
+        // Redirect to payment gateway.
+        $('payzen_iframe').writeAttribute('src', "<?php echo Mage::getUrl('payzen/payment/loader', array('mode' => 'cancel', '_secure' => true)); ?>");
+
+        checkout.setLoadWaiting(false, false);
+        checkout.changeSection('payment');
+    });
+//]]>
+</script>
+
+<div id="payzen_iframe_actions" style="display: none;" class="payzen-iframe">
+    <a href="javascript: void(0);"><?php echo Mage::helper('payzen')->__('< Cancel and return to payment choice') ?></a>
+</div>
+
+<iframe id="payzen_iframe"
+        style="display: none;"
+        class="payzen-iframe"
+        src="<?php echo Mage::getUrl('payzen/payment/loader', array('_secure' => true)); ?>" >
+</iframe>
+
+<div id="payzen_iframe_warn" style="display: none;" class="payzen-iframe">
+    <?php echo Mage::helper('payzen')->__('Please do not refresh the page until you complete payment.') ?>
+</div>

@@ -19,8 +19,8 @@
         foreach ($options as $code => $value) {
             $html = '<div class="payzen-option">';
 
-            if ($count == 1) {
-                $html .= '<input type="hidden" id="payzen_fullcb_option'.$code.'" value="'.$code.'" name="payment[payzen_fullcb_option]" /><span style="margin-right: 20px;"></span>';
+            if ($count === 1) {
+                $html .= '<input type="hidden" id="payzen_fullcb_option'.$code.'" value="'.$code.'" name="payment[payzen_fullcb_option]" /><span style="margin-right: 20px;" disabled="disabled"></span>';
             } else {
                 $html .= '<input type="radio"
                                  class="radio"
@@ -28,7 +28,8 @@
                                  ($first ? ' checked="checked"' : '').'
                                  value="'.$code.'"
                                  name="payment[payzen_fullcb_option]"
-                                 onclick="javascript: $$(\'.payzen_fullcb_review\').invoke(\'hide\'); $(\'payzen_fullcb_review_'.$value['code'].'\').show();" />' ;
+                                 onclick="$$(\'.payzen_fullcb_review\').invoke(\'hide\'); $(\'payzen_fullcb_review_'.$value['code'].'\').show();"
+                                 disabled="disabled">' ;
             }
 
             $html .= '<label for="payzen_fullcb_option'.$code.'">' . $value['label'] . '</label>';

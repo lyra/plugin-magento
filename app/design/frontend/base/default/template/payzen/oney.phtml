@@ -17,8 +17,8 @@
         foreach ($options as $code => $value) {
             $html = '<div class="payzen-option">';
 
-            if (count($options) == 1) {
-                $html .= '<input type="hidden" id="payzen_oney_option'.$code.'" value="'.$code.'" name="payment[payzen_oney_option]" /><span style="margin-right: 20px;"></span>';
+            if (count($options) === 1) {
+                $html .= '<input type="hidden" id="payzen_oney_option'.$code.'" value="'.$code.'" name="payment[payzen_oney_option]" disabled="disabled"><span style="margin-right: 20px;"></span>';
             } else {
                 $html .= '<input type="radio"
                                  class="radio"
@@ -26,7 +26,8 @@
                                  ($first ? ' checked="checked"' : '').'
                                  value="'.$code.'"
                                  name="payment[payzen_oney_option]"
-                                 onclick="javascript: $$(\'.payzen_oney_review\').invoke(\'hide\'); $(\'payzen_oney_review_'.$value['code'].'\').show();" />' ;
+                                 onclick="$$(\'.payzen_oney_review\').invoke(\'hide\'); $(\'payzen_oney_review_'.$value['code'].'\').show();"
+                                 disabled="disabled">' ;
             }
 
             $html .= '<label for="payzen_oney_option'.$code.'">' . $value['label'] . '</label>';

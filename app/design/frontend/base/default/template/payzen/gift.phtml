@@ -21,10 +21,10 @@
         foreach ($cards as $code => $label) {
             $html .= '<div class="payzen-card">';
 
-            if (count($cards) == 1) {
-                $html .= '<input type="hidden" id="payzen_gift_gc_type_'.$code.'" value="'.$code.'" name="payment[payzen_gift_gc_type]"/>' ;
+            if (count($cards) === 1) {
+                $html .= '<input type="hidden" id="payzen_gift_gc_type_'.$code.'" value="'.$code.'" name="payment[payzen_gift_gc_type]" disabled="disabled">' ;
             } else {
-                $html .= '<input type="radio" class="radio" id="payzen_gift_gc_type_'.$code.'"'.($first ? ' checked="checked"' : '').' value="'.$code.'" name="payment[payzen_gift_gc_type]"/>' ;
+                $html .= '<input type="radio" class="radio" id="payzen_gift_gc_type_'.$code.'"'.($first ? ' checked="checked"' : '').' value="'.$code.'" name="payment[payzen_gift_gc_type]" disabled="disabled">' ;
             }
 
             $first = false;

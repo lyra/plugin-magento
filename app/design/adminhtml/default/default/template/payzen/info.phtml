@@ -19,7 +19,7 @@
     if (stripos($info->getMethod(), 'payzen_multi') === 0) {
         if (! isset($option) || empty($option)) {
             // Temporary patch for module versions < 1.3 that use additional_information field
-            $option = $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::MULTI_OPTION);
+            $option = $info->getAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::MULTI_OPTION);
         }
 
         if (is_array($option) && ! empty($option)) {
@@ -30,6 +30,11 @@
         if (is_array($option) && ! empty($option)) {
             echo '<br />';
             echo $option['label'];
+        }
+    } elseif (stripos($info->getMethod(), 'payzen_other') === 0) {
+        if (is_array($option) && ! empty($option)) {
+            echo '<br />';
+            echo $option['label'] . ' (' . $option['means'] . ')';
         }
     }
     ?>
@@ -43,17 +48,17 @@ if ($info->getCcTransId()) {
     echo Mage::helper('payzen')->__('Transaction ID') . ': ' . $info->getCcTransId();
     echo '<br />';
 
-    if ($info->getCcType() == 'MULTI') {
+    if ($info->getCcType() === 'MULTI') {
         echo $this->getTransactionInfoHtml();
     } else {
         if (stripos($info->getMethod(), 'payzen_multi') === false) {
-            echo Mage::helper('payzen')->__('Transaction UUID') . ': ' . $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::TRANS_UUID);
+            echo Mage::helper('payzen')->__('Transaction UUID') . ': ' . $info->getAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::TRANS_UUID);
             echo '<br />';
         }
 
         echo Mage::helper('payzen')->__('Means of Payment') . ': ' . $info->getCcType();
 
-        $userChoice = $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::BRAND_USER_CHOICE);
+        $userChoice = $info->getAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::BRAND_USER_CHOICE);
         if ($userChoice === true) {
             echo ' ' . Mage::helper('payzen')->__('(card brand chosen by buyer)');
         } elseif ($userChoice === false) {
@@ -85,7 +90,7 @@ if ($info->getCcTransId()) {
         }
     }
 
-    $riskControl = $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::RISK_CONTROL);
+    $riskControl = $info->getAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::RISK_CONTROL);
     if (is_array($riskControl) && ! empty($riskControl)) {
         echo '<br />';
         echo Mage::helper('payzen')->__('Fraud Control Result') . ': ';
@@ -102,7 +107,7 @@ if ($info->getCcTransId()) {
         }
     }
 
-    $riskAssessment = $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::RISK_ASSESSMENT);
+    $riskAssessment = $info->getAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::RISK_ASSESSMENT);
     if (is_array($riskAssessment) && ! empty($riskAssessment)) {
         echo '<br />';
         echo Mage::helper('payzen')->__('Advanced Risk Assessment Result') . ': ';

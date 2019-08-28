@@ -16,14 +16,14 @@ $date = time();
 <table class="payzen_oney_review payzen_review" id="payzen_oney_review_<?php echo $optionDetails->getOptionCode(); ?>"<?php echo (! $this->getFirst() ? ' style="display: none;"' : ''); ?>>
     <thead>
         <tr>
-            <th><?php echo Mage::helper('payzen')->__('Your order total :'); ?> <?php echo $optionDetails->getOrderTotal(); ?></th>
+            <th><?php echo Mage::helper('payzen')->__('Your order total:'); ?> <?php echo $optionDetails->getOrderTotal(); ?></th>
             <th><?php echo Mage::helper('payzen')->__('Debit dates'); ?></th>
         </tr>
     </thead>
 
     <tbody>
         <tr>
-            <td><?php echo Mage::helper('payzen')->__('Contribution :'); ?> <?php echo $optionDetails->getFirstPayment(); ?></td>
+            <td><?php echo Mage::helper('payzen')->__('Contribution:'); ?> <?php echo $optionDetails->getFirstPayment(); ?></td>
             <td><strong><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></strong></td>
         </tr>
         <tr>
@@ -35,14 +35,14 @@ $date = time();
             $date = strtotime('+30 days', $date);
         ?>
         <tr>
-            <td>&nbsp;- <?php echo Mage::helper('payzen')->__('Payment %s :', $i); ?> <?php echo $optionDetails->getMonthlyPayment(); ?></td>
+            <td>&nbsp;- <?php echo Mage::helper('payzen')->__('Payment %s:', $i); ?> <?php echo $optionDetails->getMonthlyPayment(); ?></td>
             <td><strong><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></strong></td>
         </tr>
         <?php
         }
         ?>
         <tr>
-            <td colspan="2"><?php echo Mage::helper('payzen')->__('Total cost of credit :'); ?> <?php echo $optionDetails->getFundingFees(); ?></td>
+            <td colspan="2"><?php echo Mage::helper('payzen')->__('Total cost of credit:'); ?> <?php echo $optionDetails->getFundingFees(); ?></td>
         </tr>
         <!-- <tr>
             <td colspan="2" class="small"><?php echo Mage::helper('payzen')->__('Funding of %s with a fixed APR of %s %%.', $optionDetails->getFundingTotal(), $optionDetails->getTaeg()); ?></td>

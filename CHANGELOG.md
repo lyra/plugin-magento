@@ -1,3 +1,13 @@
+1.10.0, 2019-08-28:
+- Bug fix: Accept UNDER_VERIFICATION transaction status for refunds.
+- Use Lyranetwork as developer namespace instead of Lyra.
+- [embedded] Added payment with embedded fields option using REST API.
+- [embedded] Force the use of the last version of PrototypeJS lib.
+- Removed feature card data acquisition on merchant website.
+- Possibility to not send cart data when not mandatory.
+- Possibility to propose various payment means by redirection.
+- [sepa] Save SEPA tokens separately from CB payment tokens.
+
 1.9.4, 2019-05-20:
 - Bug fix: regression relative to currency check management.
 
@@ -106,7 +116,7 @@
 - Bug fix: override of Mage_Sales_Model_Order model to avoid a problem with payment_review order statuses (as with fraud suspected payments) in EE.
 - Bug fix: refund error when capture delay is empty or equals to 0.
 - Dispatch event order_cancel_after after order cancellation.
-- New option available for "Card data entry mode" : Payment page integrated to checkout process (inside iframe).
+- New option available for "Card data entry mode": Payment page integrated to checkout process (inside iframe).
 - Possibility to specify a CSS (and other theme configuration) to apply to payment page when payment in iframe is used.
 - Deletion of "Re-fill cart on failure" setting. Cart is now automatically recovered after a failed payment.
 - Adding a warning message if number of configuration settings is bigger than the limit defined in PHP configuration (php.ini).

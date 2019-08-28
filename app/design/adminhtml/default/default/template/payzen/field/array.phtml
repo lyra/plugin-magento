@@ -50,7 +50,7 @@ $htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getEleme
                 var d = new Date();
                 var templateData = {
                     <?php foreach ($this->_columns as $columnName => $column): ?>
-                        <?php echo $columnName ?> : '',
+                        <?php echo $columnName ?>: '',
                     <?php endforeach; ?>
                     _id : '_' + d.getTime() + '_' + d.getMilliseconds()
                 };

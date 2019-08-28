@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+
+<config>
+    <!-- Version. -->
+    <modules>
+        <Lyranetwork_Payzen>
+            <version>1.10.0</version>
+        </Lyranetwork_Payzen>
+    </modules>
+
+    <global>
+        <helpers>
+            <payzen>
+                <class>Lyranetwork_Payzen_Helper</class>
+            </payzen>
+            <payment>
+                <rewrite>
+                    <data>Lyranetwork_Payzen_Helper_Payment_Data</data>
+                </rewrite>
+            </payment>
+        </helpers>
+        <models>
+            <payzen>
+                <class>Lyranetwork_Payzen_Model</class>
+            </payzen>
+
+            <sales>
+                <rewrite>
+                    <order>Lyranetwork_Payzen_Model_Order</order>
+                </rewrite>
+            </sales>
+        </models>
+        <blocks>
+            <payzen>
+                <class>Lyranetwork_Payzen_Block</class>
+            </payzen>
+        </blocks>
+        <resources>
+            <payzen_setup>
+                <setup>
+                    <module>Lyranetwork_Payzen</module>
+                    <class>Lyranetwork_Payzen_Model_Resource_Setup</class>
+                </setup>
+            </payzen_setup>
+        </resources>
+        <sales>
+            <order>
+                <statuses>
+                    <payment_review translate="label">
+                        <label>Payment Review</label>
+                    </payment_review>
+                    <payzen_to_validate translate="label">
+                        <label>To validate payment</label>
+                    </payzen_to_validate>
+                    <payzen_pending_transfer translate="label">
+                        <label>Pending funds transfer</label>
+                    </payzen_pending_transfer>
+                </statuses>
+                <states>
+                    <payment_review translate="label">
+                        <label>Payment Review</label>
+                        <statuses>
+                            <payment_review default="1"/>
+                            <payzen_to_validate/>
+                        </statuses>
+                        <visible_on_front>1</visible_on_front>
+                    </payment_review>
+                    <processing translate="label">
+                        <statuses>
+                            <payzen_pending_transfer />
+                        </statuses>
+                    </processing>
+                </states>
+            </order>
+        </sales>
+
+        <!-- Admin parameter options. -->
+        <payment>
+            <payzen>
+                <!-- context mode values -->
+                <ctx_modes>
+                    <test>
+                        <code>TEST</code>
+                        <name>TEST</name>
+                    </test>
+                    <production>
+                        <code>PRODUCTION</code>
+                        <name>PRODUCTION</name>
+                    </production>
+                </ctx_modes>
+
+                <!-- Signature algo values. -->
+                <sign_algos>
+                    <sha1>
+                        <code>SHA-1</code>
+                        <name>SHA-1</name>
+                    </sha1>
+                    <sha256>
+                        <code>SHA-256</code>
+                        <name>HMAC-SHA-256</name>
+                    </sha256>
+                </sign_algos>
+
+                <!-- Validation mode values. -->
+                <validation_modes>
+                    <general>
+                        <code>-1</code>
+                        <name><![CDATA[PayZen general configuration]]></name>
+                    </general>
+                    <default>
+                        <code></code>
+                        <name><![CDATA[PayZen Back Office configuration]]></name>
+                    </default>
+                    <automatic>
+                        <code>0</code>
+                        <name>Automatic</name>
+                    </automatic>
+                    <manual>
+                        <code>1</code>
+                        <name>Manual</name>
+                    </manual>
+                </validation_modes>
+
+                <!-- Return mode values. -->
+                <return_modes>
+                    <get>
+                        <code>GET</code>
+                        <name>GET (parameters in the URL)</name>
+                    </get>
+                    <post>
+                        <code>POST</code>
+                        <name>POST (form)</name>
+                    </post>
+                </return_modes>
+
+              <!-- embedded fields themes -->
+                <rest_themes>
+                    <classic>
+                        <code>classic</code>
+                        <name>Classic</name>
+                    </classic>
+                    <material>
+                        <code>material</code>
+                        <name>Material</name>
+                    </material>
+                </rest_themes>
+                
+                <!-- Default gift cards. -->
+                <gift_cards>
+                    <illicado>
+                        <code>ILLICADO</code>
+                        <name>Carte Illicado</name>
+                    </illicado>
+                    <illicado_sb>
+                        <code>ILLICADO_SB</code>
+                        <name>Carte Illicado (sandbox)</name>
+                    </illicado_sb>
+                    <truffaut_cdx>
+                        <code>TRUFFAUT_CDX</code>
+                        <name>Carte Cadeau Truffaut</name>
+                    </truffaut_cdx>
+                    <alinea_cdx>
+                        <code>ALINEA_CDX</code>
+                        <name>Carte Cadeau Alinéa</name>
+                    </alinea_cdx>
+                    <alinea_cdx_sb>
+                        <code>ALINEA_CDX_SB</code>
+                        <name>Carte Cadeau Alinéa (sandbox)</name>
+                    </alinea_cdx_sb>
+                </gift_cards>
+
+                <!-- Card info modes. -->
+                <card_info_modes>
+                    <action1>
+                        <code>1</code>
+                        <name>Bank data acquisition on payment gateway</name>
+                    </action1>
+                    <action2>
+                        <code>2</code>
+                        <name>Card type selection on merchant site</name>
+                    </action2>
+                    <action3>
+                        <code>3</code>
+                        <name>Payment page integrated to checkout process (iframe mode)</name>
+                    </action3>
+                    <action4>
+                        <code>4</code>
+                        <name>Embedded payment fields (REST API)</name>
+                    </action4>
+                </card_info_modes>
+
+                <!-- Card register modes. -->
+                <card_register_modes>
+                    <unchecked>
+                        <code>1</code>
+                        <name>Registration off by default</name>
+                    </unchecked>
+                    <checked>
+                        <code>2</code>
+                        <name>Registration on by default</name>
+                    </checked>
+                    <hidden>
+                        <code>3</code>
+                        <name>Registration always on</name>
+                    </hidden>
+                </card_register_modes>
+
+                <one_click_locations>
+                    <product>
+                        <code>PRODUCT</code>
+                        <name>Product page</name>
+                    </product>
+                    <cart>
+                        <code>CART</code>
+                        <name>Cart page</name>
+                    </cart>
+                    <both>
+                        <code>BOTH</code>
+                        <name>Product and cart pages</name>
+                    </both>
+                </one_click_locations>
+
+                <!-- Gateway product categories. -->
+                <product_categories>
+                    <food_and_grocery>
+                        <code>FOOD_AND_GROCERY</code>
+                        <name>Food and grocery</name>
+                    </food_and_grocery>
+                    <automotive>
+                        <code>AUTOMOTIVE</code>
+                        <name>Automotive</name>
+                    </automotive>
+                    <entertainment>
+                        <code>ENTERTAINMENT</code>
+                        <name>Entertainment</name>
+                    </entertainment>
+                    <home_and_garden>
+                        <code>HOME_AND_GARDEN</code>
+                        <name>Home and garden</name>
+                    </home_and_garden>
+                    <home_appliance>
+                        <code>HOME_APPLIANCE</code>
+                        <name>Home appliance</name>
+                    </home_appliance>
+                    <auction_and_group_buying>
+                        <code>AUCTION_AND_GROUP_BUYING</code>
+                        <name>Auction and group buying</name>
+                    </auction_and_group_buying>
+                    <flowers_and_gifts>
+                        <code>FLOWERS_AND_GIFTS</code>
+                        <name>Flowers and gifts</name>
+                    </flowers_and_gifts>
+                    <computer_and_software>
+                        <code>COMPUTER_AND_SOFTWARE</code>
+                        <name>Computer and software</name>
+                    </computer_and_software>
+                    <health_and_beauty>
+                        <code>HEALTH_AND_BEAUTY</code>
+                        <name>Health and beauty</name>
+                    </health_and_beauty>
+                    <service_for_individual>
+                        <code>SERVICE_FOR_INDIVIDUAL</code>
+                        <name>Service for individual</name>
+                    </service_for_individual>
+                    <service_for_business>
+                        <code>SERVICE_FOR_BUSINESS</code>
+                        <name>Service for business</name>
+                    </service_for_business>
+                    <sports>
+                        <code>SPORTS</code>
+                        <name>Sports</name>
+                    </sports>
+                    <clothing_and_accessories>
+                        <code>CLOTHING_AND_ACCESSORIES</code>
+                        <name>Clothing and accessories</name>
+                    </clothing_and_accessories>
+                    <travel>
+                        <code>TRAVEL</code>
+                        <name>Travel</name>
+                    </travel>
+                    <home_audio_photo_video>
+                        <code>HOME_AUDIO_PHOTO_VIDEO</code>
+                        <name>Home audio, photo, video</name>
+                    </home_audio_photo_video>
+                    <telephony>
+                        <code>TELEPHONY</code>
+                        <name>Telephony</name>
+                    </telephony>
+                </product_categories>
+
+                <!-- Card info modes. -->
+                <multi_card_info_modes>
+                    <action1>
+                        <code>1</code>
+                        <name>On payment gateway</name>
+                    </action1>
+                    <action2>
+                        <code>2</code>
+                        <name>On merchant site</name>
+                    </action2>
+                </multi_card_info_modes>
+
+                <!-- SEPA Direct Debit mandate modes. -->
+                <mandate_modes>
+                    <payment>
+                        <code>PAYMENT</code>
+                        <name>One-off SEPA direct debit</name>
+                    </payment>
+                    <register_pay>
+                        <code>REGISTER_PAY</code>
+                        <name>Register a recurrent SEPA mandate with direct debit</name>
+                    </register_pay>
+                    <register>
+                        <code>REGISTER</code>
+                        <name>Register a recurrent SEPA mandate without direct debit</name>
+                    </register>
+                </mandate_modes>
+            </payzen>
+        </payment>
+
+        <events>
+            <sales_quote_payment_save_before>
+                <observers>
+                    <payzen_payment_multi_update>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doPaymentMultiUpdate</method>
+                    </payzen_payment_multi_update>
+                </observers>
+            </sales_quote_payment_save_before>
+
+            <sales_order_payment_save_before>
+                <observers>
+                    <payzen_payment_multi_update>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doPaymentMultiUpdate</method>
+                    </payzen_payment_multi_update>
+                </observers>
+            </sales_order_payment_save_before>
+        </events>
+
+        <payment>
+            <groups>
+                <payzen><![CDATA[PayZen]]></payzen>
+            </groups>
+        </payment>
+    </global>
+
+    <adminhtml>
+        <layout>
+            <updates>
+                <payzen>
+                    <file>payzen.xml</file>
+                </payzen>
+            </updates>
+        </layout>
+
+        <!-- Translation for admin area. -->
+        <translate>
+            <modules>
+                <Lyranetwork_Payzen>
+                    <files>
+                        <default>Lyranetwork_Payzen.csv</default>
+                    </files>
+                </Lyranetwork_Payzen>
+            </modules>
+        </translate>
+
+        <events>
+            <sales_model_service_quote_submit_after>
+                <observers>
+                    <payzen_payment_redirect>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doPaymentRedirect</method>
+                    </payzen_payment_redirect>
+                </observers>
+            </sales_model_service_quote_submit_after>
+
+            <adminhtml_block_html_before>
+                <observers>
+                    <payzen_payment_method_column_append>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doPaymentMethodColumnAppend</method>
+                    </payzen_payment_method_column_append>
+                </observers>
+            </adminhtml_block_html_before>
+
+            <adminhtml_widget_container_html_before>
+                <observers>
+                    <payzen_payment_buttons_manage>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doPaymentButtonsManage</method>
+                    </payzen_payment_buttons_manage>
+                </observers>
+            </adminhtml_widget_container_html_before>
+
+            <controller_action_layout_render_before_adminhtml_system_config_edit>
+                <observers>
+                    <payzen_after_payment_section_edit>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doAfterPaymentSectionEdit</method>
+                    </payzen_after_payment_section_edit>
+                </observers>
+            </controller_action_layout_render_before_adminhtml_system_config_edit>
+        </events>
+    </adminhtml>
+
+    <!-- Controllers mapping. -->
+    <frontend>
+        <layout>
+            <updates>
+                <payzen>
+                    <file>payzen.xml</file>
+                </payzen>
+            </updates>
+        </layout>
+        <routers>
+            <payzen>
+                <use>standard</use>
+                <args>
+                    <module>Lyranetwork_Payzen</module>
+                    <frontName>payzen</frontName>
+                </args>
+            </payzen>
+        </routers>
+        <translate>
+            <modules>
+                <Lyranetwork_Payzen>
+                    <files>
+                        <default>Lyranetwork_Payzen.csv</default>
+                    </files>
+                </Lyranetwork_Payzen>
+            </modules>
+        </translate>
+        <events>
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <payzen_oneclick_quote_process>
+                        <type>singleton</type>
+                        <class>payzen/observer</class>
+                        <method>doOneclickQuoteProcess</method>
+                    </payzen_oneclick_quote_process>
+                </observers>
+            </core_block_abstract_to_html_before>
+
+            <customer_logout>
+                <observers>
+                    <payzen_oneclick_unset_quote>
+                        <class>payzen/observer</class>
+                        <method>doOneclickUnsetQuote</method>
+                    </payzen_oneclick_unset_quote>
+                </observers>
+            </customer_logout>
+
+            <controller_action_layout_render_before>
+                <observers>
+                    <payzen_prototype_update>
+                        <class>payzen/observer</class>
+                        <method>doReplacePrototypeLibrary</method>
+                    </payzen_prototype_update>
+                </observers>
+            </controller_action_layout_render_before>
+        </events>
+    </frontend>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Lyranetwork_Payzen before="Mage_Adminhtml">Lyranetwork_Payzen_Adminhtml</Lyranetwork_Payzen>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <!-- Default configuration values. -->
+    <default>
+        <payment>
+            <payzen>
+                <developed_by>Lyra Network</developed_by>
+                <support_email>support@payzen.eu</support_email>
+                <plugin_version>1.10.0</plugin_version>
+                <gateway_version>V2</gateway_version>
+                <cms_identifier>Magento_1.4-1.9</cms_identifier>
+                <enable_logs>1</enable_logs>
+                <title><![CDATA[PayZen]]></title>
+
+                <site_id>12345678</site_id>
+                <key_test>1111111111111111</key_test>
+                <key_prod>2222222222222222</key_prod>
+                <ctx_mode>TEST</ctx_mode>
+                <sign_algo>SHA-256</sign_algo>
+                <notify_url>payzen/payment/check</notify_url>
+                <platform_url>https://secure.payzen.eu/vads-payment/</platform_url>
+                <rest_url>https://api.payzen.eu/api-payment/</rest_url>
+                <static_url>https://api.payzen.eu/static/</static_url>
+                <wsdl_url>https://secure.payzen.eu/vads-ws/v5?wsdl</wsdl_url>
+
+                <language>fr</language>
+                <validation_mode></validation_mode>
+
+                <redirect_enabled>0</redirect_enabled>
+                <redirect_success_timeout>5</redirect_success_timeout>
+                <redirect_success_message>Redirection to shop in a few seconds...</redirect_success_message>
+                <redirect_error_timeout>5</redirect_error_timeout>
+                <redirect_error_message>Redirection to shop in a few seconds...</redirect_error_message>
+                <return_mode>GET</return_mode>
+                <registered_order_status>processing</registered_order_status>
+                <capture_auto>1</capture_auto>
+
+                <send_cart_detail>1</send_cart_detail>
+                <common_category>FOOD_AND_GROCERY</common_category>
+            </payzen>
+
+            <payzen_standard>
+                <model>payzen/payment_standard</model>
+                <group>payzen</group>
+
+                <active>1</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment by credit card</title>
+                <sort_order>1</sort_order>
+                <module_logo>standard.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+                <payment_cards></payment_cards>
+                <use_oney_in_standard>0</use_oney_in_standard>
+
+                <card_info_mode>1</card_info_mode>
+                <one_click_active>0</one_click_active>
+                <one_click_title>Buy now</one_click_title>
+                <one_click_location>BOTH</one_click_location>
+                <card_register_mode>1</card_register_mode>
+                <card_register_message><![CDATA[Check this box to register your card data and to do payments in one click. <b>Card data will be stored on the secured server of the payment gateway.</b>]]></card_register_message>
+
+               <rest_notify_url>payzen/payment/restCheck</rest_notify_url>
+               <rest_theme>classic</rest_theme>
+            </payzen_standard>
+
+            <payzen_multi>
+                <model>payzen/payment_multi</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment by credit card in installments</title>
+                <sort_order>2</sort_order>
+                <module_logo>multi.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+                <payment_cards></payment_cards>
+
+                <card_info_mode>1</card_info_mode>
+            </payzen_multi>
+
+            <payzen_gift>
+                <model>payzen/payment_gift</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment by gift card</title>
+                <sort_order>3</sort_order>
+                <module_logo>gift.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_gift>
+
+            <payzen_choozeo>
+                <model>payzen/payment_choozeo</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
+                <title>Payment with Choozeo without fees</title>
+                <sort_order>4</sort_order>
+                <module_logo>choozeo.png</module_logo>
+                <payment_action>authorize</payment_action>
+            </payzen_choozeo>
+
+            <payzen_oney>
+                <model>payzen/payment_oney</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
+                <title>Payment with FacilyPay Oney</title>
+                <sort_order>5</sort_order>
+                <module_logo>oney.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+
+                <enable_payment_options>0</enable_payment_options>
+            </payzen_oney>
+
+            <payzen_fullcb>
+                <model>payzen/payment_fullcb</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>1</allowspecific>
+                <specificcountry>FR</specificcountry>
+                <title>Payment with Full CB</title>
+                <sort_order>6</sort_order>
+                <module_logo>fullcb.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <enable_payment_options>0</enable_payment_options>
+            </payzen_fullcb>
+
+           <payzen_sepa>
+                <model>payzen/payment_sepa</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment with SEPA</title>
+                <sort_order>7</sort_order>
+                <module_logo>sdd.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <mandate_mode>PAYMENT</mandate_mode>
+            </payzen_sepa>
+
+            <payzen_paypal>
+                <model>payzen/payment_paypal</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment with PayPal</title>
+                <sort_order>8</sort_order>
+                <module_logo>paypal.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_paypal>
+
+            <payzen_sofort>
+                <model>payzen/payment_sofort</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment with SOFORT Banking</title>
+                <sort_order>9</sort_order>
+                <module_logo>sofort_banking.png</module_logo>
+                <payment_action>authorize</payment_action>
+            </payzen_sofort>
+
+            <payzen_postfinance>
+                <model>payzen/payment_postfinance</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment with PostFinance</title>
+                <sort_order>10</sort_order>
+                <module_logo>postfinance.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_postfinance>
+
+            <payzen_giropay>
+                <model>payzen/payment_giropay</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Payment with Giropay</title>
+                <sort_order>11</sort_order>
+                <module_logo>giropay.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_giropay>
+
+            <payzen_ideal>
+                <model>payzen/payment_ideal</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>1</allowspecific>
+                <specificcountry>NL</specificcountry>
+                <title>Payment with iDEAL</title>
+                <sort_order>12</sort_order>
+                <module_logo>ideal.png</module_logo>
+                <payment_action>authorize</payment_action>
+            </payzen_ideal>
+
+            <payzen_other>
+                <model>payzen/payment_other</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <title>Other payment means</title>
+                <sort_order>13</sort_order>
+                <module_logo>other.png</module_logo>
+                <other_regroup_payment_means>0</other_regroup_payment_means>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_other>
+        </payment>
+    </default>
+</config>

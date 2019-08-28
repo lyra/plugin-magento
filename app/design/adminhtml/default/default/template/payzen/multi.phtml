@@ -13,7 +13,7 @@
     <li>
         <?php
         $options = $this->getAvailableOptions();
-        if (count($options) == 1) {
+        if (count($options) === 1) {
             $keys = array_keys($options);
 
             $key = $keys[0]; // The option key in options array.
@@ -23,7 +23,7 @@
         } else {
             $first = true;
             foreach ($options as $key => $option) {
-                echo '<input class="radio" type="radio"'. ($first == true ? ' checked="checked"' : '') . ' id="option' . $key . '" value="' . $key . '" name="payment[payzen_multi_option]" disabled=""/>
+                echo '<input class="radio" type="radio"'. ($first ? ' checked="checked"' : '') . ' id="option' . $key . '" value="' . $key . '" name="payment[payzen_multi_option]" disabled=""/>
                       <label style="float: none;" for="option' . $key . '">' . $option['label'] . '</label> <br style="margin-bottom: 5px;"/>';
                 $first = false;
             }
