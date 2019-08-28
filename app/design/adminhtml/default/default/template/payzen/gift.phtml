@@ -24,7 +24,7 @@
         foreach ($cards as $code => $label) {
             $html .= '<div class="payzen-card">';
 
-            if ($count == 1) {
+            if ($count === 1) {
                 $html .= '<input type="hidden" id="payzen_gift_gc_type_'.$code.'" value="'.$code.'" name="payment[payzen_gift_gc_type]"/>' ;
             } else {
                 $html .= '<input type="radio" class="radio" id="payzen_gift_gc_type_'.$code.'"'.($first ? ' checked="checked"' : '').' value="'.$code.'" name="payment[payzen_gift_gc_type]"/>' ;

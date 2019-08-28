@@ -1,0 +1,76 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+
+$availMeans = $this->getAvailableMeans();
+?>
+
+<?php if ($this->getConfigData('regroup_payment_means')): ?>
+    <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display:none;">
+        <li>
+        <?php if (count($availMeans) === 1) {?>
+            <label class="payzen-label"><?php echo Mage::helper('payzen')->__('Means of payment'); ?></label>
+        <?php } else { ?>
+            <label class="payzen-label"><?php echo Mage::helper('payzen')->__('Choose your means of payment'); ?></label>
+        <?php } ?>
+
+            <div class="payzen-field">
+            <?php
+            $first = true;
+            foreach ($availMeans as $key => $option) {
+            ?>
+                <div class="payzen-card">
+                <?php if (count($availMeans) === 1) {?>
+                    <input type="hidden" id="payzen_other_card_type_<?php echo $option['means']; ?>" name="payment[payzen_other_cc_type]" value="<?php echo $option['means']; ?>" disabled="disabled">
+                <?php } else { ?>
+                    <input type="radio" class="radio" id="payzen_other_card_type_<?php echo $option['means']; ?>" name="payment[payzen_other_cc_type]" value="<?php echo $option['means']; ?>"<?php echo ($first ? ' checked="checked"' : ''); ?> disabled="disabled">
+                <?php } ?>
+
+                    <label for="payzen_other_card_type_<?php echo $option['means']; ?>">
+                        <img alt="<?php echo $option['label']; ?>" src="<?php echo $this->getCcTypeImageSrc($option['means']); ?>" title="<?php echo $option['label']; ?>" />
+                    </label>
+
+                    <?php $first = false; ?>
+                </div>
+            <?php } ?>
+            </div>
+        </li>
+    </ul>
+<?php else: ?>
+    </dd>
+
+    <?php foreach ($availMeans as $key => $option) {?>
+       <dt id="dt_method_other_<?php echo $option['means']; ?>">
+            <input id="p_method_payzen_other_<?php echo $option['means']; ?>" value="payzen_other_<?php echo $option['means']; ?>" type="radio" name="payment[method]" title="Payment with <?php echo $option['label']; ?>" onclick="payment.switchMethod('payzen_other_<?php echo $option['means']; ?>')" class="radio">
+            <label for="p_method_payzen_other_<?php echo $option['means']; ?>" class="payzen-other-means" ><?php echo $option['label']; ?>
+                <img class="payzen-method-img" alt="<?php echo $option['label']; ?>" src="<?php echo $this->getCcTypeImageSrc($option['means']); ?>" title="<?php echo $option['label']; ?>" >
+            </label>
+       </dt>
+       <dd id="dd_method_other_<?php echo $option['means']; ?>">
+           <ul class="form-list" id="payment_form_payzen_other_<?php echo $option['means']; ?>" style="display: none;">
+             <li>
+               <div>
+                <input type="hidden" id="option_<?php echo $key; ?>" value="<?php echo $key; ?>" name="payment[payzen_other_option]" disabled="disabled">
+                <input type="hidden" id="payzen_other_card_type_<?php echo $option['means']; ?>" name="payment[payzen_other_cc_type]" value="<?php echo $option['means']; ?>" disabled="disabled">
+               </div>
+             </li>
+           </ul>
+       </dd>
+    <?php } ?>
+
+    <script type="text/javascript">
+    //<![CDATA[
+       var payzenCleanOtherMethod = function() {
+           $('p_method_payzen_other').up().remove();
+       };
+
+       payzenCleanOtherMethod.defer();
+    //]]>
+    </script>
+<?php endif; ?>

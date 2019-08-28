@@ -20,18 +20,18 @@ $date = time();
                 <table>
                     <tbody>
                         <tr>
-                            <td><?php echo Mage::helper('payzen')->__('Order amount :'); ?></td>
+                            <td><?php echo Mage::helper('payzen')->__('Order amount:'); ?></td>
                             <td><strong><?php echo $optionDetails->getOrderTotal(); ?></strong></td>
                         </tr>
                         <tr>
-                            <td><?php echo Mage::helper('payzen')->__('Fees :'); ?></td>
+                            <td><?php echo Mage::helper('payzen')->__('Fees:'); ?></td>
                             <td><strong><?php echo $optionDetails->getFundingFees(); ?></strong></td>
                         </tr>
                         <tr>
                             <td colspan="2"><hr style="margin: 0px;" /></td>
                         </tr>
                         <tr>
-                            <td><?php echo Mage::helper('payzen')->__('Total amount :'); ?></td>
+                            <td><?php echo Mage::helper('payzen')->__('Total amount:'); ?></td>
                             <td><strong><?php echo $optionDetails->getFundingTotal(); ?></strong></td>
                         </tr>
                     </tbody>

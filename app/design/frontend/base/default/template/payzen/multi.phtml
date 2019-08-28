@@ -13,7 +13,7 @@
     <li>
         <?php $options = $this->getAvailableOptions(); ?>
 
-        <?php if (count($options) == 1) { ?>
+        <?php if (count($options) === 1) { ?>
             <label class="payzen-label"><?php echo Mage::helper('payzen')->__('Payment option'); ?></label>
         <?php } else { ?>
             <label class="payzen-label"><?php echo Mage::helper('payzen')->__('Choose your payment option'); ?></label>
@@ -21,18 +21,18 @@
 
         <div class="payzen-field">
         <?php
-        if (count($options) == 1) {
+        if (count($options) === 1) {
             $keys = array_keys($options);
 
             $key = $keys[0]; // The option key in options array.
             $option = $options[$key]; // The option.
-            echo '<input type="hidden" id="option_' . $key . '" value="' . $key . '" name="payment[payzen_multi_option]"/>
-                  <label style="float: none;">' . $option['label'] . '</label> <br style="margin-bottom: 5px;"/>';
+            echo '<input type="hidden" id="option_' . $key . '" value="' . $key . '" name="payment[payzen_multi_option]" disabled="disabled">
+                  <label style="float: none;">' . $option['label'] . '</label> <br style="margin-bottom: 5px;" />';
         } else {
             $first = true;
             foreach ($options as $key => $option) {
-                echo '<input class="radio" type="radio"'. ($first == true ? ' checked="checked"' : '') . ' id="option_' . $key . '" value="' . $key . '" name="payment[payzen_multi_option]" />
-                      <label style="float: none;" for="option_' . $key . '">' . $option['label'] . '</label> <br style="margin-bottom: 5px;"/>';
+                echo '<input class="radio" type="radio"'. ($first ? ' checked="checked"' : '') . ' id="option_' . $key . '" value="' . $key . '" name="payment[payzen_multi_option]" disabled="disabled">
+                      <label style="float: none;" for="option_' . $key . '">' . $option['label'] . '</label> <br style="margin-bottom: 5px;" />';
                 $first = false;
             }
         }
@@ -44,7 +44,7 @@
     <?php $availCards = $this->getAvailableCcTypes(); ?>
 
     <li>
-    <?php if (count($availCards) == 1) {?>
+    <?php if (count($availCards) === 1) {?>
         <label class="payzen-label"><?php echo Mage::helper('payzen')->__('Means of payment'); ?></label>
     <?php } else { ?>
         <label class="payzen-label"><?php echo Mage::helper('payzen')->__('Choose your means of payment'); ?></label>
@@ -56,10 +56,10 @@
         foreach ($availCards as $code => $label) {
         ?>
             <div class="payzen-card">
-            <?php if (count($availCards) == 1) {?>
-                <input type="hidden" id="payzen_multi_card_type_<?php echo $code; ?>" name="payment[payzen_multi_cc_type]" value="<?php echo $code; ?>" >
+            <?php if (count($availCards) === 1) {?>
+                <input type="hidden" id="payzen_multi_card_type_<?php echo $code; ?>" name="payment[payzen_multi_cc_type]" value="<?php echo $code; ?>" disabled="disabled">
             <?php } else { ?>
-                <input type="radio" class="radio" id="payzen_multi_card_type_<?php echo $code; ?>" name="payment[payzen_multi_cc_type]" value="<?php echo $code; ?>"<?php echo ($first ? ' checked="checked"' : ''); ?> >
+                <input type="radio" class="radio" id="payzen_multi_card_type_<?php echo $code; ?>" name="payment[payzen_multi_cc_type]" value="<?php echo $code; ?>"<?php echo ($first ? ' checked="checked"' : ''); ?> disabled="disabled">
             <?php } ?>
 
                 <label for="payzen_multi_card_type_<?php echo $code; ?>">

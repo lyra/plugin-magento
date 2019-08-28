@@ -19,10 +19,10 @@
         foreach ($availCards as $key => $option) {
         ?>
             <div class="payzen-card">
-            <?php if (count($availCards) == 1) {?>
-                <input type="hidden" id="payzen_choozeo_card_type_<?php echo $option['code']; ?>" name="payment[payzen_choozeo_cc_type]" value="<?php echo $option['code']; ?>" >
+            <?php if (count($availCards) === 1) {?>
+                <input type="hidden" id="payzen_choozeo_card_type_<?php echo $option['code']; ?>" name="payment[payzen_choozeo_cc_type]" value="<?php echo $option['code']; ?>" disabled="disabled">
             <?php } else { ?>
-                <input type="radio" class="radio" id="payzen_choozeo_card_type_<?php echo $option['code']; ?>" name="payment[payzen_choozeo_cc_type]" value="<?php echo $option['code']; ?>"<?php echo ($first ? ' checked="checked"' : ''); ?>>
+                <input type="radio" class="radio" id="payzen_choozeo_card_type_<?php echo $option['code']; ?>" name="payment[payzen_choozeo_cc_type]" value="<?php echo $option['code']; ?>"<?php echo ($first ? ' checked="checked"' : ''); ?> disabled="disabled">
             <?php } ?>
 
                 <label for="payzen_choozeo_card_type_<?php echo $option['code']; ?>">

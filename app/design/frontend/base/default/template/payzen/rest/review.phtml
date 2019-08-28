@@ -1,0 +1,45 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+?>
+
+<script type="text/javascript">
+//<![CDATA[
+    if ((typeof payment !== 'undefined') && (payment.currentMethod === 'payzen_standard')) {
+        // Basic Magento checkout.
+        KR.validateForm().then(({KR, result}) => {
+            Review.prototype.checkAndPayOrder = function () {
+                if (checkout.loadWaiting) {
+                    return;
+                }
+
+                // Show loading message.
+                checkout.setLoadWaiting('review');
+
+                var params = Form.serialize(payment.form);
+                if (this.agreementsForm) {
+                    params += '&' + Form.serialize(this.agreementsForm);
+                }
+
+                checkout.updateFormToken(params, function() {
+                    checkout.setLoadWaiting(false, false);
+                });
+            };
+
+            var placeOrderBtn = $$('#review-buttons-container button').first();
+            placeOrderBtn.onclick = function(e) {
+                e.preventDefault();
+                review.checkAndPayOrder();
+            };
+        }).catch(({KR, result}) => {
+            return result.doOnError();
+        });
+    }
+//]]>
+</script>

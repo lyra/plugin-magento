@@ -6,7 +6,8 @@ PayZen for Magento is an open source plugin that links e-commerce websites based
 
 If plugin is already installed, search for Payzen in your Magento root directory and delete found files before upgrade.
 
-- Unzip module in your Magento 1 root directory.
+- If an older version of the plugin is installed, remove folder app/code/community/Lyranetwork or app/code/community/Lyra.
+- Unzip plugin files to your Magento 1 root directory.
 - Refresh Magento cache by deleting all files from [MAGENTO]/var/cache/ or through Magento admin panel (System / Cache management menu).
 
 ## Configuration
@@ -15,7 +16,7 @@ In the Magento admin panel:
 
 - Go to System > Configuration menu.
 - Open SALES > Payment methods section.
-- If your Magento installation has several websites, shops or views, change the current configuration scope in the upper-left corner to the desired configuration.
+- If your Magento installation has several websites, shops or views, change the current configuration scope in the upper-left corner to the desired context.
 - Click to expand the PayZen section.
 - If you installed an older version of the PayZen payment module, click "Reset" to take into account the new module features.
 

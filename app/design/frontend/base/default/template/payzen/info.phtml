@@ -19,7 +19,7 @@
     if (stripos($info->getMethod(), 'payzen_multi') === 0) {
         if (! isset($option) || empty($option)) {
             // Temporary patch for module versions < 1.3 that use additional_information field
-            $option = $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::MULTI_OPTION);
+            $option = $info->getAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::MULTI_OPTION);
         }
 
         if (is_array($option) && ! empty($option)) {
@@ -40,11 +40,11 @@ if ($info->getCcTransId()) {
     echo Mage::helper('payzen')->__('Transaction ID') . ': ' . $info->getCcTransId();
     echo '<br />';
 
-    if ($info->getCcType() == 'MULTI') {
+    if ($info->getCcType() === 'MULTI') {
         echo $this->getTransactionInfoHtml(true);
     } else {
         if (stripos($info->getMethod(), 'payzen_multi') === false) {
-            echo Mage::helper('payzen')->__('Transaction UUID') . ': ' . $info->getAdditionalInformation(Lyra_Payzen_Helper_Payment::TRANS_UUID);
+            echo Mage::helper('payzen')->__('Transaction UUID') . ': ' . $info->getAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::TRANS_UUID);
             echo '<br />';
         }
 

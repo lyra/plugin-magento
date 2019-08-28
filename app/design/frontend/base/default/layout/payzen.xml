@@ -3,17 +3,45 @@
     <checkout_onepage_index>
         <reference name="head">
             <action method="addCss"><stylesheet>css/payzen.css</stylesheet></action>
+            <block type="payzen/rest_head" name="payzen_rest_head" template="payzen/rest/head.phtml" />
         </reference>
     </checkout_onepage_index>
 
     <checkout_onepage_review>
         <reference name="checkout.onepage.review.info.items.before">
             <block type="payzen/review" name="payzen_review_before">
-                <action method="setIframeTemplate"><value>payzen/iframe.phtml</value></action>
+                <action method="setIframeTemplate"><value>payzen/iframe/review.phtml</value></action>
+                <action method="setRestTemplate"><value>payzen/rest/review.phtml</value></action>
                 <action method="chooseTemplate" />
             </block>
         </reference>
     </checkout_onepage_review>
+
+    <onestepcheckout_index_index>
+        <reference name="head">
+            <action block="head" method="addCss"><stylesheet>css/payzen.css</stylesheet></action>
+            <block type="core/template" name="payzen_oneclick_js" template="payzen/oneclick/js.phtml" />
+            <block type="payzen/rest_head" name="payzen_rest_head" template="payzen/rest/head.phtml" />
+        </reference>
+
+        <reference name="review_info">
+            <block type="payzen/review" name="payzen_review_before" as="items_before">
+                <action method="setIframeTemplate"><value>payzen/iframe/review.phtml</value></action>
+                <action method="setRestTemplate"><value>payzen/rest/review.phtml</value></action>
+                <action method="chooseTemplate" />
+            </block>
+        </reference>
+    </onestepcheckout_index_index>
+
+     <payzen_onestepcheckout_review>
+        <reference name="review_info">
+            <block type="payzen/review" name="payzen_review_before" as="items_before">
+                <action method="setIframeTemplate"><value>payzen/iframe/review.phtml</value></action>
+                <action method="setRestTemplate"><value>payzen/rest/review.phtml</value></action>
+                <action method="chooseTemplate" />
+            </block>
+        </reference>
+    </payzen_onestepcheckout_review>
 
     <payzen_payment_form>
         <reference name="root">
