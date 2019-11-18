@@ -98,6 +98,7 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
                 '</div>');
         }
 
+        KR.setFormConfig({language: '<?php echo $this->getLanguage(); ?>'});
         payzenInitRestEvents.delay(0.2);
     };
 

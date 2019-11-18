@@ -157,7 +157,8 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
         $this->_payzenRequest->set('cust_address', $order->getBillingAddress()->getStreet(1) . ' ' . $order->getBillingAddress()->getStreet(2));
         $this->_payzenRequest->set('cust_zip', $order->getBillingAddress()->getPostcode());
         $this->_payzenRequest->set('cust_city', $order->getBillingAddress()->getCity());
-        $this->_payzenRequest->set('cust_state', $order->getBillingAddress()->getRegion());
+        $this->_payzenRequest->set('cust_state', !is_numeric($order->getBillingAddress()->getRegionCode()) ?
+            $order->getBillingAddress()->getRegionCode() : $order->getBillingAddress()->getRegion());
         $this->_payzenRequest->set('cust_country', $order->getBillingAddress()->getCountryId());
         $this->_payzenRequest->set('cust_phone', $order->getBillingAddress()->getTelephone());
         $this->_payzenRequest->set('cust_cell_phone', $order->getBillingAddress()->getTelephone());
@@ -169,7 +170,8 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
             $this->_payzenRequest->set('ship_to_city', $address->getCity());
             $this->_payzenRequest->set('ship_to_street', $address->getStreet(1));
             $this->_payzenRequest->set('ship_to_street2', $address->getStreet(2));
-            $this->_payzenRequest->set('ship_to_state', $address->getRegion());
+            $this->_payzenRequest->set('ship_to_state', !is_numeric($address->getRegionCode()) ?
+                $address->getRegionCode() : $address->getRegion());
             $this->_payzenRequest->set('ship_to_country', $address->getCountryId());
             $this->_payzenRequest->set('ship_to_phone_num', $address->getTelephone());
             $this->_payzenRequest->set('ship_to_zip', $address->getPostcode());
