@@ -156,7 +156,8 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
                     'address' => $billingAddress->getStreet(1) . ' ' . $billingAddress->getStreet(2),
                     'zipCode' => $billingAddress->getPostcode(),
                     'city' => $billingAddress->getCity(),
-                    'state' => $billingAddress->getRegion(),
+                    'state' => !is_numeric($billingAddress->getRegionCode()) ?
+                        $billingAddress->getRegionCode() : $billingAddress->getRegion(),
                     'phoneNumber' => $billingAddress->getTelephone(),
                     'country' => $billingAddress->getCountryId()
                 ),
@@ -167,7 +168,8 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
                     'address2' => $shippingAddress->getStreet(2),
                     'zipCode' => $shippingAddress->getPostcode(),
                     'city' => $shippingAddress->getCity(),
-                    'state' => $shippingAddress->getregion(),
+                    'state' => !is_numeric($shippingAddress->getRegionCode()) ?
+                        $shippingAddress->getRegionCode() : $shippingAddress->getRegion(),
                     'phoneNumber' => $shippingAddress->getTelephone(),
                     'country' => $shippingAddress->getCountryId(),
                     'deliveryCompanyName' => $methodCode['oney_label'],
@@ -466,7 +468,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $timestamp = time();
 
             // Common request generation.
-            $commonRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\CommonRequest();
+            $commonRequest = new \Lyranetwork\Payzen\Model\Api\Ws\CommonRequest();
             $commonRequest->setPaymentSource('MOTO');
             $commonRequest->setSubmissionDate(new DateTime("@$timestamp"));
 
@@ -484,7 +486,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             }
 
             // Payment request generation.
-            $paymentRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\PaymentRequest();
+            $paymentRequest = new \Lyranetwork\Payzen\Model\Api\Ws\PaymentRequest();
             $paymentRequest->setTransactionId(Lyranetwork_Payzen_Model_Api_Api::generateTransId($timestamp));
             $paymentRequest->setAmount($currency->convertAmountToInteger($amount));
             $paymentRequest->setCurrency($currency->getNum());
@@ -512,11 +514,11 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             }
 
             // Order request generation.
-            $orderRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\OrderRequest();
+            $orderRequest = new \Lyranetwork\Payzen\Model\Api\Ws\OrderRequest();
             $orderRequest->setOrderId($order->getIncrementId());
 
             // Card request generation.
-            $cardRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\CardRequest();
+            $cardRequest = new \Lyranetwork\Payzen\Model\Api\Ws\CardRequest();
             $info = $this->getInfoInstance();
             $cardRequest->setNumber($info->getCcNumber());
             $cardRequest->setScheme($info->getCcType());
@@ -525,7 +527,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $cardRequest->setExpiryYear($info->getCcExpYear());
 
             // Billing details generation.
-            $billingDetailsRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\BillingDetailsRequest();
+            $billingDetailsRequest = new \Lyranetwork\Payzen\Model\Api\Ws\BillingDetailsRequest();
             $billingDetailsRequest->setReference($order->getCustomerId());
 
             if ($order->getBillingAddress()->getPrefix()) {
@@ -557,7 +559,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $billingDetailsRequest->setLanguage($language);
 
             // Shipping details generation.
-            $shippingDetailsRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\ShippingDetailsRequest();
+            $shippingDetailsRequest = new \Lyranetwork\Payzen\Model\Api\Ws\ShippingDetailsRequest();
 
             $address = $order->getShippingAddress();
             if (is_object($address)) { // Deliverable order.
@@ -573,17 +575,17 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             }
 
             // Extra details generation.
-            $extraDetailsRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\ExtraDetailsRequest();
+            $extraDetailsRequest = new \Lyranetwork\Payzen\Model\Api\Ws\ExtraDetailsRequest();
             $extraDetailsRequest->setIpAddress($this->_getHelper()->getIpAddress());
 
             // Customer request generation.
-            $customerRequest = new \Lyranetwork\_Payzen\Model\Api\Ws\CustomerRequest();
+            $customerRequest = new \Lyranetwork\Payzen\Model\Api\Ws\CustomerRequest();
             $customerRequest->setBillingDetails($billingDetailsRequest);
             $customerRequest->setShippingDetails($shippingDetailsRequest);
             $customerRequest->setExtraDetails($extraDetailsRequest);
 
             // Create payment object generation.
-            $createPayment = new \Lyranetwork\_Payzen\Model\Api\Ws\CreatePayment();
+            $createPayment = new \Lyranetwork\Payzen\Model\Api\Ws\CreatePayment();
             $createPayment->setCommonRequest($commonRequest);
             $createPayment->setPaymentRequest($paymentRequest);
             $createPayment->setOrderRequest($orderRequest);

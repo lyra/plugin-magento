@@ -59,8 +59,18 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
 
         if ($transactionDetails = $this->getProperty($transaction, 'transactionDetails')) {
             $response['vads_sequence_number'] = $this->getProperty($transactionDetails, 'sequenceNumber');
-            $response['vads_effective_amount'] = $this->getProperty($transactionDetails, 'effectiveAmount');
-            $response['vads_effective_currency'] = Lyranetwork_Payzen_Model_Api_Api::getCurrencyNumCode($this->getProperty($transactionDetails, 'effectiveCurrency'));
+
+            $effectiveAmount = $this->getProperty($transactionDetails, 'effectiveAmount');
+            $effectiveCurrency = Lyranetwork_Payzen_Model_Api_Api::getCurrencyNumCode($this->getProperty($transactionDetails, 'effectiveCurrency'));
+
+            // Workarround to adapt to REST API behavior.
+            if ($effectiveAmount && $effectiveCurrency) {
+                $response['vads_effective_amount'] = $response['vads_amount'];
+                $response['vads_effective_currency'] = $response['vads_currency'];
+                $response['vads_amount'] = $effectiveAmount;
+                $response['vads_currency'] = $effectiveCurrency;
+            }
+
             $response['vads_warranty_result'] = $this->getProperty($transactionDetails, 'liabilityShift');
 
             if ($cardDetails = $this->getProperty($transactionDetails, 'cardDetails')) {

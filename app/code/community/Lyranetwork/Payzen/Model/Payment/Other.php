@@ -13,6 +13,8 @@ class Lyranetwork_Payzen_Model_Payment_Other extends Lyranetwork_Payzen_Model_Pa
     protected $_code = 'payzen_other';
     protected $_formBlockType = 'payzen/other';
 
+    protected $_canUseInternal = false;
+
     protected function _setExtraFields($order)
     {
         $info = $this->getInfoInstance();

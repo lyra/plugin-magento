@@ -1,3 +1,10 @@
+1.10.1, 2019-11-18:
+- Bug fix: send region code instead of label when it is significant.
+- [embedded] Bug fix: default placeholders for embedded fields not translated with material theme.
+- [embedded] Bug fix: currency and effective currency fields are inverted in REST API response.
+- Bug fix: use correct class name for SOAP WS API classes.
+- Disabled other payment means for backend payment.
+
 1.10.0, 2019-08-28:
 - Bug fix: Accept UNDER_VERIFICATION transaction status for refunds.
 - Use Lyranetwork as developer namespace instead of Lyra.
