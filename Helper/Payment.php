@@ -336,7 +336,7 @@ class Payment
         } else {
             // 3DS authentication result.
             $threedsCavv = '';
-            if ($response->get('threeds_status') === 'Y') {
+            if (in_array($response->get('threeds_status'), array('Y', 'YES'))) {
                 $threedsCavv = $response->get('threeds_cavv');
             }
 
@@ -661,7 +661,7 @@ class Payment
             $payment->getOrder()->getId()
         );
 
-        if ($parentTxn && $parentTxn->getId() && $parentTxn->getTxnType() != $type) {
+        if ($parentTxn && $parentTxn->getId() && ($parentTxn->getTxnType() !== $type)) {
             $payment->setTransactionId($this->transactionManager->generateTransactionId($payment, $type, $parentTxn));
             $payment->setShouldCloseParentTransaction(true);
         } else {

@@ -9,6 +9,13 @@
  */
 namespace Lyranetwork\Payzen\Controller\Plugin;
 
+/*
+ * Class: CsrfValidator
+ *
+ * Bypass CSRF check for return and IPN URLs to avoid Form Key validation errors. Signature verification is used to check data integrity.
+ * To insure backwards compatibility, CsrfAwareActionInterface cannot be used.
+ */
+
 class CsrfValidator
 {
     /**
@@ -27,7 +34,8 @@ class CsrfValidator
         $controllerName = $request->getControllerName();
         $actionName = $request->getActionName();
 
-        if ($moduleName === 'payzen' && in_array($controllerName, ['payment', 'payment_rest']) && $actionName === 'check') {
+        if ($moduleName === 'payzen' && in_array($controllerName, ['payment', 'payment_rest']) &&
+            in_array($actionName, ['check', 'response'])) {
             return; // Skip CSRF check.
         }
 

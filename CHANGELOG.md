@@ -1,3 +1,7 @@
+2.4.3, 2020-01-20:
+- Bug fix: Manage formKey for compatibility with Magento 2.3.x versions
+- Bug fix: 3DS result is not correctly saved in Magento when using embedded payment fields.
+
 2.4.2, 2019-08-08:
 - Bug fix: Order increment ID not sent on some REST payments.
 - Bug fix: Error at the end of the payment by REST API in guest mode.
