@@ -887,10 +887,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 );
 
                 if ($txn && $txn->getId()) {
-                    $data = $txn->getAdditionalInformation('raw_details_info');
+                    $data = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
                     $data['Transaction Status'] = $response->getTransStatus();
 
-                    $txn->setAdditionalInformation('raw_details_info', $data);
+                    $txn->setAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $data);
                     $txn->save();
                 }
             }
@@ -1240,7 +1240,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
                     $order->cancel();
                     $this->dataHelper->log("Online payment cancel for order #{$order->getId()} is successful.");
-                } else { // Partial transaction cancel, call updatePayment WS.
+                } else { // Partial transaction refund, call updatePayment WS.
                     $paymentRequest = new \Lyranetwork\Payzen\Model\Api\Ws\PaymentRequest();
                     $paymentRequest->setAmount($transAmount - $amountInCents);
                     $paymentRequest->setCurrency($currency->getNum());
@@ -1349,8 +1349,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             'Transaction Status' => $commonResponse->getTransactionStatusLabel(),
             'Means of payment' => $cardResponse->getBrand(),
             'Card Number' => $cardResponse->getNumber(),
-            'Expiration Date' => $expiry,
-            '3DS Certificate' => ''
+            'Expiration Date' => $expiry
         ];
 
         $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;
