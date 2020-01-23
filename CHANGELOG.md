@@ -1,3 +1,7 @@
+1.10.2, 2020-01-22:
+- Bug fix: 3DS result is not correctly saved in Magento when using embedded payment fields.
+- Bug fix: fix capture delay parameter name when using embedded payment fields.
+
 1.10.1, 2019-11-18:
 - Bug fix: send region code instead of label when it is significant.
 - [embedded] Bug fix: default placeholders for embedded fields not translated with material theme.
@@ -36,7 +40,7 @@
 - Send Magento phone number as vads\_cell\_phone (required for some payment means).
 - Possibility to validate *all* transactions of a payment in installments from Magento backend.
 - Save transaction UUID in order payment details.
-- Imrpove "Shipping options" configuration field management.
+- Improve "Shipping options" configuration field management.
 - Added Spanish translation.
 - [prodfaq] Fix notice about shifting the shop to production mode.
 - Comply with the new management of REGISTER feature on gateway.
