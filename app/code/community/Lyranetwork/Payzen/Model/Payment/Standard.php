@@ -114,7 +114,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         if (is_numeric($this->getConfigData('capture_delay'))) {
             $captureDelay = $this->getConfigData('capture_delay');
         } else {
-            $captureDelay = $this->_getHelper()->getCommonConfigData('capture-delay');
+            $captureDelay = $this->_getHelper()->getCommonConfigData('capture_delay');
         }
 
         if ($this->getConfigData('validation_mode') !== '-1') {

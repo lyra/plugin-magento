@@ -790,7 +790,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         } else {
             // 3DS authentication result
             $threedsCavv = '';
-            if ($response->get('threeds_status') === 'Y') {
+            if (in_array($response->get('threeds_status'), array('Y', 'YES'))) {
                 $threedsCavv = $response->get('threeds_cavv');
             }
 
