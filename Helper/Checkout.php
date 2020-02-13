@@ -10,6 +10,7 @@
 namespace Lyranetwork\Payzen\Helper;
 
 use Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Checkout
 {
@@ -256,14 +257,21 @@ class Checkout
                 // Concat product label with one or two of its category names to make it clearer.
                 $categoryIds = $product->getCategoryIds();
                 if (is_array($categoryIds) && ! empty($categoryIds)) {
-                    if (isset($categoryIds[1]) && $categoryIds[1]) {
-                        $category = $this->categoryRepository->get($categoryIds[1]);
-                        $label = $category->getName() . ' I ' . $label;
-                    }
+                    try {
+                        if (isset($categoryIds[1]) && $categoryIds[1]) {
+                            $category = $this->categoryRepository->get($categoryIds[1]);
+                            $label = $category->getName() . ' I ' . $label;
+                        }
 
-                    if ($categoryIds[0]) {
-                        $category = $this->categoryRepository->get($categoryIds[0]);
-                        $label = $category->getName() . ' I ' . $label;
+                        if ($categoryIds[0]) {
+                            $category = $this->categoryRepository->get($categoryIds[0]);
+                            $label = $category->getName() . ' I ' . $label;
+                        }
+                    } catch (NoSuchEntityException $e) {
+                        $this->dataHelper->log(
+                            "Exception while retrieving product category with code {$e->getCode()}: {$e->getMessage()}",
+                            \Psr\Log\LogLevel::WARNING
+                        );
                     }
                 }
 
@@ -275,7 +283,7 @@ class Checkout
                     $priceInCents,
                     $qty,
                     $item->getProductId(),
-                    $this->toPayzenCategory($product->getCategoryIds())
+                    $this->toPayzenCategory($categoryIds)
                 );
 
                 $subtotal += $priceInCents * $qty;
