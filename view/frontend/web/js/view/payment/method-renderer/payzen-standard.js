@@ -262,10 +262,13 @@ define(
                     if (response.token) {
                         KR.setFormConfig({
                             formToken: response.token
+                        }).then(({KR, result}) => {
+                            $('#payzen_rest_form .kr-payment-button').click();
                         });
+                    } else {
+                        // Should not happen, this case is managed by failure callback.
+                        console.log('Empty form token returned by refresh.');
                     }
-
-                    $('#payzen_rest_form .kr-payment-button').click();
                 }).fail(function (response) {
                     errorProcessor.process(response, me.messageContainer);
                     fullScreenLoader.stopLoader();

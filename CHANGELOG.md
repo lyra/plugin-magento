@@ -1,3 +1,8 @@
+2.4.4, 2020-02-14:
+- Bug fix: NoSuchEntityException occurs when trying to retrieve a removed product category.
+- [embedded] Bug fix: Amount did not include shipping fees when using embedded payment fields if payment step is not refreshed.
+- BUg fix: Payment information in order confirmation email was not correctly translated in some multistore cases.
+
 2.4.3, 2020-01-20:
 - Bug fix: Manage formKey for compatibility with Magento 2.3.x versions
 - Bug fix: 3DS result is not correctly saved in Magento when using embedded payment fields.

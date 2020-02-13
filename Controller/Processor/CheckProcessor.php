@@ -35,6 +35,12 @@ class CheckProcessor
 
     /**
      *
+     * @var \Magento\Store\Model\App\Emulation
+     */
+    protected $emulation;
+
+    /**
+     *
      * @var \Magento\Sales\Model\OrderFactory
      */
     protected $orderFactory;
@@ -48,6 +54,7 @@ class CheckProcessor
     /**
      *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Store\Model\App\Emulation $emulation
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
@@ -55,12 +62,14 @@ class CheckProcessor
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Store\Model\App\Emulation $emulation,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
     ) {
         $this->storeManager = $storeManager;
+        $this->emulation = $emulation;
         $this->dataHelper = $dataHelper;
         $this->paymentHelper = $paymentHelper;
         $this->orderFactory = $orderFactory;
@@ -202,8 +211,8 @@ class CheckProcessor
         // Get store id from order.
         $storeId = $order->getStore()->getId();
 
-        // Init app with correct store ID.
-        $this->storeManager->setCurrentStore($storeId);
+        // Init app with correct store environment. No need to stop emulation on an IPN call.
+        $this->emulation->startEnvironmentEmulation($storeId);
 
         // Load API response.
         $response = $this->payzenResponseFactory->create(
