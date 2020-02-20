@@ -12,8 +12,8 @@
 <script type="text/javascript">
 //<![CDATA[
     if ((typeof payment !== 'undefined') && (payment.currentMethod === 'payzen_standard')) {
-        // Basic Magento checkout.
-        KR.validateForm().then(({KR, result}) => {
+        // Default Magento checkout.
+        KR.validateForm().then(({ KR, result }) => {
             Review.prototype.checkAndPayOrder = function () {
                 if (checkout.loadWaiting) {
                     return;
@@ -37,7 +37,7 @@
                 e.preventDefault();
                 review.checkAndPayOrder();
             };
-        }).catch(({KR, result}) => {
+        }).catch(({ KR, result }) => {
             return result.doOnError();
         });
     }
