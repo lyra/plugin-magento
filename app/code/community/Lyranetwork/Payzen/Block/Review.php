@@ -46,7 +46,7 @@ class Lyranetwork_Payzen_Block_Review extends Mage_Core_Block_Template
      */
     protected function _getMethodInstance()
     {
-        if ($this->_getQuote() && $this->_getQuote()->getPayment()) {
+        if ($this->_getQuote() && $this->_getQuote()->getPayment() && $this->_getQuote()->getPayment()->getMethod()) {
             return $this->_getQuote()->getPayment()->getMethodInstance();
         }
 
@@ -66,7 +66,7 @@ class Lyranetwork_Payzen_Block_Review extends Mage_Core_Block_Template
 
     protected function _isIframeMode()
     {
-        $check = ($this->_getMethodInstance() instanceof  Lyranetwork_Payzen_Model_Payment_Standard)
+        $check = ($this->_getMethodInstance() instanceof Lyranetwork_Payzen_Model_Payment_Standard)
             && $this->_getMethodInstance()->isIframeMode();
 
         return $check;

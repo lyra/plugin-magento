@@ -80,29 +80,32 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
         }
 
         if (!KR.vueReady) {
-            KR.setFormToken(paymentToken);
+            KR.setFormToken(paymentToken).then(({ KR }) => {
+                payzenInitRestEvents();
+            });
         } else {
-            KR.removeForms();
+            KR.removeForms().then(({ KR }) => {
+                $('payzen_standard_rest_wrapper').update(
+                    '<div class="kr-embedded" kr-form-token="' + paymentToken + '">' +
+                    '    <div class="kr-pan"></div>' +
+                    '    <div class="kr-expiry"></div>' +
+                    '    <div class="kr-security-code"></div>' +
 
-            $('payzen_standard_rest_wrapper').update(
-                '<div class="kr-embedded" kr-form-token="' + paymentToken + '">' +
-                '    <div class="kr-pan"></div>' +
-                '    <div class="kr-expiry"></div>' +
-                '    <div class="kr-security-code"></div>' +
+                    '    <div style="display: none;">' +
+                    '        <button type="button" id="payzen_rest_hidden_button" class="kr-payment-button"></button>' +
+                    '    </div>' +
 
-                '    <div style="display: none;">' +
-                '        <button type="button" id="payzen_rest_hidden_button" class="kr-payment-button"></button>' +
-                '    </div>' +
+                    '    <div class="kr-form-error"></div>' +
+                    '</div>');
 
-                '    <div class="kr-form-error"></div>' +
-                '</div>');
+                payzenInitRestEvents.delay(0.2);
+            });
         }
-
-        KR.setFormConfig({language: '<?php echo $this->getLanguage(); ?>'});
-        payzenInitRestEvents.delay(0.2);
     };
 
     window.payzenInitRestEvents = function() {
+        KR.setFormConfig({ language: '<?php echo $this->getLanguage(); ?>' });
+
         KR.onError(function(e) {
             // Not recoverable error, reload page after a while.
             if (PAYZEN_RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
@@ -183,10 +186,13 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
                         if (response.success) {
                             // Update form token and call REST API to do payment.
                             if (response.formToken) {
-                                KR.setFormToken(response.formToken);
+                                KR.setFormToken(response.formToken).then(({ KR }) => {
+                                    $('payzen_rest_hidden_button').click();
+                                });
+                            } else {
+                                // Form token is the same because data was not changed.
+                                $('payzen_rest_hidden_button').click();
                             }
-
-                            $('payzen_rest_hidden_button').click();
                         } else {
                             if (typeof resetLoaderCallback === 'function') {
                                 resetLoaderCallback.call();
@@ -222,7 +228,7 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
 
                 placeOrderBtn.onclick = function(e) {
                     if (payzenSelectedMethod() === 'payzen_standard') {
-                        KR.validateForm().then(({KR, result}) => {
+                        KR.validateForm().then(({ KR, result }) => {
                             var validator = new Validation('one-step-checkout-form');
 
                             // Validate email address.
@@ -247,7 +253,7 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
                                     placeOrderBtn.removeClassName('place-order-loader');
                                 });
                             }
-                          }).catch(({KR, result}) => {
+                          }).catch(({ KR, result }) => {
                               return result.doOnError();
                           });
                     } else {

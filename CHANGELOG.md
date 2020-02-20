@@ -1,6 +1,10 @@
+1.10.3, 2020-02-19:
+- [embedded] Bug fix: payment data was not refreshed in some cases with embedded payment fields.
+- [iframe] Fix compatibility with OneStepCheckout plugin (error when checking enabled mode).
+
 1.10.2, 2020-01-22:
-- Bug fix: 3DS result is not correctly saved in Magento when using embedded payment fields.
-- Bug fix: fix capture delay parameter name when using embedded payment fields.
+- [embedded] Bug fix: 3DS result is not correctly saved in Magento when using embedded payment fields.
+- [embedded] Bug fix: fix capture delay parameter name when using embedded payment fields.
 
 1.10.1, 2019-11-18:
 - Bug fix: send region code instead of label when it is significant.
