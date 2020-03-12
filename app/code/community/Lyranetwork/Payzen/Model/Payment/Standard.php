@@ -597,12 +597,14 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $createPaymentResponse = $wsApi->createPayment($createPayment);
 
             $wsApi->checkAuthenticity();
+
+            $successStatuses = array_merge(
+                Lyranetwork_Payzen_Model_Api_Api::getSuccessStatuses(),
+                Lyranetwork_Payzen_Model_Api_Api::getPendingStatuses()
+            );
             $wsApi->checkResult(
                 $createPaymentResponse->getCreatePaymentResult()->getCommonResponse(),
-                array(
-                    'INITIAL', 'NOT_CREATED', 'AUTHORISED', 'AUTHORISED_TO_VALIDATE',
-                    'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE'
-                )
+                $successStatuses
             );
 
             // Check operation type (0: debit, 1 refund).

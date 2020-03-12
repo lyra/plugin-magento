@@ -14,7 +14,7 @@
     <!-- Version. -->
     <modules>
         <Lyranetwork_Payzen>
-            <version>1.10.3</version>
+            <version>1.11.0</version>
         </Lyranetwork_Payzen>
     </modules>
 
@@ -496,7 +496,7 @@
             <payzen>
                 <developed_by>Lyra Network</developed_by>
                 <support_email>support@payzen.eu</support_email>
-                <plugin_version>1.10.3</plugin_version>
+                <plugin_version>1.11.0</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_1.4-1.9</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -599,6 +599,21 @@
                 <payment_action>authorize</payment_action>
             </payzen_choozeo>
 
+            <payzen_oney3x4x>
+                <model>payzen/payment_oney3x4x</model>
+                <group>payzen</group>
+
+                <active>0</active>
+                <allowspecific>0</allowspecific>
+                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
+                <title>Payment in 3 or 4 times Oney</title>
+                <sort_order>5</sort_order>
+                <module_logo>oney3x4x.png</module_logo>
+                <payment_action>authorize</payment_action>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_oney3x4x>
+
             <payzen_oney>
                 <model>payzen/payment_oney</model>
                 <group>payzen</group>
@@ -607,7 +622,7 @@
                 <allowspecific>0</allowspecific>
                 <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
                 <title>Payment with FacilyPay Oney</title>
-                <sort_order>5</sort_order>
+                <sort_order>6</sort_order>
                 <module_logo>oney.png</module_logo>
                 <payment_action>authorize</payment_action>
 
@@ -624,21 +639,21 @@
                 <allowspecific>1</allowspecific>
                 <specificcountry>FR</specificcountry>
                 <title>Payment with Full CB</title>
-                <sort_order>6</sort_order>
+                <sort_order>7</sort_order>
                 <module_logo>fullcb.png</module_logo>
                 <payment_action>authorize</payment_action>
 
                 <enable_payment_options>0</enable_payment_options>
             </payzen_fullcb>
 
-           <payzen_sepa>
+            <payzen_sepa>
                 <model>payzen/payment_sepa</model>
                 <group>payzen</group>
 
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <title>Payment with SEPA</title>
-                <sort_order>7</sort_order>
+                <sort_order>8</sort_order>
                 <module_logo>sdd.png</module_logo>
                 <payment_action>authorize</payment_action>
 
@@ -652,7 +667,7 @@
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <title>Payment with PayPal</title>
-                <sort_order>8</sort_order>
+                <sort_order>9</sort_order>
                 <module_logo>paypal.png</module_logo>
                 <payment_action>authorize</payment_action>
 
@@ -666,7 +681,7 @@
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <title>Payment with SOFORT Banking</title>
-                <sort_order>9</sort_order>
+                <sort_order>10</sort_order>
                 <module_logo>sofort_banking.png</module_logo>
                 <payment_action>authorize</payment_action>
             </payzen_sofort>
@@ -678,7 +693,7 @@
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <title>Payment with PostFinance</title>
-                <sort_order>10</sort_order>
+                <sort_order>11</sort_order>
                 <module_logo>postfinance.png</module_logo>
                 <payment_action>authorize</payment_action>
 
@@ -692,7 +707,7 @@
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <title>Payment with Giropay</title>
-                <sort_order>11</sort_order>
+                <sort_order>12</sort_order>
                 <module_logo>giropay.png</module_logo>
                 <payment_action>authorize</payment_action>
 
@@ -707,7 +722,7 @@
                 <allowspecific>1</allowspecific>
                 <specificcountry>NL</specificcountry>
                 <title>Payment with iDEAL</title>
-                <sort_order>12</sort_order>
+                <sort_order>13</sort_order>
                 <module_logo>ideal.png</module_logo>
                 <payment_action>authorize</payment_action>
             </payzen_ideal>
@@ -719,7 +734,7 @@
                 <active>0</active>
                 <allowspecific>0</allowspecific>
                 <title>Other payment means</title>
-                <sort_order>13</sort_order>
+                <sort_order>14</sort_order>
                 <module_logo>other.png</module_logo>
                 <other_regroup_payment_means>0</other_regroup_payment_means>
                 <payment_action>authorize</payment_action>

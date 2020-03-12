@@ -74,8 +74,8 @@ class Lyranetwork_Payzen_Model_Api_Ws_ResultWrapper
      */
     public function isAcceptedPayment()
     {
-        $confirmedStatuses = array('AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'CAPTURED', 'CAPTURE_FAILED');
-        return in_array($this->getTransStatus(), $confirmedStatuses) || $this->isPendingPayment();
+        return in_array($this->getTransStatus(), Lyranetwork_Payzen_Model_Api_Api::getSuccessStatuses())
+            || $this->isPendingPayment();
     }
 
     /**
@@ -86,13 +86,7 @@ class Lyranetwork_Payzen_Model_Api_Ws_ResultWrapper
      */
     public function isPendingPayment()
     {
-        $pendingStatuses = array(
-            'INITIAL',
-            'WAITING_AUTHORISATION',
-            'WAITING_AUTHORISATION_TO_VALIDATE',
-            'UNDER_VERIFICATION'
-        );
-        return in_array($this->getTransStatus(), $pendingStatuses);
+        return in_array($this->getTransStatus(), Lyranetwork_Payzen_Model_Api_Api::getPendingStatuses());
     }
 
     /**
@@ -102,8 +96,7 @@ class Lyranetwork_Payzen_Model_Api_Ws_ResultWrapper
      */
     public function isCancelledPayment()
     {
-        $cancelledStatuses = array('NOT_CREATED', 'ABANDONED');
-        return in_array($this->getTransStatus(), $cancelledStatuses);
+        return in_array($this->getTransStatus(), Lyranetwork_Payzen_Model_Api_Api::getCancelledStatuses());
     }
 
     /**
@@ -113,8 +106,7 @@ class Lyranetwork_Payzen_Model_Api_Ws_ResultWrapper
      */
     public function isToValidatePayment()
     {
-        $toValidateStatuses = array('WAITING_AUTHORISATION_TO_VALIDATE', 'AUTHORISED_TO_VALIDATE');
-        return in_array($this->getTransStatus(), $toValidateStatuses);
+        return in_array($this->getTransStatus(), Lyranetwork_Payzen_Model_Api_Api::getToValidateStatuses());
     }
 
     /**

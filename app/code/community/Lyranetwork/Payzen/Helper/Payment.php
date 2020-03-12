@@ -1215,14 +1215,17 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     {
         $type = false;
 
-        switch ($payzenType) {
-            case 'UNDER_VERIFICATION':
-            case 'INITIAL':
-            case 'WAITING_AUTHORISATION_TO_VALIDATE':
-            case 'WAITING_AUTHORISATION':
-            case 'AUTHORISED_TO_VALIDATE':
-            case 'AUTHORISED':
-            case 'CAPTURE_FAILED':
+        $successStatuses = array_merge(
+            Lyranetwork_Payzen_Model_Api_Api::getSuccessStatuses(),
+            Lyranetwork_Payzen_Model_Api_Api::getPendingStatuses()
+        );
+
+        switch (true) {
+            case in_array($payzenType, array('CAPTURED', 'ACCEPTED')):
+                $type = Mage_Sales_Model_Order_Payment_Transaction::TYPE_CAPTURE;
+                break;
+
+            case in_array($payzenType, $successStatuses):
                 $type = Mage_Sales_Model_Order_Payment_Transaction::TYPE_AUTH;
                 break;
 
@@ -1232,10 +1235,6 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             case 'NOT_CREATED':
             case 'ABANDONED':
                 $type = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
-                break;
-
-            case 'CAPTURED':
-                $type = Mage_Sales_Model_Order_Payment_Transaction::TYPE_CAPTURE;
                 break;
 
             default:

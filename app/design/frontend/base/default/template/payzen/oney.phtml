@@ -18,22 +18,22 @@
             $html = '<div class="payzen-option">';
 
             if (count($options) === 1) {
-                $html .= '<input type="hidden" id="payzen_oney_option'.$code.'" value="'.$code.'" name="payment[payzen_oney_option]" disabled="disabled"><span style="margin-right: 20px;"></span>';
+                $html .= '<input type="hidden" id="payzen_oney_option' . $code . '" value="' . $code . '" name="payment[payzen_oney_option]" disabled="disabled"><span style="margin-right: 20px;"></span>';
             } else {
                 $html .= '<input type="radio"
                                  class="radio"
-                                 id="payzen_oney_option'.$code.'"'.
+                                 id="payzen_oney_option' . $code . '"'.
                                  ($first ? ' checked="checked"' : '').'
-                                 value="'.$code.'"
+                                 value="' . $code . '"
                                  name="payment[payzen_oney_option]"
-                                 onclick="$$(\'.payzen_oney_review\').invoke(\'hide\'); $(\'payzen_oney_review_'.$value['code'].'\').show();"
+                                 onclick="$$(\'.payzen_oney_review\').invoke(\'hide\'); $(\'payzen_oney_review_' . $code . '\').show();"
                                  disabled="disabled">' ;
             }
 
-            $html .= '<label for="payzen_oney_option'.$code.'">' . $value['label'] . '</label>';
+            $html .= '<label for="payzen_oney_option' . $code . '">' . $value['label'] . '</label>';
             $html .= '</div>';
 
-            $html .= $this->getHtmlReview($value, $first);
+            $html .= $this->getHtmlReview($value, $code, $first, 'oney');
             $html .= '<br style="margin-bottom: 5px;"/>';
 
             $first = false;

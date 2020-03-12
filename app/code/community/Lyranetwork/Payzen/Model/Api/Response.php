@@ -132,15 +132,7 @@ if (! class_exists('Lyranetwork_Payzen_Model_Api_Response', false)) {
          */
         public function isAcceptedPayment()
         {
-            $confirmedStatuses = array(
-                'AUTHORISED',
-                'AUTHORISED_TO_VALIDATE',
-                'CAPTURED',
-                'CAPTURE_FAILED', /* capture will be redone */
-                'ACCEPTED'
-            );
-
-            return in_array($this->transStatus, $confirmedStatuses) || $this->isPendingPayment();
+            return in_array($this->transStatus, Lyranetwork_Payzen_Model_Api_Api::getSuccessStatuses()) || $this->isPendingPayment();
         }
 
         /**
@@ -150,25 +142,16 @@ if (! class_exists('Lyranetwork_Payzen_Model_Api_Response', false)) {
          */
         public function isPendingPayment()
         {
-            $pendingStatuses = array(
-                'INITIAL',
-                'WAITING_AUTHORISATION',
-                'WAITING_AUTHORISATION_TO_VALIDATE',
-                'UNDER_VERIFICATION',
-                'WAITING_FOR_PAYMENT'
-            );
-
-            return in_array($this->transStatus, $pendingStatuses);
+            return in_array($this->transStatus, Lyranetwork_Payzen_Model_Api_Api::getPendingStatuses());
         }
 
         /**
-         * Check if the payment process was interrupted by the client.
+         * Check if the payment process was interrupted by the buyer.
          * @return bool
          */
         public function isCancelledPayment()
         {
-            $cancelledStatuses = array('NOT_CREATED', 'ABANDONED');
-            return in_array($this->transStatus, $cancelledStatuses);
+            return in_array($this->transStatus, Lyranetwork_Payzen_Model_Api_Api::getCancelledStatuses());
         }
 
         /**
@@ -177,8 +160,7 @@ if (! class_exists('Lyranetwork_Payzen_Model_Api_Response', false)) {
          */
         public function isToValidatePayment()
         {
-            $toValidateStatuses = array('WAITING_AUTHORISATION_TO_VALIDATE', 'AUTHORISED_TO_VALIDATE');
-            return in_array($this->transStatus, $toValidateStatuses);
+            return in_array($this->transStatus, Lyranetwork_Payzen_Model_Api_Api::getToValidateStatuses());
         }
 
         /**
