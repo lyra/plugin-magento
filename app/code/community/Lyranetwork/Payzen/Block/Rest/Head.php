@@ -75,7 +75,7 @@ class Lyranetwork_Payzen_Block_Rest_Head extends Mage_Core_Block_Template
      */
     protected function _toHtml()
     {
-        if ($this->getConfigData('card_info_mode') != 4) {
+        if (! $this->getConfigData('active') || $this->getConfigData('card_info_mode') != 4) {
             return '';
         }
 

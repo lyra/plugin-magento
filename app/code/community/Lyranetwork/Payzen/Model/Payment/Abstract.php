@@ -192,7 +192,7 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
         }
 
         // Set other data specific to FacilyPay Oney payment ond risk assessment module.
-        Mage::helper('payzen/util')->setAdditionalShippingData($order, $this->_payzenRequest, $this->_proposeOney());
+        Mage::helper('payzen/util')->setAdditionalShippingData($order, $this->_payzenRequest, $this->_proposeOney(), $this->_isNewOneyApi());
 
         $paramsToLog = $this->_payzenRequest->getRequestFieldsArray(true);
         $this->_getHelper()->log('Payment parameters: ' . print_r($paramsToLog, true));
@@ -203,6 +203,11 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
     abstract protected function _setExtraFields($order);
 
     protected function _proposeOney()
+    {
+        return false;
+    }
+
+    protected function _isNewOneyApi()
     {
         return false;
     }
@@ -306,12 +311,14 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
             $getPaymentDetailsResponse = $wsApi->getPaymentDetails($getPaymentDetails);
 
             $wsApi->checkAuthenticity();
+
+            $successStatuses = array_merge(
+                Lyranetwork_Payzen_Model_Api_Api::getSuccessStatuses(),
+                Lyranetwork_Payzen_Model_Api_Api::getPendingStatuses()
+            );
             $wsApi->checkResult(
                 $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse(),
-                array(
-                    'INITIAL', 'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE', 'UNDER_VERIFICATION',
-                    'AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'CAPTURED', 'CAPTURE_FAILED'
-                ) // Pending or accepted payment.
+                $successStatuses
             );
 
             // Check operation type (0: debit, 1 refund).
@@ -898,19 +905,21 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
                 $refundPayment->setPaymentRequest($paymentRequest);
                 $refundPayment->setQueryRequest($queryRequest);
 
-               $refundPaymentResponse = $wsApi->refundPayment($refundPayment);
+                $refundPaymentResponse = $wsApi->refundPayment($refundPayment);
 
                 $wsApi->checkAuthenticity();
+
+                $successStatuses = array_merge(
+                    Lyranetwork_Payzen_Model_Api_Api::getSuccessStatuses(),
+                    Lyranetwork_Payzen_Model_Api_Api::getPendingStatuses()
+                );
                 $wsApi->checkResult(
-                   $refundPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
-                    array(
-                        'INITIAL', 'AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'WAITING_AUTHORISATION',
-                        'WAITING_AUTHORISATION_TO_VALIDATE', 'CAPTURED', 'UNDER_VERIFICATION'
-                    )
+                    $refundPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
+                    $successStatuses
                 );
 
                 // Check operation type (0: debit, 1 refund).
-                $transType =$refundPaymentResponse->getRefundPaymentResult()->getPaymentResponse()->getOperationType();
+                $transType = $refundPaymentResponse->getRefundPaymentResult()->getPaymentResponse()->getOperationType();
                 if ($transType != 1) {
                     throw new Exception("Unexpected transaction type returned ($transType).");
                 }
@@ -918,9 +927,9 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
                 // Create refund transaction in Magento.
                 $this->createRefundTransaction(
                     $payment,
-                   $refundPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
-                   $refundPaymentResponse->getRefundPaymentResult()->getPaymentResponse(),
-                   $refundPaymentResponse->getRefundPaymentResult()->getCardResponse()
+                    $refundPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
+                    $refundPaymentResponse->getRefundPaymentResult()->getPaymentResponse(),
+                    $refundPaymentResponse->getRefundPaymentResult()->getCardResponse()
                 );
 
                 $this->_getHelper()->log("Online money refund for order #{$order->getIncrementId()} is successful.");

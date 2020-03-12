@@ -1,3 +1,8 @@
+1.11.0, 2020-03-04:
+- [oney] Adding 3x 4x Oney means of payment as submodule.
+- Do not consider CAPTURE_FAILED as a success status.
+- Improve payment statuses management.
+
 1.10.3, 2020-02-19:
 - [embedded] Bug fix: payment data was not refreshed in some cases with embedded payment fields.
 - [iframe] Fix compatibility with OneStepCheckout plugin (error when checking enabled mode).
@@ -145,6 +150,7 @@
 - Adding product category to product label sent to gateway (when shopping cart data are sent).
 - Possibility to configure capture delay and validation mode in submodules.
 - Management of risk assessment module (saving module results, accept / deny transactions from Magento backend).
+- [postfinance] Adding PostFinance means of payment as submodule.
 
 1.5.4, 2015-07-13:
 - Bug fix: correction of SSL use check before allowing activation of card data entry on merchant website.

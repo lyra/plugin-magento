@@ -9,11 +9,12 @@
 
 label[for=p_method_payzen_standard], label[for=p_method_payzen_multi],
 label[for=p_method_payzen_choozeo], label[for=p_method_payzen_gift],
-label[for=p_method_payzen_oney], label[for=p_method_payzen_sepa],
-label[for=p_method_payzen_fullcb], label[for=p_method_payzen_paypal],
-label[for=p_method_payzen_sofort], label[for=p_method_payzen_postfinance],
-label[for=p_method_payzen_giropay], label[for=p_method_payzen_ideal],
-label[for=p_method_payzen_other], .payzen-other-means {
+label[for=p_method_payzen_oney], label[for=p_method_payzen_oney3x4x], 
+label[for=p_method_payzen_sepa], label[for=p_method_payzen_fullcb], 
+label[for=p_method_payzen_paypal],label[for=p_method_payzen_sofort],
+label[for=p_method_payzen_postfinance], label[for=p_method_payzen_giropay],
+label[for=p_method_payzen_ideal],label[for=p_method_payzen_other],
+.payzen-other-means {
     width: 90% !important; 
     min-height: 30px !important;
     padding-top: 6px !important;

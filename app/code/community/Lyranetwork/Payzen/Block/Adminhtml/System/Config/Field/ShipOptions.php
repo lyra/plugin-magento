@@ -205,16 +205,14 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_ShipOptions
                         }
                     });
 
-                    // Enable delay select for rows with speed equals PRIORITY and type equals RECLAIM_IN_SHOP.
+                    // Enable delay select for rows with speed equals PRIORITY.
                     $$("select.payzen_list_delay").each(function(elt) {
                         var speedName = elt.name.replace("[delay]", "[speed]");
-                        var typeName = elt.name.replace("[delay]", "[type]");
 
                         // Select by name returns one element.
                         var speedElt = $$("select[name=\"" + speedName + "\"]")[0];
-                        var typeElt = $$("select[name=\"" + typeName + "\"]")[0];
 
-                        if (speedElt.value === "PRIORITY" && typeElt.value === "RECLAIM_IN_SHOP") {
+                        if (speedElt.value === "PRIORITY") {
                             elt.enable();
                         } else {
                             elt.disable();
@@ -223,28 +221,11 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_ShipOptions
 
                     $$("select.payzen_list_speed").invoke("observe", "change", function() {
                         var delayName = this.name.replace("[speed]", "[delay]");
-                        var typeName = this.name.replace("[speed]", "[type]");
 
                         // Select by name returns one element.
                         var elt = $$("select[name=\"" + delayName + "\"]")[0];
-                        var typeElt = $$("select[name=\"" + typeName + "\"]")[0];
 
-                        if (this.value === "PRIORITY" && typeElt.value === "RECLAIM_IN_SHOP") {
-                            elt.enable();
-                        } else {
-                            elt.disable();
-                        }
-                    });
-
-                    $$("select.payzen_list_type").invoke("observe", "change", function() {
-                        var delayName = this.name.replace("[type]", "[delay]");
-                        var speedName = this.name.replace("[type]", "[speed]");
-
-                        // Select by name returns one element.
-                        var elt = $$("select[name=\"" + delayName + "\"]")[0];
-                        var speedElt = $$("select[name=\"" + speedName + "\"]")[0];
-
-                        if (speedElt.value === "PRIORITY" && this.value === "RECLAIM_IN_SHOP") {
+                        if (this.value === "PRIORITY") {
                             elt.enable();
                         } else {
                             elt.disable();

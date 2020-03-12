@@ -14,8 +14,8 @@ class Lyranetwork_Payzen_Model_Field_Choozeo_CustgroupOptions extends Lyranetwor
     {
         $values = $this->getValue();
 
-        $data = $this->getGroups('payzen_choozeo'); // Get data of FacilyPay Oney config group.
-        if ($data['fields']['choozeo_active']['value']) { // FacilyPay Oney is activated.
+        $data = $this->getGroups('payzen_choozeo'); // Get data of Choozeo config group.
+        if ($data['fields']['choozeo_active']['value']) { // Choozeo is activated.
             foreach ($values as $value) {
                 if (empty($value) || ($value['code'] !== 'all')) {
                     continue;

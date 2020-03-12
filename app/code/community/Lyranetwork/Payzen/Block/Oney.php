@@ -8,7 +8,7 @@
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
-class Lyranetwork_Payzen_Block_Oney extends Lyranetwork_Payzen_Block_Abstract
+class Lyranetwork_Payzen_Block_Oney extends Lyranetwork_Payzen_Block_Oney3x4x
 {
     protected $_model = 'oney';
 
@@ -21,24 +21,10 @@ class Lyranetwork_Payzen_Block_Oney extends Lyranetwork_Payzen_Block_Abstract
     public function getPaymentOptions()
     {
         if ($this->_getModel()->getConfigData('enable_payment_options') != 1) {
-            // Local payment options selection is not allowed.
+            // Local payment options selection is not enabled.
             return false;
         }
 
-        $amount = $this->getMethod()->getInfoInstance()->getQuote()->getBaseGrandTotal();
-        return $this->_getModel()->getPaymentOptions($amount);
-    }
-
-    public function getHtmlReview(array $option, $first)
-    {
-        $quote = $this->getMethod()->getInfoInstance()->getQuote();
-        $amount = $quote->getGrandTotal();
-
-        $block = $this->getLayout()->createBlock('payzen/oney_review')
-            ->setOption($option)
-            ->setAmount($amount)
-            ->setFirst($first);
-
-        return $block->toHtml();
+        return parent::getPaymentOptions();
     }
 }

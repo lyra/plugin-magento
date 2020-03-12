@@ -54,7 +54,7 @@ class Lyranetwork_Payzen_Block_Fullcb_Review extends Mage_Core_Block_Template
      * Set first option flag.
      *
      * @param  bool $first
-     * @return Lyranetwork_Payzen_Block_Oney_Review
+     * @return Lyranetwork_Payzen_Block_Fullcb_Review
      */
     public function setFirst($first)
     {

@@ -28,7 +28,7 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         'oney' => true,
         'paypal' => true,
         'sofort' => true,
-        'postfinance' => false,
+        'postfinance' => true,
         'giropay' => true,
         'ideal' => true,
         'choozeo' => false,
