@@ -220,7 +220,7 @@ class Checkout
     {
         // Commmon category if any.
         $commonCategory = $this->dataHelper->getCommonConfigData('common_category');
-        if ($commonCategory != 'CUSTOM_MAPPING') {
+        if ($commonCategory !== 'CUSTOM_MAPPING') {
             return $commonCategory;
         }
 

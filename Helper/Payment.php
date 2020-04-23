@@ -601,7 +601,7 @@ class Payment
         // Flag that is true if automatically create invoice.
         $autoCapture = $this->dataHelper->getCommonConfigData('capture_auto', $order->getStore()->getId());
 
-        if (! $autoCapture || $order->getStatus() != 'processing' || ! $order->canInvoice()) {
+        if (! $autoCapture || ($order->getStatus() !== 'processing') || ! $order->canInvoice()) {
             // Creating invoice not allowed.
             return;
         }

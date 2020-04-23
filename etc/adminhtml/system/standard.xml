@@ -213,7 +213,7 @@
 
             <field id="rest_attempts" translate="label comment" type="text" sortOrder="251" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Payment attempts number]]></label>
-                <comment><![CDATA[Maximum number of payment retries after a failed payment (between 0 and 10). Leave blank to use gateway configuration.]]></comment>
+                <comment><![CDATA[Maximum number of payment retries after a failed payment (between 0 and 9). If blank, the gateway default value is 3.]]></comment>
                 <config_path>payment/payzen_standard/rest_attempts</config_path>
                 <depends>
                     <field id="card_info_mode">4</field>

@@ -10,20 +10,17 @@
 ?>
 
 <script src="<?php echo $block->escapeUrl($block->getStaticUrl()); ?>js/krypton-client/V4.0/stable/kr-payment-form.min.js"
-
 <?php
 if ($panLabel = $block->getPlaceholder('pan')) {
 ?>
         kr-placeholder-pan="<?php echo $block->escapeUrl($panLabel); ?>"
 <?php
 }
-
 if ($expiryLabel = $block->getPlaceholder('expiry')) {
 ?>
         kr-placeholder-expiry="<?php echo $block->escapeUrl($expiryLabel); ?>"
 <?php
 }
-
 if ($cvvLabel = $block->getPlaceholder('cvv')) {
 ?>
         kr-placeholder-security-code="<?php echo $block->escapeUrl($cvvLabel); ?>"

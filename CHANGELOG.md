@@ -1,3 +1,7 @@
+2.4.5, 2020-04-23:
+- Some minor fixes.
+- [embedded] Bug fix: Load embedded payment fields JavaScript library inside require() function.
+
 2.4.4, 2020-02-14:
 - Bug fix: NoSuchEntityException occurs when trying to retrieve a removed product category.
 - [embedded] Bug fix: Amount did not include shipping fees when using embedded payment fields if payment step is not refreshed.

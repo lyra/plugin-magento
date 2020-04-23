@@ -18,7 +18,7 @@ class Fullcb extends Payzen
     {
         if (! $this->getConfigData('enable_payment_options')) {
             // Local payment options selection is not allowed.
-            return false;
+            return [];
         }
 
         $amount = $this->getMethod()
