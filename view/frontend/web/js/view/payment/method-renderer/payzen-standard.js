@@ -171,45 +171,42 @@ define(
                 $('li.payzen-standard-' + blockName + '-block').show();
             },
 
-            initRestEvents: function (elts) { // To be called after KR script loading.
+            initRestEvents: function (elts) { // To be called after kr-embedded div is added to DOM.
                 if (!elts || !elts.length) {
                     return;
                 }
 
                 var me = this;
 
-                KR.setFormConfig({
-                    formToken: me.getRestFormToken()
-                });
+                require(['krypton'], function (KR) {
+                    KR.setFormConfig({
+                        formToken: me.getRestFormToken()
+                    }).then(
+                        KR.onFocus(function(e) {
+                            $('#payzen_rest_form .kr-form-error').html('');
+                        })
+                    ).then(
+                        KR.onError(function (e) {
+                            fullScreenLoader.stopLoader();
+                            me.isPlaceOrderActionAllowed(true);
 
-                // Workarround bug relative to wrappers size with material theme.
-                KR.onFormReady(function (e) {
-                    $('#payzen_rest_form .kr-iframe-wrapper').css('display', '');
-                });
+                            // Not recoverable error, reload page after a while.
+                            if (RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 4000);
+                            }
 
-                KR.onFocus(function(e) {
-                    $('#payzen_rest_form .kr-form-error').html('');
-                });
+                            var msg = '';
+                            if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
+                                msg = e.errorMessage + (e.errorMessage.endsWith('.') ? '' : '.');
+                            } else {
+                                msg = me.translateError(e.errorCode);
+                            }
 
-                KR.onError(function (e) {
-                    fullScreenLoader.stopLoader();
-                    me.isPlaceOrderActionAllowed(true);
-
-                    // Not recoverable error, reload page after a while.
-                    if (RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 4000);
-                    }
-
-                    var msg = '';
-                    if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
-                        msg = e.errorMessage + (e.errorMessage.endsWith('.') ? '' : '.');
-                    } else {
-                        msg = me.translateError(e.errorCode);
-                    }
-
-                    $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
+                            $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
+                        })
+                    );
                 });
             },
 
@@ -260,10 +257,12 @@ define(
                     url.build('payzen/payment_rest/token?form_key=' + $.mage.cookies.get('form_key'))
                 ).done(function (response) {
                     if (response.token) {
-                        KR.setFormConfig({
-                            formToken: response.token
-                        }).then(({KR, result}) => {
-                            $('#payzen_rest_form .kr-payment-button').click();
+                        require(['krypton'], function (KR) {
+	                        KR.setFormConfig({
+	                            formToken: response.token
+	                        }).then(
+	                            $('#payzen_rest_form .kr-payment-button').click()
+	                        );
                         });
                     } else {
                         // Should not happen, this case is managed by failure callback.
