@@ -15,7 +15,6 @@ class Lyranetwork_Payzen_Model_Field_Oney3x4x_PaymentOptions extends Lyranetwork
     public function _beforeSave()
     {
         $values = $this->getValue();
-        Mage::helper('payzen')->log(print_r($values, true));
 
         if (! is_array($values) || count($values) <= 1) {
             if (strpos($this->_eventPrefix, '3x4x') !== false) { // Check if it's payment 3x 4x Oney.

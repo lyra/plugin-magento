@@ -18,7 +18,7 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     public static $pluginFeatures = array(
         'qualif' => false,
         'prodfaq' => true,
-        'acquis' => true,
+        'acquis' => false,
         'restrictmulti' => false,
         'shatwo' => true,
         'embedded' => true,

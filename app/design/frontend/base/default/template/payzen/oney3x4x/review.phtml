@@ -27,7 +27,7 @@ $date = time();
             <td><strong><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></strong></td>
         </tr>
         <tr>
-            <td><?php echo Mage::helper('payzen')->__('Followed by %s payments', $optionDetails->getCount()); ?></td>
+            <td><?php echo Mage::helper('payzen')->__('Followed by %s installments', $optionDetails->getCount()); ?></td>
             <td></td>
         </tr>
         <?php
@@ -35,7 +35,7 @@ $date = time();
             $date = strtotime('+30 days', $date);
         ?>
         <tr>
-            <td>&nbsp;- <?php echo Mage::helper('payzen')->__('Payment %s:', $i); ?> <?php echo $optionDetails->getMonthlyPayment(); ?></td>
+            <td>&nbsp;- <?php echo Mage::helper('payzen')->__('Installment %s:', $i); ?> <?php echo $optionDetails->getMonthlyPayment(); ?></td>
             <td><strong><?php echo Mage::helper('core')->formatDate(date('Y-m-d', $date)); ?></strong></td>
         </tr>
         <?php

@@ -7,9 +7,9 @@
  * @copyright Lyra Network
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-
-$oneClickActive = $this->getConfigData('one_click_active'); // 1-Click enabled ?
-$customer = Mage::getSingleton('customer/session')->getCustomer(); // Logged in customer.
+$paymentByTokenActive = $this->getConfigData('one_click_active'); // Payment by token active?
+$customer = Mage::getSingleton('customer/session')->getCustomer(); // Logged-in customer.
+$isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenIdentifier();
 ?>
 
 <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display:none;">
@@ -61,7 +61,7 @@ if ($this->isLocalCcType()) :
     if ($otherCards != '') echo '<li class="payzen-standard-cc-block">' . $otherCards . '</li>';
 endif;
 
-if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
+if ($isPaymentByToken) : ?>
     <li class="payzen-standard-cc-block"><?php echo Mage::helper('payzen')->__('You will enter payment data after order confirmation.') ?></li>
 
     <li class="payzen-standard-cc-block">
@@ -90,7 +90,7 @@ if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
 
 <script type="text/javascript">
 //<![CDATA[
-<?php if ($oneClickActive && $customer && $customer->getPayzenIdentifier()) : ?>
+<?php if ($isPaymentByToken) : ?>
     // Display payment by identifier block when standard payment is selected.
     Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
     Event.observe('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
