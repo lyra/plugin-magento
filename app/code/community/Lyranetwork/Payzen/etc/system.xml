@@ -259,7 +259,6 @@
                             <show_in_store>1</show_in_store>
                         </validation_mode>
 
-
                         <!-- ================================ Payment page customize. ================================== -->
                         <payment_page_customize translate="label">
                             <label><![CDATA[PAYMENT PAGE CUSTOMIZE]]></label>
@@ -305,7 +304,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </shop_url>
-
 
                         <!--  ================================== 3DS enabling. ================================== -->
                         <selective_3ds translate="label">
@@ -510,7 +508,6 @@
                         </ship_options>
                     </fields>
                 </payzen>
-
 
                 <payzen_standard translate="label">
                     <label><![CDATA[PayZen - Standard payment]]></label>
@@ -722,7 +719,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <config_path>payment/payzen_standard/one_click_active</config_path>
-                            <sort_order>42</sort_order>
+                            <sort_order>57</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -733,7 +730,7 @@
                             <comment><![CDATA[The text to display on the PayZen 1-Click payment button.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen_standard/one_click_title</config_path>
-                            <sort_order>43</sort_order>
+                            <sort_order>58</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -749,7 +746,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>payzen/source_standard_oneClickLocations</source_model>
                             <config_path>payment/payzen_standard/one_click_location</config_path>
-                            <sort_order>44</sort_order>
+                            <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -905,7 +902,7 @@
 
                         <standard_rest_attempts translate="label,comment">
                             <label><![CDATA[Payment attempts number]]></label>
-                            <comment><![CDATA[Maximum number of payment retries after a failed payment (between 0 and 10). Leave blank to use gateway configuration.]]></comment>
+                            <comment><![CDATA[Maximum number of payment retries after a failed payment (between 0 and 9). If blank, the gateway default value is 3.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen_standard/rest_attempts</config_path>
                             <sort_order>55</sort_order>
@@ -918,7 +915,6 @@
                         </standard_rest_attempts>
                     </fields>
                 </payzen_standard>
-
 
                 <payzen_multi translate="label,comment">
                     <label><![CDATA[PayZen - Payment in installments]]></label>
@@ -1133,11 +1129,10 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Click on &laquo; Add &raquo; button to configure one or more payment options.<br /><b>Label: </b>The option label to display on the frontend.<br /><b>Min. amount: </b>Minimum amount to enable the payment option.<br /><b>Max. amount: </b>Maximum amount to enable the payment option.<br /><b>Contract: </b>ID of the contract to use with the option.<br /><b>Count: </b>Total number of payments.<br /><b>Period: </b>Delay (in days) between payments.<br /><b>1st payment: </b>Amount of first payment, in percentage of total amount. If empty, all payments will have the same amount.]]></comment>
+                            <comment><![CDATA[Click on &laquo; Add &raquo; button to configure one or more payment options.<br /><b>Label: </b>The option label to display on the frontend.<br /><b>Min. amount: </b>Minimum amount to enable the payment option.<br /><b>Max. amount: </b>Maximum amount to enable the payment option.<br /><b>Contract: </b>ID of the contract to use with the option.<br /><b>Count: </b>Total number of installments.<br /><b>Period: </b>Delay (in days) between installments.<br /><b>1st installment: </b>Amount of first installment, in percentage of total amount. If empty, all installments will have the same amount.]]></comment>
                         </multi_payment_options>
                     </fields>
                 </payzen_multi>
-
 
                 <payzen_gift translate="label">
                     <label><![CDATA[PayZen - Gift card payment]]></label>
@@ -1332,7 +1327,6 @@
                     </fields>
                 </payzen_gift>
 
-
                 <payzen_choozeo translate="label">
                     <label><![CDATA[PayZen - Choozeo payment]]></label>
                     <frontend_model>payzen/adminhtml_system_config_fieldset_payment</frontend_model>
@@ -1500,7 +1494,6 @@
                         </choozeo_payment_options>
                     </fields>
                 </payzen_choozeo>
-
 
                 <payzen_oney3x4x translate="label">
                     <label><![CDATA[PayZen - Payment in 3 or 4 times Oney]]></label>
@@ -1682,7 +1675,6 @@
                         </oney3x4x_payment_options>
                     </fields>
                 </payzen_oney3x4x>
-
 
                 <payzen_oney translate="label">
                     <label><![CDATA[PayZen - FacilyPay Oney payment (Deprecated)]]></label>
@@ -1880,7 +1872,6 @@
                     </fields>
                 </payzen_oney>
 
-
                 <payzen_fullcb translate="label">
                     <label><![CDATA[PayZen - Full CB payment]]></label>
                     <frontend_model>payzen/adminhtml_system_config_fieldset_payment</frontend_model>
@@ -2025,7 +2016,6 @@
                         </fullcb_payment_options>
                     </fields>
                 </payzen_fullcb>
-
 
                 <payzen_sepa translate="label">
                     <label><![CDATA[PayZen - SEPA payment]]></label>
@@ -2206,7 +2196,6 @@
                     </fields>
                 </payzen_sepa>
 
-
                 <payzen_paypal translate="label">
                     <label><![CDATA[PayZen - PayPal payment]]></label>
                     <frontend_model>payzen/adminhtml_system_config_fieldset_payment</frontend_model>
@@ -2364,7 +2353,6 @@
                     </fields>
                 </payzen_paypal>
 
-
                 <payzen_sofort translate="label">
                     <label><![CDATA[PayZen - Sofort Banking payment]]></label>
                     <frontend_model>payzen/adminhtml_system_config_fieldset_payment</frontend_model>
@@ -2487,7 +2475,6 @@
                         </sofort_custgroup_amount_restrictions>
                     </fields>
                 </payzen_sofort>
-
 
                 <payzen_postfinance translate="label">
                     <label><![CDATA[PayZen - PostFinance payment]]></label>
@@ -2646,7 +2633,6 @@
                     </fields>
                 </payzen_postfinance>
 
-
                 <payzen_giropay translate="label">
                     <label><![CDATA[PayZen - Giropay payment]]></label>
                     <frontend_model>payzen/adminhtml_system_config_fieldset_payment</frontend_model>
@@ -2804,7 +2790,6 @@
                     </fields>
                 </payzen_giropay>
 
-
                 <payzen_ideal translate="label">
                     <label><![CDATA[PayZen - iDEAL payment]]></label>
                     <frontend_model>payzen/adminhtml_system_config_fieldset_payment</frontend_model>
@@ -2911,7 +2896,6 @@
                         </ideal_custgroup_amount_restrictions>
                     </fields>
                 </payzen_ideal>
-
 
                 <payzen_other translate="label,comment">
                     <label><![CDATA[PayZen - Other payment means]]></label>

@@ -7,13 +7,13 @@
  * @copyright Lyra Network
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-$oneClickActive = $this->getConfigData('one_click_active'); // 1-Click enabled ?
+$paymentByTokenActive = $this->getConfigData('one_click_active'); // Payment by token active?
 $customer = Mage::getSingleton('customer/session')->getCustomer(); // Logged-in customer.
-$isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
+$isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenIdentifier();
 ?>
 
 <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none;">
-<?php if ($isOneclick): ?>
+<?php if ($isPaymentByToken) : ?>
     <li class="payzen-standard-id-block">
         <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" disabled="disabled">
         <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '') ?></span>
@@ -34,7 +34,7 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
         </div>
     </li>
 
-<?php if ($isOneclick): ?>
+<?php if ($isPaymentByToken): ?>
     <li class="payzen-standard-cc-block">
         <span class="or"><?php echo Mage::helper('payzen')->__('OR') ?></span>
     </li>
@@ -57,55 +57,46 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
 //<![CDATA[
     window.FORM_TOKEN = '<?php echo $this->getFormToken(); ?>';
 
-<?php if ($isOneclick): ?>
+<?php if ($isPaymentByToken): ?>
     window.IDENTIFIER_FORM_TOKEN = '<?php echo $this->getIdentifierFormToken(); ?>';
 
-    window.payzenUpdatePaymentBlock = function(isOneclick) {
+    window.payzenUpdatePaymentBlock = function(isPaymentByToken) {
         $$('ul#payment_form_payzen_standard li').invoke('hide');
         $$('ul#payment_form_payzen_standard li input').invoke('disable');
 
-        var blockName = isOneclick ? 'id' : 'cc';
+        var blockName = isPaymentByToken ? 'id' : 'cc';
         $$('li.payzen-standard-' + blockName + '-block').invoke('show');
         $$('li.payzen-standard-' + blockName + '-block input').invoke('enable');
     };
 <?php endif; ?>
 
-    window.payzenLoadRestScript = function(isOneclick) {
+    window.payzenLoadRestScript = function(isPaymentByToken) {
         var paymentToken = FORM_TOKEN;
 
         if (typeof IDENTIFIER_FORM_TOKEN !== 'undefined') {
             // 1-Click available.
-            paymentToken = isOneclick ? IDENTIFIER_FORM_TOKEN : FORM_TOKEN;
-            payzenUpdatePaymentBlock(isOneclick);
+            paymentToken = isPaymentByToken ? IDENTIFIER_FORM_TOKEN : FORM_TOKEN;
+
+            payzenUpdatePaymentBlock(isPaymentByToken);
         }
 
-        if (!KR.vueReady) {
-            KR.setFormToken(paymentToken).then(({ KR }) => {
-                payzenInitRestEvents();
-            });
+        if (! KR.vueReady) {
+            KR.setFormConfig({
+                formToken: paymentToken
+            }).then(
+                payzenInitRestEvents()
+            );
         } else {
-            KR.removeForms().then(({ KR }) => {
-                $('payzen_standard_rest_wrapper').update(
-                    '<div class="kr-embedded" kr-form-token="' + paymentToken + '">' +
-                    '    <div class="kr-pan"></div>' +
-                    '    <div class="kr-expiry"></div>' +
-                    '    <div class="kr-security-code"></div>' +
+            var errorElt = $$('#payzen_standard_rest_wrapper .kr-form-error').first();
+            errorElt.update('');
 
-                    '    <div style="display: none;">' +
-                    '        <button type="button" id="payzen_rest_hidden_button" class="kr-payment-button"></button>' +
-                    '    </div>' +
-
-                    '    <div class="kr-form-error"></div>' +
-                    '</div>');
-
-                payzenInitRestEvents.delay(0.2);
+            KR.setFormConfig({
+                formToken: paymentToken
             });
         }
     };
 
     window.payzenInitRestEvents = function() {
-        KR.setFormConfig({ language: '<?php echo $this->getLanguage(); ?>' });
-
         KR.onError(function(e) {
             // Not recoverable error, reload page after a while.
             if (PAYZEN_RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
@@ -156,15 +147,13 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
     };
 
     var payzenDoLoadRestScript = function() {
-        var isOneclick = typeof IDENTIFIER_FORM_TOKEN !== 'undefined';
-
         if (payzenSelectedMethod() === 'payzen_standard') {
             // Load script immediately.
-            payzenLoadRestScript.defer(isOneclick);
+            payzenLoadRestScript.defer(true);
         } else {
             // Load script after method is selected.
             Event.observe($('p_method_payzen_standard'), 'change', function() {
-                payzenLoadRestScript(isOneclick);
+                payzenLoadRestScript(true);
             });
         }
     };
@@ -186,11 +175,13 @@ $isOneclick = $oneClickActive && $customer && $customer->getPayzenIdentifier();
                         if (response.success) {
                             // Update form token and call REST API to do payment.
                             if (response.formToken) {
-                                KR.setFormToken(response.formToken).then(({ KR }) => {
-                                    $('payzen_rest_hidden_button').click();
-                                });
+                                KR.setFormConfig({
+                                    formToken: response.formToken
+                                }).then(
+                                    $('payzen_rest_hidden_button').click()
+                                );
                             } else {
-                                // Form token is the same because data was not changed.
+                                // Form token is the same because data was unchanged.
                                 $('payzen_rest_hidden_button').click();
                             }
                         } else {

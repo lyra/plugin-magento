@@ -53,7 +53,7 @@ class Lyranetwork_Payzen_Model_Field_Multi_PaymentOptions extends Lyranetwork_Pa
                 }
 
                 if (! empty($value['first']) && (! is_numeric($value['first']) || $value['first'] >= 100)) {
-                    $this->_throwError('1st payment', $i);
+                    $this->_throwError('1st installment', $i);
                 }
 
                 $options[] = $value['count'];

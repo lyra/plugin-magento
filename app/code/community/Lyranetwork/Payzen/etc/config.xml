@@ -14,7 +14,7 @@
     <!-- Version. -->
     <modules>
         <Lyranetwork_Payzen>
-            <version>1.11.0</version>
+            <version>1.11.1</version>
         </Lyranetwork_Payzen>
     </modules>
 
@@ -143,7 +143,7 @@
                     </post>
                 </return_modes>
 
-              <!-- embedded fields themes -->
+                <!-- embedded fields themes -->
                 <rest_themes>
                     <classic>
                         <code>classic</code>
@@ -154,7 +154,7 @@
                         <name>Material</name>
                     </material>
                 </rest_themes>
-                
+
                 <!-- Default gift cards. -->
                 <gift_cards>
                     <illicado>
@@ -496,7 +496,7 @@
             <payzen>
                 <developed_by>Lyra Network</developed_by>
                 <support_email>support@payzen.eu</support_email>
-                <plugin_version>1.11.0</plugin_version>
+                <plugin_version>1.11.1</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_1.4-1.9</cms_identifier>
                 <enable_logs>1</enable_logs>

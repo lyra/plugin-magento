@@ -10,6 +10,8 @@
 
 class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model_Payment_Abstract
 {
+    const REST_API = '4';
+
     protected $_code = 'payzen_standard';
     protected $_formBlockType = 'payzen/standard';
 
@@ -64,7 +66,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         }
 
         if ($this->getConfigData('one_click_active') && $order->getCustomerId()) {
-            // 1-Click enabled and customer logged-in.
+            // Payment by token enabled and customer logged-in.
             $customer = Mage::getModel('customer/customer');
             $customer->load($order->getCustomerId());
 
@@ -338,7 +340,12 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             return false;
         }
 
-        // No 1-Click.
+        // Rest Api mode active.
+        if ($this->getConfigData('card_info_mode') === self::REST_API) {
+            return false;
+        }
+
+        // Payment by token not active.
         if (! $this->getConfigData('one_click_active')) {
             return false;
         }
