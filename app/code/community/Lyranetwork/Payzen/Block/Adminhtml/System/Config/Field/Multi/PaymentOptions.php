@@ -67,7 +67,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Multi_PaymentOption
         $this->addColumn(
             'first',
             array(
-                'label' => Mage::helper('payzen')->__('1st payment'),
+                'label' => Mage::helper('payzen')->__('1st installment'),
                 'style' => 'width: 70px;',
             )
         );

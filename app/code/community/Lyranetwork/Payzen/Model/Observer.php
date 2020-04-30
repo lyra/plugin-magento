@@ -411,7 +411,7 @@ class Lyranetwork_Payzen_Model_Observer
 
         // Replace library.
         if (isset($headItems['js/prototype/prototype.js'])) {
-            $headItems['js/prototype/prototype.js']['name'] = 'payzen' . DS . 'prototype' . DS . 'prototype.js';
+            $headItems['js/prototype/prototype.js']['name'] = 'payzen/prototype/prototype.js';
             $head->setData('items', $headItems);
         }
 

@@ -1,3 +1,8 @@
+1.11.1, 2020-04-29:
+- [embedded] Bugfix: Payment fields error relative to new JavaScript client library.
+- [embedded] Disable 1-Click payment buttons when using payment with embedded fields.
+- Improve some plugin translations.
+
 1.11.0, 2020-03-04:
 - [oney] Adding 3x 4x Oney means of payment as submodule.
 - Do not consider CAPTURE_FAILED as a success status.
@@ -232,5 +237,5 @@
 1.0a, 2011-12-09:
 - Bug fix: deletion of check over delivery method for a virtual cart.
 
-1.0, 2011-10-12: 
+1.0, 2011-10-12:
 - Initial version of the payment module compatible with Magento 1.4 or higher.

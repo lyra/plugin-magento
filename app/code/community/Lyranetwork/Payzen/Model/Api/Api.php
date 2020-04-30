@@ -239,7 +239,8 @@ if (! class_exists('Lyranetwork_Payzen_Model_Api_Api', false)) {
                 'SDD' => 'Prélèvement SEPA Direct Debit', 'SOFICARTE' => 'Soficarte',
                 'SOFORT_BANKING' => 'Sofort', 'TRUFFAUT_CDX' => 'Carte Cadeau Truffaut', 'UNION_PAY' => 'UnionPay',
                 'VILLAVERDE' => 'Carte enseigne Villaverde', 'VILLAVERDE_SB' => 'Carte enseigne Villaverde - Sandbox',
-                'WECHAT' => 'WeChat Pay', 'MYBANK' => 'MyBank', 'PRZELEWY24' => 'Przelewy24'
+                'WECHAT' => 'WeChat Pay', 'MYBANK' => 'MyBank', 'PRZELEWY24' => 'Przelewy24',
+                'ONEY_ENSEIGNE' => 'Cartes enseignes Oney'
             );
         }
 
