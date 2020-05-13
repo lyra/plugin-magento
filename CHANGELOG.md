@@ -1,3 +1,7 @@
+2.4.6, 2020-05-12:
+- Some minor fixes.
+- [embedded] Bug fix: Use the correct return and private keys according to the plugin context mode.
+
 2.4.5, 2020-04-23:
 - Some minor fixes.
 - [embedded] Bug fix: Load embedded payment fields JavaScript library inside require() function.
