@@ -165,10 +165,12 @@ class Rest
      */
     public function getReturnKey($storeId = null)
     {
-        $test = $this->dataHelper->getCommonConfigData('ctx_mode', $storeId);
-        return $this->method->getConfigData($test ? 'rest_return_key_test' : 'rest_return_key_prod', $storeId);
-    }
+        $ctxMode = $this->dataHelper->getCommonConfigData('ctx_mode', $storeId);
+        $field = ($ctxMode === 'TEST') ? 'rest_return_key_test' : 'rest_return_key_prod';
 
+        return $this->method->getConfigData($field, $storeId);
+    }
+    
     /**
      * Get REST API private key.
      *
@@ -176,7 +178,9 @@ class Rest
      */
     public function getPrivateKey($storeId = null)
     {
-        $test = $this->dataHelper->getCommonConfigData('ctx_mode', $storeId);
-        return $this->method->getConfigData($test ? 'rest_private_key_test' : 'rest_private_key_prod', $storeId);
+        $ctxMode = $this->dataHelper->getCommonConfigData('ctx_mode', $storeId);
+        $field = ($ctxMode === 'TEST') ? 'rest_private_key_test' : 'rest_private_key_prod';
+
+        return $this->method->getConfigData($field, $storeId);
     }
 }
