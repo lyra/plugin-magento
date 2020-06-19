@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Payment\Iframe;
 
 class Response extends \Magento\Framework\View\Element\Template
 {
-
     /**
      *
      * @var string

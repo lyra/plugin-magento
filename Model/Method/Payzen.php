@@ -13,7 +13,6 @@ use Lyranetwork\Payzen\Model\Api\PayzenApi;
 
 abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 {
-
     const CART_MAX_NB_PRODUCTS = 85;
 
     protected $_infoBlockType = \Lyranetwork\Payzen\Block\Payment\Info::class;
@@ -388,7 +387,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         return $lang;
     }
 
-
     /**
      * A flag to set that there will be redirect to third party after confirmation.
      *
@@ -434,7 +432,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         $keys = [
             \Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION,
-            \Lyranetwork\Payzen\Helper\Payment::CHOOZEO_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::FULLCB_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER

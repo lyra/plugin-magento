@@ -27,9 +27,6 @@
         <method name="payzen_gift">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
-        <method name="payzen_choozeo">
-            <allow_multiple_address>0</allow_multiple_address>
-        </method>
         <method name="payzen_fullcb">
             <allow_multiple_address>0</allow_multiple_address>
         </method>

@@ -13,7 +13,6 @@ use Lyranetwork\Payzen\Model\Api\PayzenResponse;
 
 class Info extends \Magento\Payment\Block\Info
 {
-
     /**
      *
      * @var string

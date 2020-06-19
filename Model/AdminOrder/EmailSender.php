@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\AdminOrder;
 
 class EmailSender extends \Magento\Sales\Model\AdminOrder\EmailSender
 {
-
     /**
      * Send email about new order.
      *

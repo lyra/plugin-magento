@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model;
 
 class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
 {
-
     /**
      *
      * @var string|boolean

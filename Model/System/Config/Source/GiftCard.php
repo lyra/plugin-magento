@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Source;
 
 class GiftCard implements \Magento\Framework\Option\ArrayInterface
 {
-
     public function __construct(
         \Lyranetwork\Payzen\Model\Method\Gift $method
     ) {

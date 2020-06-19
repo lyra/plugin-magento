@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\Method;
 
 class Standard extends Payzen
 {
-
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Standard::class;
 
@@ -445,9 +444,9 @@ class Standard extends Payzen
         try {
             // Perform our request.
             $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
-                $this->dataHelper->getCommonConfigData('rest_url'),
-                $this->dataHelper->getCommonConfigData('site_id'),
-                $this->getRestPrivateKey()
+                trim($this->dataHelper->getCommonConfigData('rest_url')),
+                trim($this->dataHelper->getCommonConfigData('site_id')),
+                trim($this->getRestPrivateKey())
             );
 
             $response = $client->post('V4/Charge/CreatePayment', json_encode($data));

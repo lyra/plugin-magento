@@ -14,7 +14,6 @@ use Magento\Framework\DataObject;
 
 class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data

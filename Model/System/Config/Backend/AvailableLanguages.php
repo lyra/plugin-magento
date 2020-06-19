@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend;
 
 class AvailableLanguages extends \Magento\Framework\App\Config\Value
 {
-
     public function save()
     {
         $value = $this->getValue();

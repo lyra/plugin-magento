@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
  */
 class Label extends \Magento\Config\Block\System\Config\Form\Field
 {
-
     /**
      * Unset some non-related element parameters.
      *

@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Controller\Payment\Iframe;
 
 class Loader extends \Magento\Framework\App\Action\Action
 {
-
     /**
      *
      * @var \Magento\Framework\View\Result\PageFactory

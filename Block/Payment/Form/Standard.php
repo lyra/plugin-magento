@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Payment\Form;
 
 class Standard extends Payzen
 {
-
     protected $_template = 'Lyranetwork_Payzen::payment/form/standard.phtml';
 
     public function getAvailableCcTypes()

@@ -13,7 +13,6 @@ use Lyranetwork\Payzen\Model\OrderException;
 
 class Redirect extends \Magento\Framework\App\Action\Action
 {
-
     /**
      *
      * @var \Magento\Sales\Model\OrderFactory

@@ -14,7 +14,6 @@ use Magento\Framework\Event\Observer;
 
 class UpdateMultiPaymentObserver implements ObserverInterface
 {
-
     /**
      * Update payment method ID to set installments number if multi payment.
      *

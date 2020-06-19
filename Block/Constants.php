@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block;
 
 final class Constants
 {
-
     const PARAMS_REGISTRY_KEY = 'payzen_form_params';
 
     const URL_REGISTRY_KEY = 'payzen_form_url';
