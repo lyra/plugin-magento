@@ -1,3 +1,9 @@
+2.4.7, 2020-06-19:
+- [embedded] Bug fix: Amount did not include shipping fees when using embedded payment fields in some cases.
+- [embedded] Bug fix: Compatibility of payment with embedded fields with Internet Explorer 11.
+- [embedded] Bug fix: Error 500 due to riskControl modified format in REST response.
+- Bug fix: Fix brand choice field management when returning to store for a payment with gift card.
+
 2.4.6, 2020-05-12:
 - Some minor fixes.
 - [embedded] Bug fix: Use the correct return and private keys according to the plugin context mode.

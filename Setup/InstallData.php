@@ -20,7 +20,6 @@ use Magento\Customer\Model\Customer;
  */
 class InstallData implements InstallDataInterface
 {
-
     /**
      *
      * @var CustomerSetupFactory

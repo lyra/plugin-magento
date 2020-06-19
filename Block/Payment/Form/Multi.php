@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Payment\Form;
 
 class Multi extends Payzen
 {
-
     protected $_template = 'Lyranetwork_Payzen::payment/form/multi.phtml';
 
     public function getAvailableCcTypes()

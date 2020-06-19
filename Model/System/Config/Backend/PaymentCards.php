@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend;
 
 class PaymentCards extends \Magento\Framework\App\Config\Value
 {
-
     protected $messages;
 
     /**

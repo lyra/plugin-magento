@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model;
 
 class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
 {
-
     /**
      *
      * @var \Magento\Store\Model\StoreManagerInterface

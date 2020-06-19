@@ -14,7 +14,6 @@ use Lyranetwork\Payzen\Model\ResponseException;
 
 class Response extends \Magento\Backend\App\Action
 {
-
     /**
      * @var \Lyranetwork\Payzen\Helper\Data
      */

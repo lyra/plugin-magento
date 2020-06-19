@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray
  */
 abstract class ConfigFieldArray extends \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
 {
-
     /**
      *
      * @var bool

@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend;
 
 class ThemeConfig extends \Magento\Framework\App\Config\Value
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data

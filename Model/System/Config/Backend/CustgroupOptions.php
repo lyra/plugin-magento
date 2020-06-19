@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend;
 
 class CustgroupOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized
 {
-
     public function beforeSave()
     {
         $values = $this->getValue();

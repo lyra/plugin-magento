@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend;
 
 class Logo extends \Magento\Config\Model\Config\Backend\Image
 {
-
     public function beforeSave()
     {
         $value = $this->getValue();

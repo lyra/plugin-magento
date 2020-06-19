@@ -182,30 +182,36 @@ define(
                     KR.setFormConfig({
                         formToken: me.getRestFormToken()
                     }).then(
-                        KR.onFocus(function(e) {
-                            $('#payzen_rest_form .kr-form-error').html('');
-                        })
-                    ).then(
-                        KR.onError(function (e) {
-                            fullScreenLoader.stopLoader();
-                            me.isPlaceOrderActionAllowed(true);
+                        function(v) {
+                            var KR = v.KR;
+                            KR.onFocus(function(e) {
+                                $('#payzen_rest_form .kr-form-error').html('');
+                            });
 
-                            // Not recoverable error, reload page after a while.
-                            if (RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
-                                setTimeout(function() {
-                                    window.location.reload();
-                                }, 4000);
-                            }
+                            KR.onError(function (e) {
+                                fullScreenLoader.stopLoader();
+                                me.isPlaceOrderActionAllowed(true);
 
-                            var msg = '';
-                            if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
-                                msg = e.errorMessage + (e.errorMessage.endsWith('.') ? '' : '.');
-                            } else {
-                                msg = me.translateError(e.errorCode);
-                            }
+                                // Not recoverable error, reload page after a while.
+                                if (RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 4000);
+                                }
 
-                            $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
-                        })
+                                var msg = '';
+                                if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
+                                    msg = e.errorMessage;
+                                    var endsWithDot = (msg.lastIndexOf('.') == (msg.length - 1) && msg.lastIndexOf('.') >= 0);
+
+                                    msg += (endsWithDot ? '' : '.');
+                                } else {
+                                    msg = me.translateError(e.errorCode);
+                                }
+
+                                $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
+                            });
+                        }
                     );
                 });
             },
@@ -231,7 +237,7 @@ define(
                     });
 
                     if (me.payload && (me.payload === newPayload)) {
-                        $('#payzen_rest_form .kr-payment-button').click();
+                        KR.submit();
                     } else {
                         me.payload = newPayload;
 
@@ -257,13 +263,14 @@ define(
                     url.build('payzen/payment_rest/token?form_key=' + $.mage.cookies.get('form_key'))
                 ).done(function (response) {
                     if (response.token) {
-                        require(['krypton'], function (KR) {
-	                        KR.setFormConfig({
-	                            formToken: response.token
-	                        }).then(
-	                            $('#payzen_rest_form .kr-payment-button').click()
-	                        );
-                        });
+                        KR.setFormConfig({
+                            formToken: response.token
+                        }).then(
+                            function(v) {
+                                var KR = v.KR;
+                                KR.submit();
+                            }
+                        );
                     } else {
                         // Should not happen, this case is managed by failure callback.
                         console.log('Empty form token returned by refresh.');

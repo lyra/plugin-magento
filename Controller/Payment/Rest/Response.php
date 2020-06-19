@@ -14,7 +14,6 @@ use Magento\Framework\DataObject;
 
 class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
 {
-
     /**
      *
      * @var \Magento\Sales\Model\OrderFactory

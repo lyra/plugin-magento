@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Payment\Form;
 
 abstract class Payzen extends \Magento\Payment\Block\Form
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data

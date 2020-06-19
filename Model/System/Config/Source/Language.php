@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Source;
 
 class Language implements \Magento\Framework\Option\ArrayInterface
 {
-
     public function toOptionArray()
     {
         $options = [];

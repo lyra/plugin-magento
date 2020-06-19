@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Gift;
  */
 class AddedCards extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
-
     /**
      * Prepare to render.
      *

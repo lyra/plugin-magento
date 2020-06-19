@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Source;
 
 class MultiPaymentCard implements \Magento\Framework\Option\ArrayInterface
 {
-
     protected $multiCards = [
         'AMEX',
         'CB',

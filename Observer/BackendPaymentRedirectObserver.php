@@ -15,7 +15,6 @@ use Lyranetwork\Payzen\Block\Constants;
 
 class BackendPaymentRedirectObserver implements ObserverInterface
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data

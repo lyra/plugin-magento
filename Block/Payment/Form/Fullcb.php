@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Payment\Form;
 
 class Fullcb extends Payzen
 {
-
     protected $_template = 'Lyranetwork_Payzen::payment/form/fullcb.phtml';
 
     public function getAvailableOptions()

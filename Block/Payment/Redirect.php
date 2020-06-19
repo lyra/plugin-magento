@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Payment;
 
 class Redirect extends \Magento\Framework\View\Element\Template
 {
-
     /**
      *
      * @var \Magento\Framework\Registry

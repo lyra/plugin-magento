@@ -12,10 +12,10 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="checkout_submit_all_after">
-        <observer name="payzen_backend_payment_redirect" instance="Lyranetwork\Payzen\Observer\BackendPaymentRedirectObserver"/>
+        <observer name="payzen_backend_payment_redirect" instance="Lyranetwork\Payzen\Observer\BackendPaymentRedirectObserver" />
     </event>
 
     <event name="controller_front_send_response_before">
-        <observer name="payzen_backend_payment_perform_redirect" instance="Lyranetwork\Payzen\Observer\BackendPaymentPerformRedirectObserver"/>
+        <observer name="payzen_backend_payment_perform_redirect" instance="Lyranetwork\Payzen\Observer\BackendPaymentPerformRedirectObserver" />
     </event>
 </config>

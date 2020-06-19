@@ -13,7 +13,6 @@ use Lyranetwork\Payzen\Model\ResponseException;
 
 class Check extends \Magento\Framework\App\Action\Action
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Controller\Processor\CheckProcessor

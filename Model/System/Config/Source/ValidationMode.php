@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Source;
 
 class ValidationMode extends \Magento\Framework\DataObject implements \Magento\Framework\Option\ArrayInterface
 {
-
     public function toOptionArray()
     {
         $options = [

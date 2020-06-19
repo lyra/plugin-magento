@@ -15,12 +15,9 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-
     const METHOD_STANDARD = 'payzen_standard';
 
     const METHOD_MULTI = 'payzen_multi';
-
-    const METHOD_CHOOZEO = 'payzen_choozeo';
 
     const METHOD_SEPA = 'payzen_sepa';
 
@@ -49,7 +46,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         'multi' => true,
         'gift' => true,
-        'choozeo' => false,
         'fullcb' => true,
         'sepa' => true,
         'paypal' => true

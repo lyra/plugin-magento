@@ -17,7 +17,6 @@
                 <item name="payzen_standard" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD</item>
                 <item name="payzen_multi" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_MULTI</item>
                 <item name="payzen_gift" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_GIFT</item>
-                <item name="payzen_choozeo" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_CHOOZEO</item>
                 <item name="payzen_fullcb" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_FULLCB</item>
                 <item name="payzen_sepa" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_SEPA</item>
                 <item name="payzen_paypal" xsi:type="const">Lyranetwork\Payzen\Helper\Data::METHOD_PAYPAL</item>
@@ -31,7 +30,6 @@
                 <item name="payzen_standard_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\StandardConfigProvider</item>
                 <item name="payzen_multi_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\MultiConfigProvider</item>
                 <item name="payzen_gift_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\GiftConfigProvider</item>
-                <item name="payzen_choozeo_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\ChoozeoConfigProvider</item>
                 <item name="payzen_fullcb_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\FullcbConfigProvider</item>
                 <item name="payzen_sepa_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\SepaConfigProvider</item>
                 <item name="payzen_paypal_config_provider" xsi:type="object">Lyranetwork\Payzen\Model\PaypalConfigProvider</item>
