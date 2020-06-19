@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\Logger\Handler;
 
 class Payzen extends \Magento\Framework\Logger\Handler\Base
 {
-
     /**
      *
      * @var string

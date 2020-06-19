@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Source;
 
 class PaymentCard implements \Magento\Framework\Option\ArrayInterface
 {
-
     public function toOptionArray()
     {
         $options = [

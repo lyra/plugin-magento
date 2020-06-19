@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Renderer;
 
 class ColumnList extends \Magento\Framework\View\Element\AbstractBlock
 {
-
     protected function _toHtml()
     {
         $column = $this->getColumn();

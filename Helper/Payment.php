@@ -13,15 +13,11 @@ use Lyranetwork\Payzen\Model\Api\PayzenApi;
 
 class Payment
 {
-
     // Key to save if payment is by identifier.
     const IDENTIFIER = 'payzen_identifier';
 
     // Key to save choosen multi option.
     const MULTI_OPTION = 'payzen_multi_option';
-
-    // Key to save choosen Choozeo option.
-    const CHOOZEO_OPTION = 'payzen_choozeo_option';
 
     // Key to save choosen Oney option.
     const ONEY_OPTION = 'payzen_oney_option';
@@ -325,9 +321,7 @@ class Payment
 
                 $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
 
-                if (isset($trs->{'brand_management'}) && ! empty($trs->{'brand_management'})) {
-                    $brandInfo = json_decode($trs->{'brand_management'});
-
+                if (isset($trs->{'brand_management'}) && ($brandInfo = $trs->{'brand_management'})) {
                     $userChoice[$trs->{'sequence_number'}] = (isset($brandInfo->userChoice) && $brandInfo->userChoice);
                 }
             }

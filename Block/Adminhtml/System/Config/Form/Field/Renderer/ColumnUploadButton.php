@@ -13,7 +13,6 @@ use Magento\Framework\UrlInterface;
 
 class ColumnUploadButton extends \Magento\Framework\View\Element\AbstractBlock
 {
-
     /**
      *
      * @var\Magento\Store\Model\StoreManagerInterface

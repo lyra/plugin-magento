@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
  */
 class CategoryMapping extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Model\System\Config\Source\CategoryFactory

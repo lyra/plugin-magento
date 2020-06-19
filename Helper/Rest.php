@@ -13,7 +13,6 @@ use Lyranetwork\Payzen\Model\Api\PayzenApi;
 
 class Rest
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data
@@ -112,7 +111,7 @@ class Rest
                     $response['vads_risk_control'] = '';
 
                     foreach ($riskControl as $key => $value) {
-                        $response['vads_risk_control'] .= "$key=$value;";
+                        $response['vads_risk_control'] .= "{$value['name']}={$value['result']};";
                     }
                 }
 
@@ -170,7 +169,7 @@ class Rest
 
         return $this->method->getConfigData($field, $storeId);
     }
-    
+
     /**
      * Get REST API private key.
      *

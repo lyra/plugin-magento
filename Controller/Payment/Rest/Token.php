@@ -13,7 +13,6 @@ use Magento\Framework\DataObject;
 
 class Token extends \Magento\Framework\App\Action\Action
 {
-
     /**
      * @var \Magento\Framework\Data\Form\FormKey\Validator
      */

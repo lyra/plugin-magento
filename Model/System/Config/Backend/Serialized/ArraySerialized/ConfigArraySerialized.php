@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySeriali
 
 class ConfigArraySerialized extends \Magento\Config\Model\Config\Backend\Serialized\ArraySerialized
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data

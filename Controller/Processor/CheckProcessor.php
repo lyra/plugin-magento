@@ -14,7 +14,6 @@ use Lyranetwork\Payzen\Model\ResponseException;
 
 class CheckProcessor
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data

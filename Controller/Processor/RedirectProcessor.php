@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Controller\Processor;
 
 class RedirectProcessor
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data

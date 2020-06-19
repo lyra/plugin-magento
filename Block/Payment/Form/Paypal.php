@@ -11,6 +11,5 @@ namespace Lyranetwork\Payzen\Block\Payment\Form;
 
 class Paypal extends Payzen
 {
-
     protected $_template = 'Lyranetwork_Payzen::payment/form/paypal.phtml';
 }

@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\System\Config\Source;
 
 class CtxMode implements \Magento\Framework\Option\ArrayInterface
 {
-
     public function toOptionArray()
     {
         return [

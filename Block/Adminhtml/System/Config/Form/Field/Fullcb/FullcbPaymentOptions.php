@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Fullcb;
  */
 class FullcbPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
-
     protected $staticTable = true;
 
     /**

@@ -14,7 +14,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class Checkout
 {
-
     const ORDER_ID_REGEX = '#^[a-zA-Z0-9]{1,9}$#';
 
     const CUST_ID_REGEX = '#^[a-zA-Z0-9]{1,8}$#';

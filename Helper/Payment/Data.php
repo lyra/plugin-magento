@@ -13,7 +13,6 @@ use Magento\Framework\View\LayoutFactory;
 
 class Data extends \Magento\Payment\Helper\Data
 {
-
     /**
      *
      * @var \Lyranetwork\Payzen\Helper\Data
