@@ -118,16 +118,17 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             throw new ResponseException($response->getOutputForGateway('order_not_found'));
         }
 
+        // Case of failure or expiration when retries are enabled, do nothing before last attempt.
+        if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED')) {
+            $this->dataHelper->log("Payment is not accepted but buyer can try to re-order. Do not create order at this time.
+                Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.");
+            throw new ResponseException($response->getOutputForGateway('payment_ko_bis'));
+        }
+
         // Token is created before order creation, search order by quote.
         $order = $this->orderFactory->create();
         $order->loadByIncrementId($quote->getReservedOrderId());
         if (! $order->getId()) {
-            // Case of failure when retries are enabled, do nothing before last attempt.
-            if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED')) {
-                $this->dataHelper->log("Payment is not accepted but buyer can try to re-order. Do not create order at this time. Quote ID: #{$quoteId}.");
-                throw new ResponseException($response->getOutputForGateway('payment_ko_bis'));
-            }
-
             $this->getOnepageForQuote($quote)->saveOrder();
 
             // Dispatch save order event.
@@ -146,13 +147,13 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             // Load newly created order.
             $order->loadByIncrementId($quote->getReservedOrderId());
             if (! $order->getId()) {
-                $this->dataHelper->log("Order cannot be created for quote #{$quoteId}.", \Psr\Log\LogLevel::ERROR);
+                $this->dataHelper->log("Order cannot be created. Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
                 throw new ResponseException($response->getOutputForGateway('ko', 'Error when trying to create order.'));
             }
 
-            $this->dataHelper->log("Order #{$order->getId()} has been created for quote #{$quoteId}.");
+            $this->dataHelper->log("Order #{$order->getIncrementId()} has been created for quote #{$quoteId}.");
         } else {
-            $this->dataHelper->log("Found order #{$order->getId()} for quote #{$quoteId}.");
+            $this->dataHelper->log("Found order #{$order->getIncrementId()} for quote #{$quoteId}.");
         }
 
         // Get store id from order.

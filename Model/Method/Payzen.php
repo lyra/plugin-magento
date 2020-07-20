@@ -344,7 +344,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $paramsToLog = $this->payzenRequest->getRequestFieldsArray(true);
-        $this->dataHelper->log('Payment parameters: ' . json_encode($paramsToLog), \Psr\Log\LogLevel::DEBUG);
+        $this->dataHelper->log('Payment parameters: ' . json_encode($paramsToLog));
 
         return $this->payzenRequest->getRequestFieldsArray(false, false);
     }
@@ -482,7 +482,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
-        $this->dataHelper->log("Get payment information online for order #{$order->getId()}.");
+        $this->dataHelper->log("Get payment information online for order #{$order->getIncrementId()}.");
 
         $requestId = '';
 
@@ -548,7 +548,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 throw new \Exception("Unexpected transaction type returned ($transType).");
             }
 
-            $this->dataHelper->log("Updating payment information for accepted order #{$order->getId()}.");
+            $this->dataHelper->log("Updating payment information for accepted order #{$order->getIncrementId()}.");
 
             // Payment is accepted by merchant.
             $payment->setIsFraudDetected(false);
@@ -573,7 +573,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             );
             $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
 
-            $this->dataHelper->log("Order #{$order->getId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
+            $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
             $order->setState($stateObject->getState())
                 ->setStatus($stateObject->getStatus())
                 ->addStatusHistoryComment(__('The payment has been accepted.'));
@@ -650,7 +650,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
-        $this->dataHelper->log("Cancel payment online for order #{$order->getId()}.");
+        $this->dataHelper->log("Cancel payment online for order #{$order->getIncrementId()}.");
 
         $requestId = '';
 
@@ -707,7 +707,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 ['CANCELLED']
             );
 
-            $this->dataHelper->log("Payment cancelled successfully online for order #{$order->getId()}.");
+            $this->dataHelper->log("Payment cancelled successfully online for order #{$order->getIncrementId()}.");
 
             $transactionId = $payment->getCcTransId() . '-1';
             $additionalInfo = [];
@@ -788,7 +788,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
-        $this->dataHelper->log("Validate payment online for order #{$order->getId()}.");
+        $this->dataHelper->log("Validate payment online for order #{$order->getIncrementId()}.");
 
         $requestId = '';
 
@@ -868,7 +868,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 if ($i === 1) { // Single payment or first transaction for payment in installments.
                     $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
 
-                    $this->dataHelper->log("Order #{$order->getId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
+                    $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
                     $order->setState($stateObject->getState())
                         ->setStatus($stateObject->getStatus());
                 }
@@ -892,7 +892,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 }
             }
 
-            $this->dataHelper->log("Updating payment information for validated order #{$order->getId()}.");
+            $this->dataHelper->log("Updating payment information for validated order #{$order->getIncrementId()}.");
 
             // Try to create invoice.
             $this->paymentHelper->createInvoice($order);
@@ -1076,7 +1076,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $requestId = '';
 
         $this->dataHelper->log("Start refund of {$amount} {$order->getOrderCurrencyCode()} for order " .
-             "#{$order->getId()} with {$this->_code} payment method.");
+             "#{$order->getIncrementId()} with {$this->_code} payment method.");
 
         try {
             $wsApi = $this->checkAndGetWsApi($storeId);
@@ -1215,7 +1215,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     $refurndPaymentResponse->getRefundPaymentResult()->getCardResponse()
                 );
 
-                $this->dataHelper->log("Online money refund for order #{$order->getId()} is successful.");
+                $this->dataHelper->log("Online money refund for order #{$order->getIncrementId()} is successful.");
             } else {
                 $transAmount = $getPaymentDetailsResponse->getGetPaymentDetailsResult()
                     ->getPaymentResponse()
@@ -1236,7 +1236,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     );
 
                     $order->cancel();
-                    $this->dataHelper->log("Online payment cancel for order #{$order->getId()} is successful.");
+                    $this->dataHelper->log("Online payment cancel for order #{$order->getIncrementId()} is successful.");
                 } else { // Partial transaction refund, call updatePayment WS.
                     $paymentRequest = new \Lyranetwork\Payzen\Model\Api\Ws\PaymentRequest();
                     $paymentRequest->setAmount($transAmount - $amountInCents);
@@ -1259,7 +1259,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                             'WAITING_AUTHORISATION_TO_VALIDATE'
                         ]
                     );
-                    $this->dataHelper->log("Online payment update for order #{$order->getId()} is successful.");
+                    $this->dataHelper->log("Online payment update for order #{$order->getIncrementId()} is successful.");
                 }
             }
         } catch (\Lyranetwork\Payzen\Model\WsException $e) {

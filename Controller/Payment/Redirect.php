@@ -97,14 +97,14 @@ class Redirect extends \Magento\Framework\App\Action\Action
 
         // Check that there is products in cart.
         if (! $order->getTotalDue()) {
-            $this->dataHelper->log("Payment attempt with no amount. [Order = {$order->getId()}]" .
+            $this->dataHelper->log("Payment attempt with no amount. [Order = {$order->getIncrementId()}]" .
                      " [IP = {$this->dataHelper->getIpAddress()}].");
             throw new OrderException('Order total is empty.');
         }
 
         // Check that order is not processed yet.
         if (! $checkout->getLastSuccessQuoteId()) {
-            $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getId()}]" .
+            $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getIncrementId()}]" .
                      " [IP = {$this->dataHelper->getIpAddress()}].");
             throw new OrderException('Order payment already processed.');
         }

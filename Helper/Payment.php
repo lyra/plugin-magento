@@ -31,8 +31,11 @@ class Payment
     // Key to save risk assessment results.
     const RISK_ASSESSMENT = 'payzen_risk_assessment';
 
-    // Key to save risk assessment results.
+    // Key to save payment results.
     const ALL_RESULTS = 'payzen_all_results';
+
+    // Key to save Rest Api error message.
+    const REST_ERROR_MESSAGE = 'payzen_rest_error';
 
     const TRANS_UUID = 'payzen_trans_uuid';
 
@@ -153,7 +156,7 @@ class Payment
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
     ) {
 
-        $this->dataHelper->log("Saving payment for order #{$order->getId()}.");
+        $this->dataHelper->log("Saving payment for order #{$order->getIncrementId()}.");
 
         // Update authorized amount.
         $order->getPayment()->setAmountAuthorized($order->getTotalDue());
@@ -162,11 +165,11 @@ class Payment
         // Retrieve new order state and status.
         $stateObject = $this->nextOrderState($order, $response);
 
-        $this->dataHelper->log("Order #{$order->getId()}, new state: {$stateObject->getState()}," .
+        $this->dataHelper->log("Order #{$order->getIncrementId()}, new state: {$stateObject->getState()}," .
              " new status: {$stateObject->getStatus()}.");
         $order->setState($stateObject->getState())
             ->setStatus($stateObject->getStatus())
-            ->addStatusHistoryComment($response->getMessage());
+            ->addStatusHistoryComment($response->get('error_message') ?: $response->getMessage());
 
         // Save gateway responses.
         $this->updatePaymentInfo($order, $response);
@@ -182,7 +185,7 @@ class Payment
         // Try to create invoice.
         $this->createInvoice($order);
 
-        $this->dataHelper->log("Saving confirmed order #{$order->getId()} and sending e-mail if not disabled.");
+        $this->dataHelper->log("Saving confirmed order #{$order->getIncrementId()} and sending e-mail if not disabled.");
         $order->save();
 
         if ($order->getSendEmail() === null /* not set */ || $order->getSendEmail() /* set to true */) {
@@ -251,9 +254,19 @@ class Payment
             ->setCcTransId($response->get('trans_id'))
             ->setCcType($response->get('card_brand'))
             ->setCcStatus($response->getResult())
-            ->setCcStatusDescription($response->getMessage())
+            ->setCcStatusDescription($response->get('error_message') ?: $response->getMessage())
             ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::ALL_RESULTS, serialize($response->getAllResults()))
             ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID, $response->get('trans_uuid'));
+
+        $restErrorMsg = $response->get('error_message');
+        if ($restErrorMsg) {
+            if ($response->get('detailed_error_message')) {
+                $restErrorMsg .= ' ' . $response->get('detailed_error_message');
+            }
+
+            $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE, $restErrorMsg);
+        }
+
 
         if ($response->isCancelledPayment()) {
             // No more data to save.
@@ -600,7 +613,7 @@ class Payment
             return;
         }
 
-        $this->dataHelper->log("Creating invoice for order #{$order->getId()}.");
+        $this->dataHelper->log("Creating invoice for order #{$order->getIncrementId()}.");
 
         // Convert order to invoice.
         $invoice = $order->prepareInvoice();
@@ -624,9 +637,9 @@ class Payment
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
     ) {
 
-        $this->dataHelper->log("Canceling order #{$order->getId()}.");
+        $this->dataHelper->log("Canceling order #{$order->getIncrementId()}.");
 
-        $order->registerCancellation($response->getMessage());
+        $order->registerCancellation($response->get('error_message') ?: $response->getMessage());
 
         // Save gateway responses.
         $this->updatePaymentInfo($order, $response);
