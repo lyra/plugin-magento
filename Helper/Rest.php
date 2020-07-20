@@ -57,6 +57,10 @@ class Rest
         $response['vads_result'] = $this->getProperty($transaction, 'errorCode') ? $this->getProperty($transaction, 'errorCode') : '00';
         $response['vads_extra_result'] = $this->getProperty($transaction, 'detailedErrorCode');
 
+        if ($errorMessage = $this->getErrorMessage($transaction)) {
+            $response['vads_error_message'] = $errorMessage;
+        }
+
         $response['vads_trans_status'] = $this->getProperty($transaction, 'detailedStatus');
         $response['vads_trans_uuid'] = $this->getProperty($transaction, 'uuid');
         $response['vads_operation_type'] = $this->getProperty($transaction, 'operationType');
@@ -110,7 +114,11 @@ class Rest
                 if ($riskControl = $this->getProperty($fraudManagement, 'riskControl')) {
                     $response['vads_risk_control'] = '';
 
-                    foreach ($riskControl as $key => $value) {
+                    foreach ($riskControl as $value) {
+                        if (! isset($value['name']) || ! isset($value['result'])) {
+                            continue;
+                        }
+
                         $response['vads_risk_control'] .= "{$value['name']}={$value['result']};";
                     }
                 }
@@ -122,6 +130,16 @@ class Rest
         }
 
         return $response;
+    }
+
+    private function getErrorMessage($transaction)
+    {
+        $code = $this->getProperty($transaction, 'errorCode');
+        if ($code) {
+            return ucfirst($this->getProperty($transaction, 'errorMessage')) . ' (' . $code . ').';
+        } else {
+            return null;
+        }
     }
 
     private function getProperty($restResult, $key)

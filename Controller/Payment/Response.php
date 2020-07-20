@@ -101,7 +101,7 @@ class Response extends \Magento\Framework\App\Action\Action
                 ->setLastOrderId($order->getId());
         }
 
-        $this->dataHelper->log('Redirecting to one page checkout failure page.' . ($order ? " Order #{$order->getId()}." : ''));
+        $this->dataHelper->log('Redirecting to one page checkout failure page.' . ($order ? " Order #{$order->getIncrementId()}." : ''));
         return $this->createResult('checkout/onepage/failure', ['_scope' => $this->dataHelper->getCheckoutStoreId()]);
     }
 
@@ -155,14 +155,14 @@ class Response extends \Magento\Framework\App\Action\Action
                 ->setLastRealOrderId($order->getIncrementId())
                 ->setLastOrderStatus($order->getStatus());
 
-            $this->dataHelper->log("Redirecting to one page checkout success page for order #{$order->getId()}.");
+            $this->dataHelper->log("Redirecting to one page checkout success page for order #{$order->getIncrementId()}.");
             $resultRedirect = $this->createResult('checkout/onepage/success', ['_scope' => $storeId]);
         } else {
             if ($case === Payment::FAILURE) {
                 $this->messageManager->addWarning(__('Your payment was not accepted. Please, try to re-order.'));
             }
 
-            $this->dataHelper->log("Restore cart for order #{$order->getId()} to allow re-order quicker.");
+            $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow re-order quicker.");
             $quote = $this->quoteRepository->get($order->getQuoteId());
             if ($quote->getId()) {
                 $quote->setIsActive(true)->setReservedOrderId(null);
@@ -171,7 +171,7 @@ class Response extends \Magento\Framework\App\Action\Action
                 $checkout->replaceQuote($quote);
             }
 
-            $this->dataHelper->log("Redirecting to cart page for order #{$order->getId()}.");
+            $this->dataHelper->log("Redirecting to cart page for order #{$order->getIncrementId()}.");
             $resultRedirect = $this->createResult('checkout/cart', ['_scope' => $storeId]);
         }
 

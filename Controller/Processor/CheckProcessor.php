@@ -79,7 +79,7 @@ class CheckProcessor
         \Magento\Sales\Model\Order $order,
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
     ) {
-        $this->dataHelper->log("Request authenticated for order #{$order->getId()}.");
+        $this->dataHelper->log("Request authenticated for order #{$order->getIncrementId()}.");
 
         $reviewStatuses = [
             'payment_review',
@@ -90,11 +90,11 @@ class CheckProcessor
 
         if ($order->getStatus() == 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
             // Order waiting for payment.
-            $this->dataHelper->log("Order #{$order->getId()} is waiting payment update.");
-            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $response->getLogMessage());
+            $this->dataHelper->log("Order #{$order->getIncrementId()} is waiting payment update.");
+            $this->dataHelper->log("Payment result for order #{$order->getIncrementId()}: " . ($response->get('error_message') ?: $response->getLogMessage()));
 
             if ($response->isAcceptedPayment()) {
-                $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by notification URL.");
+                $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has been confirmed by notification URL.");
 
                 $stateObject = $this->paymentHelper->nextOrderState($order, $response);
                 if ($order->getStatus() == $stateObject->getStatus()) {
@@ -108,7 +108,7 @@ class CheckProcessor
                     return 'payment_ok';
                 }
             } else {
-                $this->dataHelper->log("Payment for order #{$order->getId()} has been invalidated by notification URL.");
+                $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has been invalidated by notification URL.");
 
                 // Cancel order.
                 $this->paymentHelper->cancelOrder($order, $response);
@@ -126,7 +126,7 @@ class CheckProcessor
             ];
 
             if ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
-                $this->dataHelper->log("Order #{$order->getId()} is confirmed.");
+                $this->dataHelper->log("Order #{$order->getIncrementId()} is confirmed.");
 
                 if ($response->get('operation_type') == 'CREDIT') {
                     // This is a refund: create credit memo?
@@ -189,11 +189,11 @@ class CheckProcessor
 
                 return 'payment_ok_already_done';
             } elseif ($order->isCanceled() && ! $response->isAcceptedPayment()) {
-                $this->dataHelper->log("Order #{$order->getId()} cancelation is confirmed.");
+                $this->dataHelper->log("Order #{$order->getIncrementId()} cancelation is confirmed.");
                 return 'payment_ko_already_done';
             } else {
                 // Error case, the payment result and the order status do not match.
-                $msg = "Invalid payment result received for already saved order #{$order->getId()}.";
+                $msg = "Invalid payment result received for already saved order #{$order->getIncrementId()}.";
                 $msg .= " Payment result: {$response->getTransStatus()}, order status : {$order->getStatus()}.";
                 $this->dataHelper->log($msg, \Psr\Log\LogLevel::ERROR);
 

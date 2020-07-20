@@ -130,9 +130,9 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
                 throw new ResponseException("Order cannot be created for quote #{$quoteId}.");
             }
 
-            $this->dataHelper->log("Order #{$order->getId()} has been created for quote #{$quoteId}.");
+            $this->dataHelper->log("Order #{$order->getIncrementId()} has been created for quote #{$quoteId}.");
         } else {
-            $this->dataHelper->log("Found order #{$order->getId()} for quote #{$quoteId}.");
+            $this->dataHelper->log("Found order #{$order->getIncrementId()} for quote #{$quoteId}.");
         }
 
         $storeId = $order->getStore()->getId();

@@ -70,7 +70,7 @@ class Response extends \Magento\Backend\App\Action
         $this->messageManager->getMessages(true);
         $this->messageManager->addError(__('An error has occurred during the payment process.'));
 
-        $this->dataHelper->log('Redirecting to order creation page.' . ($order ? " Order #{$order->getId()}." : ''));
+        $this->dataHelper->log('Redirecting to order creation page.' . ($order ? " Order #{$order->getIncrementId()}." : ''));
 
         /**
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
@@ -131,7 +131,7 @@ class Response extends \Magento\Backend\App\Action
             $this->messageManager->addWarning(__('Your payment was not accepted. Please, try to re-order.'));
         }
 
-        $this->dataHelper->log("Redirecting to order view or order index page for order #{$order->getId()}.");
+        $this->dataHelper->log("Redirecting to order view or order index page for order #{$order->getIncrementId()}.");
 
         /**
          * @var \Magento\Framework\Controller\Result\Redirect $resultRedirect
