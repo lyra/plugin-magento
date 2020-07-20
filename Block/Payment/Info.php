@@ -68,8 +68,16 @@ class Info extends \Magento\Payment\Block\Info
             ];
 
             $labels = [];
+
+            $restError = $this->getInfo()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE);
+            if ($restError) {
+                $labels[] = $restError;
+                unset($keys[0]);
+            }
+
             foreach ($keys as $key) {
                 $label = $this->translate($allResults[$key], $key, true);
+
                 if (! $label) {
                     continue;
                 }

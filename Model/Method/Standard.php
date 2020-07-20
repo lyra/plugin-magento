@@ -170,7 +170,7 @@ class Standard extends Payzen
             } else {
                 // Bank data acquisition on payment page, let's ask customer for data registration.
                 $this->dataHelper->log('Customer ' . $customer->getEmail() .
-                     ' will be asked for card data registration on payment page.');
+                     " will be asked for card data registration on payment page for order #{$order->getIncrementId()}.");
                 $this->payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
             }
         }
@@ -413,7 +413,7 @@ class Standard extends Payzen
                 ]
             ],
             'contrib' => $cmsParam . '/' . $cmsVersion . '/' . PHP_VERSION,
-            'strongAuthenticationState' => $strongAuth,
+            'strongAuthentication' => $strongAuth,
             'currency' => $currency->getAlpha3(),
             'amount' => $currency->convertAmountToInteger($amount),
             'metadata' => [
@@ -452,23 +452,17 @@ class Standard extends Payzen
             $response = $client->post('V4/Charge/CreatePayment', json_encode($data));
 
             if ($response['status'] !== 'SUCCESS') {
-                $this->dataHelper->log(
-                    "Error while creating payment form token for quote #{$quote->getId()}: "
-                        . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').',
-                    \Psr\Log\LogLevel::WARNING
-                );
+                $msg = "Error while creating payment form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}: "
+                    . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
 
                 if (isset($response['answer']['detailedErrorMessage']) && ! empty($response['answer']['detailedErrorMessage'])) {
-                    $this->dataHelper->log(
-                        'Detailed message: ' . $response['answer']['detailedErrorMessage']
-                            .' ('.$response['answer']['detailedErrorCode'].').',
-                        \Psr\Log\LogLevel::WARNING
-                    );
+                    $msg .= ' Detailed message: ' . $response['answer']['detailedErrorMessage'] .' (' . $response['answer']['detailedErrorCode'] . ').';
                 }
 
+                $this->dataHelper->log($msg, \Psr\Log\LogLevel::WARNING);
                 return false;
             } else {
-                $this->dataHelper->log("Form token created successfully for quote #{$quote->getId()}.");
+                $this->dataHelper->log("Form token created successfully for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
                 // Payment form token created successfully.
                 return $response['answer']['formToken'];

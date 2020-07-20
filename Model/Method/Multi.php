@@ -139,7 +139,8 @@ class Multi extends Payzen
         $this->payzenRequest->setMultiPayment($amount, $first, $option['count'], $option['period']);
         $this->payzenRequest->set('contracts', ($option['contract']) ? 'CB=' . $option['contract'] : null);
 
-        $this->dataHelper->log('Multiple payment configuration is ' . $this->payzenRequest->get('payment_config'));
+        $this->dataHelper->log('Multiple payment configuration is ' . $this->payzenRequest->get('payment_config')
+            . ', order ID: #' . $order->getIncrementId());
     }
 
     /**

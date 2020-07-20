@@ -55,7 +55,7 @@ class RedirectProcessor
         );
 
         // Log action before redirect.
-        $this->dataHelper->log("Client {$order->getCustomerEmail()} sent to payment page for order #{$order->getId()}.");
+        $this->dataHelper->log("Client {$order->getCustomerEmail()} sent to payment page for order #{$order->getIncrementId()}.");
     }
 
     public function getDataHelper()

@@ -61,15 +61,15 @@ class ResponseProcessor
         \Magento\Sales\Model\Order $order,
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
     ) {
-        $this->dataHelper->log("Request authenticated for order #{$order->getId()}.");
+        $this->dataHelper->log("Request authenticated for order #{$order->getIncrementId()}.");
 
         if ($order->getStatus() === 'pending_payment') {
             // Order waiting for payment.
-            $this->dataHelper->log("Order #{$order->getId()} is waiting payment.");
-            $this->dataHelper->log("Payment result for order #{$order->getId()}: " . $response->getLogMessage());
+            $this->dataHelper->log("Order #{$order->getIncrementId()} is waiting payment.");
+            $this->dataHelper->log("Payment result for order #{$order->getIncrementId()}: " . ($response->get('error_message') ?: $response->getLogMessage()));
 
             if ($response->isAcceptedPayment()) {
-                $this->dataHelper->log("Payment for order #{$order->getId()} has been confirmed by client return !" .
+                $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has been confirmed by client return !" .
                      " This means the notification URL did not work.", \Psr\Log\LogLevel::WARNING);
 
                 // Save order and optionally create invoice.
@@ -81,7 +81,7 @@ class ResponseProcessor
                     'warn' => true // Notification URL warn in TEST mode.
                 ];
             } else {
-                $this->dataHelper->log("Payment for order #{$order->getId()} has failed.");
+                $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has failed.");
 
                 // Cancel order.
                 $this->paymentHelper->cancelOrder($order, $response);
@@ -95,7 +95,7 @@ class ResponseProcessor
             }
         } else {
             // Payment already processed.
-            $this->dataHelper->log("Order #{$order->getId()} has already been processed.");
+            $this->dataHelper->log("Order #{$order->getIncrementId()} has already been processed.");
 
             $storeId = $this->dataHelper->getCheckoutStoreId();
             $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $storeId);
@@ -109,14 +109,14 @@ class ResponseProcessor
             ];
 
             if ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
-                $this->dataHelper->log("Order #{$order->getId()} is confirmed.");
+                $this->dataHelper->log("Order #{$order->getIncrementId()} is confirmed.");
 
                 return [
                     'case' => Payment::SUCCESS,
                     'warn' => false
                 ];
             } elseif ($order->isCanceled() && ! $response->isAcceptedPayment()) {
-                $this->dataHelper->log("Order #{$order->getId()} cancelation is confirmed.");
+                $this->dataHelper->log("Order #{$order->getIncrementId()} cancelation is confirmed.");
 
                 $case = $response->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
                 return [
@@ -125,7 +125,7 @@ class ResponseProcessor
                 ];
             } else {
                 // Error case, the payment result and the order status do not match.
-                $msg = "Invalid payment result received for already saved order #{$order->getId()}.";
+                $msg = "Invalid payment result received for already saved order #{$order->getIncrementId()}.";
                 $msg .= " Payment result: {$response->getTransStatus()}, order status : {$order->getStatus()}.";
 
                 throw new ResponseException($msg);
