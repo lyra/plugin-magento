@@ -31,7 +31,7 @@
 "Algorithm used to compute the payment form signature. Selected algorithm must be the same as one configured in the PayZen Back Office.<br /><b>The HMAC-SHA-256 algorithm should not be activated if it is not yet available in the PayZen Back Office, the feature will be available soon.</b>","Algoritmo usado para calcular la firma del formulario de pago. El algoritmo seleccionado debe ser el mismo que el configurado en el Back Office PayZen.<br /><b>El algoritmo HMAC-SHA-256 no se debe activar si aún no está disponible el Back Office PayZen, la función estará disponible pronto.</b>"
 "Payment page URL","URL de página de pago"
 "Link to the payment page.","Enlace a la página de pago."
-"Instant Payment Notification URL","URL de notificación de pago instantáneo."
+"Instant Payment Notification URL","URL de notificación de pago instantáneo"
 "URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.","URL a copiar en el Back Office PayZen > Configuración > Reglas de notificación.<br />En modo multitienda, la URL de notificación es la misma para todas las tiendas."
 "PAYMENT PAGE","PÁGINA DE PAGO"
 "Default Language","Idioma por defecto"
