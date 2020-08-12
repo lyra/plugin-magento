@@ -1,3 +1,7 @@
+2.4.9, 2020-08-12:
+- Bug fix: Error while trying to use WS services (accept, deny and validate payment, online refund).
+- Update payment means list.
+
 2.4.8, 2020-07-20:
 - [embedded] Bug fix: Error due to strongAuthentication field renaming in REST token creation.
 - [embedded] Bug fix: Do not cancel orders in status "Fraud suspected" when new failed IPN calls are made.

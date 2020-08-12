@@ -259,7 +259,7 @@ class Multi extends Payzen
             }
 
             if (empty($cards) || in_array($card['value'], $cards)) {
-                $availCards[$card['value']] = $card['label'];
+                $availCards[$card['value']] = $card['simple_label'];
             }
         }
 

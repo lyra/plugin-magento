@@ -23,7 +23,7 @@ class PaymentCard implements \Magento\Framework\Option\ArrayInterface
         foreach (\Lyranetwork\Payzen\Model\Api\PayzenApi::getSupportedCardTypes() as $code => $name) {
             $options[] = [
                 'value' => $code,
-                'label' => $name
+                'label' => $code . " - " . $name
             ];
         }
 
