@@ -14,7 +14,7 @@
     <!-- Version. -->
     <modules>
         <Lyranetwork_Payzen>
-            <version>1.11.1</version>
+            <version>1.11.2</version>
         </Lyranetwork_Payzen>
     </modules>
 
@@ -496,7 +496,7 @@
             <payzen>
                 <developed_by>Lyra Network</developed_by>
                 <support_email>support@payzen.eu</support_email>
-                <plugin_version>1.11.1</plugin_version>
+                <plugin_version>1.11.2</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_1.4-1.9</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -585,19 +585,6 @@
 
                 <validation_mode>-1</validation_mode>
             </payzen_gift>
-
-            <payzen_choozeo>
-                <model>payzen/payment_choozeo</model>
-                <group>payzen</group>
-
-                <active>0</active>
-                <allowspecific>0</allowspecific>
-                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
-                <title>Payment with Choozeo without fees</title>
-                <sort_order>4</sort_order>
-                <module_logo>choozeo.png</module_logo>
-                <payment_action>authorize</payment_action>
-            </payzen_choozeo>
 
             <payzen_oney3x4x>
                 <model>payzen/payment_oney3x4x</model>

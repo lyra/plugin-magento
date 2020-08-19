@@ -9,11 +9,10 @@
 
 #payment_payzen table.form-list, #payment_payzen_standard table.form-list,
 #payment_payzen_multi table.form-list, #payment_payzen_gift table.form-list,
-#payment_payzen_choozeo table.form-list, #payment_payzen_oney table.form-list,
-#payment_payzen_sepa table.form-list, #payment_payzen_fullcb table.form-list,
-#payment_payzen_paypal table.form-list, #payment_payzen_sofort table.form-list,
-#payment_payzen_postfinance table.form-list, #payment_payzen_giropay table.form-list,
-#payment_payzen_ideal table.form-list {
+#payment_payzen_oney table.form-list, #payment_payzen_sepa table.form-list, 
+#payment_payzen_fullcb table.form-list, #payment_payzen_paypal table.form-list,
+#payment_payzen_sofort table.form-list, #payment_payzen_postfinance table.form-list,
+#payment_payzen_giropay table.form-list, #payment_payzen_ideal table.form-list {
     width: 100% !important;
 }
 

@@ -552,6 +552,14 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             return;
         }
 
+        // Case of failure when retries are enabled, do nothing before last attempt.
+        if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED')) {
+            $this->_getHelper()->log("Payment is not accepted but buyer can try to re-order. Do not create order at this time. Quote ID: #{$quoteId},
+                    reserved order ID: #{$quote->getReservedOrderId()}.");
+            $controller->getResponse()->setBody($response->getOutputForPlatform('payment_ko_bis'));
+            return;
+        }
+
         // Clear quote data.
         $quote->getPayment()->unsAdditionalInformation(self::TOKEN_DATA);
         $quote->getPayment()->unsAdditionalInformation(self::TOKEN);
@@ -904,7 +912,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                         ' '
                     );
 
-                    $amountDetail = $effectiveAmount. ' ' . $effectiveCurrency->getAlpha3() . ' (' . $amountDetail . ')';
+                    $amountDetail = $effectiveAmount . ' ' . $effectiveCurrency->getAlpha3() . ' (' . $amountDetail . ')';
                 }
 
                 $additionalInfo = array(

@@ -1,3 +1,12 @@
+1.11.2, 2020-08-19:
+- [embedded] Bug fix: Do not cancel orders in status "Fraud suspected" when new IPN calls are made.
+- [embedded] Bug fix: Error due to strongAuthenticationState field renaming in REST token creation.
+- [embedded] Bug fix: Compatibility of payment with embedded fields with Internet Explorer 11.
+- [embedded] Bug fix: Error 500 due to riskControl modified format in REST response.
+- [oney] Bug fix: Fix Oney3x4x options requirement.
+- [oney] Make phone number mandatory for Oney 3x/4x payments.
+- Update payment means logos.
+
 1.11.1, 2020-04-29:
 - [embedded] Bugfix: Payment fields error relative to new JavaScript client library.
 - [embedded] Disable 1-Click payment buttons when using payment with embedded fields.

@@ -24,7 +24,7 @@ class Lyranetwork_Payzen_Model_Payment_Sofort extends Lyranetwork_Payzen_Model_P
     }
 
     /**
-     * Assign data to info model instance
+     * Assign data to info model instance.
      *
      * @param  mixed $data
      * @return Mage_Payment_Model_Info

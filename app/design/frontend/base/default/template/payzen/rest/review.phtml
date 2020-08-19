@@ -13,7 +13,7 @@
 //<![CDATA[
     if ((typeof payment !== 'undefined') && (payment.currentMethod === 'payzen_standard')) {
         // Default Magento checkout.
-        KR.validateForm().then(({ KR, result }) => {
+        KR.validateForm().then(function(v) {
             Review.prototype.checkAndPayOrder = function () {
                 if (checkout.loadWaiting) {
                     return;
@@ -37,7 +37,8 @@
                 e.preventDefault();
                 review.checkAndPayOrder();
             };
-        }).catch(({ KR, result }) => {
+        }).catch(function(v) {
+            var result = v.result;
             return result.doOnError();
         });
     }

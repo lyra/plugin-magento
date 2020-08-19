@@ -638,6 +638,7 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
 
     /**
      * Validate payment method information object
+     * @deprecated to be removed in the next version.
      *
      * @param  Mage_Payment_Model_Info $info
      * @return Mage_Payment_Model_Abstract
@@ -651,7 +652,7 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
                 $shippingAddress = $info->getOrder()->getIsVirtual() ? null : $info->getOrder()->getShippingAddress();
             } else {
                 $billingAddress = $info->getQuote()->getBillingAddress();
-                $shippingAddress =  $info->getQuote()->isVirtual() ? null : $info->getQuote()->getShippingAddress();
+                $shippingAddress = $info->getQuote()->isVirtual() ? null : $info->getQuote()->getShippingAddress();
             }
 
             Mage::helper('payzen/util')->checkAddressValidity($billingAddress, 'oney');

@@ -25,6 +25,14 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
             'country' => '#^FR|GP|MQ|GF|RE|YT$#i',
             'phone' => '#^[0-9]{10}$#'
         ),
+        'oney3x4x' => array(
+            'name' => "#^[A-ZÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,63}$#ui",
+            'street' => "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui",
+            'zip' => '#^[0-9]{5}$#',
+            'city' => "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,127}$#ui",
+            'country' => '#^FR|GP|MQ|GF|RE|YT$#i',
+            'phone' => '#^[0-9]{10}$#'
+        ),
         'fullcb' => array(
             'name' => "#^[A-Za-z0-9àâçèéêîôùû]+([ \-']?[A-Za-z0-9àâçèéêîôùû]+)*$#",
             'street' => '#^[^;]*$#',
@@ -439,6 +447,8 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
             $this->_throwException($emptyMsg, 'First Name', $addressType);
         } elseif (! preg_match($nameRegex, $address->getFirstname())) {
             $this->_throwException($invalidMsg, 'First Name', $addressType);
+        } elseif (($payment === 'oney3x4x') && ! $address->getTelephone()) {
+            $this->_throwException($emptyMsg, 'Telephone', $addressType);
         } elseif ($address->getTelephone() && ! preg_match($phoneRegex, $address->getTelephone())) {
             $this->_throwException($invalidMsg, 'Telephone', $addressType);
         } elseif (! $address->getStreet(1)) {
