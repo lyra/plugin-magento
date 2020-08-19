@@ -216,4 +216,27 @@ class Lyranetwork_Payzen_Model_Payment_Oney3x4x extends Lyranetwork_Payzen_Model
 
         return true;
     }
+
+    /**
+     * Validate payment method information object
+     *
+     * @param  Mage_Payment_Model_Info $info
+     * @return Mage_Payment_Model_Abstract
+     */
+    public function validate()
+    {
+        $info = $this->getInfoInstance();
+        if ($info instanceof Mage_Sales_Model_Order_Payment) {
+            $billingAddress = $info->getOrder()->getBillingAddress();
+            $shippingAddress = $info->getOrder()->getIsVirtual() ? null : $info->getOrder()->getShippingAddress();
+        } else {
+            $billingAddress = $info->getQuote()->getBillingAddress();
+            $shippingAddress = $info->getQuote()->isVirtual() ? null : $info->getQuote()->getShippingAddress();
+        }
+
+        Mage::helper('payzen/util')->checkAddressValidity($billingAddress, 'oney3x4x');
+        Mage::helper('payzen/util')->checkAddressValidity($shippingAddress, 'oney3x4x');
+
+        return $this;
+    }
 }

@@ -30,7 +30,7 @@ class Lyranetwork_Payzen_Model_Field_Other_PaymentMeans extends Lyranetwork_Payz
         } else {
             $i = 0;
             $means = array();
-            foreach ($values as $value) {
+            foreach ($values as $key => $value) {
                 $i++;
 
                 if (empty($value)) {
@@ -38,7 +38,9 @@ class Lyranetwork_Payzen_Model_Field_Other_PaymentMeans extends Lyranetwork_Payz
                 }
 
                 if (empty($value['label'])) {
-                    $this->_throwError('Label', $i);
+                    $supportedCards = Lyranetwork_Payzen_Model_Api_Api::getSupportedCardTypes();
+                    $value['label'] = Mage::helper('payzen')->__('Payment with %s', $supportedCards[$value['means']]);
+                    $values[$key] = $value;
                 }
 
                 if (! empty($value['minimum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['minimum'])) {
@@ -61,6 +63,7 @@ class Lyranetwork_Payzen_Model_Field_Other_PaymentMeans extends Lyranetwork_Payz
                 $means[$value['means']] = $value['label'];
             }
 
+            $this->setValue($values);
             Mage::helper('payzen')->updateMeanModelConfig($means);
         }
 

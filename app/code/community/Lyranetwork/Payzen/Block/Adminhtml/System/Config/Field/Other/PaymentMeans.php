@@ -24,7 +24,14 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Other_PaymentMeans
             )
         );
 
-        $options = array('options' => Lyranetwork_Payzen_Model_Api_Api::getSupportedCardTypes());
+        $cards = Lyranetwork_Payzen_Model_Api_Api::getSupportedCardTypes();
+
+        foreach ($cards as $code => $label) {
+            $cards[$code] = $code . " - " . $label;
+        }
+
+        $options = array('options' => $cards);
+
         $this->addColumn(
             'means',
             array(
