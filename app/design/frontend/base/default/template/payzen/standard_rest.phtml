@@ -84,7 +84,9 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
             KR.setFormConfig({
                 formToken: paymentToken
             }).then(
-                payzenInitRestEvents()
+                function(v) {
+                    payzenInitRestEvents(v.KR);
+                }
             );
         } else {
             var errorElt = $$('#payzen_standard_rest_wrapper .kr-form-error').first();
@@ -96,7 +98,7 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
         }
     };
 
-    window.payzenInitRestEvents = function() {
+    window.payzenInitRestEvents = function(KR) {
         KR.onError(function(e) {
             // Not recoverable error, reload page after a while.
             if (PAYZEN_RECOVERABLE_ERRORS.indexOf(e.errorCode) === -1) {
@@ -107,7 +109,10 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
 
             var msg = '';
             if (PAYZEN_DEFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
-                msg = e.errorMessage + (e.errorMessage.endsWith('.') ? '' : '.');
+                msg = e.errorMessage;
+                var endsWithDot = (msg.lastIndexOf('.') == (msg.length - 1) && msg.lastIndexOf('.') >= 0);
+
+                msg += (endsWithDot ? '' : '.');
             } else {
                 msg = payzenTranslate(e.errorCode);
             }
@@ -178,11 +183,14 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
                                 KR.setFormConfig({
                                     formToken: response.formToken
                                 }).then(
-                                    $('payzen_rest_hidden_button').click()
+                                    function(v) {
+                                        var KR = v.KR;
+                                        KR.submit();
+                                    }
                                 );
                             } else {
                                 // Form token is the same because data was unchanged.
-                                $('payzen_rest_hidden_button').click();
+                                KR.submit();
                             }
                         } else {
                             if (typeof resetLoaderCallback === 'function') {
@@ -219,7 +227,7 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
 
                 placeOrderBtn.onclick = function(e) {
                     if (payzenSelectedMethod() === 'payzen_standard') {
-                        KR.validateForm().then(({ KR, result }) => {
+                        KR.validateForm().then(function(v) {
                             var validator = new Validation('one-step-checkout-form');
 
                             // Validate email address.
@@ -244,7 +252,8 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
                                     placeOrderBtn.removeClassName('place-order-loader');
                                 });
                             }
-                          }).catch(({ KR, result }) => {
+                          }).catch(function(v) {
+                              var result = v.result;
                               return result.doOnError();
                           });
                     } else {

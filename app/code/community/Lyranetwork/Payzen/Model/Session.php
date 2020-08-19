@@ -10,14 +10,13 @@
 
 class Lyranetwork_Payzen_Model_Session extends Mage_Checkout_Model_Session
 {
-
     public function __construct()
     {
         $this->init('payzen');
     }
 
     /**
-     * Get gateway 1-Click quote instance by current session
+     * Get gateway 1-Click quote instance by current session.
      *
      * @return Mage_Sales_Model_Quote
      */

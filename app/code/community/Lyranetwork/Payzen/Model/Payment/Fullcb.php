@@ -142,7 +142,7 @@ class Lyranetwork_Payzen_Model_Payment_Fullcb extends Lyranetwork_Payzen_Model_P
             $shippingAddress = $info->getOrder()->getIsVirtual() ? null : $info->getOrder()->getShippingAddress();
         } else {
             $billingAddress = $info->getQuote()->getBillingAddress();
-            $shippingAddress =  $info->getQuote()->isVirtual() ? null : $info->getQuote()->getShippingAddress();
+            $shippingAddress = $info->getQuote()->isVirtual() ? null : $info->getQuote()->getShippingAddress();
         }
 
         Mage::helper('payzen/util')->checkAddressValidity($billingAddress, 'fullcb');

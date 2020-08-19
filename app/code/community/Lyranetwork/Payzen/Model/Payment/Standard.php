@@ -187,7 +187,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
                 )
             ),
             'contrib' => $contrib . Mage::getVersion() . '/' . PHP_VERSION,
-            'strongAuthenticationState' => $strongAuth,
+            'strongAuthentication' => $strongAuth,
             'currency' => $currency->getAlpha3(),
             'amount' => $currency->convertAmountToInteger($amount),
             'metadata' => array(
