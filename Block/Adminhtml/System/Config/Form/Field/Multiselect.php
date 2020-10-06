@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
  */
 class Multiselect extends \Magento\Config\Block\System\Config\Form\Field
 {
-
     /**
      * Set field size.
      *

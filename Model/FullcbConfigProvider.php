@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model;
 
 class FullcbConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
 {
-
     /**
      *
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
@@ -67,7 +66,9 @@ class FullcbConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvide
     public function getConfig()
     {
         $config = parent::getConfig();
-        $config['payment'][$this->method->getCode()]['availableOptions'] = $this->getAvailableOptions();
+
+        $options = $this->getAvailableOptions();
+        $config['payment'][$this->method->getCode()]['availableOptions'] = ! empty ($options) ? $options: null;
 
         return $config;
     }

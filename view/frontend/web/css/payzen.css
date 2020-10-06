@@ -28,6 +28,11 @@ a.payzen-payment-link {
     width: 50%;
 }
 
+.payzen-choozeo fieldset div.field {
+    float: left;
+    width: 50%;
+}
+
 .payzen_review .small {
     font-size: 10px;
 }

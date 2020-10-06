@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\Method;
 
 class Fullcb extends Payzen
 {
-
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_FULLCB;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Fullcb::class;
 
@@ -110,7 +109,6 @@ class Fullcb extends Payzen
 
             if ((! $amount || ! $option['amount_min'] || $amount > $option['amount_min'])
                 && (! $amount || ! $option['amount_max'] || $amount < $option['amount_max'])) {
-
                 // Compute some fields.
                 $count = (int)$optionCount[$code];
                 $rate = (float)$option['rate'];

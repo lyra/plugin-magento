@@ -19,6 +19,9 @@ class Payment
     // Key to save choosen multi option.
     const MULTI_OPTION = 'payzen_multi_option';
 
+    // Key to save choosen Choozeo option.
+    const CHOOZEO_OPTION = 'payzen_choozeo_option';
+
     // Key to save choosen Oney option.
     const ONEY_OPTION = 'payzen_oney_option';
 
@@ -155,7 +158,6 @@ class Payment
         \Magento\Sales\Model\Order $order,
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
     ) {
-
         $this->dataHelper->log("Saving payment for order #{$order->getIncrementId()}.");
 
         // Update authorized amount.
@@ -206,7 +208,6 @@ class Payment
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response,
         $ignoreFraud = false
     ) {
-
         if ($response->isToValidatePayment()) {
             $newStatus = 'payzen_to_validate';
             $newState = \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW;
@@ -636,7 +637,6 @@ class Payment
         \Magento\Sales\Model\Order $order,
         \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
     ) {
-
         $this->dataHelper->log("Canceling order #{$order->getIncrementId()}.");
 
         $order->registerCancellation($response->get('error_message') ?: $response->getMessage());

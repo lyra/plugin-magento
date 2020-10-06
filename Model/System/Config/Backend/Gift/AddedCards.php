@@ -13,7 +13,6 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized
 {
-
     /**
      *
      * @var \Magento\Framework\File\UploaderFactory

@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model;
 
 class SepaConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
 {
-
     /**
      *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager

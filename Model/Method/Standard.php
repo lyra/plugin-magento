@@ -85,7 +85,6 @@ class Standard extends Payzen
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-
         $this->customerRepository = $customerRepository;
         $this->customerSession = $customerSession;
 

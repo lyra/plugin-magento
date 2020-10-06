@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Model\Method;
  */
 class Multix extends Multi
 {
-
     /**
      * Check method for processing with base currency.
      *

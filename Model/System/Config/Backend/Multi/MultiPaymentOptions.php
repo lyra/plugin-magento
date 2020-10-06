@@ -13,7 +13,6 @@ use Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\Co
 
 class MultiPaymentOptions extends ConfigArraySerialized
 {
-
     public function beforeSave()
     {
         $values = $this->getValue();
