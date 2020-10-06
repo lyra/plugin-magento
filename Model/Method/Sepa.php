@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\Method;
 
 class Sepa extends Payzen
 {
-
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_SEPA;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Sepa::class;
 

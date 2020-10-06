@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\Method;
 
 class Paypal extends Payzen
 {
-
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_PAYPAL;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Paypal::class;
 

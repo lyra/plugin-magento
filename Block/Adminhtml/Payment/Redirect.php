@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\Payment;
 
 class Redirect extends \Magento\Backend\Block\Widget\Form\Container
 {
-
     /**
      * Constructor.
      */

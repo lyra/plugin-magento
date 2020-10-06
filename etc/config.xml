@@ -15,7 +15,7 @@
         <payzen>
             <general>
                 <support_email>support@payzen.eu</support_email>
-                <plugin_version>2.4.9</plugin_version>
+                <plugin_version>2.4.10</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_2.x</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -109,6 +109,21 @@
 
                 <validation_mode>-1</validation_mode>
             </payzen_gift>
+
+            <payzen_choozeo>
+                <model>Lyranetwork\Payzen\Model\Method\Choozeo</model>
+                <group>payzen</group>
+                <payment_action>authorize</payment_action>
+
+                <active>0</active>
+                <title>Payment with Choozeo without fees</title>
+                <sort_order>4</sort_order>
+                <module_logo>choozeo-logo.png</module_logo>
+
+                <allowspecific>1</allowspecific>
+                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
+                <specificcountry_display>France</specificcountry_display>
+            </payzen_choozeo>
 
             <payzen_fullcb>
                 <model>Lyranetwork\Payzen\Model\Method\Fullcb</model>

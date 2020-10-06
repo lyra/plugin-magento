@@ -6,6 +6,7 @@ Namely, it enables the following payment methods :
 * PayZen - Standard payment
 * [mutli] PayZen - Payment in installments
 * [gift] PayZen - Gift card payment
+* [choozeo] PayZen - Choozeo payment
 * [fullcb] PayZen - Full CB payment
 * [sepa] PayZen - SEPA payment
 * [paypal] PayZen - PayPal payment

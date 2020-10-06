@@ -23,7 +23,7 @@
     <div class="control" style="margin-top: 20px;">
         <ul class="credit-card-types">
             <!-- ko foreach: {data: getAvailableCcTypes(), as: 'card'} -->
-            <li class="item" data-bind="css: {'_active': true}" style="padding-right: 10px; padding-bottom: 6px;">
+            <li class="item" data-bind="css: {'_active': true}" style="display: inline-block; padding-right: 20px; padding-bottom: 6px;">
                 <input type="radio"
                        class="radio"
                        data-bind="attr: {id: $parent.getCode() + '_cc_type_' + card.value, 

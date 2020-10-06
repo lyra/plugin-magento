@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\Payment\Redirect;
 
 class Form extends \Magento\Backend\Block\Widget
 {
-
     /**
      *
      * @var \Magento\Framework\Registry
