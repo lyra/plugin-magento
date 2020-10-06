@@ -1,3 +1,7 @@
+2.4.10: 2020-10-06:
+- [fullcb] Bug fix: Error when trying to pay with Full CB if payment options selection is disabled.
+- Update payment means list.
+
 2.4.9, 2020-08-12:
 - Bug fix: Error while trying to use WS services (accept, deny and validate payment, online refund).
 - Update payment means list.

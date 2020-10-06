@@ -39,7 +39,7 @@
 
         <fieldset class="fieldset payment method" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 10px;">
             <div class="field">
-            <!--ko if: getAvailableOptions().length > 0 -->
+            <!--ko if: getAvailableOptions() && getAvailableOptions().length > 0 -->
                 <div class="control">
                     <ul class="fullcb-payment-options" style="padding: 0;">
                         <!-- ko foreach: {data: getAvailableOptions(), as: 'option'} -->

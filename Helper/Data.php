@@ -19,6 +19,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const METHOD_MULTI = 'payzen_multi';
 
+    const METHOD_CHOOZEO = 'payzen_choozeo';
+
     const METHOD_SEPA = 'payzen_sepa';
 
     const METHOD_GIFT = 'payzen_gift';
@@ -46,6 +48,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         'multi' => true,
         'gift' => true,
+        'choozeo' => false,
         'fullcb' => true,
         'sepa' => true,
         'paypal' => true

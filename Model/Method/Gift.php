@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\Method;
 
 class Gift extends Payzen
 {
-
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_GIFT;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Gift::class;
 

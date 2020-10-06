@@ -11,7 +11,6 @@ namespace Lyranetwork\Payzen\Model\Method;
 
 class Multi extends Payzen
 {
-
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_MULTI;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Multi::class;
 

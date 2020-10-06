@@ -179,7 +179,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-
         $this->localeResolver = $localeResolver;
         $this->payzenRequest = $payzenRequestFactory->create();
         $this->payzenResponseFactory = $payzenResponseFactory;
@@ -432,6 +431,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         $keys = [
             \Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION,
+            \Lyranetwork\Payzen\Helper\Payment::CHOOZEO_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::FULLCB_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER

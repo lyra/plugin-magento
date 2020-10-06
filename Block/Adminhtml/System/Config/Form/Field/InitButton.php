@@ -14,7 +14,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
  */
 class InitButton extends \Magento\Config\Block\System\Config\Form\Field
 {
-
     /**
      * Set template to itself.
      */
