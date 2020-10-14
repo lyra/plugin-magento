@@ -9,13 +9,13 @@
  */
 ?>
 
-<ul class="form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display: none;">
+<ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none; margin-left: 15px;">
     <?php $options = $this->getPaymentOptions(); ?>
     <li>
     <?php
         $first = true;
         foreach ($options as $code => $value) {
-            $html = '<div class="payzen-option">';
+            $html = '<div style="margin-bottom: 5px;">';
 
             if (count($options) === 1) {
                 $html .= '<input type="hidden" id="payzen_oney3x4x_option' . $code . '" value="' . $code . '" name="payment[payzen_oney3x4x_option]" disabled="disabled"><span style="margin-right: 20px;"></span>';
@@ -26,15 +26,11 @@
                                  ($first ? ' checked="checked"' : '').'
                                  value="' . $code . '"
                                  name="payment[payzen_oney3x4x_option]"
-                                 onclick="$$(\'.payzen_oney3x4x_review\').invoke(\'hide\'); $(\'payzen_oney3x4x_review_' . $code . '\').show();"
                                  disabled="disabled">' ;
             }
 
             $html .= '<label for="payzen_oney3x4x_option' . $code . '">' . $value['label'] . '</label>';
             $html .= '</div>';
-
-            $html .= $this->getHtmlReview($value, $code, $first, 'oney3x4x');
-            $html .= '<br style="margin-bottom: 5px;"/>';
 
             $first = false;
 

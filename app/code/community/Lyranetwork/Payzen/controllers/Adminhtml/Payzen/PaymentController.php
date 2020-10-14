@@ -135,7 +135,7 @@ class Lyranetwork_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminht
             $this->getAdminSession()->addSuccess(
                 $this->__('The payment was successful. Your order was registered successfully.')
             );
-            $this->_redirect('adminhtml/sales_order/view', array('order_id' => $order->getIncrementId()));
+            $this->_redirect('adminhtml/sales_order/view', array('order_id' => $order->getId()));
         } else {
             $this->_getDataHelper()->log("Unsetting order data in session for order #{$order->getIncrementId()}.");
             $this->getCheckout()->unsLastQuoteId()

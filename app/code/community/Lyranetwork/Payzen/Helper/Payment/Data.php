@@ -10,8 +10,9 @@
 
 class Lyranetwork_Payzen_Helper_Payment_Data extends Mage_Payment_Helper_Data
 {
+
     /**
-     * Retrieve method model object.
+     * Retrieve method model object
      *
      * @param   string $code
      * @return  Mage_Payment_Model_Method_Abstract|false
@@ -22,7 +23,7 @@ class Lyranetwork_Payzen_Helper_Payment_Data extends Mage_Payment_Helper_Data
             $code = 'payzen_other';
         }
 
-        $key = self::XML_PATH_PAYMENT_METHODS . '/' . $code . '/model';
+        $key = self::XML_PATH_PAYMENT_METHODS.'/'.$code.'/model';
         $class = Mage::getStoreConfig($key);
         return Mage::getModel($class);
     }

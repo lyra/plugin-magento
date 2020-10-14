@@ -10,8 +10,9 @@
 
 class Lyranetwork_Payzen_Block_Redirect extends Mage_Core_Block_Template
 {
+
     /**
-     * Get checkout session namespace.
+     * Get checkout session namespace
      *
      * @return Mage_Checkout_Model_Session
      */
@@ -31,7 +32,7 @@ class Lyranetwork_Payzen_Block_Redirect extends Mage_Core_Block_Template
     }
 
     /**
-     * Return order instance with loaded information by increment id.
+     * Return order instance with loaded information by increment id
      *
      * @return Mage_Sales_Model_Order
      */
@@ -49,7 +50,7 @@ class Lyranetwork_Payzen_Block_Redirect extends Mage_Core_Block_Template
     }
 
     /**
-     * Get Form data by using ops payment api.
+     * Get Form data by using ops payment api
      *
      * @return array
      */
@@ -59,7 +60,7 @@ class Lyranetwork_Payzen_Block_Redirect extends Mage_Core_Block_Template
     }
 
     /**
-     * Getting gateway url.
+     * Getting gateway url
      *
      * @return string
      */
