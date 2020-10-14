@@ -10,6 +10,7 @@
 
 class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
 {
+
     /**
      *
      * @var array a global var to easily enable/disable features
@@ -30,6 +31,7 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         'postfinance' => true,
         'giropay' => true,
         'ideal' => true,
+        'choozeo' => false,
         'fullcb' => true,
         'sepa' => true
     );

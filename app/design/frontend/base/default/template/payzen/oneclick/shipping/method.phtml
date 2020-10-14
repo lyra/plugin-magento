@@ -12,7 +12,7 @@ $methodId = uniqid('payzen_shipping_method_');
 ?>
 
 <label for="<?php echo $methodId; ?>"><?php echo Mage::helper('payzen')->__('Shipping Method') ?> :</label>
-<p class="payzen-please-wait" style="display:none;">
+<p class="payzen-please-wait" style="display: none;">
     <span class="please-wait">
         <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>"
              alt="<?php echo Mage::helper('core')->quoteEscape($this->__('Please wait...')) ?>"

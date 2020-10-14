@@ -22,7 +22,7 @@ class Lyranetwork_Payzen_Model_Payment_Postfinance extends Lyranetwork_Payzen_Mo
     }
 
     /**
-     * Assign data to info model instance.
+     * Assign data to info model instance
      *
      * @param  mixed $data
      * @return Mage_Payment_Model_Info
