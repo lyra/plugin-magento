@@ -703,8 +703,7 @@
 
                         <standard_card_info_mode translate="label,comment">
                             <label><![CDATA[Card data entry mode]]></label>
-                            <comment><![CDATA[Select how the card data will be entered.]]></comment>
-                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Select how the credit card information will be entered. Attention, to use embedded payment fields, you must ensure that you have subscribed to this option with PayZen.]]></comment>                            <frontend_type>select</frontend_type>
                             <source_model>payzen/source_standard_cardInfoModes</source_model>
                             <config_path>payment/payzen_standard/card_info_mode</config_path>
                             <sort_order>41</sort_order>
@@ -1326,6 +1325,174 @@
                         </gift_added_gift_cards>
                     </fields>
                 </payzen_gift>
+
+                <payzen_choozeo translate="label">
+                    <label><![CDATA[PayZen - Choozeo payment]]></label>
+                    <frontend_model>payzen/adminhtml_system_config_fieldset_payment</frontend_model>
+                    <feature>choozeo</feature>
+                    <sort_order>104</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <frontend_class>complex</frontend_class>
+
+                    <fields>
+                        <!-- ================================== Module settings. ================================== -->
+                        <choozeo_display_options translate="label">
+                            <label><![CDATA[DISPLAY OPTIONS]]></label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_display_options>
+
+                        <choozeo_active translate="label,comment">
+                            <label><![CDATA[Activation]]></label>
+                            <comment><![CDATA[Enables / disables this payment method.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/payzen_choozeo/active</config_path>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_active>
+
+                        <choozeo_title translate="label,comment">
+                            <label><![CDATA[Method title]]></label>
+                            <comment><![CDATA[Method title to display on payment means page.]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_choozeo/title</config_path>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_title>
+
+                        <choozeo_sort_order translate="label,comment">
+                            <label><![CDATA[Sort order]]></label>
+                            <comment><![CDATA[In the payment methods list.]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_choozeo/sort_order</config_path>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_sort_order>
+
+                        <choozeo_module_logo translate="label,comment">
+                            <label><![CDATA[Logo]]></label>
+                            <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
+                            <frontend_type>image</frontend_type>
+                            <config_path>payment/payzen_choozeo/module_logo</config_path>
+                            <backend_model>payzen/field_logo</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="0">payzen/logos</upload_dir>
+                            <base_url type="media" scope_info="1">payzen/logos</base_url>
+                            <sort_order>14</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_module_logo>
+
+                        <!-- ============================ Amount Restriction parameters. ======================== -->
+                        <choozeo_restrictions translate="label">
+                            <label><![CDATA[RESTRICTIONS]]></label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_restrictions>
+
+                        <choozeo_allowspecific translate="label">
+                            <label><![CDATA[Restrict to some countries]]></label>
+                            <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
+                            <frontend_type>allowspecific</frontend_type>
+                            <config_path>payment/payzen_choozeo/allowspecific</config_path>
+                            <sort_order>21</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_allowspecific>
+
+                        <choozeo_specificcountry translate="label">
+                            <label><![CDATA[Authorized countries]]></label>
+                            <frontend_type>multiselect</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_multiselect</frontend_model>
+                            <size>5</size>
+                            <config_path>payment/payzen_choozeo/specificcountry</config_path>
+                            <sort_order>22</sort_order>
+                            <source_model>payzen/source_choozeo_availableCountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <choozeo_allowspecific>1</choozeo_allowspecific>
+                            </depends>
+                        </choozeo_specificcountry>
+
+                        <choozeo_custgroup_amount_restrictions translate="label,comment">
+                            <label><![CDATA[Restrict to some customer groups]]></label>
+                            <comment><![CDATA[Define minimum and maximum amounts to activate this payment method by customer group.]]></comment>
+                            <frontend_model>payzen/adminhtml_system_config_field_choozeo_custgroupOptions</frontend_model>
+                            <backend_model>payzen/field_choozeo_custgroupOptions</backend_model>
+                            <config_path>payment/payzen_choozeo/custgroup_amount_restrictions</config_path>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_custgroup_amount_restrictions>
+
+                        <!-- ================================== Payment page. ================================== -->
+                        <choozeo_payment_page translate="label">
+                            <label><![CDATA[PAYMENT PAGE]]></label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_payment_page>
+
+                        <choozeo_capture_delay translate="label,comment">
+                            <label><![CDATA[Capture delay]]></label>
+                            <comment><![CDATA[The number of days before the bank capture. Enter value only if different from PayZen general configuration.]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen_choozeo/capture_delay</config_path>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_capture_delay>
+
+                        <!-- ================================== Payment options. ================================== -->
+                        <choozeo_custom_options translate="label">
+                            <label><![CDATA[PAYMENT OPTIONS]]></label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </choozeo_custom_options>
+
+                        <choozeo_payment_options translate="label,comment">
+                            <label><![CDATA[Payment options]]></label>
+                            <frontend_model>payzen/adminhtml_system_config_field_choozeo_paymentOptions</frontend_model>
+                            <backend_model>payzen/field_choozeo_paymentOptions</backend_model>
+                            <config_path>payment/payzen_choozeo/payment_options</config_path>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Configure Choozeo payment options.]]></comment>
+                        </choozeo_payment_options>
+                    </fields>
+                </payzen_choozeo>
 
                 <payzen_oney3x4x translate="label">
                     <label><![CDATA[PayZen - Payment in 3 or 4 times Oney]]></label>

@@ -12,7 +12,7 @@ $customer = Mage::getSingleton('customer/session')->getCustomer(); // Logged-in 
 $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenIdentifier();
 ?>
 
-<ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none;">
+<ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none; margin-left: 15px;">
 <?php if ($isPaymentByToken) : ?>
     <li class="payzen-standard-id-block">
         <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" disabled="disabled">

@@ -519,7 +519,7 @@ class Lyranetwork_Payzen_PaymentController extends Mage_Core_Controller_Front_Ac
     }
 
     /**
-     * Set redirect into response
+     * Set redirect into response.
      *
      * @param  string $path
      * @param  array  $arguments

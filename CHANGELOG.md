@@ -1,3 +1,6 @@
+1.11.3, 2020-10-14:
+- [oney] Do not display payment installments for buyer.
+
 1.11.2, 2020-08-19:
 - [embedded] Bug fix: Do not cancel orders in status "Fraud suspected" when new IPN calls are made.
 - [embedded] Bug fix: Error due to strongAuthenticationState field renaming in REST token creation.

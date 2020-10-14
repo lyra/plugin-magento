@@ -12,7 +12,7 @@ $availMeans = $this->getAvailableMeans();
 ?>
 
 <?php if ($this->getConfigData('regroup_payment_means')): ?>
-    <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display:none;">
+    <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none; margin-left: 15px;">
         <li>
         <?php if (count($availMeans) === 1) {?>
             <label class="payzen-label"><?php echo Mage::helper('payzen')->__('Means of payment'); ?></label>
