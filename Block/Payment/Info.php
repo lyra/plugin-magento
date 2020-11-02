@@ -119,17 +119,8 @@ class Info extends \Magento\Payment\Block\Info
             }
 
             $html .= '<b>' . __('Expiration Date') . ': </b>' . $expiry;
-        }
 
-        $html .= '<br />';
-
-        $html .= '<b>' . __('3DS Authentication') . ': </b>';
-        if ($payment->getCcSecureVerify()) {
-            $html .= __('YES');
-            $html .= '<br />';
-            $html .= '<b>' . __('3DS Certificate') . ': </b>' . $payment->getCcSecureVerify();
-        } else {
-            $html .= __('NO');
+            $html .= '<hr />';
         }
 
         return $html;
@@ -151,7 +142,6 @@ class Info extends \Magento\Payment\Block\Info
             $sequenceNumber = substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
 
             $html .= '<b>' . __('Sequence Number') . ': </b>' . $sequenceNumber;
-            $html .= '<br />';
 
             $info = $item->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
             foreach ($info as $key => $value) {
@@ -159,6 +149,11 @@ class Info extends \Magento\Payment\Block\Info
                     continue;
                 }
 
+                if (! $value) {
+                    continue;
+                }
+
+                $html .= '<br />';
                 $html .= '<b>' . __($key) . ': </b>' . $value;
 
                 if ($backend && ($key === 'Means of payment') && isset($userChoice[$sequenceNumber])) {
@@ -168,9 +163,11 @@ class Info extends \Magento\Payment\Block\Info
                         $html .= ' ' . __('(default card brand used)');
                     }
                 }
-
-                $html .= '<br />';
             }
+        }
+
+        if ($backend) {
+            $html .= '<hr />';
         }
 
         return $html;

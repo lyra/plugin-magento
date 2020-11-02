@@ -66,7 +66,7 @@ class MultiPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Con
         $this->addColumn(
             'first',
             [
-                'label' => __('1st payment'),
+                'label' => __('1st installment'),
                 'style' => 'width: 70px;'
             ]
         );

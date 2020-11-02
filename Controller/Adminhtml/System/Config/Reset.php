@@ -42,6 +42,9 @@ class Reset extends \Magento\Backend\App\AbstractAction
 
     public function execute()
     {
+        // Clear all messages in session.
+        $this->messageManager->getMessages(true);
+
         // Retrieve write connection.
         $connection = $this->resourceConfig->getConnection();
 

@@ -70,7 +70,7 @@ class Data extends \Magento\Payment\Helper\Data
 
             $methods[$code] = [
                 'model' => $config['value'],
-                'title' => $payzenMultiTitle . " ($count)",
+                'title' => "$payzenMultiTitle ($count)",
                 'group' => 'payzen'
             ];
         }

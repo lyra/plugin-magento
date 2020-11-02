@@ -61,6 +61,18 @@ if ($payment->getCcTransId()) {
         echo $block->getPaymentDetailsHtml();
     }
 
+    // 3DS results.
+    echo '<b>' . __('3DS Authentication') . ': </b>';
+    if ($threedsStatus = $payment->getAdditionalInformation('threeds_status')) {
+        echo $threedsStatus;
+        echo '<br />';
+        echo ($threedsCavv = $payment->getCcSecureVerify()) ? '<b>' . __('3DS Certificate') . ': </b>' . $threedsCavv : '';
+        echo '<br />';
+        echo ($threedsAuthType = $payment->getAdditionalInformation('threeds_auth_type')) ? '<b>' . __('Authentication Type') . ': </b>' . $threedsAuthType : '';
+    } else {
+        echo 'UNAVAILABLE';
+    }
+
     // Risk control result translations.
     $riskControl = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::RISK_CONTROL);
     if (is_string($riskControl)) {
