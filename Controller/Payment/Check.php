@@ -9,8 +9,6 @@
  */
 namespace Lyranetwork\Payzen\Controller\Payment;
 
-use Lyranetwork\Payzen\Model\ResponseException;
-
 class Check extends \Magento\Framework\App\Action\Action
 {
     /**
@@ -57,7 +55,7 @@ class Check extends \Magento\Framework\App\Action\Action
 
             $case = $this->checkProcessor->execute($order, $response);
             return $this->renderResponse($response->getOutputForGateway($case));
-        } catch (ResponseException $e) {
+        } catch (\Lyranetwork\Payzen\Model\ResponseException $e) {
             return $this->renderResponse($e->getMessage());
         }
     }

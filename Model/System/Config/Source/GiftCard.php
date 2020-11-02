@@ -24,7 +24,7 @@ class GiftCard implements \Magento\Framework\Option\ArrayInterface
         foreach ($this->method->getSupportedCcTypes() as $code => $name) {
             $options[] = [
                 'value' => $code,
-                'label' => $name
+                'label' => $code . ' - ' . $name
             ];
         }
 

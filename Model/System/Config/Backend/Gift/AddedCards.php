@@ -87,7 +87,7 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
      */
     public function beforeSave()
     {
-        $value  = $this->getValue();
+        $value = $this->getValue();
 
         if (! is_array($value) || empty($value)) {
             $this->setValue([]);
@@ -110,9 +110,11 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
             // Load latest logo value.
             if ($this->dataHelper->fileExists($uploadDir . strtolower($card['code']) . '.png')) {
                 $value[$key]['logo'] = strtolower($card['code']) . '.png';
+            } else {
+                $value[$key]['logo'] = false;
             }
 
-            // Process file upload).
+            // Process file upload.
             $name = $card['logo']['name'];
             $tmpName = $card['logo']['tmp_name'];
 
@@ -133,7 +135,7 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
                     $result = $uploader->save($uploadDir, strtolower($card['code']) . '.png');
 
                     if (key_exists('file', $result) && ! empty($result['file'])) {
-                       $value[$key]['logo'] = $result['file'];
+                        $value[$key]['logo'] = $result['file'];
                     }
                 } catch (\Exception $e) {
                     // Upload errors.

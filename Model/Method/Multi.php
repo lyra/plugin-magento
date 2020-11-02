@@ -180,7 +180,7 @@ class Multi extends Payzen
         $amount = $quote ? $quote->getBaseGrandTotal() : null;
         if ($amount) {
             $options = $this->getAvailableOptions($amount);
-            return count($options) > 0;
+            return ! empty($options);
         }
 
         return true;

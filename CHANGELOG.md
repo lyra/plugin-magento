@@ -1,3 +1,8 @@
+2.4.11: 2020-11-02:
+- [embedded] Bug fix: Display 3DS result for REST API payments.
+- Bug fix: Do not re-create invoice if it already exists.
+- Some minor fixes relative to configuration screen.
+
 2.4.10: 2020-10-06:
 - [fullcb] Bug fix: Error when trying to pay with Full CB if payment options selection is disabled.
 - Update payment means list.

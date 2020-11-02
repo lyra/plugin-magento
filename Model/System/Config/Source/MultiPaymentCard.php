@@ -42,7 +42,7 @@ class MultiPaymentCard implements \Magento\Framework\Option\ArrayInterface
             if (in_array($code, $this->multiCards)) {
                 $options[] = [
                     'value' => $code,
-                    'label' => $code . " - " . $name,
+                    'label' => $code . ' - ' . $name,
                     'simple_label' => $name
                 ];
             }

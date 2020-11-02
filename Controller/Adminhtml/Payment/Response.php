@@ -10,7 +10,6 @@
 namespace Lyranetwork\Payzen\Controller\Adminhtml\Payment;
 
 use Lyranetwork\Payzen\Helper\Payment;
-use Lyranetwork\Payzen\Model\ResponseException;
 
 class Response extends \Magento\Backend\App\Action
 {
@@ -53,7 +52,7 @@ class Response extends \Magento\Backend\App\Action
             $result = $this->responseProcessor->execute($order, $response);
 
             return $this->redirectResponse($order, $result['case'], $result['warn']);
-        } catch (ResponseException $e) {
+        } catch (\Lyranetwork\Payzen\Model\ResponseException $e) {
             $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);
             return $this->redirectError($order);
         }

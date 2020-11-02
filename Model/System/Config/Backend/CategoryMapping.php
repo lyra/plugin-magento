@@ -13,4 +13,26 @@ use Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\Co
 
 class CategoryMapping extends ConfigArraySerialized
 {
+    public function beforeSave()
+    {
+        $values = $this->getValue();
+
+        if (! is_array($values) || empty($values)) {
+            $this->setValue([]);
+        } else {
+            foreach ($values as $id => $value) {
+                if (empty($value)) {
+                    continue;
+                }
+
+                if (! isset($value['payzen_category']) || empty($value['payzen_category'])) {
+                    unset($values[$id]);
+                }
+            }
+
+            $this->setValue($values);
+        }
+
+        return parent::beforeSave();
+    }
 }
