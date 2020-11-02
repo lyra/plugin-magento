@@ -180,7 +180,8 @@ define(
 
                 require(['krypton'], function (KR) {
                     KR.setFormConfig({
-                        formToken: me.getRestFormToken()
+                        formToken: me.getRestFormToken(),
+                        language: me.getLanguage()
                     }).then(
                         function(v) {
                             var KR = v.KR;
@@ -264,7 +265,8 @@ define(
                 ).done(function (response) {
                     if (response.token) {
                         KR.setFormConfig({
-                            formToken: response.token
+                            formToken: response.token,
+                            language: me.getLanguage()
                         }).then(
                             function(v) {
                                 var KR = v.KR;

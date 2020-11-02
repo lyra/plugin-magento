@@ -52,7 +52,7 @@ class Check extends \Magento\Backend\App\Action
 
             $case = $this->checkProcessor->execute($order, $response);
             return $this->renderResponse($response->getOutputForGateway($case));
-        } catch (ResponseException $e) {
+        } catch (\Lyranetwork\Payzen\Model\ResponseException $e) {
             return $this->renderResponse($e->getMessage());
         }
     }

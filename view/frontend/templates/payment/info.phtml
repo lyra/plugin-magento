@@ -43,8 +43,7 @@
 
 <?php
 if ($payment->getCcTransId()) {
-    echo $block->getResultDescHtml();
-    echo '<br /><br />';
+    echo '<br />';
 
     echo '<b>' . __('Transaction ID') . ': </b>' . $block->escapeHtml($payment->getCcTransId());
     echo '<br />';
@@ -60,6 +59,4 @@ if ($payment->getCcTransId()) {
     } else {
         echo $block->getPaymentDetailsHtml(false);
     }
-
-    echo '<br />';
 }

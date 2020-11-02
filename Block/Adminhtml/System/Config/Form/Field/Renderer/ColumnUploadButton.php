@@ -59,7 +59,8 @@ class ColumnUploadButton extends \Magento\Framework\View\Element\AbstractBlock
 
         $html .= '/>';
 
-        $src = $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'payzen/images/cc/<%- logo %>?' . time();
+        $image = '<% if (typeof logo != "undefined" && logo) { %><%- logo %><% } else { %><%- code.toLowerCase() %>.png<% } %>';
+        $src = $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . "payzen/images/cc/$image?" . time();
         $html .= '<img style="margin-left: 10px; vertical-align: middle; height: 18px;" alt="<%- code %>" src="' . $src . '" title="<%- name %>" >';
 
         $html .= '</div>';

@@ -268,6 +268,22 @@ class Payment
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE, $restErrorMsg);
         }
 
+        // 3DS authentication result.
+        $threedsCavv = '';
+        $threedsStatus = '';
+        $threedsAuthType = '';
+        if ($status = $response->get('threeds_status')) {
+            $threedsStatus = $this->getThreedsStatus($status);
+            $threedsCavv = $response->get('threeds_cavv');
+            $threedsAuthType = $response->get('threeds_auth_type');
+        }
+
+        // Save payment infos to sales_flat_order_payment.
+        $order->getPayment()
+            ->setCcSecureVerify($threedsCavv)
+            ->setAdditionalInformation('threeds_status', $threedsStatus)
+            ->setAdditionalInformation('threeds_auth_type', $threedsAuthType);
+
 
         if ($response->isCancelledPayment()) {
             // No more data to save.
@@ -296,7 +312,7 @@ class Payment
         // Set is_fraud_detected flag.
         $order->getPayment()->setIsFraudDetected($response->isSuspectedFraud());
 
-        if ($response->get('card_brand') == 'MULTI') { // Multi brand.
+        if ($response->get('card_brand') === 'MULTI') { // Multi brand.
             $data = json_decode($response->get('payment_seq'));
             $transactions = $data->{'transactions'};
 
@@ -342,18 +358,11 @@ class Payment
 
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE, $userChoice);
         } else {
-            // 3DS authentication result.
-            $threedsCavv = '';
-            if (in_array($response->get('threeds_status'), array('Y', 'YES'))) {
-                $threedsCavv = $response->get('threeds_cavv');
-            }
-
             // Save payment infos to sales_flat_order_payment.
             $order->getPayment()
                 ->setCcExpMonth($response->get('expiry_month'))
                 ->setCcExpYear($response->get('expiry_year'))
-                ->setCcNumberEnc($response->get('card_number'))
-                ->setCcSecureVerify($threedsCavv);
+                ->setCcNumberEnc($response->get('card_number'));
 
             // Save transaction details to sales_payment_transaction.
             $expiry = '';
@@ -438,7 +447,9 @@ class Payment
                         'Means of payment' => $response->get('card_brand'),
                         'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
-                        '3DS Certificate' => $threedsCavv
+                        '3DS Authentication' => $threedsStatus,
+                        '3DS Certificate' => $threedsCavv,
+                        'Authentication Type' => $threedsAuthType
                     ];
 
                     $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
@@ -479,7 +490,9 @@ class Payment
                     'Means of payment' => $response->get('card_brand'),
                     'Card Number' => $response->get('card_number'),
                     'Expiration Date' => $expiry,
-                    '3DS Certificate' => $threedsCavv
+                    '3DS Authentication' => $threedsStatus,
+                    '3DS Certificate' => $threedsCavv,
+                    'Authentication Type' => $threedsAuthType
                 ];
 
                 $this->addTransaction($order->getPayment(), $transactionType, $transactionId, $additionalInfo);
@@ -490,6 +503,26 @@ class Payment
         $order->getPayment()
             ->setTransactionId(null)
             ->setSkipTransactionCreation(true);
+    }
+
+    private function getThreedsStatus($status)
+    {
+        switch ($status) {
+            case 'Y':
+                return 'SUCCESS';
+
+            case 'N':
+                return 'FAILED';
+
+            case 'U':
+                return 'UNAVAILABLE';
+
+            case 'A':
+                return 'ATTEMPT';
+
+            default :
+                return $status;
+        }
     }
 
     public function saveIdentifier(
@@ -612,6 +645,25 @@ class Payment
         if (! $autoCapture || ($order->getStatus() !== 'processing') || ! $order->canInvoice()) {
             // Creating invoice not allowed.
             return;
+        }
+
+        // Check if an invoice already exists for this order.
+        if ($order->hasInvoices()) {
+            $alreadyInvoiced = false;
+            $transId = $order->getPayment()->getLastTransId();
+
+            $invoices = $order->getInvoiceCollection();
+            foreach ($invoices as $invoice) {
+                if ($invoice->getTransactionId() === $transId) {
+                    $alreadyInvoiced = true;
+                    break;
+                }
+            }
+
+            if ($alreadyInvoiced) {
+                $this->dataHelper->log("Invoice already exists for order #{$order->getIncrementId()} with transaction ID #{$transId}.");
+                return;
+            }
         }
 
         $this->dataHelper->log("Creating invoice for order #{$order->getIncrementId()}.");

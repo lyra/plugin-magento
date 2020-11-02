@@ -25,10 +25,16 @@ class ShipOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serial
                 $this->setValue([]);
             } else {
                 $i = 0;
-                foreach ($values as $value) {
+                foreach ($values as $id => $value) {
                     $i ++;
 
                     if (empty($value)) {
+                        continue;
+                    }
+
+                    if (! isset($value['type']) || empty($value['type'])
+                        || ! isset($value['speed']) || empty($value['speed'])) {
+                        unset($values[$id]);
                         continue;
                     }
 
@@ -36,6 +42,8 @@ class ShipOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serial
                         $this->throwException('FacilyPay Oney label', $i);
                     }
                 }
+
+                $this->setValue($values);
             }
         } else {
             $this->setValue([]);

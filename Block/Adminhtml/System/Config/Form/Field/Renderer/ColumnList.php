@@ -16,12 +16,13 @@ class ColumnList extends \Magento\Framework\View\Element\AbstractBlock
         $column = $this->getColumn();
 
         $html = '<select name="' . $this->getInputName() . '"';
-        $html .= ' class="' . ($column['class'] ? $column['class'] : 'input-text' . '"');
+        $html .= ' class="' . ($column['class'] ? $column['class'] : 'input-text') . '"';
         $html .= $column['style'] ? ' style="' . $column['style'] . '"' : '';
         $html .= '>';
 
         foreach ($this->getOptions() as $code => $name) {
-            $html .= '<option value="' . $code . '"<% if (' . $this->getColumnName() . ' == "' . $code . '") { %> selected="selected"<% } %>>' . __($name) . '</option>';
+            $html .= '<option value="' . $code . '"<% if (typeof ' . $this->getColumnName() . ' != "undefined" && '
+                . $this->getColumnName() . ' == "' . $code . '") { %> selected="selected"<% } %>>' . __($name) . '</option>';
         }
 
         $html .= '</select>';

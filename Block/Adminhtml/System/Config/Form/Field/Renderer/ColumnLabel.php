@@ -16,7 +16,7 @@ class ColumnLabel extends \Magento\Framework\View\Element\AbstractBlock
         $column = $this->getColumn();
 
         $codeInputName = str_replace($this->getColumnName(), 'code', $this->getInputName());
-        $html = '<input type="text" value="<%- code %>" name="' . $codeInputName . '" style="width: 0px; visibility: hidden;">';
+        $html = '<input type="hidden" value="<%- code %>" name="' . $codeInputName . '">';
 
         $html .= '<div';
         $html .= ' class="' . ($column['class'] ? $column['class'] : 'input-text') . '"';
