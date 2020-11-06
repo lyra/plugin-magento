@@ -1,5 +1,14 @@
+1.11.4, 2020-11-06:
+- [embedded] Bug fix: Force redirection when there is an error in payment form token creation.
+- [embedded] Bug fix: Display 3DS results for REST API payments.
+- [embedded] Bug fix: Empty cart to avoid double payments with REST API.
+- [embedded] Bug fix: Embedded payment fields not correctly displayed since the last gateway JS library delivery.
+- Bug fix: Do not re-create invoice if it already exists.
+- Some minor fixes relative to plugin configuration update.
+
 1.11.3, 2020-10-14:
 - [oney] Do not display payment installments for buyer.
+- Update payment means list.
 
 1.11.2, 2020-08-19:
 - [embedded] Bug fix: Do not cancel orders in status "Fraud suspected" when new IPN calls are made.

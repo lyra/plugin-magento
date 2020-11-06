@@ -221,8 +221,13 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         $session = Mage::getSingleton('checkout/session');
         $quote = $session->getQuote();
 
-        if (! $quote || ! $quote->getId()) {
+        if (! $quote || ! $quote->getId() || ($quote->getGrandTotal() <= 0)) {
             $this->_getHelper()->log('Cannot create form token. Empty quote passed.');
+            return false;
+        }
+
+        // If error when creating form token, we will force redirection.
+        if ($session->getPayzenForceRedirection()) {
             return false;
         }
 
@@ -248,17 +253,17 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
 
         $login = $this->_getHelper()->getCommonConfigData('site_id');
 
-        // Perform our request.
-        $client = new Lyranetwork_Payzen_Model_Api_Rest(
-            $this->_getHelper()->getCommonConfigData('rest_url'),
-            $login,
-            $this->_getPassword()
-        );
-
         try {
+            // Perform our request.
+            $client = new Lyranetwork_Payzen_Model_Api_Rest(
+                $this->_getHelper()->getCommonConfigData('rest_url'),
+                $login,
+                $this->_getPassword()
+            );
+
             $response = $client->post('V4/Charge/CreatePayment', json_encode($data));
 
-            if ($response['status'] != 'SUCCESS') {
+            if ($response['status'] !== 'SUCCESS') {
                 $msg = "Error while creating payment form token for quote #{$quote->getId()}, reserved order ID #{$quote->getReservedOrderId()}: ";
                 $msg .= $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
                 $this->_getHelper()->log($msg);
@@ -283,6 +288,10 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         } catch (\Exception $e) {
             $this->_getHelper()->log($e->getMessage());
             $token = false;
+        }
+
+        if (! $token) {
+            $session->setPayzenForceRedirection(true);
         }
 
         return $token;

@@ -75,7 +75,8 @@ class Lyranetwork_Payzen_Block_Review extends Mage_Core_Block_Template
     protected function _isRestMode()
     {
         $check = ($this->_getMethodInstance() instanceof Lyranetwork_Payzen_Model_Payment_Standard)
-            && $this->_getMethodInstance()->getConfigData('card_info_mode') == '4';
+            && ($this->_getMethodInstance()->getConfigData('card_info_mode') == '4')
+            && $this->_getMethodInstance()->getFormToken(false);
 
         return $check;
     }

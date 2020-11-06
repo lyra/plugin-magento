@@ -146,7 +146,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Other_PaymentMeans
     protected function _toHtml()
     {
         $script = '<script type="text/javascript">
-                //<![CDATA[
                 document.observe("dom:loaded", function() {
                     $$("select.payzen_list_means, select.payzen_list_validation_mode, select.payzen_list_cart_data").each(function(elt) {
                         var value = elt.readAttribute("currentvalue") || elt.readAttribute("defaultvalue");
@@ -171,7 +170,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Other_PaymentMeans
                         }
                     });
                 });
-                //]]>
                 </script>';
 
         return parent::_toHtml() . "\n" . $script;

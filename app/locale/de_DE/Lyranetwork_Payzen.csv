@@ -308,8 +308,7 @@
 "Expiration Date","Verfallsdatum"
 "3DS Authentication","3DS Authentication"
 "3DS Certificate","3DS Zertifikat"
-"YES","JA"
-"NO","NEIN"
+"Authentication Type","Authentifizierungsart"
 "Fraud Control Result","Fraud Control-Ergebnis"
 "Advanced Risk Assessment Result","Erweiterte Risikoeinschätzung Ergebnis"
 

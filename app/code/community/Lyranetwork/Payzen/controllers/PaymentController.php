@@ -111,8 +111,13 @@ class Lyranetwork_Payzen_PaymentController extends Mage_Core_Controller_Front_Ac
             }
         }
 
+        $isIdentifier = $this->getRequest()->getPost('is_identifier');
+        if ($isIdentifier === null) {
+            $isIdentifier = Mage::getSingleton('checkout/session')->getIdentifierPayment();
+        }
+
         $model = Mage::getModel('payzen/payment_standard');
-        $token = $model->getFormToken(Mage::getSingleton('checkout/session')->getIdentifierPayment());
+        $token = $model->getFormToken($isIdentifier);
 
         if ($token) {
             $result['formToken'] = $token;
@@ -120,6 +125,38 @@ class Lyranetwork_Payzen_PaymentController extends Mage_Core_Controller_Front_Ac
 
         $quote = $this->getCheckout()->getQuote();
         $quote->collectTotals()->save();
+
+        $result['success'] = true;
+        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($result));
+    }
+
+    /**
+     * Action called to clear quote for a payment by REST API.
+     */
+    public function restClearCartAction()
+    {
+        if ($this->_ajaxExpire()) {
+            return;
+        }
+
+        $result = array();
+
+        // Clear quote data.
+        $this->getCheckout()->setQuoteId(null);
+        $this->getCheckout()->setLastSuccessQuoteId(null);
+
+        $quote = $this->getCheckout()->getQuote();
+
+        if ($quote->getId()) {
+            $quote->getPayment()->unsAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::TOKEN_DATA);
+            $quote->getPayment()->unsAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::TOKEN);
+            $quote->getPayment()->unsAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::TOKEN_DATA . '_identifier');
+            $quote->getPayment()->unsAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::TOKEN . '_identifier');
+
+            // Disable quote.
+            $quote->setIsActive(false)->save();
+            $this->_getHelper()->log("Cleared quote, reserved order ID: #{$quote->getReservedOrderId()}.");
+        }
 
         $result['success'] = true;
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($result));

@@ -17,13 +17,11 @@
         <?php echo $this->getLoaderHtml(); ?>
 
         <script type="text/javascript">
-        //<![CDATA[
             if (window.top) {
                 window.top.location = "<?php echo $this->getForwardUrl(); ?>";
             } else {
                 window.location = "<?php echo $this->getForwardUrl(); ?>";
             }
-        //]]>
         </script>
     </body>
 </html>

@@ -14,7 +14,6 @@ $buttonTitle = $this->getConfigData('one_click_title') ? $this->getConfigData('o
 if ($product->isSaleable() && $this->isOneclickAvailable()) :
 ?>
     <script type="text/javascript">
-    //<![CDATA[
         var payzenOneclickInsert = function () {
             var btnHtml = '<button type="button" title="<?php echo $buttonTitle ?>" class="button btn-cart" onclick="payzenProductOneclickPayment(this);" style="width: auto;">' +
                           '  <span><span><?php echo $buttonTitle ?></span></span>' +
@@ -75,6 +74,5 @@ if ($product->isSaleable() && $this->isOneclickAvailable()) :
                 Event.observe($$('.block-related .block-subtitle a').first(), 'click', payzenUpdateShippingBlock);
             }
         });
-    //]]>
     </script>
 <?php endif; ?>

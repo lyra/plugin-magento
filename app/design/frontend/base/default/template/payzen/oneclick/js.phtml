@@ -7,11 +7,17 @@
  * @copyright Lyra Network
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
+
+$model = Mage::getModel('payzen/payment_standard');
+$session = Mage::getSingleton('customer/session');
+
+$paymentByTokenActive = $model->getConfigData('one_click_active'); // Payment by token active?
+$customer = $session->getCustomer(); // Logged-in customer.
+$isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenIdentifier();
 ?>
 
-<?php if (Mage::getModel('payzen/payment_standard')->isOneclickAvailable()) : ?>
+<?php if ($isPaymentByToken) : ?>
     <script type="text/javascript">
-    //<![CDATA[
         var payzenUpdatePaymentBlock = function(blockName) {
             $$('ul#payment_form_payzen_standard li').invoke('hide');
             $$('ul#payment_form_payzen_standard li input').invoke('disable');
@@ -25,7 +31,11 @@
         var onMethodPayzenStandardClick = function(event) {
             payzenUpdatePaymentBlock.delay(0.2, 'id');
         };
+    </script>
+<?php endif;?>
 
+<?php  if ($model->isOneclickAvailable()) : ?>
+    <script type="text/javascript">
         var payzenUpdateShippingBlock = function(event) {
             var form, params = {};
 
@@ -96,6 +106,5 @@
             form.action = "<?php echo $this->getUrl('payzen/payment/oneclickPayment', array('_secure' => true)) ?>";
             form.submit();
         };
-    //]]>
     </script>
 <?php endif;?>

@@ -63,7 +63,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_SubSectionTitle ext
 
         $script = '';
         $script .= '<script type="text/javascript">
-                    // <![CDATA[
                        function payzenSubSectionToggle() {';
 
         foreach ($fields as $field) {
@@ -71,7 +70,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_SubSectionTitle ext
         }
 
         $script .= '   }
-                    //]]>
                     </script>';
 
         return $script;

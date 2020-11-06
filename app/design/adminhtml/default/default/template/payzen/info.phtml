@@ -81,12 +81,14 @@ if ($info->getCcTransId()) {
         }
 
         echo Mage::helper('payzen')->__('3DS Authentication') . ': ';
-        if ($info->getCcSecureVerify()) {
-            echo  Mage::helper('payzen')->__('YES');
+        if ($threedsStatus = $info->getAdditionalInformation('threeds_status')) {
+            echo $threedsStatus;
             echo '<br />';
-            echo Mage::helper('payzen')->__('3DS Certificate') . ': ' . $info->getCcSecureVerify();
+            echo ($threedsCavv = $info->getCcSecureVerify()) ? Mage::helper('payzen')->__('3DS Certificate') . ': ' . $threedsCavv : '';
+            echo '<br />';
+            echo ($threedsAuthType = $info->getAdditionalInformation('threeds_auth_type')) ? Mage::helper('payzen')->__('Authentication Type') . ': ' . $threedsAuthType : '';
         } else {
-            echo  Mage::helper('payzen')->__('NO');
+            echo 'UNAVAILABLE';
         }
     }
 
@@ -96,9 +98,9 @@ if ($info->getCcTransId()) {
         echo Mage::helper('payzen')->__('Fraud Control Result') . ': ';
 
         $colors = array(
-                'OK' => '#4F8A10',
-                'WARNING' => '#9F6000',
-                'ERROR' => '#D8000C'
+            'OK' => '#4F8A10',
+            'WARNING' => '#9F6000',
+            'ERROR' => '#D8000C'
         );
 
         foreach ($riskControl as $key => $value) {

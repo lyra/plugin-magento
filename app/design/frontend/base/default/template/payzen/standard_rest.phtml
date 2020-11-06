@@ -15,7 +15,7 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
 <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none; margin-left: 15px;">
 <?php if ($isPaymentByToken) : ?>
     <li class="payzen-standard-id-block">
-        <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" disabled="disabled">
+        <input type="hidden" value="1" id="payzen_standard_use_identifier" name="payment[payzen_standard_use_identifier]" disabled="disabled">
         <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '') ?></span>
     </li>
 <?php endif;?>
@@ -27,7 +27,7 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
             <div class="kr-security-code"></div>
 
             <div style="display: none;">
-                <button type="button" id="payzen_rest_hidden_button" class="kr-payment-button"></button>
+                <button type="button" class="kr-payment-button"></button>
             </div>
 
             <div class="kr-form-error"></div>
@@ -54,7 +54,6 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
 </ul>
 
 <script type="text/javascript">
-//<![CDATA[
     window.FORM_TOKEN = '<?php echo $this->getFormToken(); ?>';
 
 <?php if ($isPaymentByToken): ?>
@@ -70,7 +69,7 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
     };
 <?php endif; ?>
 
-    window.payzenLoadRestScript = function(isPaymentByToken) {
+    window.payzenLoadRestScript = function(isPaymentByToken, init) {
         var paymentToken = FORM_TOKEN;
 
         if (typeof IDENTIFIER_FORM_TOKEN !== 'undefined') {
@@ -80,22 +79,24 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
             payzenUpdatePaymentBlock(isPaymentByToken);
         }
 
-        if (! KR.vueReady) {
-            KR.setFormConfig({
-                formToken: paymentToken
-            }).then(
-                function(v) {
-                    payzenInitRestEvents(v.KR);
-                }
-            );
-        } else {
-            var errorElt = $$('#payzen_standard_rest_wrapper .kr-form-error').first();
+        var errorElt = $$('#payzen_standard_rest_wrapper .kr-form-error').first();
+        if (errorElt) {
             errorElt.update('');
-
-            KR.setFormConfig({
-                formToken: paymentToken
-            });
         }
+
+        // Re-create UI if this is an initial loading.
+        if (init) {
+            KR.removeForms();
+        }
+
+        KR.setFormConfig({
+            formToken: paymentToken,
+            language: '<?php echo $this->getLanguage(); ?>'
+        }).then(function(v) {
+            if (init) {
+                payzenInitRestEvents(v.KR);
+            }
+        });
     };
 
     window.payzenInitRestEvents = function(KR) {
@@ -135,6 +136,22 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
             var errorElt = $$('#payzen_standard_rest_wrapper .kr-form-error').first();
             errorElt.update('');
         });
+
+        KR.onSubmit(function(e) {
+            var request = new Ajax.Request(
+                "<?php echo $this->getUrl('payzen/payment/restClearCart', array('_secure' => true)) ?>",
+                {
+                    method: 'post',
+                    parameters: {},
+                    onSuccess: function(response) {
+                        // Quote disabled successfully, do nothing on client side.
+                        console.log('Quote disabled successfully on payment success.');
+                    }
+                }
+            );
+
+            return true;
+        });
     };
 
     var payzenSelectedMethod = function() {
@@ -151,7 +168,7 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
         return method;
     };
 
-    var payzenDoLoadRestScript = function() {
+    /* var payzenDoLoadRestScript = function() {
         if (payzenSelectedMethod() === 'payzen_standard') {
             // Load script immediately.
             payzenLoadRestScript.defer(true);
@@ -161,7 +178,7 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
                 payzenLoadRestScript(true);
             });
         }
-    };
+    }; */
 
     var payzenUpdateFormToken = function(params, resetLoaderCallback) {
         var request = new Ajax.Request(
@@ -171,23 +188,23 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
                 parameters: params || {},
                 onSuccess: function(transport) {
                     if (transport && transport.responseText) {
+                        var response = {};
                         try {
                             response = eval('(' + transport.responseText + ')');
                         } catch (e) {
-                            response = {};
+                            // Nothing to do here.
                         }
 
                         if (response.success) {
                             // Update form token and call REST API to do payment.
                             if (response.formToken) {
                                 KR.setFormConfig({
-                                    formToken: response.formToken
-                                }).then(
-                                    function(v) {
-                                        var KR = v.KR;
-                                        KR.submit();
-                                    }
-                                );
+                                    formToken: response.formToken,
+                                    language: '<?php echo $this->getLanguage(); ?>'
+                                }).then(function(v) {
+                                    var KR = v.KR;
+                                    KR.submit();
+                                });
                             } else {
                                 // Form token is the same because data was unchanged.
                                 KR.submit();
@@ -215,16 +232,16 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
         );
     };
 
+    // payzenDoLoadRestScript.defer();
+    payzenLoadRestScript.defer(true, true);
+
     if (typeof checkout !== 'undefined') { // Default Magento checkout.
-        payzenDoLoadRestScript();
         checkout.updateFormToken = payzenUpdateFormToken.bind({});
     } else {
         Event.observe(window, 'load', function() {
             var placeOrderBtn = $('onestepcheckout-button-place-order');
 
             if (placeOrderBtn) { // OneStepCheckout.
-                payzenDoLoadRestScript();
-
                 placeOrderBtn.onclick = function(e) {
                     if (payzenSelectedMethod() === 'payzen_standard') {
                         KR.validateForm().then(function(v) {
@@ -244,7 +261,8 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
                                 placeOrderBtn.removeClassName('onestepcheckout-btn-checkout');
                                 placeOrderBtn.addClassName('place-order-loader');
 
-                                payzenUpdateFormToken({ skip_agreement: 1 }, function() {
+                                var isIdentifier = $('payzen_standard_use_identifier') ? (! $('payzen_standard_use_identifier').disabled | 0) : 0;
+                                payzenUpdateFormToken({ skip_agreement: 1, is_identifier: isIdentifier }, function() {
                                     $('onestepcheckout-place-order-loading').hide();
 
                                     placeOrderBtn.disabled = false;
@@ -252,10 +270,10 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
                                     placeOrderBtn.removeClassName('place-order-loader');
                                 });
                             }
-                          }).catch(function(v) {
-                              var result = v.result;
-                              return result.doOnError();
-                          });
+                        }).catch(function(v) {
+                            var result = v.result;
+                            return result.doOnError();
+                        });
                     } else {
                         oscPlaceOrder(placeOrderBtn);
                     }
@@ -362,5 +380,4 @@ $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenId
             ACQ_999: 'Ocurrió un error en el proceso de pago.'
         }
     };
-//]]>
 </script>

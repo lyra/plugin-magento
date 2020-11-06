@@ -10,9 +10,7 @@
 
 class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
 {
-
     /**
-     *
      * @var array a global var to easily enable/disable features
      */
     public static $pluginFeatures = array(
@@ -90,8 +88,8 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     {
         // Get group title.
         $config = Mage::getModel('core/config_base');
-        $config->loadFile(Mage::getConfig()->getModuleDir('etc', 'Lyranetwork_Payzen').DS.'system.xml');
-        $node = $config->getNode('sections/payment/groups/'.$group);
+        $config->loadFile(Mage::getConfig()->getModuleDir('etc', 'Lyranetwork_Payzen') . DS . 'system.xml');
+        $node = $config->getNode('sections/payment/groups/' . $group);
 
         return Mage::helper('payzen')->__((string) $node->label);
     }
@@ -207,7 +205,7 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         if (defined('Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW')) {
             return Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
         } else {
-            // For magento 1.4.0.x
+            // For magento 1.4.0.x.
             return 'payment_review';
         }
     }
@@ -247,7 +245,7 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         $currentMethod = $this->_getCallerMethod();
 
         $log  = '';
-        $log .= 'PayZen '. $this->getCommonConfigData('plugin_version');
+        $log .= 'PayZen ' . $this->getCommonConfigData('plugin_version');
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
 

@@ -24,7 +24,7 @@ class Lyranetwork_Payzen_Block_Info extends Mage_Payment_Block_Info
 
         $html = '';
 
-        $frontInfos = array('Transaction Type', 'Amount', 'Transaction ID', 'Transaction UUID', 'Means of Payment', '3DS Authentication');
+        $frontInfos = array('Transaction Type', 'Amount', 'Transaction ID', 'Transaction UUID', 'Means of Payment');
 
         foreach ($collection as $item) {
             $html .= '<hr />';
