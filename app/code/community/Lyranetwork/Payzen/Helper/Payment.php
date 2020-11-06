@@ -76,6 +76,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         // Clear quote data.
         $controller->getCheckout()->setQuoteId(null);
         $controller->getCheckout()->setLastSuccessQuoteId(null);
+        $controller->getCheckout()->unsPayzenForceRedirection();
 
         // Inactivate quote.
         $quote = Mage::getModel('sales/quote')->load($order->getQuoteId());
@@ -160,7 +161,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 // Display success page.
                 $controller->redirectResponse($order, self::SUCCESS, true /* IPN URL warn in TEST mode */);
             } else {
-                $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has failed.");
+                $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has been refused/cancelled.");
 
                 // Cancel order.
                 $this->_cancelOrder($order, $response);
@@ -197,10 +198,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 $controller->redirectResponse($order, $case);
             } else {
                 // This is an error case, the client returns with an error but the payment already has been accepted.
-                $this->_getHelper()->log(
-                    "Order #{$order->getIncrementId()} has been validated but we receive a payment error code!",
-                    Zend_Log::ERR
-                );
+                $msg = "Invalid payment result received for already saved order #{$order->getIncrementId()}.";
+                $msg .= " Payment result : {$response->getTransStatus()}, Order status : {$order->getStatus()}.";
+                $this->_getHelper()->log($msg, Zend_Log::ERR);
                 $controller->redirectError($order);
             }
         }
@@ -272,7 +272,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 }
             } else {
                 $this->_getHelper()->log(
-                    "Payment for order #{$order->getIncrementId()} has been invalidated by notification URL."
+                    "Payment for order #{$order->getIncrementId()} has been refused/cancelled by notification URL."
                 );
 
                 // Cancel order.
@@ -351,10 +351,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 $controller->getResponse()->setBody($response->getOutputForPlatform('payment_ko_already_done'));
             } else {
                 // This is an error case, the client returns with an error but the payment already has been accepted.
-                $this->_getHelper()->log(
-                    "Order #{$order->getIncrementId()} has been validated but we receive a payment error code!",
-                    Zend_Log::ERR
-                );
+                $msg = "Invalid payment result received for already saved order #{$order->getIncrementId()}.";
+                $msg .= " Payment result : {$response->getTransStatus()}, Order status : {$order->getStatus()}.";
+                $this->_getHelper()->log($msg, Zend_Log::ERR);
                 $controller->getResponse()->setBody($response->getOutputForPlatform('payment_ko_on_order_ok'));
             }
         }
@@ -422,7 +421,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         $quote->setIsActive(false)->save();
 
-        $this->_getHelper()->log("Request authenticated for quote #{$quote->getId()}.");
+        $this->_getHelper()->log("Request authenticated for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
         $order = Mage::getModel('sales/order');
         $order->loadByIncrementId($quote->getReservedOrderId());
@@ -457,7 +456,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 // Display success page.
                 $controller->redirectResponse($order, self::SUCCESS, true /* IPN URL warn in TEST mode */);
             } else {
-                $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has failed.");
+                $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has been refused/cancelled.");
 
                 // Cancel order.
                 $this->_cancelOrder($order, $response);
@@ -491,10 +490,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 $controller->redirectResponse($order, $case);
             } else {
                 // This is an error case, the client returns with an error but the payment already has been accepted.
-                $this->_getHelper()->log(
-                    "Order #{$order->getIncrementId()} has been validated but we receive a payment error code!",
-                    Zend_Log::ERR
-                );
+                $msg = "Invalid payment result received for already saved order #{$order->getIncrementId()}.";
+                $msg .= " Payment result : {$response->getTransStatus()}, Order status : {$order->getStatus()}.";
+                $this->_getHelper()->log($msg, Zend_Log::ERR);
                 $controller->redirectError($order);
              }
         }
@@ -554,8 +552,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         // Case of failure when retries are enabled, do nothing before last attempt.
         if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED')) {
-            $this->_getHelper()->log("Payment is not accepted but buyer can try to re-order. Do not create order at this time. Quote ID: #{$quoteId},
-                    reserved order ID: #{$quote->getReservedOrderId()}.");
+            $msg = 'Payment is not accepted but buyer can try to re-order. Do not create order at this time.';
+            $msg .= " Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.";
+            $this->_getHelper()->log($msg);
             $controller->getResponse()->setBody($response->getOutputForPlatform('payment_ko_bis'));
             return;
         }
@@ -609,7 +608,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 }
             } else {
                 $this->_getHelper()->log(
-                    "Payment for order #{$order->getIncrementId()} has been invalidated by notification URL."
+                    "Payment for order #{$order->getIncrementId()} has been refused/cancelled by notification URL."
                 );
 
                 // Cancel order.
@@ -640,10 +639,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 $controller->getResponse()->setBody($response->getOutputForPlatform('payment_ko_already_done'));
             } else {
                 // This is an error case, the client returns with an error but the payment already has been accepted.
-                $this->_getHelper()->log(
-                    "Order #{$order->getIncrementId()} has been validated but we receive a payment error code!",
-                    Zend_Log::ERR
-                );
+                $msg = "Invalid payment result received for already saved order #{$order->getIncrementId()}.";
+                $msg .= " Payment result : {$response->getTransStatus()}, Order status : {$order->getStatus()}.";
+                $this->_getHelper()->log($msg, Zend_Log::ERR);
                 $controller->getResponse()->setBody($response->getOutputForPlatform('payment_ko_on_order_ok'));
             }
         }
@@ -730,6 +728,22 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             ->setAdditionalInformation(self::ALL_RESULTS, serialize($response->getAllResults()))
             ->setAdditionalInformation(self::TRANS_UUID, $response->get('trans_uuid'));
 
+        // 3DS authentication result.
+        $threedsCavv = '';
+        $threedsStatus = '';
+        $threedsAuthType = '';
+        if ($status = $response->get('threeds_status')) {
+            $threedsStatus = $this->getThreedsStatus($status);
+            $threedsCavv = $response->get('threeds_cavv');
+            $threedsAuthType = $response->get('threeds_auth_type');
+        }
+
+        // Save payment infos to sales_flat_order_payment.
+        $order->getPayment()
+            ->setCcSecureVerify($threedsCavv)
+            ->setAdditionalInformation('threeds_status', $threedsStatus)
+            ->setAdditionalInformation('threeds_auth_type', $threedsAuthType);
+
         if ($response->isCancelledPayment()) {
             // No more data to save.
             return;
@@ -796,17 +810,11 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 }
             }
         } else {
-            // 3DS authentication result
-            $threedsCavv = '';
-            if (in_array($response->get('threeds_status'), array('Y', 'YES'))) {
-                $threedsCavv = $response->get('threeds_cavv');
-            }
-
             // Save payment infos to sales_flat_order_payment.
-            $order->getPayment()->setCcExpMonth($response->get('expiry_month'))
+            $order->getPayment()
+                ->setCcExpMonth($response->get('expiry_month'))
                 ->setCcExpYear($response->get('expiry_year'))
-                ->setCcNumberEnc($response->get('card_number'))
-                ->setCcSecureVerify($threedsCavv);
+                ->setCcNumberEnc($response->get('card_number'));
 
             // Format card expiration data.
             $expiry = '';
@@ -887,7 +895,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                         'Means of Payment' => $response->get('card_brand'),
                         'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
-                        '3DS Authentication' => $threedsCavv
+                        '3DS Authentication' => $threedsStatus,
+                        '3DS Certificate' => $threedsCavv,
+                        'Authentication Type' => $threedsAuthType
                     );
 
                     if ($transactionType) {
@@ -925,7 +935,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                     'Means of Payment' => $response->get('card_brand'),
                     'Card Number' => $response->get('card_number'),
                     'Expiration Date' => $expiry,
-                    '3DS Authentication' => $threedsCavv
+                    '3DS Authentication' => $threedsStatus,
+                    '3DS Certificate' => $threedsCavv,
+                    'Authentication Type' => $threedsAuthType
                 );
 
                 if ($transactionType) {
@@ -936,6 +948,26 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         // Skip automatic transaction creation.
         $order->getPayment()->setTransactionId(null)->setSkipTransactionCreation(true);
+    }
+
+    private function getThreedsStatus($status)
+    {
+        switch ($status) {
+            case 'Y':
+                return 'SUCCESS';
+
+            case 'N':
+                return 'FAILED';
+
+            case 'U':
+                return 'UNAVAILABLE';
+
+            case 'A':
+                return 'ATTEMPT';
+
+            default :
+                return $status;
+        }
     }
 
     private function _saveIdentifier(Mage_Sales_Model_Order $order, Lyranetwork_Payzen_Model_Api_Response $response)
@@ -1036,6 +1068,25 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         if (! $autoCapture || ($order->getState() !== 'processing') || ! $order->canInvoice()) {
             // Creating invoice not allowed.
             return;
+        }
+
+        // Check if an invoice already exists for this order.
+        if ($order->hasInvoices()) {
+            $alreadyInvoiced = false;
+            $transId = $order->getPayment()->getLastTransId();
+
+            $invoices = $order->getInvoiceCollection();
+            foreach ($invoices as $invoice) {
+                if ($invoice->getTransactionId() === $transId) {
+                    $alreadyInvoiced = true;
+                    break;
+                }
+            }
+
+            if ($alreadyInvoiced) {
+                $this->_getHelper()->log("Invoice already exists for order #{$order->getIncrementId()} with transaction ID #{$transId}.");
+                return;
+            }
         }
 
         $this->_getHelper()->log("Creating invoice for order #{$order->getIncrementId()}.");

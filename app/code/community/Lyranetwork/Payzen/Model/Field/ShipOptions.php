@@ -21,10 +21,16 @@ class Lyranetwork_Payzen_Model_Field_ShipOptions extends Lyranetwork_Payzen_Mode
             $this->setValue(array());
         } else {
             $i = 0;
-            foreach ($values as $value) {
+            foreach ($values as $id => $value) {
                 $i++;
 
                 if (empty($value)) {
+                    continue;
+                }
+
+                if (! isset($value['type']) || empty($value['type'])
+                    || ! isset($value['speed']) || empty($value['speed'])) {
+                    unset($values[$id]);
                     continue;
                 }
 
@@ -36,6 +42,8 @@ class Lyranetwork_Payzen_Model_Field_ShipOptions extends Lyranetwork_Payzen_Mode
                     );
                 }
             }
+
+            $this->setValue($values);
         }
 
         return parent::_beforeSave();

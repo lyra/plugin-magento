@@ -13,18 +13,18 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
     public function convertRestResult($answer)
     {
         if (! is_array($answer) || empty($answer)) {
-            return [];
+            return array();
         }
 
         $transactions = $this->getProperty($answer, 'transactions');
 
         if (! is_array($transactions) || empty($transactions)) {
-            return [];
+            return array();
         }
 
         $transaction = $transactions[0];
 
-        $response = [];
+        $response = array();
 
         $response['vads_result'] = $this->getProperty($transaction, 'errorCode') ? $this->getProperty($transaction, 'errorCode') : '00';
         $response['vads_extra_result'] = $this->getProperty($transaction, 'detailedErrorCode');
@@ -86,11 +86,19 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
                     $response['vads_auth_result'] = $this->getProperty($authorizationResponse, 'authorizationResult');
                 }
 
-                if (($threeDSResponse = $this->getProperty($cardDetails, 'threeDSResponse'))
-                    && ($authenticationResultData = $this->getProperty($threeDSResponse, 'authenticationResultData'))) {
-                        $response['vads_threeds_cavv'] = $this->getProperty($authenticationResultData, 'cavv');
-                        $response['vads_threeds_status'] = $this->getProperty($authenticationResultData, 'status');
+                if (($authenticationResponse = self::getProperty($cardDetails, 'authenticationResponse'))
+                    && ($value = self::getProperty($authenticationResponse, 'value'))) {
+                    $response['vads_threeds_status'] = self::getProperty($value, 'status');
+                    $response['vads_threeds_auth_type'] = self::getProperty($value, 'authenticationType');
+                    if ($authenticationValue = self::getProperty($value, 'authenticationValue')) {
+                        $response['vads_threeds_cavv'] = self::getProperty($authenticationValue, 'value');
                     }
+                } elseif (($threeDSResponse = $this->getProperty($cardDetails, 'threeDSResponse'))
+                    && ($authenticationResultData = $this->getProperty($threeDSResponse, 'authenticationResultData'))) {
+                    $response['vads_threeds_cavv'] = $this->getProperty($authenticationResultData, 'cavv');
+                    $response['vads_threeds_status'] = $this->getProperty($authenticationResultData, 'status');
+                    $response['vads_threeds_auth_type'] = self::getProperty($authenticationResultData, 'threeds_auth_type');
+                }
             }
 
             if ($fraudManagement = $this->getProperty($transactionDetails, 'fraudManagement')) {

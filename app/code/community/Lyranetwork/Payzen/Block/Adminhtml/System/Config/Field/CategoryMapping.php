@@ -119,7 +119,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_CategoryMapping
     protected function _toHtml()
     {
         $script = '<script type="text/javascript">
-                //<![CDATA[
                 document.observe("dom:loaded", function() {
                     $$("select.payzen_list_payzen_category").each(function(elt) {
                         var value = elt.readAttribute("currentvalue");
@@ -143,7 +142,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_CategoryMapping
 
         $script .= '
                 });
-                //]]>
                 </script>';
 
         return parent::_toHtml() . "\n" . $script;

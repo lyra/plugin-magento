@@ -77,7 +77,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Oney3x4x_PaymentOpt
         if ($this->getElement()->getCanUseWebsiteValue() || $this->getElement()->getCanUseDefaultValue()) {
             $script .= '
                 <script type="text/javascript">
-                //<![CDATA[
                   document.observe("dom:loaded", function() {';
 
             if ($this->getElement()->getDisabled()) {
@@ -93,7 +92,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Oney3x4x_PaymentOpt
                       );
                     });
                   });
-                //]]>
                 </script>';
         }
 

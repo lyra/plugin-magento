@@ -10,7 +10,6 @@
 ?>
 
 <script type="text/javascript">
-//<![CDATA[
     Review.prototype.nextStep = function(transport) {
         if (transport) {
             var response = transport.responseJSON || transport.responseText.evalJSON(true) || {};
@@ -87,7 +86,6 @@
         checkout.setLoadWaiting(false, false);
         checkout.changeSection('payment');
     });
-//]]>
 </script>
 
 <div id="payzen_iframe_actions" style="display: none;" class="payzen-iframe">

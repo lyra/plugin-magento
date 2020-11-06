@@ -10,7 +10,6 @@
 ?>
 
 <script type="text/javascript">
-//<![CDATA[
     if ((typeof payment !== 'undefined') && (payment.currentMethod === 'payzen_standard')) {
         // Default Magento checkout.
         KR.validateForm().then(function(v) {
@@ -42,5 +41,4 @@
             return result.doOnError();
         });
     }
-//]]>
 </script>

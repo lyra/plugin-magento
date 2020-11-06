@@ -49,16 +49,6 @@ if ($info->getCcTransId()) {
         }
 
         echo Mage::helper('payzen')->__('Means of Payment') . ': ' . $info->getCcType();
-        echo '<br />';
-
-        echo Mage::helper('payzen')->__('3DS Authentication') . ': ';
-        if ($info->getCcSecureVerify()) {
-            echo  Mage::helper('payzen')->__('YES');
-            echo '<br />';
-            echo Mage::helper('payzen')->__('3DS Certificate') . ': ' . $info->getCcSecureVerify();
-        } else {
-            echo  Mage::helper('payzen')->__('NO');
-        }
     }
 
     echo '<br />';
