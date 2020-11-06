@@ -188,7 +188,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_ShipOptions
     protected function _toHtml()
     {
         $script = '<script type="text/javascript">
-                //<![CDATA[
                 document.observe("dom:loaded", function() {
                     $$(
                         "select.payzen_list_type",
@@ -232,7 +231,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_ShipOptions
                         }
                     });
                 });
-                //]]>
                 </script>';
 
         return parent::_toHtml() . "\n" . $script;

@@ -10,8 +10,6 @@
 ?>
 
 <script type="text/javascript">
-//<![CDATA[
-
     Translator.add(
             'Incorrect credit card number.',
             "<?php echo Mage::helper('payzen')->__('Incorrect credit card number.') ?>"
@@ -44,8 +42,6 @@
                 return /^\d{3,4}$/.test(v);
             }]
     ]);
-
-//]]>
 </script>
 
 <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none; margin-left: 15px;">

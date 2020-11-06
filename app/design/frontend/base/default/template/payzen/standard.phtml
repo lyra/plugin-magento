@@ -89,7 +89,6 @@ if ($isPaymentByToken) : ?>
 </ul>
 
 <script type="text/javascript">
-//<![CDATA[
 <?php if ($isPaymentByToken) : ?>
     // Display payment by identifier block when standard payment is selected.
     Event.stopObserving('p_method_payzen_standard', 'click', onMethodPayzenStandardClick);
@@ -97,5 +96,4 @@ if ($isPaymentByToken) : ?>
 
     payzenUpdatePaymentBlock.delay(0.2, 'id');
 <?php endif;?>
-//]]>
 </script>

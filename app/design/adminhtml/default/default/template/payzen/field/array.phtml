@@ -28,7 +28,6 @@ $htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getEleme
 </div>
 
 <script type="text/javascript">
-//<![CDATA[
     // Create row creator.
     var arrayRow<?php echo $htmlId ?> = {
         // Define row prototypeJS template.
@@ -84,5 +83,4 @@ $htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getEleme
         toggleValueElements({checked: true}, $('<?php echo $this->getElement()->getId() ?>').parentNode);
     });
     <?php endif; ?>
-//]]>
 </script>
