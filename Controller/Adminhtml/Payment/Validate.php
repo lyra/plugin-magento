@@ -17,14 +17,11 @@ class Validate extends \Magento\Backend\App\Action implements \Magento\Framework
     protected $dataHelper;
 
     /**
-     *
      * @var \Magento\Framework\Registry
      */
-
     protected $coreRegistry;
 
     /**
-     *
      * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $resultPageFactory;

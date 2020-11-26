@@ -17,12 +17,13 @@
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {for: getCode()}" class="label">
             <!-- Full CB logo. -->
-            <img data-bind="attr: {src: getModuleLogoUrl()}"
-                 class="payment-icon"
-                 alt="PayZen"
-                 style="width: 76px;"
-            />
-
+            <!-- ko if: getModuleLogoUrl() -->
+                <img data-bind="attr: {src: getModuleLogoUrl()}"
+                     class="payment-icon"
+                     alt="PayZen"
+                     style="width: 76px;"
+                />
+            <!--/ko-->
             <span data-bind="text: getTitle()"></span>
         </label>
     </div>
@@ -41,7 +42,7 @@
             <div class="field">
             <!--ko if: getAvailableOptions() && getAvailableOptions().length > 0 -->
                 <div class="control">
-                    <ul class="fullcb-payment-options" style="padding: 0;">
+                    <ul class="payzen-fullcb-options payzen-payment-option">
                         <!-- ko foreach: {data: getAvailableOptions(), as: 'option'} -->
                         <li style="list-style: outside none none; vertical-align: top;" data-bind="css: {'_active': true}">
                             <input class="radio"
@@ -67,18 +68,18 @@
                                         <tbody>
                                           <tr>
                                             <td><span data-bind="i18n: 'Order amount :'"></span></td>
-                                            <td class="amount"><span data-bind="text: option.order_amount"></span></td>
+                                            <td class="payzen_bold"><span data-bind="text: option.order_amount"></span></td>
                                           </tr>
                                           <tr>
                                             <td><span data-bind="i18n: 'Fees :'"></span></td>
-                                            <td class="amount"><span data-bind="text: option.fees"></span></td>
+                                            <td class="payzen_bold"><span data-bind="text: option.fees"></span></td>
                                           </tr>
                                           <tr>
                                             <td colspan="2"><hr style="margin: 0px;"></td>
                                           </tr>
                                           <tr>
                                             <td><span data-bind="i18n: 'Total amount :'"></span></td>
-                                            <td class="amount"><span data-bind="text: option.total_amount"></span></td>
+                                            <td class="payzen_bold"><span data-bind="text: option.total_amount"></span></td>
                                           </tr>
                                         </tbody>
                                       </table>
@@ -92,12 +93,12 @@
                                           </tr>
                                           <tr>
                                             <td><span data-bind="text: option.first_date"></span></td>
-                                            <td class="amount"><span data-bind="text: option.first_payment"></span></td>
+                                            <td class="payzen_bold"><span data-bind="text: option.first_payment"></span></td>
                                           </tr>
                                           <!-- ko  foreach: {data: option.installment_dates, as: 'date'} -->
                                             <tr>
                                                <td><span data-bind="text: date"></span></td>
-                                               <td class="amount"><span data-bind="text: option.monthly_payment"></span></td>
+                                               <td class="payzen_bold"><span data-bind="text: option.monthly_payment"></span></td>
                                             </tr>
                                           <!--/ko-->
                                         </tbody>

@@ -11,6 +11,9 @@ namespace Lyranetwork\Payzen\Model\Method;
 
 class Fullcb extends Payzen
 {
+    const FULLCB_THREE_TIMES_MAX_FEES = 9;
+    const FULLCB_FOUR_TIMES_MAX_FEES = 12;
+
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_FULLCB;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Fullcb::class;
 
@@ -110,8 +113,8 @@ class Fullcb extends Payzen
             if ((! $amount || ! $option['amount_min'] || $amount > $option['amount_min'])
                 && (! $amount || ! $option['amount_max'] || $amount < $option['amount_max'])) {
                 // Compute some fields.
-                $count = (int)$optionCount[$code];
-                $rate = (float)$option['rate'];
+                $count = (int) $optionCount[$code];
+                $rate = (float) $option['rate'];
 
                 $max_fees = $option['cap'];
                 if (! $max_fees) {
@@ -137,7 +140,7 @@ class Fullcb extends Payzen
 
                 $first = $amount - ($payment * ($count - 1)) + $fees;
 
-                $option['order_amount'] = (float)$amount;
+                $option['order_amount'] = (float) $amount;
                 $option['first_payment'] = $first;
                 $option['monthly_payment'] = $payment;
                 $option['total_amount'] = $amount + $fees;

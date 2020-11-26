@@ -16,27 +16,23 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const METHOD_STANDARD = 'payzen_standard';
-
     const METHOD_MULTI = 'payzen_multi';
-
     const METHOD_CHOOZEO = 'payzen_choozeo';
-
     const METHOD_SEPA = 'payzen_sepa';
-
     const METHOD_GIFT = 'payzen_gift';
-
     const METHOD_ONEY = 'payzen_oney';
-
     const METHOD_PAYPAL = 'payzen_paypal';
-
     const METHOD_FULLCB = 'payzen_fullcb';
+    const METHOD_FRANFINANCE = 'payzen_franfinance';
+    const METHOD_OTHER = 'payzen_other';
 
-    const METHOD_SOFORT = 'payzen_sofort';
-
-    const METHOD_POSTFINANCE = 'payzen_postfinance';
+    const MODE_FORM = 1;
+    const MODE_LOCAL_TYPE = 2;
+    const MODE_IFRAME = 3;
+    const MODE_EMBEDDED = 4;
+    const MODE_POPIN = 5;
 
     /**
-     *
      * @var array a global var to easily enable/disable features
      */
     public static $pluginFeatures = [
@@ -49,73 +45,75 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'multi' => true,
         'gift' => true,
         'choozeo' => false,
+        'oney' => true,
         'fullcb' => true,
         'sepa' => true,
-        'paypal' => true
+        'paypal' => true,
+        'franfinance' => true,
+        'other' => true
     ];
 
     /**
-     *
      * @var \Magento\Framework\ObjectManagerInterface
      */
     protected $objectManager;
 
     /**
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
     /**
-     *
      * @var \Magento\Framework\App\MaintenanceMode
      */
     protected $maintenanceMode;
 
     /**
-     *
      * @var \Magento\Config\Model\ResourceModel\Config
      */
     protected $resourceConfig;
 
     /**
-     *
      * @var \Magento\Framework\Filesystem
      */
     protected $filesystem;
 
     /**
-     *
      * @var \Magento\Config\Model\Config\Structure
      */
     protected $configStructure;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Logger\Payzen
      */
     protected $logger;
 
     /**
-     *
      * @var \Magento\Framework\App\State
      */
     protected $appState;
 
     /**
-     *
      * @var \Zend\Http\PhpEnvironment\RemoteAddress
      */
     protected $remoteAddress;
 
     /**
-     *
      * @var \Magento\Framework\Filesystem\Io\File
      */
     protected $file;
 
     /**
-     *
+     * @var \Magento\Framework\View\Asset\Repository $assetRepo
+     */
+    protected $assetRepo;
+
+    /**
+     * @var \Magento\Payment\Helper\Data
+     */
+    protected $paymentHelper;
+
+    /**
      * @param \Lyranetwork\Payzen\Helper\Context $context
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -127,6 +125,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\State $appState
      * @param \Zend\Http\PhpEnvironment\RemoteAddress $remoteAddress
      * @param \Magento\Framework\Filesystem\Io\File $file
+     * @param \Magento\Framework\View\Asset\Repository $assetRepo
+     * @param \Magento\Payment\Helper\Data $paymentHelper
      */
     public function __construct(
         \Lyranetwork\Payzen\Helper\Context $context,
@@ -139,7 +139,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Lyranetwork\Payzen\Model\Logger\Payzen $logger,
         \Magento\Framework\App\State $appState,
         \Zend\Http\PhpEnvironment\RemoteAddress $remoteAddress,
-        \Magento\Framework\Filesystem\Io\File $file
+        \Magento\Framework\Filesystem\Io\File $file,
+        \Magento\Framework\View\Asset\Repository $assetRepo,
+        \Magento\Payment\Helper\Data $paymentHelper
     ) {
         parent::__construct($context);
 
@@ -153,6 +155,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->appState = $appState;
         $this->remoteAddress = $remoteAddress;
         $this->file = $file;
+        $this->assetRepo = $assetRepo;
+        $this->paymentHelper = $paymentHelper;
     }
 
     /**
@@ -168,7 +172,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId = $this->getCheckoutStoreId();
         }
 
-        return $this->scopeConfig->getValue('payzen/general/' . $field, ScopeInterface::SCOPE_STORE, $storeId);
+        $value = $this->scopeConfig->getValue('payzen/general/' . $field, ScopeInterface::SCOPE_STORE, $storeId);
+        return is_string($value) ? trim($value) : $value;
     }
 
     /**
@@ -364,6 +369,40 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Add a model config parameter for each of given $options (other payment options).
+     *
+     * @param array[string][mixed] $options
+     */
+    public function updateOtherPaymentModelConfig($options)
+    {
+        foreach ($options as $option) {
+            $this->resourceConfig->saveConfig(
+                'payment/payzen_other_' . $option['means'] . '/model',
+                \Lyranetwork\Payzen\Model\Method\Other::class,
+                ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                0
+            );
+        }
+    }
+
+    /**
+     * Get other payment method models.
+     *
+     * @return array[int] $options
+     */
+    public function getOtherPaymentModelConfig()
+    {
+        // Retrieve DB connection.
+        $connection = $this->resourceConfig->getConnection();
+
+        $select = $connection->select()
+            ->from($this->resourceConfig->getMainTable())
+            ->where('path LIKE ?', 'payment/payzen\_other\_%/model');
+
+        return $connection->fetchAll($select);
+    }
+
+    /**
      * Check if server has requirements to do WS operations.
      *
      * @throws \Lyranetwork\Payzen\Model\WsException
@@ -394,7 +433,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $result = json_decode($string, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            // Magento 2.1.x: try PHP serialization
+            // Magento 2.1.x: try PHP serialization.
             $result = @unserialize($string);
         }
 
@@ -438,5 +477,79 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return null;
+    }
+
+    /**
+     * Return logged in customer model data.
+     * @param \Magento\Customer\Model\Session
+     *
+     * @return int
+     */
+    public function getCurrentCustomer($customerSession)
+    {
+        // Customer not logged in.
+        if (! $customerSession->isLoggedIn()) {
+            return false;
+        }
+
+        // Customer has not gateway identifier.
+        $customer = $customerSession->getCustomer();
+        if (! $customer || ! $customer->getId()) {
+            return false;
+        }
+
+        return $customer->getDataModel();
+    }
+
+    /**
+     * Return card logo source path if exists, else return false.
+     * @param string $card
+     * @param boolean $cc
+     *
+     * @return string|boolean
+     */
+    public function getCcTypeImageSrc($card, $cc = true)
+    {
+        if ($cc) {
+            $card = 'cc/' . strtolower($card) . '.png';
+        }
+
+        if ($this->isUploadFileImageExists($card)) {
+            return $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
+                'payzen/images/' . $card;
+        } else {
+            $asset = $this->assetRepo->createAsset('Lyranetwork_Payzen::images/' . $card);
+
+            if ($this->isPublishFileImageExists($asset->getRelativeSourceFilePath())) {
+                return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $card);
+            }
+        }
+
+        return false;
+    }
+
+    public function getViewFileUrl($fileId, array $params = [])
+    {
+        try {
+            return $this->assetRepo->getUrlWithParams($fileId, $params);
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            $this->logger->critical($e);
+            return $this->_getUrl('', [
+                '_direct' => 'core/index/notFound'
+            ]);
+        }
+    }
+
+    public function getMethodInstance($methodCode)
+    {
+        return $this->paymentHelper->getMethodInstance($methodCode);
+    }
+
+    public function isOneClickActive()
+    {
+        $standardMethod = $this->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD);
+        $sepaMethod = $this->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_SEPA);
+
+        return $standardMethod->isOneClickActive() || $sepaMethod->isOneClickActive();
     }
 }

@@ -118,19 +118,79 @@
             </field>
         </group>
 
-        <group id="payzen_payment_page" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_rest_api_keys" translate="label comment" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[REST API KEYS]]></label>
+            <comment><![CDATA[Configure this section if you are using order operations from Magento backend or if you are using &laquo; Embedded payment fields &raquo; mode. <br />REST API keys are available in your PayZen Back Office (menu: Settings > Shops > REST API keys).]]></comment>
+            <attribute type="expanded">0</attribute>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="rest_private_key_test" translate="label" type="obscure" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Test password</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <config_path>payzen/general/rest_private_key_test</config_path>
+            </field>
+
+            <field id="rest_private_key_prod" translate="label" type="obscure" sortOrder="132" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Production password</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <config_path>payzen/general/rest_private_key_prod</config_path>
+            </field>
+
+            <field id="rest_public_key_test" translate="label" type="text" sortOrder="133" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Public test key</label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
+                <config_path>payzen/general/rest_public_key_test</config_path>
+            </field>
+
+            <field id="rest_public_key_prod" translate="label" type="text" sortOrder="134" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Public production key</label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
+                <config_path>payzen/general/rest_public_key_prod</config_path>
+            </field>
+
+            <field id="rest_return_key_test" translate="label" type="obscure" sortOrder="135" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>HMAC-SHA-256 test key</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <config_path>payzen/general/rest_return_key_test</config_path>
+            </field>
+
+            <field id="rest_return_key_prod" translate="label" type="obscure" sortOrder="136" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>HMAC-SHA-256 production key</label>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <config_path>payzen/general/rest_return_key_prod</config_path>
+            </field>
+
+            <field id="rest_notify_url" translate="label comment" type="label" sortOrder="137" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>REST API Notification URL</label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\NotifyUrl</frontend_model>
+                <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
+                <config_path>payzen/general/rest_notify_url</config_path>
+            </field>
+
+            <field id="rest_url" translate="label comment" type="text" sortOrder="138" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>REST API server URL</label>
+                <config_path>payzen/general/rest_url</config_path>
+            </field>
+
+            <field id="static_url" translate="label comment" type="text" sortOrder="139" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>JavaScript client URL</label>
+                <config_path>payzen/general/static_url</config_path>
+            </field>
+        </group>
+
+        <group id="payzen_payment_page" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[PAYMENT PAGE]]></label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="language" translate="label comment" type="select" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="language" translate="label comment" type="select" sortOrder="141" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Default Language]]></label>
                 <comment><![CDATA[Default language on the payment page.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\Language</source_model>
                 <config_path>payzen/general/language</config_path>
             </field>
 
-            <field id="available_languages" translate="label comment" type="multiselect" sortOrder="132" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="available_languages" translate="label comment" type="multiselect" sortOrder="142" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Available languages]]></label>
                 <comment><![CDATA[Languages available on the payment page. If you do not select any, all the supported languages will be available.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
@@ -139,13 +199,13 @@
                 <config_path>payzen/general/available_languages</config_path>
             </field>
 
-            <field id="capture_delay" translate="label comment" type="text" sortOrder="133" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="capture_delay" translate="label comment" type="text" sortOrder="143" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Capture delay]]></label>
                 <comment><![CDATA[The number of days before the bank capture (adjustable in your PayZen Back Office).]]></comment>
                 <config_path>payzen/general/capture_delay</config_path>
             </field>
 
-            <field id="validation_mode" translate="label comment" type="select" sortOrder="134" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="validation_mode" translate="label comment" type="select" sortOrder="144" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Validation mode]]></label>
                 <comment><![CDATA[If manual is selected, you will have to confirm payments manually in your PayZen Back Office.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ValidationMode</source_model>
@@ -153,25 +213,25 @@
             </field>
         </group>
 
-        <group id="payzen_payment_page_customize" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_payment_page_customize" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[PAYMENT PAGE CUSTOMIZE]]></label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="theme_config" translate="label comment" type="text" sortOrder="141" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="theme_config" translate="label comment" type="text" sortOrder="151" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Theme configuration]]></label>
                 <comment><![CDATA[The theme configuration to customize the payment page.]]></comment>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\ThemeConfig</backend_model>
                 <config_path>payzen/general/theme_config</config_path>
             </field>
 
-            <field id="shop_name" translate="label comment" type="text" sortOrder="142" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="shop_name" translate="label comment" type="text" sortOrder="152" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Shop name]]></label>
                 <comment><![CDATA[Shop name to display on the payment page. Leave blank to use gateway configuration.]]></comment>
                 <config_path>payzen/general/shop_name</config_path>
             </field>
 
-            <field id="shop_url" translate="label comment" type="text" sortOrder="143" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="shop_url" translate="label comment" type="text" sortOrder="153" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Shop URL]]></label>
                 <comment><![CDATA[Shop URL to display on the payment page. Leave blank to use gateway configuration.]]></comment>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\ShopUrl</backend_model>
@@ -179,31 +239,31 @@
             </field>
         </group>
 
-        <group id="payzen_selective_3ds" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_selective_3ds" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[SELECTIVE 3DS]]></label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="threeds_min_amount" translate="label comment" type="text" sortOrder="151" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="threeds_min_amount" translate="label comment" type="text" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Disable 3DS]]></label>
                 <comment><![CDATA[Amount below which 3DS will be disabled. Needs subscription to selective 3DS option. For more information, refer to the module documentation.]]></comment>
                 <config_path>payzen/general/threeds_min_amount</config_path>
             </field>
         </group>
 
-        <group id="payzen_return_options" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_return_options" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[RETURN TO SHOP]]></label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="redirect_enabled" translate="label comment" type="select" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="redirect_enabled" translate="label comment" type="select" sortOrder="171" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Automatic redirection]]></label>
                 <comment><![CDATA[If enabled, the buyer is automatically redirected to your site at the end of the payment.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payzen/general/redirect_enabled</config_path>
             </field>
 
-            <field id="redirect_success_timeout" translate="label comment" type="text" sortOrder="162" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="redirect_success_timeout" translate="label comment" type="text" sortOrder="172" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Redirection timeout on success]]></label>
                 <comment><![CDATA[Time in seconds (0-300) before the buyer is automatically redirected to your website after a successful payment.]]></comment>
                 <config_path>payzen/general/redirect_success_timeout</config_path>
@@ -212,7 +272,7 @@
                 </depends>
             </field>
 
-            <field id="redirect_success_message" translate="label comment" type="text" sortOrder="163" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="redirect_success_message" translate="label comment" type="text" sortOrder="173" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Redirection message on success]]></label>
                 <comment><![CDATA[Message displayed on the payment page prior to redirection after a successful payment.]]></comment>
                 <config_path>payzen/general/redirect_success_message</config_path>
@@ -221,7 +281,7 @@
                 </depends>
             </field>
 
-            <field id="redirect_error_timeout" translate="label comment" type="text" sortOrder="164" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="redirect_error_timeout" translate="label comment" type="text" sortOrder="174" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Redirection timeout on failure]]></label>
                 <comment><![CDATA[Time in seconds (0-300) before the buyer is automatically redirected to your website after a declined payment.]]></comment>
                 <config_path>payzen/general/redirect_error_timeout</config_path>
@@ -230,7 +290,7 @@
                 </depends>
             </field>
 
-            <field id="redirect_error_message" translate="label comment" type="text" sortOrder="165" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="redirect_error_message" translate="label comment" type="text" sortOrder="175" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Redirection message on failure]]></label>
                 <comment><![CDATA[Message displayed on the payment page prior to redirection after a declined payment.]]></comment>
                 <config_path>payzen/general/redirect_error_message</config_path>
@@ -239,21 +299,21 @@
                 </depends>
             </field>
 
-            <field id="return_mode" translate="label comment" type="select" sortOrder="166" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="return_mode" translate="label comment" type="select" sortOrder="176" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Return mode]]></label>
                 <comment><![CDATA[Method that will be used for transmitting the payment result from the payment page to your shop.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\ReturnMode</source_model>
                 <config_path>payzen/general/return_mode</config_path>
             </field>
 
-            <field id="registered_order_status" translate="label comment" type="select" sortOrder="167" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="registered_order_status" translate="label comment" type="select" sortOrder="177" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Registered orders status]]></label>
                 <comment><![CDATA[Status of orders when payment is successfull.]]></comment>
                 <source_model>Magento\Sales\Model\Config\Source\Order\Status\Newprocessing</source_model>
                 <config_path>payzen/general/registered_order_status</config_path>
             </field>
 
-            <field id="capture_auto" translate="label comment" type="select" sortOrder="168" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="capture_auto" translate="label comment" type="select" sortOrder="178" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Invoice creation]]></label>
                 <comment><![CDATA[Automatically create invoice when payment is successfull.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -264,26 +324,26 @@
             </field>
         </group>
 
-        <group id="payzen_additional_options" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="0" showInStore="1">
+        <group id="payzen_additional_options" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="0" showInStore="1">
             <label><![CDATA[ADDITIONAL OPTIONS]]></label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="send_cart_detail" translate="label comment" type="select" sortOrder="171" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="send_cart_detail" translate="label comment" type="select" sortOrder="181" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Send shopping cart details]]></label>
                 <comment><![CDATA[If you disable this option, the shopping cart details will not be sent to the gateway. Attention, in some cases, this option has to be enabled. For more information, refer to the module documentation.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payzen/general/send_cart_detail</config_path>
             </field>
 
-            <field id="common_category" translate="label comment" type="select" sortOrder="172" showInDefault="1" showInWebsite="0" showInStore="1">
+            <field id="common_category" translate="label comment" type="select" sortOrder="182" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label><![CDATA[Category mapping]]></label>
                 <comment><![CDATA[Use the same category for all products.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\Category</source_model>
                 <config_path>payzen/general/common_category</config_path>
             </field>
 
-            <field id="category_mapping" translate="label comment" sortOrder="173" showInDefault="1" showInWebsite="0" showInStore="1">
+            <field id="category_mapping" translate="label comment" sortOrder="183" showInDefault="1" showInWebsite="0" showInStore="1">
                 <comment><![CDATA[Match each product category with a PayZen category.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CategoryMapping</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CategoryMapping</backend_model>
@@ -293,16 +353,13 @@
                 </depends>
             </field>
 
-             <!--  field id="ship_options" translate="label comment" sortOrder="173" showInDefault="1" showInWebsite="0" showInStore="1">
-                <label><![CDATA[FacilyPay Oney shipping options]]></label>
-                <comment><![CDATA[Define the FacilyPay Oney information about all shipping methods.<br /><b>FacilyPay Oney label: </b>The label of the shipping method (use 55 alphanumeric characters, accentuated characters and these special characters: space, slash, hyphen, apostrophe).<br /><b>Type: </b>The delivery type of shipping method.<br /><b>Speed: </b>Select whether the delivery is STANDARD or EXPRESS.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
+             <field id="ship_options" translate="label comment" sortOrder="184" showInDefault="1" showInWebsite="0" showInStore="1">
+                <label><![CDATA[Shipping options]]></label>
+                <comment><![CDATA[Define the PayZen information about all shipping methods.<br /><b>Method title: </b>The label of the shipping method.<br /><b>Type: </b>The delivery type of shipping method.<br /><b>Rapidity: </b>Select whether the delivery is STANDARD or EXPRESS.<br /><b>Delay: </b>Select the delivery delay if rapidity is &laquo; Priority &raquo;.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ShipOptions</frontend_model>
-                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\ShipOptions</backend_model>
                 <config_path>payzen/general/ship_options</config_path>
-                <depends>
-                    <field id="oney_contract">1</field>
-                </depends>
-            </field -->
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized</backend_model>
+            </field>
         </group>
     </group>
 </include>

@@ -17,12 +17,13 @@
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {for: getCode()}" class="label">
             <!-- Standard logo. -->
-            <img data-bind="attr: {src: getModuleLogoUrl()}"
-                 class="payment-icon"
-                 alt="PayZen"
-                 style="width: 76px;"
-            />
-
+            <!-- ko if: getModuleLogoUrl() -->
+                <img data-bind="attr: {src: getModuleLogoUrl()}"
+                     class="payment-icon"
+                     alt="PayZen"
+                     style="width: 76px;"
+                />
+            <!--/ko-->
             <span data-bind="text: getTitle()"></span>
         </label>
     </div>
@@ -37,19 +38,21 @@
             <!--/ko-->
         </div>
 
+        <div id='payzen_standard_message'></div>
+
         <fieldset class="fieldset payment method payzen-form" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 10px;">
-            <!-- ko if: (getEntryMode() == 2) && !isOneClick() -->
+            <!-- ko if: (getEntryMode() == 2) && !isOneClick() --><!-- Payment means selection on merchant site. -->
                 <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
             <!--/ko-->
 
-            <!-- ko if: (getEntryMode() == 4) && getRestFormToken() -->
+            <!-- ko if: (getEntryMode() == 4 || getEntryMode() == 5) && getRestFormToken() --><!-- Embedded or popin mode. -->
                 <!-- ko template: { name: 'Lyranetwork_Payzen/payment/rest', data: $parent, afterRender: function(elts) { $data.initRestEvents(elts); } } --><!-- /ko -->
             <!--/ko-->
 
             <!-- ko if: isOneClick() -->
                 <ul class="payzen-identifier">
                     <li class="payzen-standard-cc-block payzen-block">
-                        <!-- ko if: (getEntryMode() == 2) -->
+                        <!-- ko if: (getEntryMode() == 2) --><!-- Payment means selection on merchant site. -->
                             <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
                         <!--/ko-->
 
@@ -63,12 +66,15 @@
                     <li class="payzen-standard-cc-block payzen-block">
                         <a data-bind="click: function() { payzenUseIdentifier(1); updatePaymentBlock('id'); return true; }"
                            class="payzen-payment-link" href="javascript: void(0);">
-                            <span data-bind="i18n: 'Click here to pay with your registered means of payment.'"></span>
+                            <span data-bind="i18n: 'Click here to pay with your stored means of payment.'"></span>
                         </a>
                     </li>
 
                     <li class="payzen-standard-id-block payzen-block" >
-                        <span data-bind="html: $t('You will pay with your registered means of payment %s. No data entry is needed.').replace('%s', '<b>' + getMaskedPan() + '</b>')"></span>
+                        <span data-bind="html: $t('You will pay with your stored means of payment %s').replace('%s', '<b>' + getMaskedPan() + '</b>')"></span>
+                        <a data-bind="attr: {href: getPaymentMeansUrl()}" class="payzen-payment-link">
+                            (<span data-bind="i18n: 'manage your payment means'"></span>).
+                        </a>
                     </li>
 
                     <li class="payzen-standard-id-block payzen-block">
@@ -105,7 +111,7 @@
             </div>
         </div>
 
-        <!-- ko if: (getEntryMode() == 3) -->
+        <!-- ko if: (getEntryMode() == 3) --><!-- Iframe mode is enabled. -->
             <!-- ko template: { name: 'Lyranetwork_Payzen/payment/iframe', data: $parent, afterRender: function(elts) { $data.initIframeEvents(elts); } } --><!-- /ko -->
         <!--/ko-->
     </div>

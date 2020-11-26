@@ -24,7 +24,7 @@ class MultiPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Con
         $this->addColumn(
             'label',
             [
-                'label' => __('Label') . '<span style="color: red;">*</span>',
+                'label' => __('Label'),
                 'style' => 'width: 150px;'
             ]
         );
@@ -52,14 +52,14 @@ class MultiPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Con
         $this->addColumn(
             'count',
             [
-                'label' => __('Count') . '<span style="color: red;">*</span>',
+                'label' => __('Count'),
                 'style' => 'width: 65px;'
             ]
         );
         $this->addColumn(
             'period',
             [
-                'label' => __('Period') . '<span style="color: red;">*</span>',
+                'label' => __('Period'),
                 'style' => 'width: 65px;'
             ]
         );

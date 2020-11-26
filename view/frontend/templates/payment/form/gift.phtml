@@ -36,11 +36,14 @@
                 $first = false;
             }
             ?>
-
             <label for="payzen_gift_cc_type_<?php echo $block->escapeHtml($code); ?>" style="float: none;">
-                <img alt="<?php echo $block->escapeHtml($label); ?>"
-                     src="<?php echo $block->escapeHtml($block->getCcTypeImageSrc($code)); ?>"
-                     title="<?php echo $block->escapeHtml($label); ?>" />
+                <?php if ($img = $block->getCcTypeImageSrc($code)): ?>
+                     <img alt="<?php echo $block->escapeHtml($label); ?>"
+                          src="<?php echo $block->escapeHtml($img); ?>"
+                          title="<?php echo $block->escapeHtml($label); ?>" />
+                <?php else: ?>
+                    <span><?php echo $block->escapeHtml($label); ?></span>
+                <?php endif ?>
             </label>
             <br style="margin-bottom: 5px;" />
         <?php } ?>

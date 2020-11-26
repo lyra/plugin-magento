@@ -12,13 +12,11 @@ namespace Lyranetwork\Payzen\Block\Payment\Form;
 abstract class Payzen extends \Magento\Payment\Block\Form
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param array $data
@@ -39,12 +37,7 @@ abstract class Payzen extends \Magento\Payment\Block\Form
             return false;
         }
 
-        if ($this->dataHelper->isUploadFileImageExists($fileName)) {
-            return $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
-                 'payzen/images/' . $fileName;
-        } else {
-            return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $fileName);
-        }
+        return $this->getCcTypeImageSrc($fileName, false);
     }
 
     public function getConfigData($name)
@@ -74,5 +67,15 @@ abstract class Payzen extends \Magento\Payment\Block\Form
         }
 
         return parent::_toHtml();
+    }
+
+    public function getCcTypeImageSrc($card, $cc = true)
+    {
+        return $this->dataHelper->getCcTypeImageSrc($card, $cc);
+    }
+
+    public function getCurrentCustomer()
+    {
+        return $this->getMethod()->getCurrentCustomer();
     }
 }

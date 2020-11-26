@@ -10,7 +10,8 @@
 define(
     [
         'uiComponent',
-        'Magento_Checkout/js/model/payment/renderer-list'
+        'Magento_Checkout/js/model/payment/renderer-list',
+        'Magento_Checkout/js/view/payment/default'
     ],
     function (Component, rendererList) {
         'use strict';
@@ -32,6 +33,10 @@ define(
                 component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-choozeo'
             },
             {
+                type: 'payzen_oney',
+                component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-oney'
+            },
+            {
                 type: 'payzen_fullcb',
                 component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-fullcb'
             },
@@ -42,6 +47,14 @@ define(
             {
                 type: 'payzen_paypal',
                 component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-paypal'
+            },
+            {
+                type: 'payzen_franfinance',
+                component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-franfinance'
+            },
+            {
+                type: 'payzen_other',
+                component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-other'
             }
         );
 

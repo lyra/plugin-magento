@@ -52,7 +52,7 @@ class ChoozeoPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\C
     /**
      * Obtain existing data from form element.
      *
-     * Each row will be instance of Varien_Object
+     * Each row will be instance of Varien_Object.
      *
      * @return array
      */

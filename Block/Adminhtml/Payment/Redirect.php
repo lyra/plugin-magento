@@ -25,7 +25,7 @@ class Redirect extends \Magento\Backend\Block\Widget\Form\Container
     }
 
     /**
-     * Get URL for back (reset) button
+     * Get URL for back (reset) button.
      *
      * @return string
      */

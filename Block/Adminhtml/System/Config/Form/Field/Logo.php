@@ -15,13 +15,11 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 class Logo extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param array $data

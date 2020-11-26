@@ -15,12 +15,12 @@ class RestTheme extends \Magento\Framework\DataObject implements \Magento\Framew
     {
         $options = [
             [
-                'value' => 'material',
-                'label' => 'Material'
-            ],
-            [
                 'value' => 'classic',
                 'label' => 'Classic'
+            ],
+            [
+                'value' => 'material',
+                'label' => 'Material'
             ]
         ];
 

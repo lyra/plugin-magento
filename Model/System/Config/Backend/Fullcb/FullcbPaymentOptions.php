@@ -20,7 +20,7 @@ class FullcbPaymentOptions extends \Lyranetwork\Payzen\Model\System\Config\Backe
         } else {
             $i = 0;
             foreach ($values as $value) {
-                $i ++;
+                $i++;
 
                 if (empty($value)) {
                     continue;
@@ -30,21 +30,10 @@ class FullcbPaymentOptions extends \Lyranetwork\Payzen\Model\System\Config\Backe
                     $this->throwException('Label', $i);
                 }
 
-                if (! empty($value['amount_min']) && (! is_numeric($value['amount_min']) || $value['amount_min'] < 0)) {
-                    $this->throwException('Minimum amount', $i);
-                }
-
-                if (! empty($value['amount_max']) && (! is_numeric($value['amount_max']) || $value['amount_max'] < 0)) {
-                    $this->throwException('Maximum amount', $i);
-                }
-
-                if (! empty($value['rate']) && (! is_numeric($value['rate']) || $value['rate'] < 0)) {
-                    $this->throwException('Rate', $i);
-                }
-
-                if (! empty($value['cap']) && (! is_numeric($value['cap']) || $value['cap'] < 0)) {
-                    $this->throwException('Cap', $i);
-                }
+                $this->checkAmount($value['amount_min'], 'Minimum amount', $i);
+                $this->checkAmount($value['amount_max'], 'Maximum amount', $i);
+                $this->checkRate($value['rate'], 'Rate', $i);
+                $this->checkAmount($value['cap'], 'Cap', $i);
             }
         }
 

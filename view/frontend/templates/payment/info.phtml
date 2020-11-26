@@ -37,6 +37,17 @@
             echo '<br />';
             echo $block->escapeHtml($option['label']);
         }
+    } elseif (stripos($payment->getMethod(), 'payzen_other') === 0) {
+        // Other payment means, show selected option.
+        $option = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::OTHER_OPTION);
+        if (is_string($option)) {
+            $option = @unserialize($option);
+        }
+
+        if (isset($option) && is_array($option)) {
+            echo '<br />';
+            echo $block->escapeHtml($option['label'] . ' (' . $option['means'] . ')');
+        }
     }
     ?>
 </b></p>

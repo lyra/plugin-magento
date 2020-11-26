@@ -7,13 +7,11 @@
  * @copyright Lyra Network
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
+namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Fullcb;
 
 /**
  * Custom renderer for the Full CB customer group options field.
  */
-
-namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Fullcb;
-
 class FullcbCustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CustgroupOptions
 {
     public function __construct(

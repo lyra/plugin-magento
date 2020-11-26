@@ -21,13 +21,11 @@ use Magento\Customer\Model\Customer;
 class InstallData implements InstallDataInterface
 {
     /**
-     *
      * @var CustomerSetupFactory
      */
     protected $customerSetupFactory;
 
     /**
-     *
      * @param CustomerSetupFactory $customerSetupFactory
      */
     public function __construct(CustomerSetupFactory $customerSetupFactory)
@@ -36,9 +34,7 @@ class InstallData implements InstallDataInterface
     }
 
     /**
-     *
      * {@inheritdoc}
-     *
      */
     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {

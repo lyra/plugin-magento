@@ -10,6 +10,7 @@
 namespace Lyranetwork\Payzen\Model\Method;
 
 use Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Lyranetwork\Payzen\Model\Api\PayzenRest;
 
 abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 {
@@ -35,97 +36,86 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     protected $needsCartData = false;
 
     /**
-     *
      * @var \Magento\Framework\Locale\ResolverInterface
      */
     protected $localeResolver;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenRequest
      */
     protected $payzenRequest;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenResponse
      */
     protected $payzenResponse;
 
     /**
-     *
      * @var \Magento\Sales\Model\Order\Payment\Transaction
      */
     protected $transaction;
 
     /**
-     *
      * @var \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction
      */
     protected $transactionResource;
 
     /**
-     *
      * @var \Magento\Framework\UrlInterface
      */
     protected $urlBuilder;
 
     /**
-     *
      * @var \Magento\Framework\App\Response\Http $
      */
     protected $redirect;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Payment
      */
     protected $paymentHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Checkout
      */
     protected $checkoutHelper;
 
     /**
-     *
+     * @var \Lyranetwork\Payzen\Helper\Rest
+     */
+    protected $restHelper;
+
+    /**
      * @var \Magento\Framework\App\ProductMetadataInterface
      */
     protected $productMetadata;
 
     /**
-     *
      * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
 
     /**
-     *
      * @var \Magento\Framework\Module\Dir\Reader
      */
     protected $dirReader;
 
     /**
-     *
      * @var \Magento\Framework\DataObject\Factory
      */
     protected $dataObjectFactory;
 
     /**
-     *
      * @var \Magento\Backend\Model\Auth\Session
      */
     protected $authSession;
 
     /**
-     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -143,6 +133,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
+     * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
@@ -170,6 +161,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
+        \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
@@ -189,6 +181,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->dataHelper = $dataHelper;
         $this->paymentHelper = $paymentHelper;
         $this->checkoutHelper = $checkoutHelper;
+        $this->restHelper = $restHelper;
         $this->productMetadata = $productMetadata;
         $this->messageManager = $messageManager;
         $this->dirReader = $dirReader;
@@ -210,7 +203,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     *
      * @param \Magento\Sales\Model\Order $order
      * @return <string:mixed> array of params as key=>value
      */
@@ -290,7 +282,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $availableLanguages = in_array('', $availableLanguages) ? '' : implode(';', $availableLanguages);
         $this->payzenRequest->set('available_languages', $availableLanguages);
 
-        // Activate 3ds ?
+        // Activate 3ds?
         $threedsMpi = null;
         $threedsMinAmount = $this->dataHelper->getCommonConfigData('threeds_min_amount');
         if ($threedsMinAmount != '' && $order->getTotalDue() < $threedsMinAmount) {
@@ -308,7 +300,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->payzenRequest->set('cust_address', implode(' ', $order->getBillingAddress()->getStreet()));
         $this->payzenRequest->set('cust_zip', $order->getBillingAddress()->getPostcode());
         $this->payzenRequest->set('cust_city', $order->getBillingAddress()->getCity());
-        $this->payzenRequest->set('cust_state', $order->getBillingAddress()->getRegion());
+        $this->payzenRequest->set('cust_state', $order->getBillingAddress()->getRegionCode());
         $this->payzenRequest->set('cust_country', $order->getBillingAddress()->getCountryId());
         $this->payzenRequest->set('cust_phone', $order->getBillingAddress()->getTelephone());
         $this->payzenRequest->set('cust_cell_phone', $order->getBillingAddress()->getTelephone());
@@ -320,7 +312,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->payzenRequest->set('ship_to_city', $address->getCity());
             $this->payzenRequest->set('ship_to_street', $address->getStreetLine(1));
             $this->payzenRequest->set('ship_to_street2', $address->getStreetLine(2));
-            $this->payzenRequest->set('ship_to_state', $address->getRegion());
+            $this->payzenRequest->set('ship_to_state', $address->getRegionCode());
             $this->payzenRequest->set('ship_to_country', $address->getCountryId());
             $this->payzenRequest->set('ship_to_phone_num', $address->getTelephone());
             $this->payzenRequest->set('ship_to_zip', $address->getPostcode());
@@ -335,11 +327,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         // Add cart data.
         if ($sendCartDetails || $this->needsCartData /* Cart data are mandatory for the payment method. */) {
             $this->checkoutHelper->setCartData($order, $this->payzenRequest);
-        }
-
-        if ($this->sendOneyFields()) {
-            // Set other data specific to FacilyPay Oney payment.
-            $this->checkoutHelper->setOneyData($order, $this->payzenRequest);
         }
 
         $paramsToLog = $this->payzenRequest->getRequestFieldsArray(true);
@@ -431,10 +418,12 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         $keys = [
             \Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION,
+            \Lyranetwork\Payzen\Helper\Payment::OTHER_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::CHOOZEO_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::FULLCB_OPTION,
             \Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION,
-            \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER
+            \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER,
+            \Lyranetwork\Payzen\Helper\Payment::SEPA_IDENTIFIER
         ];
 
         foreach ($keys as $key) {
@@ -479,72 +468,49 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     {
         parent::acceptPayment($payment);
 
+        // Clear all messages in session.
+        $this->messageManager->getMessages(true);
+
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
+        // Client has not configured private key in module backend, let Magento accept order offline.
+        if (! $this->restHelper->getPrivateKey($storeId)) {
+            $this->dataHelper->log("Cannot get online payment information for order #{$order->getIncrementId()}: private key is not configured, let Magento accepts the payment.");
+
+            return true;
+        }
+
         $this->dataHelper->log("Get payment information online for order #{$order->getIncrementId()}.");
 
-        $requestId = '';
-
         try {
-            $wsApi = $this->checkAndGetWsApi($storeId);
-
-            $sid = false;
-
             // Retrieve transaction UUID.
             $uuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
             if (! $uuid) { // Retro compatibility.
-                $legacyTransactionKeyRequest = new \Lyranetwork\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
-                $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
-                $legacyTransactionKeyRequest->setSequenceNumber('1');
-                $legacyTransactionKeyRequest->setCreationDate(new \DateTime($order->getCreatedAt()));
+                $data = $this->getPaymentDetails($order, false);
+                $getPaymentDetails['answer'] = reset($data);
+                $getPaymentDetails['status'] = 'SUCCESS';
+            } else {
+                $requestData = ['uuid' => $uuid];
 
-                $getPaymentUuid = new \Lyranetwork\Payzen\Model\Api\Ws\GetPaymentUuid();
-                $getPaymentUuid->setLegacyTransactionKeyRequest($legacyTransactionKeyRequest);
+                // Perform our request.
+                $client = new PayzenRest(
+                    $this->dataHelper->getCommonConfigData('rest_url', $storeId),
+                    $this->dataHelper->getCommonConfigData('site_id', $storeId),
+                    $this->restHelper->getPrivateKey($storeId)
+                );
 
-                $requestId = $wsApi->setHeaders();
-                $getPaymentUuidResponse = $wsApi->getPaymentUuid($getPaymentUuid);
-
-                $wsApi->checkAuthenticity();
-                $wsApi->checkResult($getPaymentUuidResponse->getLegacyTransactionKeyResult()->getCommonResponse());
-
-                $uuid = $getPaymentUuidResponse->getLegacyTransactionKeyResult()
-                    ->getPaymentResponse()
-                    ->getTransactionUuid();
-
-                // Retrieve JSESSIONID created for getPaymentUuid call.
-                $sid = $wsApi->getJsessionId();
+                $getPaymentDetails = $client->post('V4/Transaction/Get', json_encode($requestData));
             }
 
-            // Common $queryRequest object to use in all operations.
-            $queryRequest = new \Lyranetwork\Payzen\Model\Api\Ws\QueryRequest();
-            $queryRequest->setUuid($uuid);
+            // Pending or accepted payment.
+            $successStatuses = array_merge(PayzenApi::getSuccessStatuses(), PayzenApi::getPendingStatuses());
 
-            $getPaymentDetails = new \Lyranetwork\Payzen\Model\Api\Ws\GetPaymentDetails($queryRequest);
-            $getPaymentDetails->setQueryRequest($queryRequest);
+            $this->restHelper->checkResult($getPaymentDetails, $successStatuses);
 
-            $requestId = $wsApi->setHeaders();
-
-            // Set JSESSIONID if ws getPaymentUuid is called.
-            if ($sid) {
-                $wsApi->setJsessionId($sid);
-            }
-
-            $getPaymentDetailsResponse = $wsApi->getPaymentDetails($getPaymentDetails);
-
-            $wsApi->checkAuthenticity();
-            $wsApi->checkResult(
-                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse(),
-                [
-                    'INITIAL', 'WAITING_AUTHORISATION', 'WAITING_AUTHORISATION_TO_VALIDATE', 'UNDER_VERIFICATION',
-                    'WAITING_FOR_PAYMENT', 'AUTHORISED', 'AUTHORISED_TO_VALIDATE', 'CAPTURED', 'CAPTURE_FAILED',
-                    'ACCEPTED'
-                ] // Pending or accepted payment.
-            );
-
-            // Check operation type (0: debit, 1 refund, 5: verification).
-            $transType = $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getPaymentResponse()->getOperationType();
-            if (($transType !== 0) && ($transType !== 5)) {
+            // Check operation type.
+            $transType = $getPaymentDetails['answer']['operationType'];
+            if ($transType !== 'DEBIT') {
                 throw new \Exception("Unexpected transaction type returned ($transType).");
             }
 
@@ -553,30 +519,25 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             // Payment is accepted by merchant.
             $payment->setIsFraudDetected(false);
 
-            $wrapper = new \Lyranetwork\Payzen\Model\Api\Ws\ResultWrapper(
-                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse(),
-                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getPaymentResponse(),
-                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getAuthorizationResponse(),
-                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCardResponse(),
-                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getThreeDSResponse(),
-                $getPaymentDetailsResponse->getGetPaymentDetailsResult()->getFraudManagementResponse()
-            );
+            // Wrap payment result to use traditional order creation tunnel.
+            $data = $this->restHelper->convertRestResult($getPaymentDetails['answer'], true);
 
             // Load API response.
             $response = $this->payzenResponseFactory->create(
                 [
-                    'params' => $wrapper->getResponseParams(),
-                    'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
-                    'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
-                    'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId)
+                    'params' => $data,
+                    'ctx_mode' => null,
+                    'key_test' => null,
+                    'key_prod' => null,
+                    'algo' => null
                 ]
             );
             $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
 
             $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
             $order->setState($stateObject->getState())
-                ->setStatus($stateObject->getStatus())
-                ->addStatusHistoryComment(__('The payment has been accepted.'));
+                  ->setStatus($stateObject->getStatus())
+                  ->addStatusHistoryComment(__('The payment has been accepted.'));
 
             // Try to create invoice.
             $this->paymentHelper->createInvoice($order);
@@ -593,45 +554,26 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
             $this->redirect->setRedirect($redirectUrl)->sendResponse();
             exit;
-        } catch(\Lyranetwork\Payzen\Model\WsException $e) {
-            $this->dataHelper->log(
-                "[$requestId] {$e->getMessage()}",
-                \Psr\Log\LogLevel::WARNING
-            );
-
-            $this->messageManager->addWarning(__('Please fix this error to use PayZen web services.'));
-            $this->messageManager->addError(__($e->getMessage()));
-
-            return true;
-        } catch(\SoapFault $f) {
-            $this->dataHelper->log(
-                "[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.",
-                \Psr\Log\LogLevel::WARNING
-            );
-
-            $this->messageManager->addWarning(__('Please fix this error to use PayZen web services.'));
-            $this->messageManager->addError($f->faultstring);
-
-            return true;
         } catch(\UnexpectedValueException $e) {
             $this->dataHelper->log(
-                "[$requestId] getPaymentDetails error with code {$e->getCode()}: {$e->getMessage()}.",
+                "getPaymentDetails error with code {$e->getCode()}: {$e->getMessage()}.",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            if ($e->getCode() === -1) {
-                throw new \Exception(__('Authentication error !'));
-            } elseif ($e->getCode() === 1) {
-                // Merchant does not subscribe to WS option, accept payment offline.
-                return true;
-            } else {
-                throw new \Exception($e->getMessage());
-            }
+            throw new \Exception($e->getMessage());
         } catch (\Exception $e) {
             $this->dataHelper->log(
-                "[$requestId] Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Exception with code {$e->getCode()}: {$e->getMessage()}",
                 \Psr\Log\LogLevel::ERROR
             );
+
+            if ($e->getCode() <= -1) { // Manage cUrl errors.
+                $message = __("Please consult the PayZen logs for more details.");
+            } else {
+                $message = $e->getMessage();
+            }
+
+            $this->messageManager->addError($message);
 
             throw $e;
         }
@@ -647,69 +589,50 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     {
         parent::denyPayment($payment);
 
+        // Clear all messages in session.
+        $this->messageManager->getMessages(true);
+
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
+        // Client has not configured private key in module backend, let Magento accept order offline.
+        if (! $this->restHelper->getPrivateKey($storeId)) {
+            $this->dataHelper->log("Cannot cancel payment online for order #{$order->getIncrementId()}: private key is not configured, let Magento cancel the payment.");
+
+            $this->messageManager->addWarning(__('Payment is cancelled only in Magento. Please, consider cancelling the payment in PayZen Back Office.'));
+            return true;
+        }
+
         $this->dataHelper->log("Cancel payment online for order #{$order->getIncrementId()}.");
 
-        $requestId = '';
-
         try {
-            $wsApi = $this->checkAndGetWsApi($storeId);
-
-            $sid = false;
-
             // Retrieve transaction UUID.
             $uuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
             if (! $uuid) { // Retro compatibility.
-                $legacyTransactionKeyRequest = new \Lyranetwork\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
-                $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
-                $legacyTransactionKeyRequest->setSequenceNumber('1');
-                $legacyTransactionKeyRequest->setCreationDate(new \DateTime($order->getCreatedAt()));
-
-                $getPaymentUuid = new \Lyranetwork\Payzen\Model\Api\Ws\GetPaymentUuid();
-                $getPaymentUuid->setLegacyTransactionKeyRequest($legacyTransactionKeyRequest);
-
-                $requestId = $wsApi->setHeaders();
-                $getPaymentUuidResponse = $wsApi->getPaymentUuid($getPaymentUuid);
-
-                $wsApi->checkAuthenticity();
-                $wsApi->checkResult($getPaymentUuidResponse->getLegacyTransactionKeyResult()->getCommonResponse());
-
-                $uuid = $getPaymentUuidResponse->getLegacyTransactionKeyResult()
-                    ->getPaymentResponse()
-                    ->getTransactionUuid();
-
-                // Retrieve JSESSIONID created for getPaymentUuid call.
-                $sid = $wsApi->getJsessionId();
+                // Get UUID from Order.
+                $uuidArray = $this->getPaymentDetails($order);
+                $uuid = reset($uuidArray);
             }
 
-            // Common $queryRequest object to use in all operations.
-            $queryRequest = new \Lyranetwork\Payzen\Model\Api\Ws\QueryRequest();
-            $queryRequest->setUuid($uuid);
+            $requestData = [
+                'uuid' => $uuid,
+                'resolutionMode' => 'CANCELLATION_ONLY',
+                'comment' => $this->getUserInfo()
+            ];
 
-            $cancelPayment = new \Lyranetwork\Payzen\Model\Api\Ws\CancelPayment();
-            $cancelPayment->setCommonRequest(new \Lyranetwork\Payzen\Model\Api\Ws\CommonRequest());
-            $cancelPayment->setQueryRequest($queryRequest);
-
-            $requestId = $wsApi->setHeaders();
-
-            // Set JSESSIONID if ws getPaymentUuid is called.
-            if ($sid) {
-                $wsApi->setJsessionId($sid);
-            }
-
-            $cancelPaymentResponse = $wsApi->cancelPayment($cancelPayment);
-
-            $wsApi->checkAuthenticity();
-            $wsApi->checkResult(
-                $cancelPaymentResponse->getCancelPaymentResult()->getCommonResponse(),
-                ['CANCELLED']
+            // Perform our request.
+            $client = new PayzenRest(
+                $this->dataHelper->getCommonConfigData('rest_url', $storeId),
+                $this->dataHelper->getCommonConfigData('site_id', $storeId),
+                $this->restHelper->getPrivateKey($storeId)
             );
+
+            $cancelPaymentResponse = $client->post('V4/Transaction/CancelOrRefund', json_encode($requestData));
+            $this->restHelper->checkResult($cancelPaymentResponse, ['CANCELLED']);
 
             $this->dataHelper->log("Payment cancelled successfully online for order #{$order->getIncrementId()}.");
 
-            $transactionId = $payment->getCcTransId() . '-1';
+            $transactionId = $payment->getCcTransId() . '-' . $cancelPaymentResponse['answer']['transactionDetails']['sequenceNumber'];
             $additionalInfo = [];
 
             $txn = $this->transactionResource->loadObjectByTxnId(
@@ -720,7 +643,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             );
 
             if ($txn && $txn->getId()) {
-               $additionalInfo = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+                $additionalInfo = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
             }
 
             // New transaction status.
@@ -730,48 +653,26 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->paymentHelper->addTransaction($payment, $transactionType, $transactionId, $additionalInfo);
 
             return true; // Let Magento cancel order.
-        } catch(\Lyranetwork\Payzen\Model\WsException $e) {
-            $this->dataHelper->log(
-                "[$requestId] {$e->getMessage()}",
-                \Psr\Log\LogLevel::WARNING
-            );
-
-            $this->messageManager->addWarning(__('Please fix this error to use PayZen web services.'));
-            $this->messageManager->addError(__($e->getMessage()));
-
-            return true;
-        } catch(\SoapFault $f) {
-            $this->dataHelper->log(
-                "[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.",
-                \Psr\Log\LogLevel::WARNING
-            );
-
-            $this->messageManager->addWarning(__('Please fix this error to use PayZen web services.'));
-            $this->messageManager->addError($f->faultstring);
-
-            return true;
         } catch(\UnexpectedValueException $e) {
             $this->dataHelper->log(
-                "[$requestId] cancelPayment error with code {$e->getCode()}: {$e->getMessage()}.",
+                "cancelPayment error with code {$e->getCode()}: {$e->getMessage()}.",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            if ($e->getCode() === -1) {
-                throw new \Exception(__('Authentication error !'));
-            } elseif ($e->getCode() === 1) {
-                // Merchant does not subscribe to WS option, cancel payment offline.
-                $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
-                $this->messageManager->addNotice($notice);
-
-                return true;
-            } else {
-                throw new \Exception($e->getMessage());
-            }
+            throw new \Exception($e->getMessage());
         } catch (\Exception $e) {
             $this->dataHelper->log(
-                "[$requestId] Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Exception with code {$e->getCode()}: {$e->getMessage()}",
                 \Psr\Log\LogLevel::ERROR
             );
+
+            if ($e->getCode() <= -1) { // Manage cUrl errors.
+                $message = __("Please consult the PayZen logs for more details.");
+            } else {
+                $message = $e->getMessage();
+            }
+
+            $this->messageManager->addError($message);
 
             throw $e;
         }
@@ -785,111 +686,136 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function validatePayment(\Magento\Payment\Model\InfoInterface $payment)
     {
+        // Clear all messages in session.
+        $this->messageManager->getMessages(true);
+
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
-        $this->dataHelper->log("Validate payment online for order #{$order->getIncrementId()}.");
+        $uuidArray = [];
+        $onlineValidatePayment = true;
 
-        $requestId = '';
+        if (! $this->restHelper->getPrivateKey($storeId)) {
+            // Client has not configured private key in module backend, let Magento validate payment offline.
+            $this->dataHelper->log("Cannot validate online payment for order #{$order->getIncrementId()}: private key is not configured, let Magento validate payment.");
+            $this->messageManager->addWarning(__('Payment is validated only in Magento. Please, consider validating the payment in PayZen Back Office.'));
+            $onlineValidatePayment = false;
+        } else {
+            $this->dataHelper->log("Validate payment online for order #{$order->getIncrementId()}.");
+        }
 
         try {
-            $wsApi = $this->checkAndGetWsApi($storeId);
-
-            $sid = false;
-
             // Get choosen payment option if any.
             $option = @unserialize($payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION));
-            $multi = (stripos($payment->getMethod(), 'payzen_multi') === 0) && is_array($option) && !empty($option);
+            $multi = (stripos($payment->getMethod(), 'payzen_multi') === 0) && is_array($option) && ! empty($option);
             $count = $multi ? (int) $option['count'] : 1;
 
-            // Retrieve saved transaction UUID.
-            $savedUuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
+            if ($onlineValidatePayment) {
+                // Retrieve saved transaction UUID.
+                $savedUuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
 
-            for ($i = 1; $i <= $count; $i++) {
-                if ($i == 1 && $savedUuid) {
-                    $uuid = $savedUuid;
+                if (! $savedUuid || ($count > 1)) {
+                    $uuidArray = $this->getPaymentDetails($order);
                 } else {
-                    $legacyTransactionKeyRequest = new \Lyranetwork\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
-                    $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
-                    $legacyTransactionKeyRequest->setSequenceNumber($i);
-                    $legacyTransactionKeyRequest->setCreationDate(new \DateTime($order->getCreatedAt()));
-
-                    $getPaymentUuid = new \Lyranetwork\Payzen\Model\Api\Ws\GetPaymentUuid();
-                    $getPaymentUuid->setLegacyTransactionKeyRequest($legacyTransactionKeyRequest);
-
-                    $requestId = $wsApi->setHeaders();
-                    $getPaymentUuidResponse = $wsApi->getPaymentUuid($getPaymentUuid);
-
-                    $wsApi->checkAuthenticity();
-                    $wsApi->checkResult($getPaymentUuidResponse->getLegacyTransactionKeyResult()->getCommonResponse());
-
-                    $uuid = $getPaymentUuidResponse->getLegacyTransactionKeyResult()
-                        ->getPaymentResponse()
-                        ->getTransactionUuid();
+                    $uuidArray[] = $savedUuid;
                 }
 
-                // Common $queryRequest object to use in all operations.
-                $queryRequest = new \Lyranetwork\Payzen\Model\Api\Ws\QueryRequest();
-                $queryRequest->setUuid($uuid);
+                $first = true;
+                foreach ($uuidArray as $uuid) {
+                    $requestData = [
+                        'uuid' => $uuid,
+                        'comment' => $this->getUserInfo()
+                    ];
 
-                $validatePayment = new \Lyranetwork\Payzen\Model\Api\Ws\ValidatePayment();
-                $validatePayment->setCommonRequest(new \Lyranetwork\Payzen\Model\Api\Ws\CommonRequest());
-                $validatePayment->setQueryRequest($queryRequest);
+                    // Perform our request.
+                    $client = new PayzenRest(
+                        $this->dataHelper->getCommonConfigData('rest_url', $storeId),
+                        $this->dataHelper->getCommonConfigData('site_id', $storeId),
+                        $this->restHelper->getPrivateKey($storeId)
+                    );
 
-                $requestId = $wsApi->setHeaders();
+                    $validatePaymentResponse = $client->post('V4/Transaction/Validate', json_encode($requestData));
 
-                // Set JSESSIONID if ws getPaymentUuid is called.
-                if ($sid) {
-                    $wsApi->setJsessionId($sid);
+                    $this->restHelper->checkResult($validatePaymentResponse, ['WAITING_AUTHORISATION', 'AUTHORISED']);
+
+                    // Wrap payment result to use traditional order creation tunnel.
+                    $data = $this->restHelper->convertRestResult($validatePaymentResponse['answer'], true);
+
+                    // Load API response.
+                    $response = $this->payzenResponseFactory->create(
+                        [
+                            'params' => $data,
+                            'ctx_mode' => null,
+                            'key_test' => null,
+                            'key_prod' => null,
+                            'algo' => null
+                        ]
+                    );
+
+                    $transId = $order->getPayment()->getCcTransId() . '-' . $response->get('sequence_number');
+
+                    if ($first) { // Single payment or first transaction for payment in installments.
+                        $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
+
+                        $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
+                        $order->setState($stateObject->getState())
+                              ->setStatus($stateObject->getStatus());
+                    }
+
+                    $order->addStatusHistoryComment(__('Transaction %1 has been validated.', $transId));
+
+                    // Update transaction status.
+                    $txn = $this->transactionResource->loadObjectByTxnId(
+                        $this->transaction,
+                        $order->getId(),
+                        $order->getPayment()->getId(),
+                        $transId
+                    );
+
+                    if ($txn && $txn->getId()) {
+                        $data = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+                        $data['Transaction Status'] = $response->getTransStatus();
+
+                        $txn->setAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $data);
+                        $txn->save();
+                    }
+
+                    $first = false;
                 }
+            } else {
+                // Wrap payment result to use traditional order creation tunnel.
+                $data = ['vads_trans_status' => 'AUTHORISED'];
 
-                $validatePaymentResponse = $wsApi->validatePayment($validatePayment);
-
-                $wsApi->checkAuthenticity();
-                $wsApi->checkResult(
-                    $validatePaymentResponse->getValidatePaymentResult()->getCommonResponse(),
-                    ['WAITING_AUTHORISATION', 'AUTHORISED']
-                );
-
-                $wrapper = new \Lyranetwork\Payzen\Model\Api\Ws\ResultWrapper($validatePaymentResponse->getValidatePaymentResult()->getCommonResponse());
-
-                // Load API response.
-                $response = $this->payzenResponseFactory->create(
-                    [
-                        'params' => $wrapper->getResponseParams(),
-                        'ctx_mode' => $this->dataHelper->getCommonConfigData('ctx_mode', $storeId),
-                        'key_test' => $this->dataHelper->getCommonConfigData('key_test', $storeId),
-                        'key_prod' => $this->dataHelper->getCommonConfigData('key_prod', $storeId)
-                    ]
-                );
-
-                $transId = $order->getPayment()->getCcTransId() . '-'. $i;
-
-                if ($i === 1) { // Single payment or first transaction for payment in installments.
-                    $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
-
-                    $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
-                    $order->setState($stateObject->getState())
-                        ->setStatus($stateObject->getStatus());
-                }
-
-                $order->addStatusHistoryComment(__('Transaction %1 has been validated.', $transId));
-
-                // Update transaction status.
                 $txn = $this->transactionResource->loadObjectByTxnId(
                     $this->transaction,
                     $order->getId(),
                     $order->getPayment()->getId(),
-                    $transId
+                    $order->getPayment()->getLastTransId()
                 );
 
                 if ($txn && $txn->getId()) {
-                    $data = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
-                    $data['Transaction Status'] = $response->getTransStatus();
-
-                    $txn->setAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $data);
-                    $txn->save();
+                    $txnData = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+                    $data['vads_card_brand'] = $txnData['Means of payment'];
                 }
+
+                // Load API response.
+                $response = $this->payzenResponseFactory->create(
+                    [
+                        'params' => $data,
+                        'ctx_mode' => null,
+                        'key_test' => null,
+                        'key_prod' => null,
+                        'algo' => null
+                    ]
+                );
+
+                $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
+
+                $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
+                $order->setState($stateObject->getState())
+                      ->setStatus($stateObject->getStatus());
+
+                $order->addStatusHistoryComment(__('Order %1 has been validated.', $order->getIncrementId()));
             }
 
             $this->dataHelper->log("Updating payment information for validated order #{$order->getIncrementId()}.");
@@ -899,44 +825,25 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
             $order->save();
             $this->messageManager->addSuccess(__('Payment validated successfully.'));
-        } catch(\Lyranetwork\Payzen\Model\WsException $e) {
-            $this->dataHelper->log(
-                "[$requestId] {$e->getMessage()}",
-                \Psr\Log\LogLevel::WARNING
-            );
-
-            $this->messageManager->addWarning(__('Please fix this error to use PayZen web services.'));
-            $this->messageManager->addError(__($e->getMessage()));
-        } catch(\SoapFault $f) {
-            $this->dataHelper->log(
-                "[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.",
-                \Psr\Log\LogLevel::WARNING
-            );
-
-            $this->messageManager->addWarning(__('Please fix this error to use PayZen web services.'));
-            $this->messageManager->addError($f->faultstring);
         } catch(\UnexpectedValueException $e) {
             $this->dataHelper->log(
-                "[$requestId] validatePayment error with code {$e->getCode()}: {$e->getMessage()}.",
+                "validatePayment error with code {$e->getCode()}: {$e->getMessage()}.",
                 \Psr\Log\LogLevel::ERROR
             );
-
-            if ($e->getCode() === -1) {
-                throw new \Exception(__('Authentication error !'));
-            } elseif ($e->getCode() === 1) {
-                // Merchant does not subscribe to WS option, validate payment offline.
-                $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
-                $this->messageManager->addNotice($notice);
-            } else {
-                $this->messageManager->addError($e->getMessage());
-            }
         } catch (\Exception $e) {
             $this->dataHelper->log(
-                "[$requestId] Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Exception with code {$e->getCode()}: {$e->getMessage()}",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            $this->messageManager->addError($e->getMessage());
+            $message = __("We cannot update the payment right now.");
+            if ($e->getCode() <= -1) { // Manage cUrl errors.
+                $message .= ' ' . __("Please consult the PayZen logs for more details.");
+            } else {
+                $message .= ' ' . $e->getMessage();
+            }
+
+            $this->messageManager->addError($message);
         }
     }
 
@@ -1070,188 +977,128 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        // Clear all messages in session.
+        $this->messageManager->getMessages(true);
+
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
-
-        $requestId = '';
 
         $this->dataHelper->log("Start refund of {$amount} {$order->getOrderCurrencyCode()} for order " .
              "#{$order->getIncrementId()} with {$this->_code} payment method.");
 
         try {
-            $wsApi = $this->checkAndGetWsApi($storeId);
-
             // Get currency.
             $currency = PayzenApi::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
-
-            $sid = false;
 
             // Retrieve transaction UUID.
             $uuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
             if (! $uuid) { // Retro compatibility.
-                $legacyTransactionKeyRequest = new \Lyranetwork\Payzen\Model\Api\Ws\LegacyTransactionKeyRequest();
-                $legacyTransactionKeyRequest->setTransactionId($payment->getCcTransId());
-                $legacyTransactionKeyRequest->setSequenceNumber('1'); // Only single payments can be refund.
-                $legacyTransactionKeyRequest->setCreationDate(new \DateTime($order->getCreatedAt()));
-
-                $getPaymentUuid = new \Lyranetwork\Payzen\Model\Api\Ws\GetPaymentUuid();
-                $getPaymentUuid->setLegacyTransactionKeyRequest($legacyTransactionKeyRequest);
-
-                $requestId = $wsApi->setHeaders();
-                $getPaymentUuidResponse = $wsApi->getPaymentUuid($getPaymentUuid);
-
-                $wsApi->checkAuthenticity();
-                $wsApi->checkResult($getPaymentUuidResponse->getLegacyTransactionKeyResult()->getCommonResponse());
-
-                $uuid = $getPaymentUuidResponse->getLegacyTransactionKeyResult()
-                    ->getPaymentResponse()
-                    ->getTransactionUuid();
-
-                // Retrieve JSESSIONID created for getPaymentUuid call.
-                $sid = $wsApi->getJsessionId();
+                // Get UUID from Order.
+                $uuidArray = $this->getPaymentDetails($order);
+                $uuid = reset($uuidArray);
             }
 
-            // Common $queryRequest object to use in all operations.
-            $queryRequest = new \Lyranetwork\Payzen\Model\Api\Ws\QueryRequest();
-            $queryRequest->setUuid($uuid);
+            $requestData = ['uuid' => $uuid];
 
-            $getPaymentDetails = new \Lyranetwork\Payzen\Model\Api\Ws\GetPaymentDetails();
-            $getPaymentDetails->setQueryRequest($queryRequest);
+            // Perform our request.
+            $client = new PayzenRest(
+                $this->dataHelper->getCommonConfigData('rest_url', $storeId),
+                $this->dataHelper->getCommonConfigData('site_id', $storeId),
+                $this->restHelper->getPrivateKey($storeId)
+            );
 
-            $requestId = $wsApi->setHeaders();
-            if ($sid) { // Set JSESSIONID if ws getPaymentUuid is called.
-                $wsApi->setJsessionId($sid);
-            }
+            $getPaymentDetails = $client->post('V4/Transaction/Get', json_encode($requestData));
 
-            $getPaymentDetailsResponse = $wsApi->getPaymentDetails($getPaymentDetails);
+            $this->restHelper->checkResult($getPaymentDetails);
 
-            $wsApi->checkAuthenticity();
-            $wsApi->checkResult($getPaymentDetailsResponse->getGetPaymentDetailsResult()->getCommonResponse());
-
-            // Retrieve JSESSIONID created for getPaymentDetails call.
-            if (! $sid) {
-                $sid = $wsApi->getJsessionId();
-            }
-
-            $transStatus = $getPaymentDetailsResponse->getGetPaymentDetailsResult()
-                ->getCommonResponse()
-                ->getTransactionStatusLabel();
+            $transStatus = $getPaymentDetails['answer']['detailedStatus'];
             $amountInCents = $currency->convertAmountToInteger($amount);
 
-            // Common request generation.
-            $commonRequest = new \Lyranetwork\Payzen\Model\Api\Ws\CommonRequest();
-            $commentText = 'Magento user: ' . $this->authSession->getUser()->getUsername();
-            $commentText .= '; IP address: ' . $this->dataHelper->getIpAddress();
+            $commentText = $this->getUserInfo();
+
             foreach ($payment->getCreditmemo()->getComments() as $comment) {
                 $commentText .= '; ' . $comment->getComment();
             }
 
-            $commonRequest->setComment($commentText);
-
-            $requestId = $wsApi->setHeaders();
-            $wsApi->setJsessionId($sid); // Set JSESSIONID for the last ws call.
-
             if ($transStatus === 'CAPTURED') { // Transaction captured, we can do refund.
-                $timestamp = time();
+                $requestData = [
+                    'uuid' => $uuid,
+                    'amount' => $amountInCents,
+                    'resolutionMode' => 'REFUND_ONLY',
+                    'currency' => $currency->getAlpha3(),
+                    'comment' => $commentText
+                ];
 
-                $paymentRequest = new \Lyranetwork\Payzen\Model\Api\Ws\PaymentRequest();
-                $paymentRequest->setTransactionId(PayzenApi::generateTransId($timestamp));
-                $paymentRequest->setAmount($amountInCents);
-                $paymentRequest->setCurrency($currency->getNum());
+                $refundPaymentResponse = $client->post('V4/Transaction/CancelOrRefund', json_encode($requestData));
 
-                $captureDelay = $this->getConfigData('capture_delay', $storeId); // Get submodule specific param.
-                if (! is_numeric($captureDelay)) {
-                    // Get general param.
-                    $captureDelay = $this->dataHelper->getCommonConfigData('capture_delay', $storeId);
-                }
+                // Pending or accepted payment.
+                $successStatuses = array_merge(PayzenApi::getSuccessStatuses(), PayzenApi::getPendingStatuses());
 
-                if (is_numeric($captureDelay)) {
-                    $paymentRequest->setExpectedCaptureDate(new \DateTime('@' . strtotime("+$captureDelay days", $timestamp)));
-                }
+                $this->restHelper->checkResult($refundPaymentResponse, $successStatuses);
 
-                $validationMode = $this->getConfigData('validation_mode', $storeId); // Get submodule specific param.
-                if ($validationMode === '-1') {
-                    // Get general param.
-                    $validationMode = $this->dataHelper->getCommonConfigData('validation_mode', $storeId);
-                }
+                // Check operation type.
+                $transType = $refundPaymentResponse['answer']['operationType'];
 
-                if ($validationMode !== '') {
-                    $paymentRequest->setManualValidation($validationMode);
-                }
-
-                $refundPayment = new \Lyranetwork\Payzen\Model\Api\Ws\RefundPayment();
-                $refundPayment->setCommonRequest($commonRequest);
-                $refundPayment->setPaymentRequest($paymentRequest);
-                $refundPayment->setQueryRequest($queryRequest);
-                $refurndPaymentResponse = $wsApi->refundPayment($refundPayment);
-
-                $wsApi->checkAuthenticity();
-                $wsApi->checkResult(
-                    $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
-                    [
-                        'INITIAL',
-                        'AUTHORISED',
-                        'AUTHORISED_TO_VALIDATE',
-                        'WAITING_AUTHORISATION',
-                        'WAITING_AUTHORISATION_TO_VALIDATE',
-                        'CAPTURED',
-                        'UNDER_VERIFICATION'
-                    ]
-                );
-
-                // Check operation type (0: debit, 1 refund).
-                $transType = $refurndPaymentResponse->getRefundPaymentResult()
-                    ->getPaymentResponse()
-                    ->getOperationType();
-                if ($transType != 1) {
+                if ($transType !== 'CREDIT') {
                     throw new \Exception("Unexpected transaction type returned ($transType).");
                 }
 
                 // Create refund transaction in Magento.
-                $this->createRefundTransaction(
-                    $payment,
-                    $refurndPaymentResponse->getRefundPaymentResult()->getCommonResponse(),
-                    $refurndPaymentResponse->getRefundPaymentResult()->getPaymentResponse(),
-                    $refurndPaymentResponse->getRefundPaymentResult()->getCardResponse()
-                );
+                $this->createRefundTransaction($payment, $refundPaymentResponse['answer']);
 
                 $this->dataHelper->log("Online money refund for order #{$order->getIncrementId()} is successful.");
             } else {
-                $transAmount = $getPaymentDetailsResponse->getGetPaymentDetailsResult()
-                    ->getPaymentResponse()
-                    ->getAmount();
+                $transAmount = $getPaymentDetails['answer']['amount'];
+
                 if ($amountInCents >= $transAmount) { // Transaction cancel.
-                    $cancelPayment = new \Lyranetwork\Payzen\Model\Api\Ws\CancelPayment();
-                    $cancelPayment->setCommonRequest($commonRequest);
-                    $cancelPayment->setQueryRequest($queryRequest);
+                    $requestData = [
+                        'uuid' => $uuid,
+                        'resolutionMode' => 'CANCELLATION_ONLY',
+                        'comment' => $commentText
+                    ];
 
-                    $cancelPaymentResponse = $wsApi->cancelPayment($cancelPayment);
+                    $cancelPaymentResponse = $client->post('V4/Transaction/CancelOrRefund', json_encode($requestData));
 
-                    $wsApi->checkAuthenticity();
-                    $wsApi->checkResult(
-                        $cancelPaymentResponse->getCancelPaymentResult()->getCommonResponse(),
-                        [
-                            'CANCELLED'
-                        ]
-                    );
+                    $this->restHelper->checkResult($cancelPaymentResponse, ['CANCELLED']);
 
                     $order->cancel();
                     $this->dataHelper->log("Online payment cancel for order #{$order->getIncrementId()} is successful.");
-                } else { // Partial transaction refund, call updatePayment WS.
-                    $paymentRequest = new \Lyranetwork\Payzen\Model\Api\Ws\PaymentRequest();
-                    $paymentRequest->setAmount($transAmount - $amountInCents);
-                    $paymentRequest->setCurrency($currency->getNum());
+                } else {
+                    // Partial transaction cancel, call update WS.
+                    $timestamp = time();
 
-                    $updatePayment = new \Lyranetwork\Payzen\Model\Api\Ws\UpdatePayment();
-                    $updatePayment->setCommonRequest($commonRequest);
-                    $updatePayment->setQueryRequest($queryRequest);
-                    $updatePayment->setPaymentRequest($paymentRequest);
+                    $captureDelay = $this->getConfigData('capture_delay', $storeId); // Get submodule specific param.
+                    if (! is_numeric($captureDelay)) {
+                        // Get general param.
+                        $captureDelay = $this->dataHelper->getCommonConfigData('capture_delay', $storeId);
+                    }
 
-                    $updatePaymentResponse = $wsApi->updatePayment($updatePayment);
+                    $expectedCaptureDate = (is_numeric($captureDelay)) ? new \DateTime('@' . strtotime("+$captureDelay days", $timestamp)) : null;
 
-                    $wsApi->checkAuthenticity();
-                    $wsApi->checkResult(
-                        $updatePaymentResponse->getUpdatePaymentResult()->getCommonResponse(),
+                    $validationMode = $this->getConfigData('validation_mode', $storeId); // Get submodule specific param.
+                    if ($validationMode === '-1') {
+                        // Get general param.
+                        $validationMode = $this->dataHelper->getCommonConfigData('validation_mode', $storeId);
+                    }
+
+                    if ($validationMode !== '') {
+                        $validationMode = ($validationMode == '1') ? 'YES' : 'NO';
+                    }
+
+                    $requestData = [
+                        'uuid' => $uuid,
+                        'cardUpdate' => [
+                            'amount' => $transAmount - $amountInCents,
+                            'currency' => $currency->getAlpha3(),
+                            'expectedCaptureDate' => $expectedCaptureDate,
+                            'manualValidation' => $validationMode
+                        ],
+                        'comment' => $commentText
+                    ];
+
+                    $updatePaymentResponse = $client->post('V4/Transaction/Update', json_encode($requestData));
+
+                    $this->restHelper->checkResult($updatePaymentResponse,
                         [
                             'AUTHORISED',
                             'AUTHORISED_TO_VALIDATE',
@@ -1262,76 +1109,53 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     $this->dataHelper->log("Online payment update for order #{$order->getIncrementId()} is successful.");
                 }
             }
-        } catch (\Lyranetwork\Payzen\Model\WsException $e) {
-            $this->dataHelper->log("[$requestId] {$e->getMessage()}", \Psr\Log\LogLevel::WARNING);
-
-            $this->messageManager->addError($e->getMessage());
-            $this->messageManager->addWarning('Please fix error to refund payments through PayZen. If you want to refund order in Magento, use the &laquo; Refund Offline &raquo; button.');
-            throw new \Exception($e->getMessage());
-        } catch (\SoapFault $f) {
-            $this->dataHelper->log(
-                "[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.",
-                \Psr\Log\LogLevel::WARNING
-            );
-
-            $this->messageManager->addError($f->faultstring);
-            $this->messageManager->addWarning('Please fix error to refund payments through PayZen. If you want to refund order in Magento, use the &laquo; Refund Offline &raquo; button.');
-            throw new \Exception($f->faultstring);
         } catch(\UnexpectedValueException $e) {
-            $this->dataHelper->log("[$requestId] refund error with code {$e->getCode()}: {$e->getMessage()}.", \Psr\Log\LogLevel::ERROR);
-
-            if ($e->getCode() === -1) {
-                throw new \Exception(__('Authentication error !'));
-            } elseif ($e->getCode() === 1) {
-                // Merchant does not subscribe to WS option, refund payment offline.
-                $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
-                $this->messageManager->addNotice($notice);
-                // Magento will do an offline refund.
-            } elseif ($e->getCode() === 83) {
-                throw new \Exception(__('Chargebacks cannot be refunded.'));
-            } else {
-                throw new \Exception($e->getMessage());
-            }
+            $this->dataHelper->log("refund error with code {$e->getCode()}: {$e->getMessage()}.", \Psr\Log\LogLevel::ERROR);
         } catch (\Exception $e) {
             $this->dataHelper->log(
-                "[$requestId] Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Exception with code {$e->getCode()}: {$e->getMessage()}",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            $message = __('Refund error')->render() . ': ' . $e->getMessage();
-            $this->messageManager->addError($message);
-            throw $e;
+            $message = __('Refund error') . ':';
+            if ($e->getCode() <= -1) { // Manage cUrl errors.
+                $message .= ' ' . __('Please consult the PayZen logs for more details.');
+            } else {
+                $message .= ' ' . $e->getMessage();
+            }
+
+            throw new \Exception($message);
         }
 
         $order->save();
         return $this;
     }
 
-    private function createRefundTransaction($payment, $commonResponse, $paymentResponse, $cardResponse)
+    private function createRefundTransaction($payment, $refundResponse)
     {
-        $currency = PayzenApi::findCurrencyByNumCode($paymentResponse->getCurrency());
+        $response = $this->restHelper->convertRestResult($refundResponse, true);
 
         // Save transaction details to sales_payment_transaction.
-        $transactionId = $paymentResponse->getTransactionId() . '-' . $paymentResponse->getSequenceNumber();
+        $transactionId = $response['vads_trans_id']. '-' . $response['vads_sequence_number'];
 
         $expiry = '';
-        if ($cardResponse->getExpiryMonth() && $cardResponse->getExpiryYear()) {
-            $expiry = str_pad($cardResponse->getExpiryMonth(), 2, '0', STR_PAD_LEFT) . ' / ' .
-                 $cardResponse->getExpiryYear();
+        if ($response['vads_expiry_month'] && $response['vads_expiry_year']) {
+            $expiry = str_pad($response['vads_expiry_month'], 2, '0', STR_PAD_LEFT) . ' / ' .
+                $response['vads_expiry_year'];
         }
 
         // Save paid amount.
-        $currency = PayzenApi::findCurrencyByNumCode($paymentResponse->getCurrency());
-        $amount = round($currency->convertAmountToFloat($paymentResponse->getAmount()), $currency->getDecimals());
+        $currency = PayzenApi::findCurrencyByNumCode($response['vads_currency']);
+        $amount = round($currency->convertAmountToFloat($response['vads_amount']), $currency->getDecimals());
 
         $amountDetail = $amount . ' ' . $currency->getAlpha3();
 
-        if ($paymentResponse->getEffectiveCurrency() &&
-             ($paymentResponse->getCurrency() !== $paymentResponse->getEffectiveCurrency())) {
-            $effectiveCurrency = PayzenApi::findCurrencyByNumCode($paymentResponse->getEffectiveCurrency());
+        if (isset($response['vads_effective_currency']) &&
+            ($response['vads_currency'] !== $response['vads_effective_currency'])) {
+                $effectiveCurrency = PayzenApi::findCurrencyByNumCode($response['vads_effective_currency']);
 
             $effectiveAmount = round(
-                $effectiveCurrency->convertAmountToFloat($paymentResponse->getEffectiveAmount()),
+                $effectiveCurrency->convertAmountToFloat($response['vads_effective_amount']),
                 $effectiveCurrency->getDecimals()
             );
 
@@ -1342,10 +1166,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             'Transaction Type' => 'CREDIT',
             'Amount' => $amountDetail,
             'Transaction ID' => $transactionId,
-            'Transaction UUID' => $paymentResponse->getTransactionUuid(),
-            'Transaction Status' => $commonResponse->getTransactionStatusLabel(),
-            'Means of payment' => $cardResponse->getBrand(),
-            'Card Number' => $cardResponse->getNumber(),
+            'Transaction UUID' => $response['vads_trans_uuid'],
+            'Transaction Status' => $response['vads_trans_status'],
+            'Means of payment' => $response['vads_card_brand'],
+            'Card Number' => $response['vads_card_number'],
             'Expiration Date' => $expiry
         ];
 
@@ -1353,37 +1177,54 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->paymentHelper->addTransaction($payment, $transactionType, $transactionId, $additionalInfo);
     }
 
-    protected function checkAndGetWsApi($storeId)
+    protected function getPaymentDetails($order, $uuidOnly = true)
     {
-        $this->dataHelper->checkWsRequirements();
+        $storeId = $order->getStore()->getId();
 
-        // Headers generation.
-        $shopId = $this->dataHelper->getCommonConfigData('site_id', $storeId);
-        $mode = $this->dataHelper->getCommonConfigData('ctx_mode', $storeId);
-        $keyTest = $this->dataHelper->getCommonConfigData('key_test', $storeId);
-        $keyProd = $this->dataHelper->getCommonConfigData('key_prod', $storeId);
+        // Get UUIDs from Order.
+        $client = new PayzenRest(
+            $this->dataHelper->getCommonConfigData('rest_url', $storeId),
+            $this->dataHelper->getCommonConfigData('site_id', $storeId),
+            $this->restHelper->getPrivateKey($storeId)
+        );
 
-        // Load specific configuration file for WS.
-        $options = parse_ini_file($this->dirReader->getModuleDir('etc', 'Lyranetwork_Payzen') . '/ws.ini') ?: [];
+        $requestData = [
+            'orderId' => $order->getIncrementId(),
+            'operationType' => 'DEBIT'
+        ];
 
-        if (! empty($options)) {
-            if (! $options['proxy.enabled']) {
-                unset(
-                    $options['proxy_host'],
-                    $options['proxy_port'],
-                    $options['proxy_login'],
-                    $options['proxy_password']
-                );
+        $getOrderResponse = $client->post('V4/Order/Get', json_encode($requestData));
+        $this->restHelper->checkResult($getOrderResponse);
+
+        // Order transactions organized by sequence numbers.
+        $transBySequence = [];
+        foreach ($getOrderResponse['answer']['transactions'] as $transaction) {
+            $sequenceNumber = $transaction['transactionDetails']['sequenceNumber'];
+            // Unpaid transactions are not considered.
+            if ($transaction['status'] !== 'UNPAID') {
+                $transBySequence[$sequenceNumber] = $uuidOnly ? $transaction['uuid'] : $transaction;
             }
-
-            unset($options['proxy.enabled']);
         }
 
-        $url = $this->dataHelper->getCommonConfigData('wsdl_url', $storeId);
+        ksort($transBySequence);
+        return $transBySequence;
+    }
 
-        $wsApi = new \Lyranetwork\Payzen\Model\Api\Ws\WsApi($url, $options);
-        $wsApi->init($shopId, $mode, $keyTest, $keyProd);
+    protected function getUserInfo()
+    {
+        $commentText = 'Magento user: ' . $this->authSession->getUser()->getUsername();
+        $commentText .= '; IP address: ' . $this->dataHelper->getIpAddress();
 
-        return $wsApi;
+        return $commentText;
+    }
+
+    /**
+     * Return logged in customer model data.
+     *
+     * @return int
+     */
+    public function getCurrentCustomer()
+    {
+        return $this->dataHelper->getCurrentCustomer($this->customerSession);
     }
 }

@@ -54,7 +54,6 @@ class Token extends \Magento\Framework\App\Action\Action
     protected $resultJsonFactory;
 
     /**
-     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
      * @param \Magento\CheckoutAgreements\Model\AgreementsValidator $agreementsValidator

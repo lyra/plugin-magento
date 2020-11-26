@@ -18,13 +18,11 @@ use Magento\Customer\Model\Customer;
 class UpgradeData implements UpgradeDataInterface
 {
     /**
-     *
      * @var CustomerSetupFactory
      */
     protected $customerSetupFactory;
 
     /**
-     *
      * @param CustomerSetupFactory $customerSetupFactory
      */
     public function __construct(CustomerSetupFactory $customerSetupFactory)
@@ -33,9 +31,7 @@ class UpgradeData implements UpgradeDataInterface
     }
 
     /**
-     *
      * {@inheritdoc}
-     *
      */
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {

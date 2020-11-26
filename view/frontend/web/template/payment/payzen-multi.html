@@ -17,12 +17,13 @@
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {for: getCode()}" class="label">
             <!-- Multi logo. -->
-            <img data-bind="attr: {src: getModuleLogoUrl()}"
-                 class="payment-icon"
-                 alt="PayZen"
-                 style="width: 76px;"
-            />
-
+            <!-- ko if: getModuleLogoUrl() -->
+                <img data-bind="attr: {src: getModuleLogoUrl()}"
+                     class="payment-icon"
+                     alt="PayZen"
+                     style="width: 76px;"
+                />
+            <!--/ko-->
             <span data-bind="text: getTitle()"></span>
         </label>
     </div>
@@ -50,7 +51,7 @@
                 </label>
 
                 <div class="control" style="margin-top: 20px;">
-                    <ul class="multi-payment-options" style="padding: 0;">
+                    <ul class="payzen-multi-options payzen-payment-option">
                         <!-- ko foreach: {data: getAvailableOptions(), as: 'option'} -->
                         <li style="list-style: outside none none; vertical-align: top;" data-bind="css: {'_active': true}">
                             <input class="radio"
@@ -68,7 +69,7 @@
                 </div>
             </div>
 
-            <!-- ko if: (getEntryMode() == 2) -->
+            <!-- ko if: (getEntryMode() == 2) --><!-- Payment means selection on merchant site. -->
                 <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
             <!--/ko-->
         </fieldset>

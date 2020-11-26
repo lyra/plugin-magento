@@ -15,25 +15,21 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 class CustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
     /**
-     *
      * @var \Magento\Customer\Model\GroupFactory
      */
     protected $customerGroupFactory;
 
     /**
-     *
      * @var bool
      */
     protected $staticTable = true;
 
     /**
-     *
      * @var array
      */
     protected $_default = [];
 
     /**
-     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Customer\Model\GroupFactory $customerGroupFactory
      * @param array $data

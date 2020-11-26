@@ -25,9 +25,12 @@
                 <include path="Lyranetwork_Payzen::system/multi.xml" />
                 <include path="Lyranetwork_Payzen::system/gift.xml" />
                 <include path="Lyranetwork_Payzen::system/choozeo.xml" />
+                <include path="Lyranetwork_Payzen::system/oney.xml" />
                 <include path="Lyranetwork_Payzen::system/fullcb.xml" />
                 <include path="Lyranetwork_Payzen::system/sepa.xml" />
                 <include path="Lyranetwork_Payzen::system/paypal.xml" />
+                <include path="Lyranetwork_Payzen::system/franfinance.xml" />
+                <include path="Lyranetwork_Payzen::system/other.xml" />
             </group>
         </section>
     </system>

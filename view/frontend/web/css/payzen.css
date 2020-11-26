@@ -7,7 +7,11 @@
 }
 
 .payzen-standard-cc-block {
-    display:none;
+    display: none;
+}
+
+.payzen-sepa-cc-block {
+    display: none;
 }
 
 ul.payzen-identifier {
@@ -19,7 +23,6 @@ a.payzen-payment-link {
     color: #39C;
     text-decoration: none;
     font-family: Georgia,Times,"Times New Roman",serif;
-    font-style: italic;
     font-size: 16px;
 }
 
@@ -29,6 +32,15 @@ a.payzen-payment-link {
 }
 
 .payzen-choozeo fieldset div.field {
+    float: left;
+    width: 50%;
+}
+.payzen-payment-option ul {
+    padding: 5px 5px;
+}
+
+
+.payzen-other fieldset div.field {
     float: left;
     width: 50%;
 }
@@ -49,10 +61,43 @@ a.payzen-payment-link {
     border-bottom: 1px solid black;
 }
 
-.payzen_review td.amount {
+.payzen_review .payzen_bold {
     font-weight: bold;
 }
 
 .payzen_review td, .payzen_review th {
     padding: 5px 5px;
+}
+
+button.kr-popin-button {
+    display: none !important;
+    width: 0;
+    height: 0;
+}
+
+.payzen-card {
+    display: inline !important;
+}
+
+.payzen-card img, .payzen-card span {
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.payzen-card img {
+    max-width: 90px;
+    max-height: 30px;
+}
+
+.payzen-card span {
+    height: 30px;
+}
+
+.payzen-confirm-delete {
+    max-width: 750px;
+    margin: auto;
+}
+
+.payzen-confirm-delete .modal-footer {
+    text-align: right;
 }

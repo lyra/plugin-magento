@@ -18,18 +18,6 @@ class Multi extends Payzen
         return $this->getMethod()->getAvailableCcTypes();
     }
 
-    public function getCcTypeImageSrc($card)
-    {
-        $card = 'cc/' . strtolower($card) . '.png';
-
-        if ($this->dataHelper->isUploadFileImageExists($card)) {
-            return $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
-            'payzen/images/' . $card;
-        } else {
-            return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $card);
-        }
-    }
-
     public function getAvailableOptions()
     {
         $amount = $this->getMethod()

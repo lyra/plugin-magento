@@ -112,8 +112,8 @@
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="card_info_mode" translate="label comment" type="select" sortOrder="241" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Bank data acquisition mode]]></label>
-                <comment><![CDATA[Select how the credit card infos will be entered. Attention, to use data acquisition on the merchant site, you must ensure that you have subscribed to this option with PayZen.]]></comment>
+                <label><![CDATA[Card data entry mode]]></label>
+                <comment><![CDATA[Select how the credit card information will be entered. Attention, to use embedded payment fields, you must ensure that you have subscribed to this option with PayZen.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\CardInfoMode</source_model>
                 <config_path>payment/payzen_standard/card_info_mode</config_path>
             </field>
@@ -128,95 +128,33 @@
                 </depends>
             </field>
 
-            <field id="rest_private_key_test" translate="label" type="obscure" sortOrder="242" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Test password</label>
-                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                <config_path>payment/payzen_standard/rest_private_key_test</config_path>
-                <depends>
-                    <field id="card_info_mode">4</field>
-                </depends>
-            </field>
-
-            <field id="rest_private_key_prod" translate="label" type="obscure" sortOrder="243" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Production password</label>
-                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                <config_path>payment/payzen_standard/rest_private_key_prod</config_path>
-                <depends>
-                    <field id="card_info_mode">4</field>
-                </depends>
-            </field>
-
-            <field id="rest_public_key_test" translate="label" type="text" sortOrder="244" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Public test key</label>
-                <config_path>payment/payzen_standard/rest_public_key_test</config_path>
-                <depends>
-                    <field id="card_info_mode">4</field>
-                </depends>
-            </field>
-
-            <field id="rest_public_key_prod" translate="label" type="text" sortOrder="245" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Public production key</label>
-                <config_path>payment/payzen_standard/rest_public_key_prod</config_path>
-                <depends>
-                    <field id="card_info_mode">4</field>
-                </depends>
-            </field>
-
-            <field id="rest_return_key_test" translate="label" type="obscure" sortOrder="246" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>HMAC-SHA-256 test key</label>
-                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                <config_path>payment/payzen_standard/rest_return_key_test</config_path>
-                <depends>
-                    <field id="card_info_mode">4</field>
-                </depends>
-            </field>
-
-            <field id="rest_return_key_prod" translate="label" type="obscure" sortOrder="247" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>HMAC-SHA-256 production key</label>
-                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                <config_path>payment/payzen_standard/rest_return_key_prod</config_path>
-                <depends>
-                    <field id="card_info_mode">4</field>
-                </depends>
-            </field>
-
-            <field id="notify_url" translate="label comment" type="label" sortOrder="248" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>API REST Notification URL</label>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\NotifyUrl</frontend_model>
-                <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
-                <config_path>payment/payzen_standard/notify_url</config_path>
-                <depends>
-                    <field id="card_info_mode">4</field>
-                </depends>
-            </field>
-
-            <field id="rest_theme" translate="label comment" type="select" sortOrder="249" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_theme" translate="label comment" type="select" sortOrder="244" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Theme]]></label>
                 <comment><![CDATA[Select a theme to use to display embedded payment fields. For more customization, you can edit module template manually.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\RestTheme</source_model>
                 <config_path>payment/payzen_standard/rest_theme</config_path>
                 <depends>
-                    <field id="card_info_mode">4</field>
+                    <field id="card_info_mode" separator=",">4,5</field>
                 </depends>
             </field>
 
-            <field id="rest_placeholders" translate="label comment" sortOrder="250" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_placeholders" translate="label comment" sortOrder="245" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Custom fields placeholders]]></label>
                 <comment><![CDATA[Texts to use as placeholders for embedded payment fields.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Standard\RestPlaceholders</frontend_model>
                 <config_path>payment/payzen_standard/rest_placeholders</config_path>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized</backend_model>
                 <depends>
-                    <field id="card_info_mode">4</field>
+                    <field id="card_info_mode" separator=",">4,5</field>
                 </depends>
             </field>
 
-            <field id="rest_attempts" translate="label comment" type="text" sortOrder="251" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_attempts" translate="label comment" type="text" sortOrder="246" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Payment attempts number]]></label>
                 <comment><![CDATA[Maximum number of payment retries after a failed payment (between 0 and 9). If blank, the gateway default value is 3.]]></comment>
                 <config_path>payment/payzen_standard/rest_attempts</config_path>
                 <depends>
-                    <field id="card_info_mode">4</field>
+                    <field id="card_info_mode" separator=",">4,5</field>
                 </depends>
             </field>
         </group>

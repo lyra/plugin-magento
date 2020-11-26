@@ -15,7 +15,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray
 abstract class ConfigFieldArray extends \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
 {
     /**
-     *
      * @var bool
      */
     protected $staticTable = false;
@@ -102,6 +101,29 @@ abstract class ConfigFieldArray extends \Magento\Config\Block\System\Config\Form
     }
 
     /**
+     * Retrieve list type column renderer.
+     *
+     * @return Customergroup
+     */
+    protected function getMultiselectRenderer($columnName, $options)
+    {
+        if (! isset($this->$columnName) || ! $this->$columnName) {
+            $this->$columnName = $this->getLayout()->createBlock(
+                \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Renderer\ColumnMultiselect::class,
+                '',
+                [
+                    'data' => [
+                        'is_render_to_js_template' => false,
+                        'options' => $options
+                    ]
+                ]
+            );
+        }
+
+        return $this->$columnName;
+    }
+
+    /**
      * Retrieve HTML markup for given form element.
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
@@ -121,40 +143,53 @@ abstract class ConfigFieldArray extends \Magento\Config\Block\System\Config\Form
     }
 
     /**
+     * Render element JavaScript code.
+     *
+     * @return string
+     */
+    protected function renderScript()
+    {
+        $thisEltId = $this->getElement()->getId();
+        $script = '';
+
+        if ($this->_isInheritCheckboxRequired($this->getElement())) {
+            $script = '
+                <script>
+                     require([
+                        "prototype"
+                    ], function () {
+                        document.observe("dom:loaded", function() {
+                ';
+
+            $script .= '    toggleValueElements($("' . $thisEltId . '_inherit"), $("' . $thisEltId . '"));';
+
+            if (! empty($this->dependantFields)) {
+                foreach ($this->dependantFields as $dependantField) {
+                    $script .= '
+                            Event.observe($("' . $dependantField . '"), "change", function() {
+                                toggleValueElements($("' . $thisEltId . '_inherit"), $("' . $thisEltId . '"));
+                            });
+                        ';
+                }
+            }
+
+            $script .= '});
+                   });
+                </script>';
+        }
+
+        return $script;
+    }
+
+
+    /**
      * Render HTML block.
      *
      * @return string
      */
     protected function _toHtml()
     {
-        $thisEltId = $this->getElement()->getId();
-
-        $script = '';
-
-        if ($this->_isInheritCheckboxRequired($this->getElement())) {
-            $script .= '
-                <script>
-                     require([
-                        "prototype"
-                    ], function () {
-                        document.observe("dom:loaded", function() {
-                            toggleValueElements($("' . $thisEltId . '_inherit"), $("' . $thisEltId . '"));';
-
-            if (! empty($this->dependantFields)) {
-                foreach ($this->dependantFields as $dependantField) {
-                    $script .= '
-                        Event.observe($("' . $dependantField . '"), "change", function() {
-                            toggleValueElements($("' . $thisEltId . '_inherit"), $("' . $thisEltId . '"));
-                        });';
-                }
-            }
-
-            $script .= '});
-                    });
-                </script>
-            ';
-        }
-
-        return '<div id="' . $thisEltId . '">' . parent::_toHtml() . "\n$script" . '</div>';
+        return '<div id="' . $this->getElement()->getId() . '" style="max-width: 500px;">'
+            . parent::_toHtml() . "\n" . $this->renderScript() . '</div>';
     }
 }

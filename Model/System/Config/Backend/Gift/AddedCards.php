@@ -14,19 +14,16 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized
 {
     /**
-     *
      * @var \Magento\Framework\File\UploaderFactory
      */
     protected $uploaderFactory;
 
     /**
-     *
      * @var \Magento\Framework\Filesystem
      */
     protected $filesystem;
 
     /**
-     *
      * @var \Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface
      */
     protected $requestData;
@@ -37,7 +34,6 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
     protected $adapterFactory;
 
     /**
-     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -83,7 +79,7 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
     }
 
     /**
-     * Save uploaded files before saving config value
+     * Save uploaded files before saving config value.
      */
     public function beforeSave()
     {
@@ -96,7 +92,7 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
 
         $i = 0;
         foreach ($value as $key => $card) {
-            $i ++;
+            $i++;
 
             if (empty($card)) {
                 continue;

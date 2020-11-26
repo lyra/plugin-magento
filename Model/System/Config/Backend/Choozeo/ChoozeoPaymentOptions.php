@@ -20,18 +20,14 @@ class ChoozeoPaymentOptions extends \Lyranetwork\Payzen\Model\System\Config\Back
         } else {
             $i = 0;
             foreach ($values as $value) {
-                $i ++;
+                $i++;
 
                 if (empty($value)) {
                     continue;
                 }
 
-                if (! empty($value['amount_min']) && (! is_numeric($value['amount_min']) || $value['amount_min'] < 0)) {
-                    $this->throwException('Minimum amount', $i);
-                } elseif (! empty($value['amount_max']) &&
-                    (! is_numeric($value['amount_max']) || $value['amount_max'] < 0)) {
-                    $this->throwException('Maximum amount', $i);
-                }
+                $this->checkAmount($value['amount_min'], 'Minimum amount', $i);
+                $this->checkAmount($value['amount_max'], 'Maximum amount', $i);
             }
         }
 

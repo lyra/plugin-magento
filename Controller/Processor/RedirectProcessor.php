@@ -12,19 +12,16 @@ namespace Lyranetwork\Payzen\Controller\Processor;
 class RedirectProcessor
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Magento\Framework\Registry
      */
     protected $coreRegistry;
 
     /**
-     *
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\Registry $coreRegistry
      */

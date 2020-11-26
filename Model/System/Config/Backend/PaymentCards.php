@@ -14,19 +14,16 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
     protected $messages;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Checkout
      */
     protected $checkoutHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -62,36 +59,8 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
             $this->setValue([]);
         }
 
-        $data = $this->getGroups('payzen'); // Get data of general config group.
-        $oneyContract = isset($data['fields']['oney_contract']['value']) && $data['fields']['oney_contract']['value'];
-
-        $oney = true;
-        if ($oneyContract) {
-            if (empty($this->getValue()) /* ALL */
-                || in_array('ONEY', $this->getValue()) || in_array('ONEY_SANDBOX', $this->getValue())) {
-                try {
-                    // Check Oney requirements.
-                    $this->checkoutHelper->checkOneyRequirements($this->getScope(), $this->getScopeId());
-                } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                    $this->setValue(array_diff($this->getValue(), [
-                        'ONEY',
-                        'ONEY_SANDBOX'
-                    ]));
-
-                    if (! in_array($e->getMessage(), $this->messages)) {
-                        $this->messages[] = $e->getMessage();
-                    }
-
-                    $oney = false;
-                }
-            }
-        } else {
-            // No Oney contract, let's unselect them.
-            $this->setValue(array_diff($this->getValue(), [
-                'ONEY',
-                'ONEY_SANDBOX'
-            ]));
-        }
+        // Remove Oney card from payment means list.
+        $this->setValue(array_diff($this->getValue(), ['ONEY_3X_4X']));
 
         if (strlen(implode(';', $this->getValue())) > 127) {
             $config = $this->getFieldConfig();
@@ -102,19 +71,8 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
             $msg = __('Invalid value for field &laquo; %1 &raquo; in section &laquo; %2 &raquo;.', $field, $group)->render();
             $msg .= ' ' . __('Too many card types are selected.')->render();
             throw new \Magento\Framework\Exception\LocalizedException(__($msg));
-        } elseif (! $oney) {
-            $this->messages[] = __('FacilyPay Oney means of payment cannot be used.')->render();
         }
 
         return parent::save();
-    }
-
-    public function afterCommitCallback()
-    {
-        if (! empty($this->messages)) {
-            throw new \Magento\Framework\Exception\LocalizedException(__(implode("\n", $this->messages)));
-        }
-
-        return parent::afterCommitCallback();
     }
 }

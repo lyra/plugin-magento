@@ -12,13 +12,11 @@ namespace Lyranetwork\Payzen\Model\Logger\Handler;
 class Payzen extends \Magento\Framework\Logger\Handler\Base
 {
     /**
-     *
      * @var string
      */
     protected $fileName = '/var/log/payzen.log';
 
     /**
-     *
      * @var int
      */
     protected $loggerType = \Monolog\Logger::INFO;

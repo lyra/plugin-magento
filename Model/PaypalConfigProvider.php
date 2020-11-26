@@ -12,29 +12,19 @@ namespace Lyranetwork\Payzen\Model;
 class PaypalConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
 {
     /**
-     *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Framework\UrlInterface $urlBuilder
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param string $methodCode
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\UrlInterface $urlBuilder,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Payment\Helper\Data $paymentHelper,
         \Lyranetwork\Payzen\Helper\Data $dataHelper
     ) {
         parent::__construct(
             $storeManager,
-            $assetRepo,
             $urlBuilder,
-            $logger,
-            $paymentHelper,
             $dataHelper,
             \Lyranetwork\Payzen\Helper\Data::METHOD_PAYPAL
         );

@@ -1,9 +1,26 @@
-2.4.11: 2020-11-02:
+2.5.0, 2020-11-25:
+- [embedded] Bug fix: Empty cart to avoid double payments with REST API.
+- [franfinance] Added new FranFinance submodule.
+- [oney] Added payment in 3 or 4 times Oney submodule.
+- [sepa] Possibility to enable payment by alias in SEPA submodule.
+- [embedded] Possibility to display embedded payment fields in a popin.
+- [alias] Added link to delete stored means of payment.
+- [alias] Display the brand of the stored means of payment if payment by alias is enabled.
+- [alias] Check alias validity before proceeding to payment.
+- Possibility to configure REST API URLs.
+- Refund payments using REST API v4.
+- Accept and deny payments using REST API v4.
+- Validate payments using REST API v4.
+- [other] Possibility to propose other payment means by redirection.
+- Improve configuration fields validation messages.
+- Fix some translations.
+
+2.4.11, 2020-11-02:
 - [embedded] Bug fix: Display 3DS result for REST API payments.
 - Bug fix: Do not re-create invoice if it already exists.
 - Some minor fixes relative to configuration screen.
 
-2.4.10: 2020-10-06:
+2.4.10, 2020-10-06:
 - [fullcb] Bug fix: Error when trying to pay with Full CB if payment options selection is disabled.
 - Update payment means list.
 
@@ -34,7 +51,7 @@
 2.4.4, 2020-02-14:
 - Bug fix: NoSuchEntityException occurs when trying to retrieve a removed product category.
 - [embedded] Bug fix: Amount did not include shipping fees when using embedded payment fields if payment step is not refreshed.
-- BUg fix: Payment information in order confirmation email was not correctly translated in some multistore cases.
+- Bug fix: Payment information in order confirmation email was not correctly translated in some multistore cases.
 
 2.4.3, 2020-01-20:
 - Bug fix: Manage formKey for compatibility with Magento 2.3.x versions

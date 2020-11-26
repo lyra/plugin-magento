@@ -15,6 +15,7 @@ class Payment
 {
     // Key to save if payment is by identifier.
     const IDENTIFIER = 'payzen_identifier';
+    const SEPA_IDENTIFIER = 'payzen_identifier';
 
     // Key to save choosen multi option.
     const MULTI_OPTION = 'payzen_multi_option';
@@ -27,6 +28,12 @@ class Payment
 
     // Key to save choosen Full CB option.
     const FULLCB_OPTION = 'payzen_fullcb_option';
+
+    // Key to save choosen FranFinance option.
+    const FRANFINANCE_OPTION = 'payzen_franfinance_option';
+
+    // Key to save choosen other payment means.
+    const OTHER_OPTION = 'payzen_other_option';
 
     // Key to save risk control results.
     const RISK_CONTROL = 'payzen_risk_control';
@@ -44,57 +51,49 @@ class Payment
 
     const BRAND_USER_CHOICE = 'payzen_brand_user_choice';
 
-    const ONECLICK_LOCATION_CART = 'CART';
-
-    const ONECLICK_LOCATION_PRODUCT = 'PRODUCT';
-
-    const ONECLICK_LOCATION_BOTH = 'BOTH';
-
     const SUCCESS = 1;
     const FAILURE = 2;
     const CANCEL = 3;
 
     /**
-     *
      * @var \Magento\Framework\Event\ManagerInterface
      */
     protected $eventManager;
 
     /**
-     *
      * @var \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface
      */
     protected $transactionManager;
 
     /**
-     *
      * @var \Magento\Sales\Api\TransactionRepositoryInterface
      */
     protected $transactionRepository;
 
     /**
-     *
      * @var \Magento\Customer\Model\CustomerFactory
      */
      protected $customerFactory;
 
      /**
-      *
       * @var \Magento\Customer\Model\ResourceModel\CustomerFactory
       */
      protected $customerResourceFactory;
 
     /**
-     *
      * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
      */
     protected $orderSender;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
+
+    /**
+     * @var \Lyranetwork\Payzen\Helper\Rest
+     */
+    protected $restHelper;
 
     /**
      * \Magento\Framework\DataObject\Factory
@@ -112,7 +111,6 @@ class Payment
     protected $timezone;
 
     /**
-     *
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
      * @param \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface $transactionManager
@@ -120,6 +118,7 @@ class Payment
      * @param \Magento\Customer\Model\ResourceModel\CustomerFactory $customerResourceFactory
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
+     * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
      * @param \Magento\Sales\Model\Order\Config $orderConfig
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
@@ -132,6 +131,7 @@ class Payment
         \Magento\Customer\Model\ResourceModel\CustomerFactory $customerResourceFactory,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
+        \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \Magento\Sales\Model\Order\Config $orderConfig,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
@@ -143,6 +143,7 @@ class Payment
         $this->customerResourceFactory = $customerResourceFactory;
         $this->orderSender = $orderSender;
         $this->dataHelper = $dataHelper;
+        $this->restHelper = $restHelper;
         $this->dataObjectFactory = $dataObjectFactory;
         $this->orderConfig = $orderConfig;
         $this->timezone = $timezone;
@@ -404,15 +405,15 @@ class Payment
                     $date->setTimestamp(strtotime("+$delay days", $timestamp));
 
                     switch (true) {
-                        case ($i == 1): // first transaction
+                        case ($i == 1): // First transaction.
                             $amount = $firstAmount;
                             break;
 
-                        case ($i == $count): // last transaction
+                        case ($i == $count): // Last transaction.
                             $amount = $totalAmount - $firstAmount - $installmentAmount * ($i - 2);
                             break;
 
-                        default: // others
+                        default: // Others.
                             $amount = $installmentAmount;
                             break;
                     }
@@ -609,6 +610,81 @@ class Payment
         }
     }
 
+    public function deleteIdentifier($customerId, $attribute, $maskedAttribute)
+    {
+        $customer = $this->customerFactory->create()->load($customerId);
+        $customerData = $customer->getDataModel();
+        $customerData->setId($customerId);
+
+        if (! $customerData->getCustomAttribute($attribute)) {
+            $this->dataHelper->log("Customer {$customer->getEmail()} doesn't have a saved {$attribute} attribute.");
+            return false;
+        }
+
+        $identifier = $customerData->getCustomAttribute($attribute)->getValue();
+
+        try {
+            if ($this->restHelper->getPrivateKey()) {
+                $requestData = ['paymentMethodToken' => $identifier];
+
+                // Perform REST request to cancel identifier.
+                $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
+                    $this->dataHelper->getCommonConfigData('rest_url'),
+                    $this->dataHelper->getCommonConfigData('site_id'),
+                    $this->restHelper->getPrivateKey()
+                );
+
+                $cancelIdentifierResponse = $client->post('V4/Token/Cancel', json_encode($requestData));
+                $this->restHelper->checkResult($cancelIdentifierResponse);
+            } else {
+                // Client has not configured private key in module backend.
+                $this->dataHelper->log("Identifier for customer {$customer->getEmail()} cannot be deleted on gateway: private key is not configured. Let's just delete it from Magento.");
+            }
+
+            // Delete identifier from Magento.
+            $this->deleteIdentifierAttribute($customer, $attribute, $maskedAttribute);
+
+            return true;
+        } catch (\Exception $e) {
+            $invalidIdentCodes = ['PSP_030', 'PSP_031', 'PSP_561', 'PSP_607'];
+
+            if (in_array($e->getCode(), $invalidIdentCodes)) {
+                // The identifier is invalid or doesn't exist.
+                $this->dataHelper->log(
+                    "Identifier for customer {$customer->getEmail()} is invalid or doesn't exist. Let's delete it from Magento",
+                    \Psr\Log\LogLevel::WARNING
+                );
+
+                // Delete identifier from Magento.
+                $this->deleteIdentifierAttribute($customer, $attribute, $maskedAttribute);
+
+                return true;
+            } else {
+                $this->dataHelper->log(
+                    "Identifier for customer {$customer->getEmail()} couldn't be deleted on gateway. Error occurred: {$e->getMessage()}",
+                    \Psr\Log\LogLevel::ERROR
+                );
+
+                return false;
+            }
+        }
+    }
+
+    private function deleteIdentifierAttribute($customer, $attribute, $maskedAttribute)
+    {
+        $customerData = $customer->getDataModel();
+        $customerData->setId($customer->getId());
+        $customerData->setCustomAttribute($attribute, null);
+        $customerData->setCustomAttribute($maskedAttribute, null);
+        $customer->updateData($customerData);
+
+        $customerResource = $this->customerResourceFactory->create();
+        $customerResource->saveAttribute($customer, $attribute);
+        $customerResource->saveAttribute($customer, $maskedAttribute);
+
+        $this->dataHelper->log("Identifier for customer {$customer->getEmail()} successfully deleted.");
+    }
+
     private function maskPan($response)
     {
         $number = $response->get('card_number');
@@ -617,24 +693,23 @@ class Payment
         $matches = [];
         if (preg_match('#^([A-Z]{2}[0-9]{2}[A-Z0-9]{10,30})(_[A-Z0-9]{8,11})?$#i', $number, $matches)) {
             // IBAN(_BIC).
-            $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . ' / ' : ''; // BIC
+            $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . ' / ' : ''; // BIC.
 
             $iban = $matches[1];
             $masked .= substr($iban, 0, 4) . str_repeat('X', strlen($iban) - 8) . substr($iban, -4);
         } elseif (strlen($number) > 4) {
-            $masked = str_repeat('X', strlen($number) - 4) . substr($number, -4);
+            $masked .= str_repeat('X', strlen($number) - 4) . substr($number, -4);
 
             if ($response->get('expiry_month') && $response->get('expiry_year')) {
                 // Format card expiration data.
-                $masked .= ' (';
+                $masked .= ' - ';
                 $masked .= str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT);
                 $masked .= '/';
                 $masked .= $response->get('expiry_year');
-                $masked .= ')';
             }
         }
 
-        return $masked;
+        return $response->get('card_brand') . '|' . $masked;
     }
 
     public function createInvoice(\Magento\Sales\Model\Order $order)

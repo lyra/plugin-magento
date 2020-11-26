@@ -12,44 +12,31 @@ namespace Lyranetwork\Payzen\Model;
 class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
 {
     /**
-     *
      * @var string|boolean
      */
     protected $formToken = false;
 
     /**
-     *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Framework\UrlInterface $urlBuilder
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param string $methodCode
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\UrlInterface $urlBuilder,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Payment\Helper\Data $paymentHelper,
         \Lyranetwork\Payzen\Helper\Data $dataHelper
     ) {
         parent::__construct(
             $storeManager,
-            $assetRepo,
             $urlBuilder,
-            $logger,
-            $paymentHelper,
             $dataHelper,
             \Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD
         );
     }
 
     /**
-     *
      * {@inheritdoc}
-     *
      */
     public function getConfig()
     {
@@ -64,7 +51,7 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
             $maskedPan = $customer->getCustomAttribute('payzen_masked_pan')->getValue();
         }
 
-        $config['payment'][$this->method->getCode()]['maskedPan'] = $maskedPan;
+        $config['payment'][$this->method->getCode()]['maskedPan'] = $this->renderMaskedPan($maskedPan);
 
         // For payment via REST API.
         $config['payment'][$this->method->getCode()]['restFormToken'] = $this->getRestFormToken();
@@ -89,7 +76,7 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
 
     private function getRestFormToken()
     {
-        if ($this->getEntryMode() != 4) {
+        if (! $this->method->isRestMode()) {
             return false;
         }
 

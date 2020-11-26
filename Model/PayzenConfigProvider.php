@@ -12,74 +12,47 @@ namespace Lyranetwork\Payzen\Model;
 class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
 {
     /**
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
     /**
-     *
-     * @var \Magento\Framework\View\Asset\Repository
-     */
-    protected $assetRepo;
-
-    /**
-     *
      * @var \Magento\Framework\UrlInterface
      */
     protected $urlBuilder;
 
     /**
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Method\Payzen
      */
     protected $method;
 
     /**
-     *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Framework\UrlInterface $urlBuilder
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param string $methodCode
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\UrlInterface $urlBuilder,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Payment\Helper\Data $paymentHelper,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         $methodCode
     ) {
         $this->storeManager = $storeManager;
-        $this->assetRepo = $assetRepo;
         $this->urlBuilder = $urlBuilder;
-        $this->logger = $logger;
-        $this->method = $paymentHelper->getMethodInstance($methodCode);
         $this->dataHelper = $dataHelper;
+        $this->method = $this->dataHelper->getMethodInstance($methodCode);
 
         $this->method->setStore($this->storeManager->getStore()->getId());
     }
 
     /**
-     *
      * {@inheritdoc}
-     *
      */
     public function getConfig()
     {
@@ -113,31 +86,7 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
     {
         $fileName = $this->method->getConfigData('module_logo');
 
-        if ($this->dataHelper->isUploadFileImageExists($fileName)) {
-            return $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
-                 'payzen/images/' . $fileName;
-        } else {
-            return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $fileName);
-        }
-    }
-
-    /**
-     * Retrieve URL of a view file.
-     *
-     * @param string $fileId
-     * @param array $params
-     * @return string[]
-     */
-    protected function getViewFileUrl($fileId, array $params = [])
-    {
-        try {
-            return $this->assetRepo->getUrlWithParams($fileId, $params);
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->logger->critical($e);
-            return $this->urlBuilder->getUrl('', [
-                '_direct' => 'core/index/notFound'
-            ]);
-        }
+        return $this->getCcTypeImageSrc($fileName, false);
     }
 
     protected function getAvailableCcTypes()
@@ -148,19 +97,7 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
 
         $cards = [];
         foreach ($this->method->getAvailableCcTypes() as $value => $label) {
-            $card = 'cc/' . strtolower($value) . '.png';
-
-            $icon = false;
-            if ($this->dataHelper->isUploadFileImageExists($card)) {
-                $icon = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
-                    'payzen/images/' . $card;
-            } else {
-                $asset = $this->assetRepo->createAsset('Lyranetwork_Payzen::images/' . $card);
-
-                if ($this->dataHelper->isPublishFileImageExists($asset->getRelativeSourceFilePath())) {
-                    $icon = $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $card);
-                }
-            }
+            $icon = $this->getCcTypeImageSrc($value);
 
             $cards[] = [
                 'value' => $value,
@@ -179,5 +116,31 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
         }
 
         return $this->method->getEntryMode();
+    }
+
+    protected function getCcTypeImageSrc($card, $cc = true)
+    {
+        return $this->dataHelper->getCcTypeImageSrc($card, $cc);
+    }
+
+    protected function renderMaskedPan($maskedPan)
+    {
+        // Recover card brand if saved with masked pan and check if logo exists.
+        if (strpos($maskedPan, '|') !== false) {
+            $cardBrand = substr($maskedPan, 0, strpos($maskedPan, '|'));
+
+            $logoSrc = $this->getCcTypeImageSrc($cardBrand);
+            if ($logoSrc) {
+                $logo = '<img src="' . $logoSrc . '"
+                        alt="' . $cardBrand . '"
+                        title="' . $cardBrand . '"
+                        style="vertical-align: middle; margin: 0 10px 0 5px; max-height: 20px; display: unset;">';
+            }
+
+            return $logoSrc ? $logo . '<span style="vertical-align: middle;">' . substr($maskedPan, strpos($maskedPan, '|') + 1) .
+                '</span>' : str_replace('|',' ', $maskedPan);
+        }
+
+        return $maskedPan;
     }
 }

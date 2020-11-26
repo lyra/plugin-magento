@@ -9,6 +9,8 @@
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
+use Lyranetwork\Payzen\Helper\Data;
+
 class Multi extends Payzen
 {
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_MULTI;
@@ -18,13 +20,11 @@ class Multi extends Payzen
     protected $_canRefundInvoicePartial = false;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\System\Config\Source\MultiPaymentCard
      */
     protected $multiCardPayment;
 
     /**
-     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -70,6 +70,7 @@ class Multi extends Payzen
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
+        \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
@@ -100,6 +101,7 @@ class Multi extends Payzen
             $dataHelper,
             $paymentHelper,
             $checkoutHelper,
+            $restHelper,
             $productMetadata,
             $messageManager,
             $dirReader,
@@ -234,7 +236,7 @@ class Multi extends Payzen
     }
 
     /**
-     * Return available card types
+     * Return available card types.
      *
      * @return string
      */
@@ -276,7 +278,7 @@ class Multi extends Payzen
             return false;
         }
 
-        return $this->getEntryMode() == 2;
+        return $this->getEntryMode() == Data::MODE_LOCAL_TYPE;
     }
 
     /**

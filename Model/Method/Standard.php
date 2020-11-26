@@ -9,25 +9,24 @@
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
+use Lyranetwork\Payzen\Helper\Data;
+
 class Standard extends Payzen
 {
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Standard::class;
 
     /**
-     *
      * @var \Magento\Customer\Api\CustomerRepositoryInterface
      */
     protected $customerRepository;
 
     /**
-     *
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
 
     /**
-     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -45,6 +44,7 @@ class Standard extends Payzen
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
+     * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
@@ -74,6 +74,7 @@ class Standard extends Payzen
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
+        \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
@@ -106,6 +107,7 @@ class Standard extends Payzen
             $dataHelper,
             $paymentHelper,
             $checkoutHelper,
+            $restHelper,
             $productMetadata,
             $messageManager,
             $dirReader,
@@ -154,11 +156,11 @@ class Standard extends Payzen
             $this->payzenRequest->set('url_return', $returnUrl . '?iframe=true');
         }
 
-        if ($this->getConfigData('oneclick_active') && $order->getCustomerId()) {
+        if ($this->isOneClickActive() && $order->getCustomerId()) {
             // 1-Click enabled and customer logged-in.
             $customer = $this->customerRepository->getById($order->getCustomerId());
 
-            if ($customer->getCustomAttribute('payzen_identifier')) {
+            if ($customer->getCustomAttribute('payzen_identifier') && $this->customerSession->getValidAlias()) {
                 // Customer has an identifier.
                 $this->payzenRequest->set('identifier', $customer->getCustomAttribute('payzen_identifier')->getValue());
 
@@ -173,17 +175,8 @@ class Standard extends Payzen
                 $this->payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
             }
         }
-    }
 
-    protected function sendOneyFields()
-    {
-        $oneyContract = $this->dataHelper->getCommonConfigData('oney_contract');
-        if (! $oneyContract) {
-            return false;
-        }
-
-        $cards = explode(',', $this->getConfigData('payment_cards'));
-        return in_array('', $cards) /* All cards */ || in_array('ONEY', $cards) || in_array('ONEY_SANDBOX', $cards);
+        $this->customerSession->unsetValidAlias();
     }
 
     /**
@@ -209,12 +202,8 @@ class Standard extends Payzen
             $cards = array_keys($allCards);
         }
 
-        if (! $this->sendOneyFields()) {
-            $cards = array_diff($cards, [
-                'ONEY',
-                'ONEY_SANDBOX'
-            ]);
-        }
+        // Remove Oney card from payment means list.
+        $cards = array_diff($cards, ['ONEY_3X_4X']);
 
         $availCards = [];
         foreach ($allCards as $code => $label) {
@@ -232,25 +221,34 @@ class Standard extends Payzen
             return false;
         }
 
-        // No 1-Click.
-        if (! $this->getConfigData('oneclick_active')) {
-            return false;
-        }
-
         if ($this->dataHelper->isBackend()) {
             return false;
         }
 
-        if ($this->getEntryMode() == 4) {
+        if (! $this->isOneClickActive()) {
             return false;
         }
 
         // Customer has not gateway identifier.
-        if (! $this->getCurrentCustomer() || ! $this->getCurrentCustomer()->getCustomAttribute('payzen_identifier')) {
+        $customer = $this->getCurrentCustomer();
+        if (! $customer || ! ($identifier = $customer->getCustomAttribute('payzen_identifier'))) {
             return false;
         }
 
-        return true;
+        try {
+            $aliasEnabled = $this->restHelper->checkIdentifier($identifier->getValue(), $customer->getEmail());
+        }  catch (\Exception $e) {
+            $this->dataHelper->log(
+                "Saved identifier for customer {$customer->getEmail()} couldn't be verified on gateway. Error occurred: {$e->getMessage()}",
+                \Psr\Log\LogLevel::ERROR
+            );
+
+            // Unable to validate alias online, we cannot disable feature.
+            $aliasEnabled = true;
+        }
+
+        $this->customerSession->setValidAlias($aliasEnabled);
+        return $aliasEnabled;
     }
 
     /**
@@ -269,7 +267,7 @@ class Standard extends Payzen
 
         $info->setCcType($payzenData->getData('payzen_standard_cc_type'));
 
-        // Wether to do a payment by identifier.
+        // Whether to do a payment by identifier.
         $info->setAdditionalInformation(
             \Lyranetwork\Payzen\Helper\Payment::IDENTIFIER,
             $payzenData->getData('payzen_standard_use_identifier')
@@ -289,7 +287,7 @@ class Standard extends Payzen
             return false;
         }
 
-        return $this->getEntryMode() == 3;
+        return $this->getEntryMode() == Data::MODE_IFRAME;
     }
 
     /**
@@ -303,7 +301,22 @@ class Standard extends Payzen
             return false;
         }
 
-        return $this->getEntryMode() == 2;
+        return $this->getEntryMode() == Data::MODE_LOCAL_TYPE;
+    }
+
+    /**
+     * Check if embedded or popin mode is choosen.
+     *
+     * @return bool
+     */
+    public function isRestMode()
+    {
+        if ($this->dataHelper->isBackend()) {
+            return false;
+        }
+
+        $restModes = [Data::MODE_EMBEDDED, Data::MODE_POPIN];
+        return in_array($this->getEntryMode(), $restModes);
     }
 
     /**
@@ -314,27 +327,6 @@ class Standard extends Payzen
     public function getEntryMode()
     {
         return $this->getConfigData('card_info_mode');
-    }
-
-    /**
-     * Return logged in customer model data.
-     *
-     * @return int
-     */
-    public function getCurrentCustomer()
-    {
-        // Customer not logged in.
-        if (! $this->customerSession->isLoggedIn()) {
-            return false;
-        }
-
-        // Customer has not gateway identifier.
-        $customer = $this->customerSession->getCustomer();
-        if (! $customer || ! $customer->getId()) {
-            return false;
-        }
-
-        return $customer->getDataModel();
     }
 
     public function getRestApiFormToken()
@@ -352,7 +344,7 @@ class Standard extends Payzen
         // Currency.
         $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getOrderCurrencyCode());
         if ($currency == null) {
-            // If currency is not supported, use base currency,.
+            // If currency is not supported, use base currency.
             $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
 
             // ... and order total in base currency.
@@ -443,9 +435,9 @@ class Standard extends Payzen
         try {
             // Perform our request.
             $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
-                trim($this->dataHelper->getCommonConfigData('rest_url')),
-                trim($this->dataHelper->getCommonConfigData('site_id')),
-                trim($this->getRestPrivateKey())
+                $this->dataHelper->getCommonConfigData('rest_url'),
+                $this->dataHelper->getCommonConfigData('site_id'),
+                $this->restHelper->getPrivateKey()
             );
 
             $response = $client->post('V4/Charge/CreatePayment', json_encode($data));
@@ -472,11 +464,13 @@ class Standard extends Payzen
         }
     }
 
-    private function getRestPrivateKey()
+    public function isOneClickActive()
     {
-        $mode = $this->dataHelper->getCommonConfigData('ctx_mode');
+        // 1-Click enabled and not payment by embedded fields (REST API).
+        if (! $this->isRestMode() && $this->getConfigData('oneclick_active')) {
+            return true;
+        }
 
-        $key = ($mode === 'PRODUCTION') ? 'rest_private_key_prod' : 'rest_private_key_test';
-        return $this->getConfigData($key);
+        return false;
     }
 }

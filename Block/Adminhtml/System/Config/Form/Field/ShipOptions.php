@@ -10,30 +10,26 @@
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 
 /**
- * Custom renderer for the FacilyPay Oney shipping options field.
+ * Custom renderer for the Shipping options field.
  */
 class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Checkout
      */
     protected $checkoutHelper;
 
     /**
-     *
      * @var \Magento\Shipping\Model\Config
      */
     protected $shippingConfig;
 
     /**
-     *
      * @var bool
      */
     protected $staticTable = true;
 
     /**
-     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
      * @param \Magento\Shipping\Model\Config $shippingConfig
@@ -66,19 +62,13 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
                 'renderer' => $this->getLabelRenderer('_title')
             ]
         );
-        $this->addColumn(
-            'oney_label',
-            [
-                'label' => __('FacilyPay Oney label'),
-                'style' => 'width: 210px;'
-            ]
-        );
 
         $this->addColumn(
             'type',
             [
                 'label' => __('Type'),
                 'style' => 'width: 130px;',
+                'class' => 'payzen_list_type',
                 'renderer' => $this->getListRenderer(
                     '_type',
                     [
@@ -94,13 +84,33 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
         $this->addColumn(
             'speed',
             [
-                'label' => __('Speed'),
+                'label' => __('Rapidity'),
                 'style' => 'width: 75px;',
+                'class' => 'payzen_list_speed',
                 'renderer' => $this->getListRenderer(
                     '_speed',
                     [
                         'STANDARD' => 'Standard',
-                        'EXPRESS' => 'Express'
+                        'EXPRESS' => 'Express',
+                        'PRIORITY' => 'Priority'
+                    ]
+                )
+            ]
+        );
+
+        $this->addColumn(
+            'delay',
+            [
+                'label' => __('Delay'),
+                'style' => 'width: 75px;',
+                'class' => 'payzen_list_delay',
+                'renderer' => $this->getListRenderer(
+                    '_delay',
+                    [
+                        'INFERIOR_EQUALS' => __('<= 1 hour'),
+                        'SUPERIOR' => __('> 1 hour'),
+                        'IMMEDIATE' => __('Immediate'),
+                        'ALWAYS' => __('24/7')
                     ]
                 )
             ]
@@ -111,7 +121,7 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
 
     /**
      * Obtain existing data from form element.
-     * Each row will be instance of \Magento\Framework\DataObject
+     * Each row will be instance of \Magento\Framework\DataObject.
      *
      * @return array
      */
@@ -140,7 +150,6 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
                 $value[uniqid('_' . $code . '_')] = [
                     'code' => $code,
                     'title' => $name,
-                    'oney_label' => $this->checkoutHelper->cleanShippingMethod($name), // To match Oney restrictions.
                     'type' => 'PACKAGE_DELIVERY_COMPANY',
                     'speed' => 'STANDARD',
                     'mark' => true
@@ -198,5 +207,51 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
         }
 
         return $allMethods;
+    }
+
+    /**
+     * Render element JavaScript code.
+     *
+     * @return string
+     */
+    protected function renderScript()
+    {
+        $script = parent::renderScript();
+
+        $script .= "\n" . '
+            <script>
+                 require([
+                    "prototype"
+                ], function () {
+                    // Enable delay select for rows with speed equals PRIORITY.
+                    $$("select.payzen_list_delay").each(function(elt) {
+                        var speedName = elt.name.replace("[delay]", "[speed]");
+
+                        // Select by name returns one element.
+                        var speedElt = $$("select[name=\"" + speedName + "\"]")[0];
+
+                        if (speedElt.value === "PRIORITY") {
+                            elt.enable();
+                        } else {
+                            elt.disable();
+                        }
+                    });
+
+                    $$("select.payzen_list_speed").invoke("observe", "change", function() {
+                        var delayName = this.name.replace("[speed]", "[delay]");
+
+                        // Select by name returns one element.
+                        var elt = $$("select[name=\"" + delayName + "\"]")[0];
+
+                        if (this.value === "PRIORITY") {
+                            elt.enable();
+                        } else {
+                            elt.disable();
+                        }
+                    });
+                });
+            </script>';
+
+        return $script;
     }
 }
