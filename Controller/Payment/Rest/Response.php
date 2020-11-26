@@ -15,19 +15,16 @@ use Magento\Framework\DataObject;
 class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
 {
     /**
-     *
      * @var \Magento\Sales\Model\OrderFactory
      */
     protected $orderFactory;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
      */
     protected $payzenResponseFactory;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Rest
      */
     protected $restHelper;
@@ -38,7 +35,6 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
     protected $quoteManagement;
 
     /**
-     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
@@ -102,6 +98,13 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         $quote = $this->quoteRepository->get($quoteId);
         if (! $quote->getId()) {
             throw new ResponseException("Quote #{$quoteId} not found in database.");
+        }
+
+        // Disable quote.
+        if ($quote->getIsActive()) {
+            $quote->setIsActive(false);
+            $this->quoteRepository->save($quote);
+            $this->dataHelper->log("Cleared quote, reserved order ID: #{$quote->getReservedOrderId()}.");
         }
 
         // Token is created before order creation, search order by quote.

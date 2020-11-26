@@ -16,31 +16,26 @@ use Lyranetwork\Payzen\Block\Constants;
 class BackendPaymentRedirectObserver implements ObserverInterface
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Magento\Framework\UrlInterface
      */
     protected $urlBuilder;
 
     /**
-     *
      * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
 
     /**
-     *
      * @var \Magento\Framework\Registry
      */
     protected $coreRegistry;
 
     /**
-     *
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Magento\Framework\App\Request\Http $request

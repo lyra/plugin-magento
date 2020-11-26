@@ -33,7 +33,12 @@ class CardInfoMode implements \Magento\Framework\Option\ArrayInterface
         if ($features['embedded']) {
             $options[] = [
                 'value' => '4',
-                'label' => __('Embedded payment fields (REST API)')
+                'label' => __('Embedded payment fields on merchant site (REST API)')
+            ];
+
+            $options[] = [
+                'value' => '5',
+                'label' => __('Embedded payment fields in a pop-in (REST API)')
             ];
         }
 

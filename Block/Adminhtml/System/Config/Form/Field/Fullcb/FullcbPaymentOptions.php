@@ -65,7 +65,7 @@ class FullcbPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Co
     /**
      * Obtain existing data from form element.
      *
-     * Each row will be instance of Varien_Object
+     * Each row will be instance of Varien_Object.
      *
      * @return array
      */

@@ -15,43 +15,36 @@ use Lyranetwork\Payzen\Model\ResponseException;
 class CheckProcessor
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Payment
      */
     protected $paymentHelper;
 
     /**
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
     /**
-     *
      * @var \Magento\Store\Model\App\Emulation
      */
     protected $emulation;
 
     /**
-     *
      * @var \Magento\Sales\Model\OrderFactory
      */
     protected $orderFactory;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
      */
     protected $payzenResponseFactory;
 
     /**
-     *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Store\Model\App\Emulation $emulation
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
@@ -118,7 +111,6 @@ class CheckProcessor
             }
         } else {
             // Payment already processed.
-
             $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $order->getStore()->getId());
             $successStatuses = [
                 $acceptedStatus,

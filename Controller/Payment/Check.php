@@ -12,19 +12,16 @@ namespace Lyranetwork\Payzen\Controller\Payment;
 class Check extends \Magento\Framework\App\Action\Action
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Controller\Processor\CheckProcessor
      */
     protected $checkProcessor;
 
     /**
-     *
      * @var \Magento\Framework\Controller\Result\RawFactory
      */
     protected $rawResultFactory;
 
     /**
-     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Lyranetwork\Payzen\Controller\Processor\CheckProcessor $checkProcessor
      * @param \Magento\Framework\Controller\Result\RawFactory $rawResultFactory

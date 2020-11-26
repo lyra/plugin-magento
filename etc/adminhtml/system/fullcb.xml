@@ -11,36 +11,36 @@
 -->
 
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="payzen_fullcb" translate="label" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+    <group id="payzen_fullcb" translate="label" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
         <label><![CDATA[FULL CB PAYMENT]]></label>
         <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset\Dependant</frontend_model>
         <attribute type="expanded">0</attribute>
         <attribute type="feature">fullcb</attribute>
 
-        <group id="payzen_display_options" translate="label" type="text" sortOrder="61" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_display_options" translate="label" type="text" sortOrder="71" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[DISPLAY OPTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="active" translate="label comment" type="select" sortOrder="611" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="active" translate="label comment" type="select" sortOrder="711" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Activation]]></label>
                 <comment><![CDATA[Enables / disables this payment method.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>payment/payzen_fullcb/active</config_path>
             </field>
 
-            <field id="title" translate="label comment" type="text" sortOrder="612" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="title" translate="label comment" type="text" sortOrder="712" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Method title]]></label>
                 <comment><![CDATA[Method title to display on payment means page.]]></comment>
                 <config_path>payment/payzen_fullcb/title</config_path>
             </field>
 
-            <field id="sort_order" translate="label comment" type="text" sortOrder="613" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="sort_order" translate="label comment" type="text" sortOrder="713" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Sort order]]></label>
                 <comment><![CDATA[In the payment methods list.]]></comment>
                 <config_path>payment/payzen_fullcb/sort_order</config_path>
             </field>
 
-            <field id="module_logo" translate="label comment" type="image" sortOrder="614" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="module_logo" translate="label comment" type="image" sortOrder="714" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Logo]]></label>
                 <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
                 <config_path>payment/payzen_fullcb/module_logo</config_path>
@@ -51,16 +51,16 @@
             </field>
         </group>
 
-        <group id="payzen_restrictions" translate="label" type="text" sortOrder="62" showInDefault="1" showInWebsite="1" showInStore="1">
+        <group id="payzen_restrictions" translate="label" type="text" sortOrder="72" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[RESTRICTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="specificcountry_display" translate="label comment" type="label" sortOrder="621" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="specificcountry_display" translate="label comment" type="label" sortOrder="721" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Authorized countries]]></label>
                 <config_path>payment/payzen_fullcb/specificcountry_display</config_path>
             </field>
 
-            <field id="custgroup_amount_restriction" translate="label comment" sortOrder="622" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="custgroup_amount_restriction" translate="label comment" sortOrder="722" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Customer group amount restriction]]></label>
                 <comment><![CDATA[Define amount restriction for each customer group.]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Fullcb\FullcbCustgroupOptions</frontend_model>
@@ -69,18 +69,18 @@
             </field>
         </group>
 
-         <group id="payzen_payment_options" translate="label" type="text" sortOrder="63" showInDefault="1" showInWebsite="1" showInStore="1">
+         <group id="payzen_payment_options" translate="label" type="text" sortOrder="73" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[PAYMENT OPTIONS]]></label>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="enable_payment_options" translate="label comment" type="select" sortOrder="631" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="enable_payment_options" translate="label comment" type="select" sortOrder="731" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Enable options selection]]></label>
                 <comment><![CDATA[Enable payment options selection on merchant site.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>payment/payzen_fullcb/enable_payment_options</config_path>
             </field>
 
-            <field id="fullcb_payment_options" translate="label comment" sortOrder="632" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="fullcb_payment_options" translate="label comment" sortOrder="732" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Payment options]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Fullcb\FullcbPaymentOptions</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Fullcb\FullcbPaymentOptions</backend_model>

@@ -17,12 +17,13 @@
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {for: getCode()}" class="label">
             <!-- Choozeo logo. -->
-            <img data-bind="attr: {src: getModuleLogoUrl()}"
-                 class="payment-icon"
-                 alt="PayZen"
-                 style="width: 76px;"
-            />
-
+            <!-- ko if: getModuleLogoUrl() -->
+                <img data-bind="attr: {src: getModuleLogoUrl()}"
+                     class="payment-icon"
+                     alt="PayZen"
+                     style="width: 76px;"
+                />
+            <!--/ko-->
             <span data-bind="text: getTitle()"></span>
         </label>
     </div>

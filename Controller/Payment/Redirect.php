@@ -14,31 +14,26 @@ use Lyranetwork\Payzen\Model\OrderException;
 class Redirect extends \Magento\Framework\App\Action\Action
 {
     /**
-     *
      * @var \Magento\Sales\Model\OrderFactory
      */
     protected $orderFactory;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor
      */
     protected $redirectProcessor;
 
     /**
-     *
      * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $resultPageFactory;
 
     /**
-     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor
@@ -77,7 +72,6 @@ class Redirect extends \Magento\Framework\App\Action\Action
     private function getAndCheckOrder()
     {
         /**
-         *
          * @var Magento\Checkout\Model\Session $checkout
          */
         $checkout = $this->dataHelper->getCheckout();

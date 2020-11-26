@@ -39,25 +39,14 @@ class Standard extends Payzen
         }
     }
 
-    public function getCcTypeImageSrc($card)
-    {
-        $card = 'cc/' . strtolower($card) . '.png';
-
-        if ($this->dataHelper->isUploadFileImageExists($card)) {
-            return $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
-                 'payzen/images/' . $card;
-        } else {
-            return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $card);
-        }
-    }
-
-    public function getCurrentCustomer()
-    {
-        return $this->getMethod()->getCurrentCustomer();
-    }
-
     public function isLocalCcType()
     {
         return $this->getMethod()->isLocalCcType();
+    }
+
+    // Check if the 1-click payment is active for Standard.
+    public function isOneClickActive()
+    {
+        return $this->getMethod()->isOneClickActive();
     }
 }

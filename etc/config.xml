@@ -15,7 +15,7 @@
         <payzen>
             <general>
                 <support_email>support@payzen.eu</support_email>
-                <plugin_version>2.4.11</plugin_version>
+                <plugin_version>2.5.0</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_2.x</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -29,8 +29,13 @@
                 <wsdl_url>https://secure.payzen.eu/vads-ws/v5?wsdl</wsdl_url>
                 <notify_url>payzen/payment/check</notify_url>
 
+                <rest_private_key_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <rest_private_key_prod backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <rest_return_key_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <rest_return_key_prod backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <rest_notify_url>payzen/payment_rest/check</rest_notify_url>
                 <rest_url>https://api.payzen.eu/api-payment/</rest_url>
-                <static_url>https://api.payzen.eu/static/</static_url>
+                <static_url>https://static.payzen.eu/static/</static_url>
 
                 <language>fr</language>
                 <validation_mode></validation_mode>
@@ -69,11 +74,6 @@
                 <card_info_mode>1</card_info_mode>
                 <oneclick_active>0</oneclick_active>
 
-                <rest_private_key_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
-                <rest_private_key_prod backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
-                <rest_return_key_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
-                <rest_return_key_prod backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
-                <notify_url>payzen/payment_rest/check</notify_url>
                 <rest_theme>material</rest_theme>
             </payzen_standard>
 
@@ -125,6 +125,21 @@
                 <specificcountry_display>France</specificcountry_display>
             </payzen_choozeo>
 
+            <payzen_oney>
+                <model>Lyranetwork\Payzen\Model\Method\Oney</model>
+                <group>payzen</group>
+                <payment_action>authorize</payment_action>
+
+                <active>0</active>
+                <title>Payment in 3 or 4 times with Oney</title>
+                <sort_order>5</sort_order>
+                <module_logo>oney-logo.png</module_logo>
+
+                <allowspecific>0</allowspecific>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_oney>
+
             <payzen_fullcb>
                 <model>Lyranetwork\Payzen\Model\Method\Fullcb</model>
                 <group>payzen</group>
@@ -132,7 +147,7 @@
 
                 <active>0</active>
                 <title>Payment with Full CB</title>
-                <sort_order>5</sort_order>
+                <sort_order>6</sort_order>
                 <module_logo>fullcb-logo.png</module_logo>
 
                 <allowspecific>1</allowspecific>
@@ -142,6 +157,21 @@
                 <enable_payment_options>0</enable_payment_options>
             </payzen_fullcb>
 
+            <payzen_franfinance>
+                <model>Lyranetwork\Payzen\Model\Method\Franfinance</model>
+                <group>payzen</group>
+                <payment_action>authorize</payment_action>
+
+                <active>0</active>
+                <title>Payment with FranFinance</title>
+                <sort_order>7</sort_order>
+                <module_logo>franfinance-logo.png</module_logo>
+
+                <allowspecific>1</allowspecific>
+                <specificcountry>FR</specificcountry>
+                <specificcountry_display>France</specificcountry_display>
+            </payzen_franfinance>
+
             <payzen_sepa>
                 <model>Lyranetwork\Payzen\Model\Method\Sepa</model>
                 <group>payzen</group>
@@ -149,12 +179,13 @@
 
                 <active>0</active>
                 <title>Payment with SEPA</title>
-                <sort_order>6</sort_order>
+                <sort_order>8</sort_order>
                 <module_logo>sepa-logo.png</module_logo>
 
                 <allowspecific>0</allowspecific>
 
                 <mandate_mode>PAYMENT</mandate_mode>
+                <oneclick_active>0</oneclick_active>
             </payzen_sepa>
 
             <payzen_paypal>
@@ -164,13 +195,29 @@
 
                 <active>0</active>
                 <title>Payment with PayPal</title>
-                <sort_order>7</sort_order>
+                <sort_order>9</sort_order>
                 <module_logo>paypal-logo.png</module_logo>
 
                 <allowspecific>0</allowspecific>
 
                 <validation_mode>-1</validation_mode>
             </payzen_paypal>
+
+            <payzen_other>
+                <model>Lyranetwork\Payzen\Model\Method\Other</model>
+                <group>payzen</group>
+                <payment_action>authorize</payment_action>
+
+                <active>0</active>
+                <title>Other payment means</title>
+                <sort_order>10</sort_order>
+                <module_logo>other-logo.png</module_logo>
+
+                <allowspecific>0</allowspecific>
+                <regroup_payment_means>0</regroup_payment_means>
+
+                <validation_mode>-1</validation_mode>
+            </payzen_other>
         </payment>
     </default>
 </config>

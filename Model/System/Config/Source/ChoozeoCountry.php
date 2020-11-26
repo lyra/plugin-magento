@@ -15,14 +15,13 @@ class ChoozeoCountry implements \Magento\Framework\Option\ArrayInterface
     public static $availableCountries = ['FR', 'GP', 'MQ', 'GF', 'RE', 'YT'];
 
     /**
-     * Locale model
+     * Locale model.
      *
      * @var \Magento\Framework\Locale\ListsInterface
      */
     protected $localeLists;
 
     /**
-     *
      * @param \Magento\Framework\Locale\ListsInterface $localeLists
      */
     public function __construct(\Magento\Framework\Locale\ListsInterface $localeLists)

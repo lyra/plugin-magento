@@ -15,25 +15,21 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 class CategoryMapping extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\System\Config\Source\CategoryFactory
      */
     protected $payzenCategoryFactory;
 
     /**
-     *
      * @var \Magento\Catalog\Model\CategoryFactory
      */
     protected $categoryFactory;
 
     /**
-     *
      * @var bool
      */
     protected $staticTable = true;
 
     /**
-     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Lyranetwork\Payzen\Model\System\Config\Source\CategoryFactory $payzenCategoryFactory
      * @param \Magento\Catalog\Model\CategoryFactory $categoryFactory

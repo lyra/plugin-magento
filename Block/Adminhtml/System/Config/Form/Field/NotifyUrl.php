@@ -15,7 +15,6 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field;
 class NotifyUrl extends Label
 {
     /**
-     *
      * @param \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Context $context
      * @param array $data
      */

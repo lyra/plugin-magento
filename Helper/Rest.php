@@ -14,43 +14,36 @@ use Lyranetwork\Payzen\Model\Api\PayzenApi;
 class Rest
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
-     * @var \Lyranetwork\Payzen\Model\Method\Payzen
-     */
-    protected $method;
-
-    /**
-     *
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
-     * @param \Magento\Payment\Helper\Data $magentoPaymentHelper
      */
     public function __construct(
-        \Lyranetwork\Payzen\Helper\Data $dataHelper,
-        \Magento\Payment\Helper\Data $magentoPaymentHelper
+        \Lyranetwork\Payzen\Helper\Data $dataHelper
     ) {
         $this->dataHelper = $dataHelper;
-        $this->method = $magentoPaymentHelper->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD);
     }
 
-    public function convertRestResult($answer)
+    public function convertRestResult($answer, $isTransaction = false)
     {
-        if (!is_array($answer) || empty($answer)) {
+        if (! is_array($answer) || empty($answer)) {
             return [];
         }
 
-        $transactions = $this->getProperty($answer, 'transactions');
+        if ($isTransaction) {
+            $transaction = $answer;
+        } else {
+            $transactions = $this->getProperty($answer, 'transactions');
 
-        if (! is_array($transactions) || empty($transactions)) {
-            return [];
+            if (! is_array($transactions) || empty($transactions)) {
+                return [];
+            }
+
+            $transaction = $transactions[0];
         }
-
-        $transaction = $transactions[0];
 
         $response = [];
 
@@ -67,8 +60,12 @@ class Rest
         $response['vads_effective_creation_date'] = $this->getProperty($transaction, 'creationDate');
         $response['vads_payment_config'] = 'SINGLE'; // Only single payments are possible via REST API at this time.
 
-        if (($customer = $this->getProperty($answer, 'customer')) && ($billingDetails = $this->getProperty($customer, 'billingDetails'))) {
-            $response['vads_language'] = $this->getProperty($billingDetails, 'language');
+        if (($customer = $this->getProperty($answer, 'customer'))) {
+            $response['vads_cust_email'] = $this->getProperty($customer, 'email');
+
+            if ($billingDetails = $this->getProperty($customer, 'billingDetails')) {
+                $response['vads_language'] = $this->getProperty($billingDetails, 'language');
+            }
         }
 
         $response['vads_amount'] = $this->getProperty($transaction, 'amount');
@@ -86,8 +83,18 @@ class Rest
 
         if ($transactionDetails = $this->getProperty($transaction, 'transactionDetails')) {
             $response['vads_sequence_number'] = $this->getProperty($transactionDetails, 'sequenceNumber');
-            $response['vads_effective_amount'] = $this->getProperty($transactionDetails, 'effectiveAmount');
-            $response['vads_effective_currency'] = PayzenApi::getCurrencyNumCode($this->getProperty($transactionDetails, 'effectiveCurrency'));
+
+            // Workarround to adapt to REST API behavior.
+            $effectiveAmount = $this->getProperty($transactionDetails, 'effectiveAmount');
+            $effectiveCurrency = PayzenApi::getCurrencyNumCode($this->getProperty($transactionDetails, 'effectiveCurrency'));
+
+            if ($effectiveAmount && $effectiveCurrency) {
+                $response['vads_effective_amount'] = $response['vads_amount'];
+                $response['vads_effective_currency'] = $response['vads_currency'];
+                $response['vads_amount'] = $effectiveAmount;
+                $response['vads_currency'] = $effectiveCurrency;
+            }
+
             $response['vads_warranty_result'] = $this->getProperty($transactionDetails, 'liabilityShift');
 
             if ($cardDetails = $this->getProperty($transactionDetails, 'cardDetails')) {
@@ -150,6 +157,24 @@ class Rest
         }
     }
 
+    public function checkResult($response, $expectedStatuses = array())
+    {
+        $answer = $response['answer'];
+
+        if ($response['status'] !== 'SUCCESS') {
+            $msg = $answer['errorMessage'] . ' (' . $answer['errorCode'] . ').';
+            if (isset($answer['detailedErrorMessage']) && ! empty($answer['detailedErrorMessage'])) {
+                $msg .= ' Detailed message: ' . $answer['detailedErrorMessage'] .' (' . $answer['detailedErrorCode'] . ').';
+            }
+
+            throw new \Exception($msg);
+        } elseif (! empty($expectedStatuses) && ! in_array($answer['detailedStatus'], $expectedStatuses)) {
+            throw new \UnexpectedValueException(
+                "Unexpected transaction status returned ({$answer['detailedStatus']})."
+            );
+        }
+    }
+
     private function getProperty($restResult, $key)
     {
         if (isset($restResult[$key])) {
@@ -193,7 +218,7 @@ class Rest
         $ctxMode = $this->dataHelper->getCommonConfigData('ctx_mode', $storeId);
         $field = ($ctxMode === 'TEST') ? 'rest_return_key_test' : 'rest_return_key_prod';
 
-        return $this->method->getConfigData($field, $storeId);
+        return $this->dataHelper->getCommonConfigData($field, $storeId);
     }
 
     /**
@@ -206,6 +231,49 @@ class Rest
         $ctxMode = $this->dataHelper->getCommonConfigData('ctx_mode', $storeId);
         $field = ($ctxMode === 'TEST') ? 'rest_private_key_test' : 'rest_private_key_prod';
 
-        return $this->method->getConfigData($field, $storeId);
+        return $this->dataHelper->getCommonConfigData($field, $storeId);
+    }
+
+    public function checkIdentifier($identifier, $customerEmail)
+    {
+        try {
+            $requestData = [
+                'paymentMethodToken' => $identifier
+            ];
+
+            // Perform REST request to check identifier.
+            $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
+                $this->dataHelper->getCommonConfigData('rest_url'),
+                $this->dataHelper->getCommonConfigData('site_id'),
+                $this->getPrivateKey()
+            );
+
+            $checkIdentifierResponse = $client->post('V4/Token/Get', json_encode($requestData));
+            $this->checkResult($checkIdentifierResponse);
+
+            $cancellationDate = $this->getProperty($checkIdentifierResponse['answer'], 'cancellationDate');
+            if ($cancellationDate && (strtotime($cancellationDate) <= time())) {
+                $this->dataHelper->log(
+                    "Saved identifier for customer {$customerEmail} is expired on payment gateway in date of: {$cancellationDate}.",
+                    \Psr\Log\LogLevel::WARNING
+                );
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            $invalidIdentCodes = ['PSP_030', 'PSP_031', 'PSP_561', 'PSP_607'];
+
+            if (in_array($e->getCode(), $invalidIdentCodes)) {
+                // The identifier is invalid or doesn't exist.
+                $this->dataHelper->log(
+                    "Identifier for customer {$customerEmail} is invalid or doesn't exist: {$e->getMessage()}.",
+                     \Psr\Log\LogLevel::WARNING
+                );
+                return false;
+            } else {
+                throw $e;
+            }
+        }
     }
 }

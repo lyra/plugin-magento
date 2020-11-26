@@ -12,44 +12,32 @@ namespace Lyranetwork\Payzen\Model;
 class FullcbConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
 {
     /**
-     *
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
     protected $timezone;
 
     /**
-     *
      * @var \Magento\Framework\Pricing\Helper\Data
      */
     protected $pricingHelper;
 
     /**
-     *
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Framework\UrlInterface $urlBuilder
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\Framework\Pricing\Helper\Data $pricingHelper
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\UrlInterface $urlBuilder,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Payment\Helper\Data $paymentHelper,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Framework\Pricing\Helper\Data $pricingHelper
     ) {
         parent::__construct(
             $storeManager,
-            $assetRepo,
             $urlBuilder,
-            $logger,
-            $paymentHelper,
             $dataHelper,
             \Lyranetwork\Payzen\Helper\Data::METHOD_FULLCB
         );
@@ -59,9 +47,7 @@ class FullcbConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvide
     }
 
     /**
-     *
      * {@inheritdoc}
-     *
      */
     public function getConfig()
     {

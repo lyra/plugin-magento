@@ -23,7 +23,7 @@ class MultiPaymentOptions extends ConfigArraySerialized
             $i = 0;
             $options = [];
             foreach ($values as $value) {
-                $i ++;
+                $i++;
 
                 if (empty($value)) {
                     continue;
@@ -40,12 +40,10 @@ class MultiPaymentOptions extends ConfigArraySerialized
                     $this->throwException('Contract', $i);
                 }
 
-                $this->checkDecimal($value['count'], 'Count', $i);
-                $this->checkDecimal($value['period'], 'Period', $i);
+                $this->checkMandatoryDecimal($value['count'], 'Count', $i);
+                $this->checkMandatoryDecimal($value['period'], 'Period', $i);
 
-                if (! empty($value['first']) && (! is_numeric($value['first']) || $value['first'] >= 100)) {
-                    $this->throwException('1st payment', $i);
-                }
+                $this->checkRate($value['first'], '1st installment', $i);
 
                 $options[] = $value;
             }
@@ -54,19 +52,5 @@ class MultiPaymentOptions extends ConfigArraySerialized
         }
 
         return parent::beforeSave();
-    }
-
-    private function checkDecimal($value, $fieldLabel, $i)
-    {
-        if (! preg_match('#^[1-9]\d*$#', $value)) {
-            $this->throwException($fieldLabel, $i);
-        }
-    }
-
-    private function checkAmount($amount, $fieldLabel, $i)
-    {
-        if (! empty($amount) && ! preg_match('#^\d+(\.\d+)?$#', $amount)) {
-            $this->throwException($fieldLabel, $i);
-        }
     }
 }

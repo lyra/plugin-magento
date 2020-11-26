@@ -14,13 +14,11 @@ use Magento\Framework\UrlInterface;
 class ColumnUploadButton extends \Magento\Framework\View\Element\AbstractBlock
 {
     /**
-     *
      * @var\Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
     /**
-     *
      * @param \Magento\Framework\View\Element\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param array $data

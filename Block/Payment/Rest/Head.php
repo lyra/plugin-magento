@@ -14,19 +14,16 @@ use Lyranetwork\Payzen\Model\Api\PayzenApi;
 class Head extends \Magento\Framework\View\Element\Template
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Method\Payzen
      */
     protected $method;
 
     /**
-     *
      * @var \Magento\Framework\Locale\ResolverInterface
      */
     protected $localeResolver;
@@ -34,19 +31,15 @@ class Head extends \Magento\Framework\View\Element\Template
     private $placeholders = null;
 
     /**
-     *
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
-     * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
-        \Magento\Payment\Helper\Data $paymentHelper,
-
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -54,7 +47,7 @@ class Head extends \Magento\Framework\View\Element\Template
         $this->dataHelper = $dataHelper;
         $this->localeResolver = $localeResolver;
 
-        $this->method = $paymentHelper->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD);
+        $this->method = $this->dataHelper->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD);
         $this->method->setStore($this->_storeManager->getStore()->getId());
     }
 
@@ -85,7 +78,7 @@ class Head extends \Magento\Framework\View\Element\Template
         $mode = $this->dataHelper->getCommonConfigData('ctx_mode');
         $key = ($mode === 'PRODUCTION') ? 'rest_public_key_prod' : 'rest_public_key_test';
 
-        return $this->method->getConfigData($key);
+        return $this->dataHelper->getCommonConfigData($key);
     }
 
     public function getTheme()
@@ -122,7 +115,7 @@ class Head extends \Magento\Framework\View\Element\Template
      */
     protected function _toHtml()
     {
-        if ($this->method->getConfigData('card_info_mode') != 4) {
+        if (! $this->method->isRestMode()) {
             return '';
         }
 

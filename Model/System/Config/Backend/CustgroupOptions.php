@@ -20,7 +20,7 @@ class CustgroupOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\S
         } else {
             $i = 0;
             foreach ($values as $value) {
-                $i ++;
+                $i++;
 
                 if (empty($value)) {
                     continue;

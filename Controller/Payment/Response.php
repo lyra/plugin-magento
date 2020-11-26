@@ -14,31 +14,26 @@ use Lyranetwork\Payzen\Helper\Payment;
 class Response extends \Magento\Framework\App\Action\Action
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor
      */
     protected $responseProcessor;
 
     /**
-     *
      * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $resultPageFactory;
 
     /**
-     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
@@ -114,7 +109,6 @@ class Response extends \Magento\Framework\App\Action\Action
     protected function redirectResponse($order, $case, $checkUrlWarn = false)
     {
         /**
-         *
          * @var Magento\Checkout\Model\Session $checkout
          */
         $checkout = $this->dataHelper->getCheckout();
@@ -132,7 +126,7 @@ class Response extends \Magento\Framework\App\Action\Action
             }
 
             if ($checkUrlWarn) {
-                // Order not validated by notification URL. In TEST mode, user is webmaster
+                // Order not validated by notification URL. In TEST mode, user is webmaster.
                 // So display a warning about notification URL not working.
 
                 if ($this->dataHelper->isMaintenanceMode()) {
@@ -191,7 +185,6 @@ class Response extends \Magento\Framework\App\Action\Action
             return null;
         } else {
             /**
-             *
              * @var \Magento\Framework\Controller\Result\Redirect $result
              */
             $result = $this->resultRedirectFactory->create();

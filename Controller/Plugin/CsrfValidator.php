@@ -9,13 +9,12 @@
  */
 namespace Lyranetwork\Payzen\Controller\Plugin;
 
-/*
+/**
  * Class: CsrfValidator
  *
  * Bypass CSRF check for return and IPN URLs to avoid Form Key validation errors. Signature verification is used to check data integrity.
  * To insure backwards compatibility, CsrfAwareActionInterface cannot be used.
  */
-
 class CsrfValidator
 {
     /**

@@ -11,11 +11,9 @@
 /*global define*/
 define(
     [
-        'jquery',
-        'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract'
     ],
-    function ($, Component, fullScreenLoader) {
+    function (Component) {
         'use strict';
 
         return Component.extend({

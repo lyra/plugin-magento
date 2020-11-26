@@ -15,31 +15,26 @@ use Lyranetwork\Payzen\Model\ResponseException;
 class ResponseProcessor
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Payment
      */
     protected $paymentHelper;
 
     /**
-     *
      * @var \Magento\Sales\Model\OrderFactory
      */
     protected $orderFactory;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
      */
     protected $payzenResponseFactory;
 
     /**
-     *
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Magento\Sales\Model\OrderFactory $orderFactory

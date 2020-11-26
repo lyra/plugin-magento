@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="payzen_other" translate="label" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label><![CDATA[OTHER PAYMENT MEANS]]></label>
+        <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset\Dependant</frontend_model>
+        <attribute type="expanded">0</attribute>
+        <attribute type="feature">other</attribute>
+
+        <group id="payzen_display_options" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[DISPLAY OPTIONS]]></label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="active" translate="label comment" type="select" sortOrder="1111" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Activation]]></label>
+                <comment><![CDATA[Enables / disables this payment method.]]></comment>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/payzen_other/active</config_path>
+            </field>
+
+            <field id="title" translate="label comment" type="text" sortOrder="1112" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Method title]]></label>
+                <comment><![CDATA[Method title to display on payment means page. Used only if &laquo; Regroup payment means &raquo; option is enabled.]]></comment>
+                <config_path>payment/payzen_other/title</config_path>
+            </field>
+
+            <field id="sort_order" translate="label comment" type="text" sortOrder="1113" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Sort order]]></label>
+                <comment><![CDATA[In the payment methods list.]]></comment>
+                <config_path>payment/payzen_other/sort_order</config_path>
+            </field>
+
+            <field id="module_logo" translate="label comment" type="image" sortOrder="1114" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Logo]]></label>
+                <comment><![CDATA[Allowed file types: jpeg, gif, png. Used only if &laquo; Regroup payment means &raquo; option is enabled.]]></comment>
+                <config_path>payment/payzen_other/module_logo</config_path>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Logo</frontend_model>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>
+                <upload_dir config="system/filesystem/media" scope_info="0">payzen/images</upload_dir>
+                <base_url type="media" scope_info="0">payzen/images</base_url>
+            </field>
+        </group>
+
+        <group id="payzen_restrictions" translate="label" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[RESTRICTIONS]]></label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="allowspecific" translate="label comment" type="allowspecific" sortOrder="1121" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Restrict to some countries]]></label>
+                <comment><![CDATA[Buyer's billing countries in which this payment method is available.]]></comment>
+                <config_path>payment/payzen_other/allowspecific</config_path>
+                <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            </field>
+
+            <field id="specificcountry" translate="label comment" type="multiselect" sortOrder="1122" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Authorized countries]]></label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multiselect</frontend_model>
+                <config_path>payment/payzen_other/specificcountry</config_path>
+                <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                <depends>
+                    <field id="allowspecific">1</field>
+                </depends>
+            </field>
+
+            <field id="custgroup_amount_restriction" translate="label comment" sortOrder="1123" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Customer group amount restriction]]></label>
+                <comment><![CDATA[Define amount restriction for each customer group.]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CustgroupOptions</frontend_model>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\CustgroupOptions</backend_model>
+                <config_path>payment/payzen_other/custgroup_amount_restriction</config_path>
+            </field>
+        </group>
+
+        <group id="payzen_payment_options" translate="label" type="text" sortOrder="113" showInDefault="1" showInWebsite="1" showInStore="1">
+           <label><![CDATA[PAYMENT OPTIONS]]></label>
+           <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+           <field id="regroup_payment_means" translate="label comment" type="select" sortOrder="1131" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Regroup payment means]]></label>
+                <comment><![CDATA[If this option is enabled, all the payment means added in this section will be displayed within the same payment submodule.]]></comment>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <config_path>payment/payzen_other/regroup_payment_means</config_path>
+            </field>
+
+            <field id="other_payment_means" translate="label comment" sortOrder="1132" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Payment means]]></label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Other\OtherPaymentMeans</frontend_model>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Other\OtherPaymentMeans</backend_model>
+                <config_path>payment/payzen_other/other_payment_means</config_path>
+                <comment><![CDATA[Click on &laquo; Add &raquo; button to configure one or more payment means.<br /><b>Label: </b>The label of the means of payment to display on your site.<br /><b>Means of payment: </b>Choose the means of payment you want to propose.<br /><b>Countries: </b>Countries where the means of payment will be available. Leave blank to authorize all countries.<br /><b>Min. amount: </b>Minimum amount to enable the means of payment.<br /><b>Max. amount: </b>Maximum amount to enable the means of payment.<br /><b>Capture delay: </b>The number of days before the bank capture. Enter value only if different from PayZen general configuration.<br /><b>Validation mode: </b>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.<br /><b>Cart data: </b>If you disable this option, the shopping cart details will not be sent to the gateway. Attention, in some cases, this option has to be enabled. For more information, refer to the module documentation.]]></comment>
+            </field>
+            
+            <field id="added_payment_means" translate="label comment" sortOrder="1133" showInDefault="1" showInWebsite="1" showInStore="1">
+               <label><![CDATA[Add payment means]]></label>
+               <comment><![CDATA[Click on &laquo; Add &raquo; button to add one or more new payment means.<br /><b>Code: </b>The code of the means of payment as expected by PayZen gateway.<br /><b>Label: </b>The default label of the means of payment.]]></comment>
+               <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Other\AddedPaymentMeans</frontend_model>
+               <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Other\AddedPaymentMeans</backend_model>
+               <config_path>payment/payzen_other/added_payment_means</config_path>
+           </field>
+        </group>
+    </group>
+</include>

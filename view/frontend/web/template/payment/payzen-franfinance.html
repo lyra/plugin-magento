@@ -1,0 +1,87 @@
+<!--
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
+        <label data-bind="attr: {for: getCode()}" class="label">
+            <!-- FranFinance logo. -->
+            <!-- ko if: getModuleLogoUrl() -->
+                <img data-bind="attr: {src: getModuleLogoUrl()}"
+                     class="payment-icon"
+                     alt="PayZen"
+                     style="width: 76px;"
+                />
+            <!--/ko-->
+            <span data-bind="text: getTitle()"></span>
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <fieldset class="fieldset payment method" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 10px;">
+            <div class="field">
+            <!--ko if: getAvailableOptions().length > 0 -->
+                <div class="control">
+                    <ul class="payzen-franfinance-options payzen-payment-option">
+                        <!-- ko foreach: {data: getAvailableOptions(), as: 'option'} -->
+                        <li style="list-style: outside none none; vertical-align: top;" data-bind="css: {'_active': true}">
+                            <input class="radio"
+                                   type="radio"
+                                   name="payment[payzen_franfinance_option]"
+                                   data-bind="attr: {id: $parent.getCode() + '_option' + option.key, checked: (option.key == $parent.payzenFranfinanceOption())},
+                                              value: option.key,
+                                              visible: $parent.getAvailableOptions().length > 1,
+                                              click: function() { $parent.payzenFranfinanceOption(option.key); return true; }" />
+
+                            <label data-bind="attr: {for: $parent.getCode() + '_option' + option.key}">
+                                <span style="display: inline !important;" data-bind="text: option.label"></span>
+                            </label>
+                        </li>
+                        <!--/ko-->
+                    </ul>
+                </div>
+                <!--/ko-->
+            </div>
+        </fieldset>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="click: placeOrder,
+                                   attr: {title: $t('Pay with FranFinance')},
+                                   css: {disabled: !isPlaceOrderActionAllowed()},
+                                   enable: (getCode() == isChecked())"
+                        disabled>
+                    <span data-bind="i18n: 'Pay with FranFinance'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

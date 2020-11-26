@@ -13,8 +13,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="sales_quote_payment_save_before">
         <observer name="payzen_update_quote_multi_payment" instance="Lyranetwork\Payzen\Observer\UpdateMultiPaymentObserver" />
+        <observer name="payzen_update_quote_other_payment" instance="Lyranetwork\Payzen\Observer\UpdateOtherPaymentObserver" />
     </event>
     <event name="sales_order_payment_save_before">
         <observer name="payzen_update_order_multi_payment" instance="Lyranetwork\Payzen\Observer\UpdateMultiPaymentObserver" />
+        <observer name="payzen_update_order_other_payment" instance="Lyranetwork\Payzen\Observer\UpdateOtherPaymentObserver" />
     </event>
 </config>

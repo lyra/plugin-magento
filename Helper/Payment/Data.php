@@ -14,13 +14,12 @@ use Magento\Framework\View\LayoutFactory;
 class Data extends \Magento\Payment\Helper\Data
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     * Construct
+     * Construct.
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param LayoutFactory $layoutFactory
@@ -71,6 +70,21 @@ class Data extends \Magento\Payment\Helper\Data
             $methods[$code] = [
                 'model' => $config['value'],
                 'title' => "$payzenMultiTitle ($count)",
+                'group' => 'payzen'
+            ];
+        }
+
+        $payzenOtherTitle = $methods['payzen_other']['title']; // Get multi payment general title.
+        unset($methods['payzen_other']);
+
+        // Add other payment virtual methods to the list.
+        foreach ($this->dataHelper->getOtherPaymentModelConfig() as $config) {
+            $code = substr($config['path'], strlen('payment/'), - strlen('/model'));
+            $means = substr($code, strlen('payzen_other_'));
+
+            $methods[$code] = [
+                'model' => $config['value'],
+                'title' => $payzenOtherTitle . " ($means)",
                 'group' => 'payzen'
             ];
         }

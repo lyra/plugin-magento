@@ -15,19 +15,16 @@ use Magento\Framework\DataObject;
 class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
     /**
-     *
      * @var \Magento\Sales\Model\OrderFactory
      */
     protected $orderFactory;
@@ -38,25 +35,21 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
     protected $quoteManagement;
 
     /**
-     *
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
      */
     protected $payzenResponseFactory;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Rest
      */
     protected $restHelper;
 
     /**
-     *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Lyranetwork\Payzen\Controller\Processor\CheckProcessor $checkProcessor
      * @param \Magento\Framework\Controller\Result\RawFactory $rawResultFactory
@@ -94,7 +87,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         $answer = json_decode($params['kr-answer'], true);
         if (! is_array($answer)) {
             $this->dataHelper->log('Invalid response received. Content: ' . json_encode($params), \Psr\Log\LogLevel::ERROR);
-            throw new ResponseException('<span style="display:none">KO-Invalid IPN request received.'."\n".'</span>');
+            throw new ResponseException('<span style="display:none">KO-Invalid IPN request received.' . "\n" . '</span>');
         }
 
         // Wrap payment result to use traditional order creation tunnel.
@@ -116,6 +109,13 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         if (! $quote->getId()) {
             $this->dataHelper->log("Quote not found with ID #{$quoteId}.", \Psr\Log\LogLevel::ERROR);
             throw new ResponseException($response->getOutputForGateway('order_not_found'));
+        }
+
+        // Disable quote.
+        if ($quote->getIsActive()) {
+            $quote->setIsActive(false);
+            $this->quoteRepository->save($quote);
+            $this->dataHelper->log("Cleared quote, reserved order ID: #{$quote->getReservedOrderId()}.");
         }
 
         // Case of failure or expiration when retries are enabled, do nothing before last attempt.

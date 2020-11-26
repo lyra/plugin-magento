@@ -12,13 +12,11 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend;
 class ShopUrl extends \Magento\Framework\App\Config\Value
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config

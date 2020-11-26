@@ -1,0 +1,66 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+
+$means = $block->getStoredPaymentMeans();
+
+?>
+<?php if (! empty($means)): ?>
+    <div class="table-wrapper my-credit-cards">
+        <table class="data table table-credit-cards" id="payzen-means-list">
+            <thead>
+                <tr>
+                    <th scope="col" class="col"><?php echo $block->escapeHtml(__('Type')); ?></th>
+                    <th scope="col" class="col"><?php echo $block->escapeHtml(__('Means of payment')); ?></th>
+                    <th scope="col" class="col actions"><?php echo $block->escapeHtml(__('Action')); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+              <?php foreach($means as $card): ?>
+                <tr>
+                    <?php if ($img = $block->getCcTypeImageSrc($card['brand'])): ?>
+                      <td><img alt="<?php echo $block->escapeHtml($card['brand']); ?>"
+                               style="max-height: 30px; max-width: 80px; vertical-align: middle;"
+                               src="<?php echo $block->escapeHtml($img); ?>"
+                               title="<?php echo $block->escapeHtml($card['brand']); ?>">
+                      </td>
+                    <?php else: ?>
+                      <td class="col"><span><?php echo $block->escapeHtml($card['brand']); ?></span></td>
+                    <?php endif ?>
+                    <td class="col"><?php echo $block->escapeHtml($card['number']); ?></td>
+                    <td class="col">
+                        <form class="form"
+                              action="<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>"
+                              method="post">
+                            <?php echo $block->getBlockHtml('formkey'); ?>
+                            <input name="alias_attr" value="<?php echo $block->escapeHtml($card['alias']); ?>" type="hidden">
+                            <input name="pm_attr" value="<?php echo $block->escapeHtml($card['pm']); ?>" type="hidden">
+                            <button type="submit"
+                                    class="action delete"
+                                    data-mage-init='{
+                                        "Lyranetwork_Payzen/js/customer/delete-widget": {
+                                            "type": "popup",
+                                            "modalClass": "payzen-confirm-delete",
+                                            "toggleEvent": "click",
+                                            "title": "<?php echo $block->escapeHtml(sprintf(__('Delete %s'), $card['number'])); ?>",
+                                            "content": "<?php echo $block->escapeHtml(__('Are you sure you want to delete your saved means of payment? This action is not reversible!')); ?>"
+                                        }
+                                    }'>
+                                <span><?php echo $block->escapeHtml(__('Delete')); ?></span>
+                            </button>
+                       </form>
+                   </td>
+                </tr>
+             <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php else: ?>
+    <div class="message info empty"><span><?php echo $block->escapeHtml(__('You have no stored payment means.')); ?></span></div>
+<?php endif ?>

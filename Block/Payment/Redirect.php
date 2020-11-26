@@ -12,13 +12,11 @@ namespace Lyranetwork\Payzen\Block\Payment;
 class Redirect extends \Magento\Framework\View\Element\Template
 {
     /**
-     *
      * @var \Magento\Framework\Registry
      */
     protected $coreRegistry;
 
     /**
-     *
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param array $data
@@ -34,7 +32,7 @@ class Redirect extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * Get Form data by using ops payment api
+     * Get Form data by using ops payment api.
      *
      * @return array
      */
@@ -44,7 +42,7 @@ class Redirect extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * Getting gateway url
+     * Getting gateway url.
      *
      * @return string
      */

@@ -1,0 +1,71 @@
+<!--
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+<!-- ko foreach: {data: getAvailableOptions(), as: 'option'} -->
+<div class="payment-method" data-bind="css: {'_active': ($parent.getOptionCode(option.key) == $parent.isChecked())}">
+    <div class="payment-method-title field choice">
+    <input type="hidden"
+                 name="payment[payzen_other_option]"
+                 data-bind="value: option.key" />
+
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {id: $parent.getOptionCode(option.key)}, 
+                          value: $parent.getOptionCode(option.key),
+                          checked: $parent.isChecked,
+                          click: function() { $parent.selectOptionPaymentMethod(option.key); 
+                                              $parent.payzenOtherOption(option.key); 
+                                              return true; },
+                          visible: $parent.isRadioButtonVisible()" />
+
+        <label data-bind="attr: {for: $parent.getOptionCode(option.key)}" class="label  payzen-card">
+            <!--ko if: option.icon -->
+            <img data-bind="attr: {src: option.icon, title: option.label}"
+                 class="payment-icon"
+                 style="height: 36px;"/>
+            <!--/ko-->
+
+            <span data-bind="text: option.label"></span>
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+        <!-- ko foreach: $parent.getRegion('messages') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address payzen-form">
+            <!-- ko foreach: $parents[1].getRegion($parent.getBillingAddressFormName()) -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+         <div class="checkout-agreements-block payzen-form">
+            <!-- ko foreach: $parents[1].getRegion('before-place-order') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="click: function(data, event) {$parent.placeOrder(data, event)},
+                                   attr: {title: $t('Pay with %s').replace('%s', option.value)},
+                                   css: {disabled: !$parent.isPlaceOrderActionAllowed()},
+                                   enable: true">
+                    <span data-bind="html: $t('Pay with %s').replace('%s', option.value)"></span>
+                </button>
+             <!--/ko-->
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ko-->

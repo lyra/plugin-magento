@@ -15,13 +15,11 @@ namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Standard;
 class RestPlaceholders extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {
     /**
-     *
      * @var bool
      */
     protected $staticTable = true;
 
     /**
-     *
      * @var array
      */
     protected $_default = [];

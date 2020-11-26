@@ -9,6 +9,18 @@
  */
 -->
 
+<!-- ko if: ($parent.getEntryMode() == 5) --><!-- Popin mode is enabled. -->
+<div id="payzen_rest_form" class="kr-embedded" kr-popin>
+    <div class="kr-pan"></div>
+    <div class="kr-expiry"></div>
+    <div class="kr-security-code"></div>
+
+    <button type="button" class="kr-payment-button"></button>
+    <div class="kr-form-error"></div>
+</div>
+<!--/ko-->
+
+<!-- ko if: ($parent.getEntryMode() == 4) --><!-- Embedded mode is enabled. -->
 <div id="payzen_rest_form" class="kr-embedded">
     <div class="kr-pan"></div>
     <div class="kr-expiry"></div>
@@ -20,3 +32,4 @@
 
     <div class="kr-form-error"></div>
 </div>
+<!--/ko-->

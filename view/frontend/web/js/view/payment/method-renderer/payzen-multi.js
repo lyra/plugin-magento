@@ -36,7 +36,7 @@ define(
             getData: function () {
                 var data = this._super();
 
-                if (this.getEntryMode() == 2) {
+                if (this.getEntryMode() == 2) { // Payment means selection on merchant site.
                     data['additional_data']['payzen_multi_cc_type'] = this.payzenCcType();
                 }
 

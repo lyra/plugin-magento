@@ -30,6 +30,9 @@
         <method name="payzen_choozeo">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="payzen_oney">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="payzen_fullcb">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
@@ -37,6 +40,12 @@
             <allow_multiple_address>0</allow_multiple_address>
         </method>
         <method name="payzen_paypal">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="payzen_franfinance">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="payzen_other">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
     </methods>

@@ -12,13 +12,11 @@ namespace Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySeriali
 class ConfigArraySerialized extends \Magento\Config\Model\Config\Backend\Serialized\ArraySerialized
 {
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
@@ -67,5 +65,35 @@ class ConfigArraySerialized extends \Magento\Config\Model\Config\Backend\Seriali
 
         // Throw exception.
         throw new \Magento\Framework\Exception\LocalizedException(__($msg));
+    }
+
+    protected function checkMandatoryDecimal($value, $fieldLabel, $i)
+    {
+        if (empty($value)) {
+            $this->throwException($fieldLabel, $i);
+        }
+
+        $this->checkDecimal($value, $fieldLabel, $i);
+    }
+
+    protected function checkDecimal($value, $fieldLabel, $i)
+    {
+        if (! empty($value) && ! preg_match('#^\d+$#', $value)) {
+            $this->throwException($fieldLabel, $i);
+        }
+    }
+
+    protected function checkAmount($amount, $fieldLabel, $i)
+    {
+        if (! empty($amount) && ! preg_match('#^\d+(\.\d+)?$#', $amount)) {
+            $this->throwException($fieldLabel, $i);
+        }
+    }
+
+    protected function checkRate($rate, $fieldLabel, $i)
+    {
+        if (! empty($rate) && (! is_numeric($rate) || ($rate < 0) || ($rate >= 100))) {
+            $this->throwException($fieldLabel, $i);
+        }
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"> 
+    <update handle="customer_account" />
+
+    <head>
+        <css src="Lyranetwork_Payzen::css/payzen.css" />
+    </head>
+
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">My payment means</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="Lyranetwork\Payzen\Block\Customer\Index" name="payzen_payment_means" template="Lyranetwork_Payzen::customer/payment_means.phtml" cacheable="false" />
+        </referenceContainer>
+    </body>
+</page>

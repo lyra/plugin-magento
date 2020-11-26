@@ -21,49 +21,60 @@ class Checkout
     const PRODUCT_REF_REGEX = '#^[a-zA-Z0-9]{1,64}$#';
 
     /**
-     *
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
     protected $productCollectionFactory;
 
     /**
-     *
      * @var \Magento\Customer\Model\ResourceModel\Customer\CollectionFactory
      */
     protected $customerCollectionFactory;
 
     /**
-     *
      * @var \Magento\Catalog\Model\CategoryRepository
      */
     protected $categoryRepository;
 
     /**
-     *
      * @var \Magento\Eav\Model\Config
      */
     protected $eavConfig;
 
     /**
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
     /**
-     *
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
 
     /**
-     *
+     * @var \Magento\Shipping\Model\Config
+     */
+    protected $shippingConfig;
+
+    /**
+    * @var \Magento\Framework\Stdlib\CookieManagerInterface
+    */
+    protected $cookieManager;
+
+    /**
+     * @var \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory
+     */
+    protected $cookieMetadataFactory;
+
+    /**
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
      * @param \Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $customerCollectionFactory
      * @param \Magento\Catalog\Model\CategoryRepository $categoryRepository
      * @param \Magento\Eav\Model\Config $eavConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
+     * @param \Magento\Shipping\Model\Config $shippingConfig
+     * @param \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager
+     * @param \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
      */
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
@@ -71,7 +82,10 @@ class Checkout
         \Magento\Catalog\Model\CategoryRepository $categoryRepository,
         \Magento\Eav\Model\Config $eavConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Lyranetwork\Payzen\Helper\Data $dataHelper
+        \Lyranetwork\Payzen\Helper\Data $dataHelper,
+        \Magento\Shipping\Model\Config $shippingConfig,
+        \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager,
+        \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->customerCollectionFactory = $customerCollectionFactory;
@@ -79,18 +93,9 @@ class Checkout
         $this->eavConfig = $eavConfig;
         $this->storeManager = $storeManager;
         $this->dataHelper = $dataHelper;
-    }
-
-    /**
-     * Normalize shipping method name.
-     *
-     * @param string $name
-     * @return string normalized name
-     */
-    public function cleanShippingMethod($name)
-    {
-        $notAllowed = "#[^A-ZÇ0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]#ui";
-        return preg_replace($notAllowed, '', $name);
+        $this->shippingConfig = $shippingConfig;
+        $this->cookieManager = $cookieManager;
+        $this->cookieMetadataFactory = $cookieMetadataFactory;
     }
 
     public function checkCustormers($scope, $scopeId)
@@ -311,65 +316,74 @@ class Checkout
         $payzenRequest->set('cust_status', 'PRIVATE');
         $payzenRequest->set('ship_to_status', 'PRIVATE');
 
-        $notAllowedCharsRegex = "#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]#ui";
-
-        if ($order->getIsVirtual() || ! $order->getShippingMethod()) {
-            // There is no shipping mean set store name after illegal characters replacement.
-
-            $storeId = $this->dataHelper->getCheckoutStoreId();
-            $payzenRequest->set(
-                'ship_to_delivery_company_name',
-                preg_replace($notAllowedCharsRegex, ' ', $this->dataHelper->getStore($storeId)->getFrontendName())
-            );
-
+        if ($order->getIsVirtual() || ! $order->getShippingMethod()) { // There is no shipping method.
             $payzenRequest->set('ship_to_type', 'ETICKET');
             $payzenRequest->set('ship_to_speed', 'EXPRESS');
         } else {
             $shippingMethod = $this->toOneyCarrier($order->getShippingMethod());
 
+            $storeId = $this->dataHelper->getCheckoutStoreId();
+            $carriers = $this->shippingConfig->getAllCarriers($storeId);
+            $carrierCode = substr($shippingMethod['code'], 0, strpos($shippingMethod['code'], '_'));
+            $carrierName = $carriers[$carrierCode]->getConfigData('title');
+
+            // Delivery point name.
+            $name = '';
             switch ($shippingMethod['type']) {
                 case 'RECLAIM_IN_SHOP':
                 case 'RELAY_POINT':
+                    $name = $order->getShippingDescription();
+
+                    if ($carrierName) {
+                        $name = str_replace($carrierName . ' - ', '', $name);
+                    }
+
+                    if (strpos($name, '<')) {
+                        $name = substr($name, 0, strpos($name, '<')); // Remove html elements.
+                    }
+
+                    // Break intentionally omitted.
                 case 'RECLAIM_IN_STATION':
                     // It's recommended to put a specific logic here.
-
-                    $address = ''; // Initialize with selected SHOP/RELAY POINT/STATION name.
-                    $address .= $order->getShippingAddress()->getStreet(1);
-                    $address .= $order->getShippingAddress()->getStreet(2) ? ' ' .
-                         $order->getShippingAddress()->getStreet(2) : '';
+                    $address = $order->getShippingAddress()->getStreetLine(1);
+                    $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' .
+                         $order->getShippingAddress()->getStreetLine(2) : '';
 
                     $payzenRequest->set('ship_to_street', $address);
                     $payzenRequest->set('ship_to_zip', $order->getShippingAddress()->getPostcode());
                     $payzenRequest->set('ship_to_city', $order->getShippingAddress()->getCity());
-                    $payzenRequest->set('ship_to_country', 'FR');
-                    $payzenRequest->set('ship_to_street2', null); // Not sent to FacilyPay Oney.
+
+                    $street2 = ($shippingMethod['type'] == 'RELAY_POINT') ? $name : null;
+                    $payzenRequest->set('ship_to_street2', $street2);
                     $payzenRequest->set('ship_to_state', null);
-                    $payzenRequest->set('ship_to_phone_num', null);
 
-                    // Add postcode and city to send them in ship_to_delivery_company_name.
-                    $address .= ' ' . $order->getShippingAddress()->getPostcode();
-                    $address .= ' ' . $order->getShippingAddress()->getCity();
-
-                    // Delete not allowed chars.
-                    $address = preg_replace($notAllowedCharsRegex, ' ', $address);
-                    $method = $shippingMethod['oney_label'] . ' ' . $address;
+                    $method = $carrierName . ' ' . $address;
                     $payzenRequest->set('ship_to_delivery_company_name', $method);
                     break;
+
                 default:
                     $address = '';
-                    $address .= $order->getShippingAddress()->getStreet(1);
-                    $address .= $order->getShippingAddress()->getStreet(2) ? ' ' .
-                         $order->getShippingAddress()->getStreet(2) : '';
+                    $address .= $order->getShippingAddress()->getStreetLine(1);
+                    $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' .
+                         $order->getShippingAddress()->getStreetLine(2) : '';
 
                     $payzenRequest->set('ship_to_street', $address);
-                    $payzenRequest->set('ship_to_street2', null); // Not sent to FacilyPay Oney.
+                    $payzenRequest->set('ship_to_street2', null); // Not sent to Oney.
 
-                    $payzenRequest->set('ship_to_delivery_company_name', $shippingMethod['oney_label']);
+                    $payzenRequest->set('ship_to_delivery_company_name', $carrierName);
                     break;
             }
 
+            // Send FR even if address is in DOM-TOM, otherwise form is rejected.
+            $payzenRequest->set('cust_country', 'FR');
+            $payzenRequest->set('ship_to_country', 'FR');
+
             $payzenRequest->set('ship_to_type', $shippingMethod['type']);
             $payzenRequest->set('ship_to_speed', $shippingMethod['speed']);
+
+            if ($shippingMethod['speed'] === 'PRIORITY') {
+                $payzenRequest->set('ship_to_delay', $shippingMethod['delay']);
+            }
         }
     }
 
@@ -384,7 +398,7 @@ class Checkout
         $phoneRegex = "#^[0-9]{10}$#";
         $cityRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,127}$#ui";
         $streetRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui";
-        $countryRegex = "#^FR$#i";
+        $countryRegex = "#^FR|GP|MQ|GF|RE|YT$#i";
         $zipRegex = "#^[0-9]{5}$#";
 
         // Address type.
@@ -393,8 +407,8 @@ class Checkout
         $this->checkFieldValidity($address->getLastname(), $nameRegex, 'Last Name', $addressType);
         $this->checkFieldValidity($address->getFirstname(), $nameRegex, 'First Name', $addressType);
         $this->checkFieldValidity($address->getTelephone(), $phoneRegex, 'Telephone', $addressType, false);
-        $this->checkFieldValidity($address->getStreet(1), $streetRegex, 'Address', $addressType);
-        $this->checkFieldValidity($address->getStreet(2), $streetRegex, 'Address', $addressType, false);
+        $this->checkFieldValidity($address->getStreetLine(1), $streetRegex, 'Address', $addressType);
+        $this->checkFieldValidity($address->getStreetLine(2), $streetRegex, 'Address', $addressType, false);
         $this->checkFieldValidity($address->getPostcode(), $zipRegex, 'Postcode', $addressType);
         $this->checkFieldValidity($address->getCity(), $cityRegex, 'City', $addressType);
         $this->checkFieldValidity($address->getCountryId(), $countryRegex, 'Country', $addressType);
@@ -407,20 +421,60 @@ class Checkout
         $emptyMsg = 'The field %1 of your %2 is mandatory.';
 
         if ($mandatory && ! $field) {
-            $this->throwException($emptyMsg, $fieldName, $addressType);
+            $this->setErrorMsg($emptyMsg, $fieldName, $addressType);
         }
 
         if ($field && ! preg_match($regex, $field)) {
-            $this->throwException($invalidMsg, $fieldName, $addressType);
+            // Delete valid characters to retrieve invalid ones.
+            $replaceRegex = preg_replace("/{(.*?)}/", '', $regex);
+            $replaceRegex = str_replace(array('^', '$'), '', $replaceRegex);
+            $invalidChars = preg_replace($replaceRegex, '', $field);
+
+            $arr = str_split($invalidChars);
+            $invalidChars = '';
+            foreach ($arr as $char) {
+                $invalidChars .= '<b>' . $char . '</b> ';
+            }
+
+            $this->setErrorMsg($invalidMsg, $fieldName, $addressType, $invalidChars);
         }
     }
 
-    private function throwException($msg, $field, $addressType)
+    private function setErrorMsg($msg, $fieldName, $addressType, $invalidChars = null)
     {
         // Translate.
-        $field = __($field);
+        $fieldName = __($fieldName);
         $addressType = __($addressType);
 
-        throw new \Magento\Framework\Exception\LocalizedException(__($msg, $field, $addressType));
+        $translated = __($msg, $fieldName, $addressType)->render();
+
+        if ($invalidChars) {
+            $translated .= '<br>' . __('The following characters: %1 are not allowed for this field.', $invalidChars)->render();
+        }
+
+        // Store error message in a cookie.
+        $metadata = $this->cookieMetadataFactory
+            ->createPublicCookieMetadata()
+            ->setPath('/');
+
+        $this->cookieManager->setPublicCookie(
+            'payzen_oney_error',
+            $translated,
+            $metadata
+        );
+    }
+
+    public function clearErrorMsg()
+    {
+        if ($this->cookieManager->getCookie('payzen_oney_error')) {
+            $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata()
+                ->setPath('/');
+
+            $this->cookieManager->setPublicCookie(
+                'payzen_oney_error',
+                null,
+                $metadata
+            );
+        }
     }
 }

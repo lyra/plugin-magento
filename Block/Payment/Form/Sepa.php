@@ -12,4 +12,10 @@ namespace Lyranetwork\Payzen\Block\Payment\Form;
 class Sepa extends Payzen
 {
     protected $_template = 'Lyranetwork_Payzen::payment/form/sepa.phtml';
+
+    // Check if the 1-click payment is active for SEPA.
+    public function isOneClickActive()
+    {
+        return $this->getMethod()->isOneClickActive();
+    }
 }

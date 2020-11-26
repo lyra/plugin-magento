@@ -139,7 +139,7 @@ define(
                     data['additional_data']['payzen_standard_use_identifier'] = this.payzenUseIdentifier();
                 }
 
-                if (this.getEntryMode() == 2) {
+                if (this.getEntryMode() == 2) { // Payment means selection on merchant site.
                     data['additional_data']['payzen_standard_cc_type'] = this.payzenCcType();
                 }
 
@@ -220,15 +220,19 @@ define(
             placeOrderClick: function () {
                 var me = this;
 
-                if ((me.getEntryMode() == 4) && me.getRestFormToken()) {
+                if (((me.getEntryMode() == 4) || (me.getEntryMode() == 5)) && me.getRestFormToken()) {
+                    // Embedded or popin mode.
                     $('#payzen_rest_form .kr-form-error').html('');
 
                     if (!additionalValidators.validate()) {
                         return;
                     }
 
-                    fullScreenLoader.startLoader();
-                    me.isPlaceOrderActionAllowed(false);
+                    var isPopin = $('.kr-popin-button').length > 0;
+                    if (!isPopin) {
+                        fullScreenLoader.startLoader();
+                        me.isPlaceOrderActionAllowed(false);
+                    }
 
                     var newPayload = JSON.stringify({
                         cartId: quote.getQuoteId(),
@@ -238,7 +242,11 @@ define(
                     });
 
                     if (me.payload && (me.payload === newPayload)) {
-                        KR.submit();
+                        if (isPopin) {
+                            KR.openPopin();
+                        } else {
+                            KR.submit();
+                        }
                     } else {
                         me.payload = newPayload;
 
@@ -270,7 +278,11 @@ define(
                         }).then(
                             function(v) {
                                 var KR = v.KR;
-                                KR.submit();
+                                if ($('.kr-popin-button').length > 0) {
+                                    KR.openPopin();
+                                } else {
+                                    KR.submit();
+                                }
                             }
                         );
                     } else {
@@ -325,7 +337,7 @@ define(
             afterPlaceOrder: function () {
                 var me = this;
 
-                if (me.getEntryMode() == 3) {
+                if (me.getEntryMode() == 3) { // Iframe mode.
                     // Iframe mode.
                     fullScreenLoader.stopLoader();
 

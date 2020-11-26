@@ -14,25 +14,21 @@ use Lyranetwork\Payzen\Model\Api\PayzenResponse;
 class Info extends \Magento\Payment\Block\Info
 {
     /**
-     *
      * @var string
      */
     protected $_template = 'Lyranetwork_Payzen::payment/info.phtml';
 
     /**
-     *
      * @var \Magento\Framework\Locale\ResolverInterface
      */
     protected $localeResolver;
 
     /**
-     *
      * @var \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory
      */
     protected $trsCollectionFactory;
 
     /**
-     *
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $trsCollectionFactory
