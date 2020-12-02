@@ -10,6 +10,11 @@
 
 class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    const MODE_FORM = 1;
+    const MODE_LOCAL_TYPE = 2;
+    const MODE_IFRAME = 3;
+    const MODE_EMBEDDED = 4;
+    const MODE_POPIN = 5;
     /**
      * @var array a global var to easily enable/disable features
      */
@@ -47,7 +52,8 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
             $storeId = Mage::getSingleton('adminhtml/session_quote')->getStoreId();
         }
 
-        return Mage::getStoreConfig('payment/payzen/' . $field, $storeId);
+        $value = Mage::getStoreConfig('payment/payzen/' . $field, $storeId);
+        return is_string($value) ? trim($value) : $value;
     }
 
     /**
@@ -60,7 +66,7 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $result = array();
 
-        $xmlNode = 'global/payment/payzen/'.$name;
+        $xmlNode = 'global/payment/payzen/' . $name;
         foreach (Mage::getConfig()->getNode($xmlNode)->asArray() as $xmlData) {
             $result[$xmlData['code']] = $xmlData['name'];
         }
@@ -207,26 +213,6 @@ class Lyranetwork_Payzen_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             // For magento 1.4.0.x.
             return 'payment_review';
-        }
-    }
-
-    /**
-     * Check if server has requirements to do WS operations.
-     *
-     * @throws Lyranetwork_Payzen_Model_WsException
-     */
-    public function checkWsRequirements()
-    {
-        if (! extension_loaded('soap')) {
-            throw new Lyranetwork_Payzen_Model_WsException(
-                'SOAP extension for PHP must be enabled on the server in order to use gateway web services.'
-            );
-        }
-
-        if (! extension_loaded('openssl')) {
-            throw new Lyranetwork_Payzen_Model_WsException(
-                'OPENSSL extension for PHP must be enabled on the server in order to use gateway web services.'
-            );
         }
     }
 

@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+
+$means = $this->getStoredPaymentMeans();
+
+?>
+<div class="page-title">
+    <h1><?php echo $this->__('My payment means') ?></h1>
+</div>
+<?php if (! empty($means)): ?>
+    <div class="table-wrapper my-credit-cards">
+        <table class="data-table table-credit-cards" id="payzen-means-list">
+            <thead>
+                <tr>
+                    <th scope="col" class="col"><?php echo $this->escapeHtml(__('Type')); ?></th>
+                    <th scope="col" class="col"><?php echo $this->escapeHtml(__('Means of payment')); ?></th>
+                    <th scope="col" class="col actions"><?php echo $this->escapeHtml(__('Action')); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+              <?php foreach($means as $card): ?>
+                <tr>
+                    <?php if ($img = $this->getCcTypeImageSrc($card['brand'])): ?>
+                      <td><img alt="<?php echo $this->escapeHtml($card['brand']); ?>"
+                               style="max-height: 30px; max-width: 80px; vertical-align: middle;"
+                               src="<?php echo $this->escapeHtml($img); ?>"
+                               title="<?php echo $this->escapeHtml($card['brand']); ?>">
+                      </td>
+                    <?php else: ?>
+                      <td class="col"><span><?php echo $this->escapeHtml($card['brand']); ?></span></td>
+                    <?php endif ?>
+                    <td class="col"><?php echo $this->escapeHtml($card['number']); ?></td>
+                    <td class="col">
+                        <a href="#" onclick="payzenConfirmDelete('<?php echo $this->escapeHtml($card['alias']); ?>', '<?php echo $this->escapeHtml($card['pm']); ?>')">
+                            <span><?php echo $this->escapeHtml(__('Delete')); ?></span>
+                        </a>
+                   </td>
+                </tr>
+             <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            var payzenConfirmDelete = function(alias, pm) {
+                if (confirm("<?php echo $this->escapeHtml(__('Are you sure you want to delete your saved means of payment? This action is not reversible!')); ?>")) {
+                    jQuery.ajax({
+                        "type": "POST",
+                        "url": "<?php echo $this->escapeUrl($this->getUrl('payzen/customer/cancel')); ?>",
+                        "data": { "alias": alias, "pm":pm},
+                        "success": function () {
+                                    location.reload();
+                                   }
+                    });
+                }
+            }
+        //]]>
+        </script>
+    </div>
+<?php else: ?>
+    <p><?php echo $this->escapeHtml(__('You have no stored payment means.')); ?><p>
+<?php endif ?>

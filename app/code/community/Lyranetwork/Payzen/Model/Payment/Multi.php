@@ -25,7 +25,7 @@ class Lyranetwork_Payzen_Model_Payment_Multi extends Lyranetwork_Payzen_Model_Pa
 
         $info = $this->getInfoInstance();
 
-        if (! $this->_getHelper()->isAdmin() && ($this->getConfigData('card_info_mode') == 2)) {
+        if (! $this->_getHelper()->isAdmin() && ($this->getConfigData('card_info_mode') == Lyranetwork_Payzen_Helper_Data::MODE_LOCAL_TYPE)) {
             $this->_payzenRequest->set('payment_cards', $info->getCcType());
         } else {
             // payment_cards is given as csv by Magento.

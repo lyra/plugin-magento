@@ -58,21 +58,10 @@ class Lyranetwork_Payzen_Model_Field_Oney3x4x_PaymentOptions extends Lyranetwork
                         $this->_throwError('Code', $i);
                     }
 
-                    if (! empty($value['minimum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['minimum'])) {
-                        $this->_throwError('Min. amount', $i);
-                    }
-
-                    if (! empty($value['maximum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['maximum'])) {
-                        $this->_throwError('Max. amount', $i);
-                    }
-
-                    if (! preg_match('#^[1-9]\d*$#', $value['count'])) {
-                        $this->_throwError('Count', $i);
-                    }
-
-                    if (! is_numeric($value['rate']) || $value['rate'] >= 100 || $value['rate'] < 0) {
-                        $this->_throwError('Rate', $i);
-                    }
+                    $this->checkAmount($value['minimum'], 'Min. amount', $i);
+                    $this->checkAmount($value['maximum'], 'Max. amount', $i);
+                    $this->checkMandatoryDecimal($value['count'], 'Count', $i);
+                    $this->checkRate($value['rate'], 'Rate', $i);
                 }
             }
         }

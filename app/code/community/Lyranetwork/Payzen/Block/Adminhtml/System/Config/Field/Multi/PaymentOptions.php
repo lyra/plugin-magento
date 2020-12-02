@@ -20,21 +20,21 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Multi_PaymentOption
             'label',
             array(
                 'label' => Mage::helper('payzen')->__('Label'),
-                'style' => 'width: 150px;',
+                'style' => 'width: 150px;'
             )
         );
         $this->addColumn(
             'minimum',
             array(
                 'label' => Mage::helper('payzen')->__('Min. amount'),
-                'style' => 'width: 80px;',
+                'style' => 'width: 80px;'
             )
         );
         $this->addColumn(
             'maximum',
             array(
                 'label' => Mage::helper('payzen')->__('Max. amount'),
-                'style' => 'width: 80px;',
+                'style' => 'width: 80px;'
             )
         );
 
@@ -45,7 +45,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Multi_PaymentOption
                 'contract',
                 array(
                     'label' => Mage::helper('payzen')->__('Contract'),
-                    'style' => 'width: 65px;',
+                    'style' => 'width: 65px;'
                 )
             );
         }
@@ -54,21 +54,21 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Multi_PaymentOption
             'count',
             array(
                 'label' => Mage::helper('payzen')->__('Count'),
-                'style' => 'width: 65px;',
+                'style' => 'width: 65px;'
             )
         );
         $this->addColumn(
             'period',
             array(
                 'label' => Mage::helper('payzen')->__('Period'),
-                'style' => 'width: 65px;',
+                'style' => 'width: 65px;'
             )
         );
         $this->addColumn(
             'first',
             array(
                 'label' => Mage::helper('payzen')->__('1st installment'),
-                'style' => 'width: 70px;',
+                'style' => 'width: 70px;'
             )
         );
 

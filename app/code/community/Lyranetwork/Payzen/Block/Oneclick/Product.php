@@ -14,7 +14,7 @@ class Lyranetwork_Payzen_Block_Oneclick_Product extends Mage_Catalog_Block_Produ
     {
         $model = Mage::getModel('payzen/payment_standard');
 
-        // 1-Click is not available in current context
+        // 1-Click is not available in current context.
         $configContext = $model->getConfigData('one_click_location');
         if ($configContext !== Lyranetwork_Payzen_Helper_Payment::ONECLICK_LOCATION_PRODUCT
             && $configContext !== Lyranetwork_Payzen_Helper_Payment::ONECLICK_LOCATION_BOTH

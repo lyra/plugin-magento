@@ -20,7 +20,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Oney3x4x_PaymentOpt
             'label',
             array(
                 'label' => Mage::helper('payzen')->__('Label'),
-                'style' => 'width: 150px;',
+                'style' => 'width: 150px;'
             )
         );
         $this->addColumn(
@@ -34,28 +34,28 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Oney3x4x_PaymentOpt
             'minimum',
             array(
                 'label' => Mage::helper('payzen')->__('Min. amount'),
-                'style' => 'width: 80px;',
+                'style' => 'width: 80px;'
             )
         );
         $this->addColumn(
             'maximum',
             array(
                 'label' => Mage::helper('payzen')->__('Max. amount'),
-                'style' => 'width: 80px;',
+                'style' => 'width: 80px;'
             )
         );
         $this->addColumn(
             'count',
             array(
                 'label' => Mage::helper('payzen')->__('Count'),
-                'style' => 'width: 65px;',
+                'style' => 'width: 65px;'
             )
         );
         $this->addColumn(
             'rate',
             array(
                 'label' => Mage::helper('payzen')->__('Rate'),
-                'style' => 'width: 65px;',
+                'style' => 'width: 65px;'
             )
         );
 

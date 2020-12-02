@@ -11,7 +11,7 @@
 class Lyranetwork_Payzen_Block_Adminhtml_Redirect extends Lyranetwork_Payzen_Block_Redirect
 {
     /**
-     * Get checkout session namespace
+     * Get checkout session namespace.
      *
      * @return Mage_Adminhtml_Model_Session_Quote
      */

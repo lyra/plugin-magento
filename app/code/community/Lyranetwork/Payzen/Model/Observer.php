@@ -26,11 +26,6 @@ class Lyranetwork_Payzen_Model_Observer
 
         $method = $order->getPayment()->getMethodInstance();
 
-        if ($method instanceof Lyranetwork_Payzen_Model_Payment_Standard && $this->_getHelper()->isCurrentlySecure()) {
-            // Use WS instead.
-            return;
-        }
-
         if ($method instanceof Lyranetwork_Payzen_Model_Payment_Abstract) {
             // Backend payment with redirection.
 
@@ -394,7 +389,7 @@ class Lyranetwork_Payzen_Model_Observer
         }
 
         // Do nothing if payment by embedded fields is not enabled.
-        if (Mage::getModel('payzen/payment_standard')->getConfigData('card_info_mode') != '4') {
+        if (! Mage::getModel('payzen/payment_standard')->isEmbedded()) {
             return $this;
         }
 

@@ -1,3 +1,15 @@
+1.12.0, 2020-12-02:
+- Reorganize backend (REST API keys moved to general configuration section).
+- Do payment from backend by redirection in all cases.
+- Refund payment using REST API.
+- Payment validation using REST API.
+- Accept and deny payment using REST API.
+- [embedded] Possibility to display embedded payment fields in a popin.
+- Do not use vads_order_info* gateway parameter.
+- [alias] Display the brand of the registered means of payment in payment by alias.
+- [alias] Check registred alias Validity before proposing it for payment.
+- [alias] Added possibility to delete registered payment means.
+
 1.11.4, 2020-11-06:
 - [embedded] Bug fix: Force redirection when there is an error in payment form token creation.
 - [embedded] Bug fix: Display 3DS results for REST API payments.
@@ -22,6 +34,7 @@
 1.11.1, 2020-04-29:
 - [embedded] Bugfix: Payment fields error relative to new JavaScript client library.
 - [embedded] Disable 1-Click payment buttons when using payment with embedded fields.
+- [sofort] Bug fix: do not cancel order on buyer return if transaction status is NOT_CREATED.
 - Improve some plugin translations.
 
 1.11.0, 2020-03-04:

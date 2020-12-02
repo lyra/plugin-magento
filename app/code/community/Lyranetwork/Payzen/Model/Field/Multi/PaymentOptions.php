@@ -32,29 +32,16 @@ class Lyranetwork_Payzen_Model_Field_Multi_PaymentOptions extends Lyranetwork_Pa
                     $this->_throwError('Label', $i);
                 }
 
-                if (! empty($value['minimum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['minimum'])) {
-                    $this->_throwError('Min. amount', $i);
-                }
-
-                if (! empty($value['maximum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['maximum'])) {
-                    $this->_throwError('Max. amount', $i);
-                }
+                $this->checkAmount($value['minimum'], 'Min. amount', $i);
+                $this->checkAmount($value['maximum'], 'Max. amount', $i);
 
                 if (! empty($value['contract']) && ! preg_match('#^[^;=]+$#', $value['contract'])) {
                     $this->_throwError('Contract', $i);
                 }
 
-                if (! preg_match('#^[1-9]\d*$#', $value['count'])) {
-                    $this->_throwError('Count', $i);
-                }
-
-                if (! preg_match('#^[1-9]\d*$#', $value['period'])) {
-                    $this->_throwError('Period', $i);
-                }
-
-                if (! empty($value['first']) && (! is_numeric($value['first']) || $value['first'] >= 100)) {
-                    $this->_throwError('1st installment', $i);
-                }
+                $this->checkMandatoryDecimal($value['count'], 'Count', $i);
+                $this->checkMandatoryDecimal($value['period'], 'Period', $i);
+                $this->checkRate($value['first'], '1st installment', $i);
 
                 $options[] = $value['count'];
             }

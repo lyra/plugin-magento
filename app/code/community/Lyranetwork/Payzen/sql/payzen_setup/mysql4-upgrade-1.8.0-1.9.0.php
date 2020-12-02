@@ -12,7 +12,7 @@
  * For backward compatibility (less than 1.6 Magento versions).
  */
 
- /* install data just for versions less than 1.6 */
+ // Install data just for versions less than 1.6.
 if (version_compare(Mage::getVersion(), '1.6.0.0', '<')) {
     /**
      * @var $this Lyranetwork_Payzen_Model_Resource_Setup 

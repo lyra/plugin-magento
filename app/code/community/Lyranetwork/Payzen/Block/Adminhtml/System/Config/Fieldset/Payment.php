@@ -15,7 +15,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Fieldset_Payment
     extends Mage_Adminhtml_Block_System_Config_Form_Fieldset
 {
     /**
-     * Render fieldset html
+     * Render fieldset html.
      *
      * @param  Varien_Data_Form_Element_Abstract $element
      * @return string

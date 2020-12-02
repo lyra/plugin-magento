@@ -198,12 +198,121 @@
                             <show_in_store>1</show_in_store>
                         </platform_url>
 
+                       <!-- ================ REST API KEYS. ============== -->
+                        <rest_api_keys translate="label,comment">
+                            <label><![CDATA[REST API KEYS]]></label>
+                            <comment><![CDATA[Configure this section if you are using order operations from Magento Back Office or if you are using &laquo; Embedded payment fields &raquo; mode. <br />REST API keys are available in your PayZen Back Office (menu: Settings > Shops > REST API keys).]]></comment>
+                            <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_api_keys>
+
+                        <rest_private_key_test translate="label">
+                            <label><![CDATA[Test password]]></label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <config_path>payment/payzen/rest_private_key_test</config_path>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_private_key_test>
+
+                        <rest_private_key_prod translate="label">
+                            <label><![CDATA[Production password]]></label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <config_path>payment/payzen/rest_private_key_prod</config_path>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_private_key_prod>
+
+                        <rest_public_key_test translate="label">
+                            <label><![CDATA[Public test key]]></label>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sensitive</frontend_model>
+                            <config_path>payment/payzen/rest_public_key_test</config_path>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_public_key_test>
+
+                        <rest_public_key_prod translate="label">
+                            <label><![CDATA[Public production key]]></label>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_sensitive</frontend_model>
+                            <config_path>payment/payzen/rest_public_key_prod</config_path>
+                            <sort_order>34</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_public_key_prod>
+
+                        <rest_return_key_test translate="label">
+                            <label><![CDATA[HMAC-SHA-256 test key]]></label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <config_path>payment/payzen/rest_return_key_test</config_path>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_return_key_test>
+
+                        <rest_return_key_prod translate="label">
+                            <label><![CDATA[HMAC-SHA-256 production key]]></label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <config_path>payment/payzen/rest_return_key_prod</config_path>
+                            <sort_order>36</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_return_key_prod>
+
+                        <rest_url translate="label,comment">
+                            <label><![CDATA[REST API server URL]]></label>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/rest_url</config_path>
+                            <sort_order>37</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_url>
+
+                        <static_url translate="label,comment">
+                            <label><![CDATA[JavaScript client URL]]></label>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/payzen/static_url</config_path>
+                            <sort_order>38</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </static_url>
+
+                        <rest_notify_url translate="label,comment">
+                            <label><![CDATA[REST API Notification URL]]></label>
+                            <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>payzen/adminhtml_system_config_field_notifyUrl</frontend_model>
+                            <config_path>payment/payzen/rest_notify_url</config_path>
+                            <sort_order>39</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rest_notify_url>
+
                         <!-- ================================== Payment page. ================================== -->
                         <payment_page translate="label">
                             <label><![CDATA[PAYMENT PAGE]]></label>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
-                            <sort_order>30</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -215,7 +324,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>payzen/source_languages</source_model>
                             <config_path>payment/payzen/language</config_path>
-                            <sort_order>31</sort_order>
+                            <sort_order>41</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -230,7 +339,7 @@
                             <source_model>payzen/source_languages</source_model>
                             <backend_model>payzen/field_availableLanguages</backend_model>
                             <config_path>payment/payzen/available_languages</config_path>
-                            <sort_order>32</sort_order>
+                            <sort_order>42</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -241,7 +350,7 @@
                             <comment><![CDATA[The number of days before the bank capture (adjustable in your PayZen Back Office).]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen/capture_delay</config_path>
-                            <sort_order>33</sort_order>
+                            <sort_order>43</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -253,7 +362,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>payzen/source_validationModes</source_model>
                             <config_path>payment/payzen/validation_mode</config_path>
-                            <sort_order>34</sort_order>
+                            <sort_order>44</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -264,7 +373,7 @@
                             <label><![CDATA[PAYMENT PAGE CUSTOMIZE]]></label>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
-                            <sort_order>40</sort_order>
+                            <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -276,7 +385,7 @@
                             <frontend_type>text</frontend_type>
                             <backend_model>payzen/field_themeConfig</backend_model>
                             <config_path>payment/payzen/theme_config</config_path>
-                            <sort_order>41</sort_order>
+                            <sort_order>51</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -287,7 +396,7 @@
                             <comment><![CDATA[Shop name to display on the payment page. Leave blank to use gateway configuration.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen/shop_name</config_path>
-                            <sort_order>42</sort_order>
+                            <sort_order>52</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -299,7 +408,7 @@
                             <frontend_type>text</frontend_type>
                             <backend_model>payzen/field_shopUrl</backend_model>
                             <config_path>payment/payzen/shop_url</config_path>
-                            <sort_order>43</sort_order>
+                            <sort_order>53</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -310,7 +419,7 @@
                             <label><![CDATA[SELECTIVE 3DS]]></label>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
-                            <sort_order>50</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -322,7 +431,7 @@
                             <frontend_model>payzen/adminhtml_system_config_field_threedsCustgroupOptions</frontend_model>
                             <backend_model>payzen/field_custgroupOptions</backend_model>
                             <config_path>payment/payzen/custgroup_threeds_min_amount</config_path>
-                            <sort_order>51</sort_order>
+                            <sort_order>61</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -333,7 +442,7 @@
                             <label><![CDATA[RETURN TO SHOP]]></label>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
-                            <sort_order>60</sort_order>
+                            <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -345,7 +454,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <config_path>payment/payzen/redirect_enabled</config_path>
-                            <sort_order>61</sort_order>
+                            <sort_order>71</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -356,7 +465,7 @@
                             <comment><![CDATA[Time in seconds (0-300) before the buyer is automatically redirected to your website after a successful payment.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen/redirect_success_timeout</config_path>
-                            <sort_order>62</sort_order>
+                            <sort_order>72</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -370,7 +479,7 @@
                             <comment><![CDATA[Message displayed on the payment page prior to redirection after a successful payment.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen/redirect_success_message</config_path>
-                            <sort_order>63</sort_order>
+                            <sort_order>73</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -384,7 +493,7 @@
                             <comment><![CDATA[Time in seconds (0-300) before the buyer is automatically redirected to your website after a declined payment.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen/redirect_error_timeout</config_path>
-                            <sort_order>64</sort_order>
+                            <sort_order>74</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -398,7 +507,7 @@
                             <comment><![CDATA[Message displayed on the payment page prior to redirection after a declined payment.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen/redirect_error_message</config_path>
-                            <sort_order>65</sort_order>
+                            <sort_order>75</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -413,7 +522,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>payzen/source_returnModes</source_model>
                             <config_path>payment/payzen/return_mode</config_path>
-                            <sort_order>66</sort_order>
+                            <sort_order>76</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -425,7 +534,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_order_status_newprocessing</source_model>
                             <config_path>payment/payzen/registered_order_status</config_path>
-                            <sort_order>67</sort_order>
+                            <sort_order>77</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -437,7 +546,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <config_path>payment/payzen/capture_auto</config_path>
-                            <sort_order>68</sort_order>
+                            <sort_order>78</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -451,7 +560,7 @@
                             <label><![CDATA[ADDITIONAL OPTIONS]]></label>
                             <frontend_type>label</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_sectionTitle</frontend_model>
-                            <sort_order>70</sort_order>
+                            <sort_order>80</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -463,7 +572,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <config_path>payment/payzen/send_cart_detail</config_path>
-                            <sort_order>71</sort_order>
+                            <sort_order>81</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -475,7 +584,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>payzen/source_categories</source_model>
                             <config_path>payment/payzen/common_category</config_path>
-                            <sort_order>72</sort_order>
+                            <sort_order>82</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -486,7 +595,7 @@
                             <frontend_model>payzen/adminhtml_system_config_field_categoryMapping</frontend_model>
                             <backend_model>payzen/field_categoryMapping</backend_model>
                             <config_path>payment/payzen/category_mapping</config_path>
-                            <sort_order>73</sort_order>
+                            <sort_order>83</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -501,7 +610,7 @@
                             <frontend_model>payzen/adminhtml_system_config_field_shipOptions</frontend_model>
                             <backend_model>payzen/field_shipOptions</backend_model>
                             <config_path>payment/payzen/ship_options</config_path>
-                            <sort_order>74</sort_order>
+                            <sort_order>84</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -756,118 +865,18 @@
                         </standard_one_click_location>
 
                         <standard_rest_settings translate="label">
-                            <label><![CDATA[REST API SETTINGS]]></label>
-                            <comment><![CDATA[REST API keys are available in your PayZen Back Office (menu: Settings > Shops > REST API keys).]]></comment>
+                            <label><![CDATA[EMBEDDED PAYMENT FIELDS CUSTOMIZATION]]></label>
                             <frontend_type>text</frontend_type>
                             <frontend_model>payzen/adminhtml_system_config_field_subSectionTitle</frontend_model>
-                            <included_fields>standard_rest_public_key_test,standard_rest_private_key_test,standard_rest_public_key_prod,standard_rest_private_key_prod,standard_rest_return_key_test,standard_rest_return_key_prod,standard_rest_notify_url,standard_rest_theme,standard_rest_placeholders,standard_rest_attempts</included_fields>
+                            <included_fields>standard_rest_theme,standard_rest_placeholders,standard_rest_attempts</included_fields>
                             <sort_order>45</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
+                                <standard_card_info_mode separator=",">4,5</standard_card_info_mode>
                             </depends>
                         </standard_rest_settings>
-
-                        <standard_rest_private_key_test translate="label">
-                            <label><![CDATA[Test password]]></label>
-                            <frontend_type>obscure</frontend_type>
-                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
-                            <config_path>payment/payzen_standard/rest_private_key_test</config_path>
-                            <sort_order>46</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                               <standard_card_info_mode>4</standard_card_info_mode>
-                            </depends>
-                        </standard_rest_private_key_test>
-
-                        <standard_rest_private_key_prod translate="label">
-                            <label><![CDATA[Production password]]></label>
-                            <frontend_type>obscure</frontend_type>
-                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
-                            <config_path>payment/payzen_standard/rest_private_key_prod</config_path>
-                            <sort_order>47</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
-                            </depends>
-                        </standard_rest_private_key_prod>
-
-                        <standard_rest_public_key_test translate="label">
-                            <label><![CDATA[Public test key]]></label>
-                            <frontend_type>text</frontend_type>
-                            <frontend_model>payzen/adminhtml_system_config_field_sensitive</frontend_model>
-                            <config_path>payment/payzen_standard/rest_public_key_test</config_path>
-                            <sort_order>48</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
-                            </depends>
-                        </standard_rest_public_key_test>
-
-                        <standard_rest_public_key_prod translate="label">
-                            <label><![CDATA[Public production key]]></label>
-                            <frontend_type>text</frontend_type>
-                            <frontend_model>payzen/adminhtml_system_config_field_sensitive</frontend_model>
-                            <config_path>payment/payzen_standard/rest_public_key_prod</config_path>
-                            <sort_order>49</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
-                            </depends>
-                        </standard_rest_public_key_prod>
-
-                        <standard_rest_return_key_test translate="label">
-                            <label><![CDATA[HMAC-SHA-256 test key]]></label>
-                            <frontend_type>obscure</frontend_type>
-                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
-                            <config_path>payment/payzen_standard/rest_return_key_test</config_path>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
-                            </depends>
-                        </standard_rest_return_key_test>
-
-                        <standard_rest_return_key_prod translate="label">
-                            <label><![CDATA[HMAC-SHA-256 production key]]></label>
-                            <frontend_type>obscure</frontend_type>
-                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
-                            <config_path>payment/payzen_standard/rest_return_key_prod</config_path>
-                            <sort_order>51</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
-                            </depends>
-                        </standard_rest_return_key_prod>
-
-                        <standard_rest_notify_url translate="label,comment">
-                            <label><![CDATA[REST API Notification URL]]></label>
-                            <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
-                            <frontend_type>label</frontend_type>
-                            <frontend_model>payzen/adminhtml_system_config_field_notifyUrl</frontend_model>
-                            <config_path>payment/payzen_standard/rest_notify_url</config_path>
-                            <sort_order>52</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
-                            </depends>
-                        </standard_rest_notify_url>
 
                         <standard_rest_theme translate="label,comment">
                             <label><![CDATA[Theme]]></label>
@@ -875,12 +884,12 @@
                             <frontend_type>select</frontend_type>
                             <source_model>payzen/source_standard_restThemes</source_model>
                             <config_path>payment/payzen_standard/rest_theme</config_path>
-                            <sort_order>53</sort_order>
+                            <sort_order>47</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
+                                <standard_card_info_mode separator=",">4,5</standard_card_info_mode>
                             </depends>
                         </standard_rest_theme>
 
@@ -890,12 +899,12 @@
                             <frontend_model>payzen/adminhtml_system_config_field_standard_restPlaceholders</frontend_model>
                             <backend_model>payzen/field_standard_restPlaceholders</backend_model>
                             <config_path>payment/payzen_standard/rest_placeholders</config_path>
-                            <sort_order>54</sort_order>
+                            <sort_order>48</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
+                                <standard_card_info_mode separator=",">4,5</standard_card_info_mode>
                             </depends>
                         </standard_rest_placeholders>
 
@@ -904,12 +913,12 @@
                             <comment><![CDATA[Maximum number of payment retries after a failed payment (between 0 and 9). If blank, the gateway default value is 3.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen_standard/rest_attempts</config_path>
-                            <sort_order>55</sort_order>
+                            <sort_order>49</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends>
-                                <standard_card_info_mode>4</standard_card_info_mode>
+                                <standard_card_info_mode separator=",">4,5</standard_card_info_mode>
                             </depends>
                         </standard_rest_attempts>
                     </fields>
@@ -2930,7 +2939,7 @@
 
                         <other_title translate="label,comment">
                             <label><![CDATA[Method title]]></label>
-                            <comment><![CDATA[Method title to display on payment means page.]]></comment>
+                            <comment><![CDATA[Method title to display on payment means page. Used only if &laquo; Regroup payment means &raquo; option is enabled.]]></comment>
                             <frontend_type>text</frontend_type>
                             <config_path>payment/payzen_other/title</config_path>
                             <sort_order>12</sort_order>
@@ -2952,7 +2961,7 @@
 
                          <other_module_logo translate="label,comment">
                             <label><![CDATA[Logo]]></label>
-                            <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
+                            <comment><![CDATA[Allowed file types: jpeg, gif, png. Used only if &laquo; Regroup payment means &raquo; option is enabled.]]></comment>
                             <frontend_type>image</frontend_type>
                             <config_path>payment/payzen_other/module_logo</config_path>
                             <backend_model>payzen/field_logo</backend_model>

@@ -17,7 +17,7 @@ class Lyranetwork_Payzen_Model_Source_Gift_GiftCards
         foreach (Mage::getModel('payzen/payment_gift')->getSupportedGcTypes() as $code => $name) {
             $options[] = array(
                 'value' => $code,
-                'label' => $name
+                'label' => $code . ' - ' . $name
             );
         }
 

@@ -15,15 +15,7 @@ class Lyranetwork_Payzen_Model_Field_Other_PaymentMeans extends Lyranetwork_Payz
     protected function _beforeSave()
     {
         $values = $this->getValue();
-
-        $savedOptions = array();
-        foreach ($values as $value) {
-            if (isset($value['means'])){
-                $savedOptions[] = $value['means'];
-            }
-        }
-
-        $occurences = array_count_values($savedOptions);
+        $usedCards = array();
 
         if (! is_array($values) || empty($values)) {
             $this->setValue(array());
@@ -37,28 +29,22 @@ class Lyranetwork_Payzen_Model_Field_Other_PaymentMeans extends Lyranetwork_Payz
                     continue;
                 }
 
+                if (in_array($value['means'], $usedCards)) {
+                    // Do not save several options with the same means of payment.
+                    $this->_throwError('Payment means', $i, 'You cannot enable several options with the same means of payment.');
+                } else {
+                    $usedCards[] = $value['means'];
+                }
+
                 if (empty($value['label'])) {
                     $supportedCards = Lyranetwork_Payzen_Model_Api_Api::getSupportedCardTypes();
                     $value['label'] = Mage::helper('payzen')->__('Payment with %s', $supportedCards[$value['means']]);
                     $values[$key] = $value;
                 }
 
-                if (! empty($value['minimum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['minimum'])) {
-                    $this->_throwError('Min. amount', $i);
-                }
-
-                if (! empty($value['maximum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['maximum'])) {
-                    $this->_throwError('Max. amount', $i);
-                }
-
-                if (! empty($value['minimum']) && ! preg_match('#^\d+(\.\d+)?$#', $value['capture_delay'])) {
-                    $this->_throwError('Capture delay', $i);
-                }
-
-                if ($occurences[$value['means']] > 1) {
-                    // Do not save several options with the same means of payment.
-                    $this->_throwError('Payment means', $i, 'You cannot enable several options with the same means of payment.');
-                }
+                $this->checkAmount($value['minimum'], 'Min. amount', $i);
+                $this->checkAmount($value['maximum'], 'Max. amount', $i);
+                $this->checkDecimal($value['capture_delay'], 'Capture delay', $i);
 
                 $means[$value['means']] = $value['label'];
             }

@@ -38,7 +38,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_NotifyUrl extends M
 
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
-        $html = '<input id="'.$element->getId().'" class="input-text" type="hidden">';
+        $html = '<input id="' . $element->getId() . '" class="input-text" type="hidden">';
 
         $html .= $element->getElementHtml();
         return $html;

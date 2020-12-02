@@ -10,7 +10,6 @@
 
 class Lyranetwork_Payzen_Block_Rest_Head extends Mage_Core_Block_Template
 {
-
     protected function _construct()
     {
         parent::_construct();
@@ -20,7 +19,7 @@ class Lyranetwork_Payzen_Block_Rest_Head extends Mage_Core_Block_Template
     public function getPublicKey()
     {
         $test = $this->_getHelper()->getCommonConfigData('ctx_mode') === 'TEST';
-        return $this->getConfigData($test ? 'rest_public_key_test' : 'rest_public_key_prod');
+        return $this->_getHelper()->getCommonConfigData($test ? 'rest_public_key_test' : 'rest_public_key_prod');
     }
 
     public function getPlaceholder($name)
@@ -75,7 +74,7 @@ class Lyranetwork_Payzen_Block_Rest_Head extends Mage_Core_Block_Template
      */
     protected function _toHtml()
     {
-        if (! $this->getConfigData('active') || $this->getConfigData('card_info_mode') != 4) {
+        if (! $this->getConfigData('active') || ! Mage::getModel('payzen/payment_standard')->isEmbedded()) {
             return '';
         }
 

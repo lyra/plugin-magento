@@ -33,7 +33,7 @@ class Lyranetwork_Payzen_Block_Standard extends Lyranetwork_Payzen_Block_Abstrac
     {
         parent::_construct();
 
-        if (($this->getConfigData('card_info_mode') == '4') && $this->getFormToken()) {
+        if ($this->_getModel()->isEmbedded() && $this->getFormToken()) {
             $this->setTemplate('payzen/standard_rest.phtml');
         } else {
             $this->setTemplate('payzen/standard.phtml');
