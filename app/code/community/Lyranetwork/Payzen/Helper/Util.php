@@ -140,7 +140,7 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
 
     public function checkProducts($scope, $scopeId)
     {
-        // Check products' IDs and labels.
+        // Check products IDs and labels.
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->addAttributeToSelect('name');
 

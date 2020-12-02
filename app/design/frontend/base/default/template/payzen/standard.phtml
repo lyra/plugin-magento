@@ -10,6 +10,11 @@
 $paymentByTokenActive = $this->getConfigData('one_click_active'); // Payment by token active?
 $customer = Mage::getSingleton('customer/session')->getCustomer(); // Logged-in customer.
 $isPaymentByToken = $paymentByTokenActive && $customer && $customer->getPayzenIdentifier();
+if ($isPaymentByToken) {
+    Mage::helper('payzen/rest')->setSessionValidPaymentByToken($customer);
+    $isPaymentByToken &= Mage::getSingleton('checkout/session')->getValidAlias();
+}
+
 ?>
 
 <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display: none; margin-left: 15px;">
@@ -61,7 +66,18 @@ if ($this->isLocalCcType()) :
     if ($otherCards != '') echo '<li class="payzen-standard-cc-block">' . $otherCards . '</li>';
 endif;
 
-if ($isPaymentByToken) : ?>
+if ($isPaymentByToken) :
+$maskedPan = $customer->getPayzenMaskedCard();
+$pos = strpos($maskedPan, '|');
+
+if ($pos !== false) {
+    $brand = substr($maskedPan, 0, $pos);
+    $cardNumber = substr($maskedPan, $pos + 1);
+} else {
+    $brand = '';
+    $cardNumber = $maskedPan;
+}
+?>
     <li class="payzen-standard-cc-block"><?php echo Mage::helper('payzen')->__('You will enter payment data after order confirmation.') ?></li>
 
     <li class="payzen-standard-cc-block">
@@ -75,7 +91,18 @@ if ($isPaymentByToken) : ?>
     <!-- Payment with registered card block. -->
     <li class="payzen-standard-id-block">
         <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" disabled="disabled">
-        <span><?php echo Mage::helper('payzen')->__('You will pay with your registered means of payment %s. No data entry is needed.', '<b>' . $customer->getPayzenMaskedCard() . '</b>') ?></span>
+        <?php
+            if ($brand && ($img = $this->getCcTypeImageSrc($brand))) {
+                $brand = '<img alt="' . $this->escapeHtml($brand) . '" style="max-height: 25px; max-width: 30px; vertical-align: middle; display:inline!important"
+                          src="' . $this->escapeHtml($img) . '" title=" ' . $this->escapeHtml($brand).'">';
+            }
+
+            $maquesdCard = $brand ? $brand . ' ' . $cardNumber : $cardNumber;
+        ?>
+        <span>
+          <?php echo Mage::helper('payzen')->__('You will pay with your stored means of payment %s', '<b>' . $maquesdCard . '</b>') ?>
+          <a class="payzen-payment-link" href="<?php echo $this->escapeUrl($this->getUrl('payzen/customer/index')); ?>">(<?php echo Mage::helper('payzen')->__('manage your payment means');?>).</a>
+        </span>
     </li>
 
     <li class="payzen-standard-id-block">

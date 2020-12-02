@@ -14,8 +14,13 @@ class Lyranetwork_Payzen_Model_Source_Standard_CardInfoModes
     {
         $options =  array();
 
+        $embedded = array(
+            Lyranetwork_Payzen_Helper_Data::MODE_EMBEDDED,
+            Lyranetwork_Payzen_Helper_Data::MODE_POPIN
+        );
+
         foreach (Mage::helper('payzen')->getConfigArray('card_info_modes') as $code => $name) {
-            if (($code == 4) && ! Lyranetwork_Payzen_Helper_Data::$pluginFeatures['embedded']) {
+            if ((in_array($code, $embedded)) && ! Lyranetwork_Payzen_Helper_Data::$pluginFeatures['embedded']) {
                 // Payment with embedded fields option using REST API not available for all.
                 continue;
             }

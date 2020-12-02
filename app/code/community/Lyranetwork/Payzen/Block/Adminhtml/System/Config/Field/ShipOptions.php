@@ -92,7 +92,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_ShipOptions
     /**
      * Obtain existing data from form element.
      *
-     * Each row will be instance of Varien_Object
+     * Each row will be instance of Varien_Object.
      *
      * @return array
      */

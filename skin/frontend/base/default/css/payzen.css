@@ -53,6 +53,10 @@ label[for=p_method_payzen_ideal],label[for=p_method_payzen_other],
     vertical-align: middle !important;
 }
 
+.payzen-option label {
+	margin: 0 0 6px 6px;
+}
+
 .payzen-card label img {
     margin-right: 10px;
     max-height: 30px;

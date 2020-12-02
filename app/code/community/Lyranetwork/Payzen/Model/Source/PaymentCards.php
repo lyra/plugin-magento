@@ -25,7 +25,7 @@ class Lyranetwork_Payzen_Model_Source_PaymentCards
 
             $options[] = array (
                 'value' => $code,
-                'label' => $code . " - " . $name,
+                'label' => $code . ' - ' . $name,
             );
         }
 

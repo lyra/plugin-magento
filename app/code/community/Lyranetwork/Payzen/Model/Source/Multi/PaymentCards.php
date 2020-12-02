@@ -27,7 +27,7 @@ class Lyranetwork_Payzen_Model_Source_Multi_PaymentCards
                 continue;
             }
 
-            $options[] = array('value' => $code, 'label' => $code . " - " . $name);
+            $options[] = array('value' => $code, 'label' => $code . ' - ' . $name);
         }
 
         return $options;

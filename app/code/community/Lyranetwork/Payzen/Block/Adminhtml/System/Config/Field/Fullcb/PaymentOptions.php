@@ -45,7 +45,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Fullcb_PaymentOptio
             'rate',
             array(
                 'label' => Mage::helper('payzen')->__('Rate'),
-                'style' => 'width: 100px;',
+                'style' => 'width: 100px;'
             )
         );
 
@@ -53,7 +53,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Fullcb_PaymentOptio
             'cap',
             array(
                 'label' => Mage::helper('payzen')->__('Cap'),
-                'style' => 'width: 100px;',
+                'style' => 'width: 100px;'
             )
         );
 

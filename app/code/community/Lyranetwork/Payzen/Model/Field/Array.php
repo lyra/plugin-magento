@@ -27,4 +27,34 @@ class Lyranetwork_Payzen_Model_Field_Array extends Mage_Adminhtml_Model_System_C
         // Throw exception.
         Mage::throwException($msg);
     }
+
+    protected function checkMandatoryDecimal($value, $fieldLabel, $i)
+    {
+        if (empty($value)) {
+            $this->_throwError($fieldLabel, $i);
+        }
+
+        $this->checkDecimal($value, $fieldLabel, $i);
+    }
+
+    protected function checkDecimal($value, $fieldLabel, $i)
+    {
+        if (! empty($value) && ! preg_match('#^\d+$#', $value)) {
+            $this->_throwError($fieldLabel, $i);
+        }
+    }
+
+    protected function checkAmount($amount, $fieldLabel, $i)
+    {
+        if (! empty($amount) && ! preg_match('#^\d+(\.\d+)?$#', $amount)) {
+            $this->_throwError($fieldLabel, $i);
+        }
+    }
+
+    protected function checkRate($rate, $fieldLabel, $i)
+    {
+        if (! empty($rate) && (! is_numeric($rate) || ($rate < 0) || ($rate >= 100))) {
+            $this->_throwError($fieldLabel, $i);
+        }
+    }
 }

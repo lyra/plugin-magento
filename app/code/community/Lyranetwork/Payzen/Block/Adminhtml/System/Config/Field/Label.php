@@ -13,7 +13,6 @@
  */
 class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Label extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
-
     /**
      * Unset some non-related element parameters.
      *

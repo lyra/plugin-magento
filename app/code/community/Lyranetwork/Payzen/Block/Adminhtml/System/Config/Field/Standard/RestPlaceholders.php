@@ -55,7 +55,7 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Standard_RestPlaceh
         $options = array(
             'pan'     => Mage::helper('payzen')->__('Card Number'),
             'expiry'  => Mage::helper('payzen')->__('Expiration Date'),
-            'cvv'     => Mage::helper('payzen')->__('CVV'),
+            'cvv'     => Mage::helper('payzen')->__('CVV')
         );
 
         $savedOptions = $this->getElement()->getValue();

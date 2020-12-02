@@ -10,8 +10,6 @@
 
 class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model_Payment_Abstract
 {
-    const REST_API = '4';
-
     protected $_code = 'payzen_standard';
     protected $_formBlockType = 'payzen/standard';
 
@@ -70,7 +68,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $customer = Mage::getModel('customer/customer');
             $customer->load($order->getCustomerId());
 
-            if ($customer->getPayzenIdentifier()) {
+            if ($customer->getPayzenIdentifier() && Mage::getSingleton('checkout/session')->getValidAlias()) {
                 // Customer has an identifier.
                 $this->_getHelper()->log("Customer {$customer->getEmail()} has an identifier. Use it for payment of order #{$order->getIncrementId()}.");
                 $this->_payzenRequest->set('identifier', $customer->getPayzenIdentifier());
@@ -202,7 +200,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
 
         $customer = $quote->getCustomer();
 
-        if ($useIdentifier) {
+        if ($useIdentifier && Mage::getSingleton('checkout/session')->getValidAlias()) {
             $this->_getHelper()->log("Customer {$customer->getEmail()} has an identifier. Use it for payment of order #{$quote->getReservedOrderId()}.");
             $data['paymentMethodToken'] = $customer->getPayzenIdentifier();
         } elseif ($this->getConfigData('one_click_active') && $quote->getCustomer()->getId()) {
@@ -258,7 +256,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $client = new Lyranetwork_Payzen_Model_Api_Rest(
                 $this->_getHelper()->getCommonConfigData('rest_url'),
                 $login,
-                $this->_getPassword()
+                $this->_getRestHelper()->getPassword()
             );
 
             $response = $client->post('V4/Charge/CreatePayment', json_encode($data));
@@ -297,16 +295,8 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         return $token;
     }
 
-    private function _getPassword()
-    {
-        $test = $this->_getHelper()->getCommonConfigData('ctx_mode') === 'TEST';
-        $crypted = $this->getConfigData($test ? 'rest_private_key_test' : 'rest_private_key_prod');
-
-        return Mage::helper('core')->decrypt($crypted);
-    }
-
     /**
-     * Return available card types
+     * Return available card types.
      *
      * @return string
      */
@@ -349,8 +339,8 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             return false;
         }
 
-        // Rest Api mode active.
-        if ($this->getConfigData('card_info_mode') === self::REST_API) {
+        // Rest API mode active.
+        if ($this->isEmbedded()) {
             return false;
         }
 
@@ -380,7 +370,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
     }
 
     /**
-     * Assign data to info model instance
+     * Assign data to info model instance.
      *
      * @param  mixed $data
      * @return Mage_Payment_Model_Info
@@ -410,7 +400,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
     }
 
     /**
-     * Prepare info instance for save
+     * Prepare info instance for save.
      *
      * @return Mage_Payment_Model_Abstract
      */
@@ -420,31 +410,6 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         $info->setCcNumberEnc(null);
         $info->setCcNumber(null);
         $info->setCcCid(null);
-
-        return $this;
-    }
-
-    /**
-     * Method that will be executed instead of authorize or capture
-     * if flag isInitializeNeeded set to true
-     *
-     * @param string $paymentAction
-     * @param object $stateObject
-     *
-     * @return Mage_Payment_Model_Abstract
-     */
-    public function initialize($paymentAction, $stateObject)
-    {
-        parent::initialize($paymentAction, $stateObject);
-
-        if ($this->_getHelper()->isAdmin() && $this->_getHelper()->isCurrentlySecure()) {
-            // Do instant payment by WS.
-            $stateObjectResult = $this->_doInstantPayment($this->getInfoInstance());
-
-            $stateObject->setState($stateObjectResult->getState());
-            $stateObject->setStatus($stateObjectResult->getStatus());
-            $stateObject->setIsNotified($stateObjectResult->getIsNotified());
-        }
 
         return $this;
     }
@@ -464,261 +429,37 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
     }
 
     /**
-     * Call gateway by WS to do an instant payment
-     *
-     * @param  Mage_Sales_Model_Order_Payment $payment
-     * @return Varien_Object
-     */
-    protected function _doInstantPayment($payment)
-    {
-        $order = $payment->getOrder();
-        $storeId = $order->getStore()->getId();
 
-        $this->_getHelper()->log("Instant payment using WS for order #{$order->getIncrementId()}.");
-
-        $requestId = '';
-
-        try {
-            $wsApi = $this->checkAndGetWsApi($storeId);
-
-            $timestamp = time();
-
-            // Common request generation.
-            $commonRequest = new \Lyranetwork\Payzen\Model\Api\Ws\CommonRequest();
-            $commonRequest->setPaymentSource('MOTO');
-            $commonRequest->setSubmissionDate(new DateTime("@$timestamp"));
-
-            // Amount in current order currency.
-            $amount = $order->getGrandTotal();
-
-            // Retrieve currency.
-            $currency = Lyranetwork_Payzen_Model_Api_Api::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
-            if ($currency == null) {
-                // If currency is not supported, use base currency.
-                $currency = Lyranetwork_Payzen_Model_Api_Api::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
-
-                // ... and order total in base currency.
-                $amount = $order->getBaseGrandTotal();
-            }
-
-            // Payment request generation.
-            $paymentRequest = new \Lyranetwork\Payzen\Model\Api\Ws\PaymentRequest();
-            $paymentRequest->setTransactionId(Lyranetwork_Payzen_Model_Api_Api::generateTransId($timestamp));
-            $paymentRequest->setAmount($currency->convertAmountToInteger($amount));
-            $paymentRequest->setCurrency($currency->getNum());
-
-            $captureDelay = $this->getConfigData('capture_delay', $storeId); // Get submodule specific param.
-            if (! is_numeric($captureDelay)) {
-                // Get general param.
-                $captureDelay = $this->_getHelper()->getCommonConfigData('capture_delay', $storeId);
-            }
-
-            if (is_numeric($captureDelay)) {
-                $paymentRequest->setExpectedCaptureDate(
-                    new DateTime('@' . strtotime("+$captureDelay days", $timestamp))
-                );
-            }
-
-            $validationMode = $this->getConfigData('validation_mode', $storeId); // Get submodule specific param.
-            if ($validationMode === '-1') {
-                // Get general param.
-                $validationMode = $this->_getHelper()->getCommonConfigData('validation_mode', $storeId);
-            }
-
-            if ($validationMode !== '') {
-                $paymentRequest->setManualValidation($validationMode);
-            }
-
-            // Order request generation.
-            $orderRequest = new \Lyranetwork\Payzen\Model\Api\Ws\OrderRequest();
-            $orderRequest->setOrderId($order->getIncrementId());
-
-            // Card request generation.
-            $cardRequest = new \Lyranetwork\Payzen\Model\Api\Ws\CardRequest();
-            $info = $this->getInfoInstance();
-            $cardRequest->setNumber($info->getCcNumber());
-            $cardRequest->setScheme($info->getCcType());
-            $cardRequest->setCardSecurityCode($info->getCcCid());
-            $cardRequest->setExpiryMonth($info->getCcExpMonth());
-            $cardRequest->setExpiryYear($info->getCcExpYear());
-
-            // Billing details generation.
-            $billingDetailsRequest = new \Lyranetwork\Payzen\Model\Api\Ws\BillingDetailsRequest();
-            $billingDetailsRequest->setReference($order->getCustomerId());
-
-            if ($order->getBillingAddress()->getPrefix()) {
-                $billingDetailsRequest->setTitle($order->getBillingAddress()->getPrefix());
-            }
-
-            $billingDetailsRequest->setFirstName($order->getBillingAddress()->getFirstname());
-            $billingDetailsRequest->setLastName($order->getBillingAddress()->getLastname());
-            $billingDetailsRequest->setPhoneNumber($order->getBillingAddress()->getTelephone());
-            $billingDetailsRequest->setCellPhoneNumber($order->getBillingAddress()->getTelephone());
-            $billingDetailsRequest->setEmail($order->getCustomerEmail());
-
-            $address = $order->getBillingAddress()->getStreet(1) . ' ' . $order->getBillingAddress()->getStreet(2);
-            $billingDetailsRequest->setAddress(trim($address));
-
-            $billingDetailsRequest->setZipCode($order->getBillingAddress()->getPostcode());
-            $billingDetailsRequest->setCity($order->getBillingAddress()->getCity());
-            $billingDetailsRequest->setState($order->getBillingAddress()->getRegion());
-            $billingDetailsRequest->setCountry($order->getBillingAddress()->getCountryId());
-
-            // Language.
-            $currentLang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
-            if (Lyranetwork_Payzen_Model_Api_Api::isSupportedLanguage($currentLang)) {
-                $language = $currentLang;
-            } else {
-                $language = $this->_getHelper()->getCommonConfigData('language', $storeId);
-            }
-
-            $billingDetailsRequest->setLanguage($language);
-
-            // Shipping details generation.
-            $shippingDetailsRequest = new \Lyranetwork\Payzen\Model\Api\Ws\ShippingDetailsRequest();
-
-            $address = $order->getShippingAddress();
-            if (is_object($address)) { // Deliverable order.
-                $shippingDetailsRequest->setFirstName($address->getFirstname());
-                $shippingDetailsRequest->setLastName($address->getLastname());
-                $shippingDetailsRequest->setPhoneNumber($address->getTelephone());
-                $shippingDetailsRequest->setAddress($address->getStreet(1));
-                $shippingDetailsRequest->setAddress2($address->getStreet(2));
-                $shippingDetailsRequest->setZipCode($address->getPostcode());
-                $shippingDetailsRequest->setCity($address->getCity());
-                $shippingDetailsRequest->setState($address->getRegion());
-                $shippingDetailsRequest->setCountry($address->getCountryId());
-            }
-
-            // Extra details generation.
-            $extraDetailsRequest = new \Lyranetwork\Payzen\Model\Api\Ws\ExtraDetailsRequest();
-            $extraDetailsRequest->setIpAddress($this->_getHelper()->getIpAddress());
-
-            // Customer request generation.
-            $customerRequest = new \Lyranetwork\Payzen\Model\Api\Ws\CustomerRequest();
-            $customerRequest->setBillingDetails($billingDetailsRequest);
-            $customerRequest->setShippingDetails($shippingDetailsRequest);
-            $customerRequest->setExtraDetails($extraDetailsRequest);
-
-            // Create payment object generation.
-            $createPayment = new \Lyranetwork\Payzen\Model\Api\Ws\CreatePayment();
-            $createPayment->setCommonRequest($commonRequest);
-            $createPayment->setPaymentRequest($paymentRequest);
-            $createPayment->setOrderRequest($orderRequest);
-            $createPayment->setCardRequest($cardRequest);
-            $createPayment->setCustomerRequest($customerRequest);
-
-            // Do createPayment WS call.
-            $requestId = $wsApi->setHeaders();
-            $createPaymentResponse = $wsApi->createPayment($createPayment);
-
-            $wsApi->checkAuthenticity();
-
-            $successStatuses = array_merge(
-                Lyranetwork_Payzen_Model_Api_Api::getSuccessStatuses(),
-                Lyranetwork_Payzen_Model_Api_Api::getPendingStatuses()
-            );
-            $wsApi->checkResult(
-                $createPaymentResponse->getCreatePaymentResult()->getCommonResponse(),
-                $successStatuses
-            );
-
-            // Check operation type (0: debit, 1 refund).
-            $transType = $createPaymentResponse->getCreatePaymentResult()->getPaymentResponse()->getOperationType();
-            if ($transType != 0) {
-                throw new Exception("Unexpected transaction type returned ($transType).");
-            }
-
-            // Update authorized amount.
-            $payment->setAmountAuthorized($order->getTotalDue());
-            $payment->setBaseAmountAuthorized($order->getBaseTotalDue());
-
-            $wrapper = new Lyranetwork_Payzen_Model_Api_Ws_ResultWrapper(
-                $createPaymentResponse->getCreatePaymentResult()->getCommonResponse(),
-                $createPaymentResponse->getCreatePaymentResult()->getPaymentResponse(),
-                $createPaymentResponse->getCreatePaymentResult()->getAuthorizationResponse(),
-                $createPaymentResponse->getCreatePaymentResult()->getCardResponse(),
-                $createPaymentResponse->getCreatePaymentResult()->getThreeDSResponse(),
-                $createPaymentResponse->getCreatePaymentResult()->getFraudManagementResponse()
-            );
-
-            // Retrieve new order state and status.
-            $stateObject = $this->_getPaymentHelper()->nextOrderState($wrapper, $order);
-            $this->_getHelper()->log("Order #{$order->getIncrementId()}, new state: {$stateObject->getState()}, new status: {$stateObject->getStatus()}.");
-
-            $order->setState($stateObject->getState(), $stateObject->getStatus(), $wrapper->getMessage());
-            if ($stateObject->getState() === Mage_Sales_Model_Order::STATE_HOLDED) { // For magento 1.4.0.x
-                $stateObject->setState($stateObject->getBeforeState());
-                $stateObject->setStatus($stateObject->getBeforeStatus());
-            }
-
-            // Save gateway responses.
-            $this->_getPaymentHelper()->updatePaymentInfo($order, $wrapper);
-
-            // Try to create invoice.
-            $this->_getPaymentHelper()->createInvoice($order);
-
-            $stateObject->setIsNotified(true);
-            return $stateObject;
-        } catch(Lyranetwork_Payzen_Model_WsException $e) {
-            $this->_getHelper()->log("[$requestId] {$e->getMessage()}", Zend_Log::WARN);
-
-            $warn = $this->_getHelper()->__('Please correct this error to use PayZen web services.');
-            $this->_getAdminSession()->addWarning($warn);
-            $this->_getAdminSession()->addError($this->_getHelper()->__($e->getMessage()));
-            Mage::throwException('');
-        } catch(\SoapFault $f) {
-            $this->_getHelper()->log(
-                "[$requestId] SoapFault with code {$f->faultcode}: {$f->faultstring}.",
-                Zend_Log::WARN
-            );
-
-            $warn = $this->_getHelper()->__('Please correct this error to use PayZen web services.');
-            $this->_getAdminSession()->addWarning($warn);
-            $this->_getAdminSession()->addError($f->faultstring);
-            Mage::throwException('');
-        } catch(\UnexpectedValueException $e) {
-            $this->_getHelper()->log(
-                "[$requestId] createPayment error with code {$e->getCode()}: {$e->getMessage()}.",
-                Zend_Log::ERR
-            );
-
-            if ($e->getCode() === -1) {
-                $this->_getAdminSession()->addError($this->_getHelper()->__('Authentication error ! '));
-            } else {
-                $this->_getAdminSession()->addError($e->getMessage());
-            }
-
-            Mage::throwException('');
-        } catch (Exception $e) {
-            $this->_getHelper()->log(
-                "[$requestId] Exception with code {$e->getCode()}: {$e->getMessage()}",
-                Zend_Log::ERR
-            );
-
-            $this->_getAdminSession()->addError($e->getMessage());
-            Mage::throwException('');
-        }
-    }
-
-
-    /**
      * Return true if iframe mode is enabled.
      *
      * @return string
      */
     public function isIframeMode()
     {
-        return $this->getConfigData('card_info_mode') == 3;
+        return $this->getConfigData('card_info_mode') == Lyranetwork_Payzen_Helper_Data::MODE_IFRAME;
     }
 
     /**
-     * Check if the local card type selection option is choosen
+     * Check if the local card type selection option is choosen.
      *
      * @return boolean
      */
     public function isLocalCcType()
     {
-        return $this->getConfigData('card_info_mode') == 2;
+        return $this->getConfigData('card_info_mode') == Lyranetwork_Payzen_Helper_Data::MODE_LOCAL_TYPE;
+    }
+
+    /**
+     * Check if the embedded payment fields option is choosen.
+     *
+     * @return boolean
+     */
+    public function isEmbedded() {
+        $embedded = array(
+            Lyranetwork_Payzen_Helper_Data::MODE_EMBEDDED,
+            Lyranetwork_Payzen_Helper_Data::MODE_POPIN
+        );
+
+        return in_array($this->getConfigData('card_info_mode'), $embedded);
     }
 }

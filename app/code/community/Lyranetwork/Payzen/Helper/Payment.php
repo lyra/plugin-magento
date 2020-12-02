@@ -160,6 +160,11 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
                 // Display success page.
                 $controller->redirectResponse($order, self::SUCCESS, true /* IPN URL warn in TEST mode */);
+            } elseif ($this->isSofort($response) && $response->getTransStatus() == 'NOT_CREATED') {
+                // Case of Sofort payment, display only success page.
+                $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has not been processed yet.");
+
+                $controller->redirectResponse($order, self::SUCCESS, true);
             } else {
                 $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has been refused/cancelled.");
 
@@ -372,21 +377,6 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             return;
         }
 
-        $test = $this->_getHelper()->getCommonConfigData('ctx_mode') === 'TEST';
-        $returnKey = $this->_getRestHelper()->getReturnKey($test);
-
-        if (! $this->_getRestHelper()->checkResponseHash($rawData, $returnKey)) {
-            // authentication failed
-            $ip = $this->_getHelper()->getIpAddress();
-
-            $this->_getHelper()->log(
-                "{$ip} tries to access payzen/payment/restReturn page without valid signature.",
-                Zend_Log::ERR
-            );
-            $controller->getResponse()->setRedirect(Mage::getBaseUrl());
-            return;
-        }
-
         $answer = json_decode($rawData['kr-answer'], true);
         if (! is_array($answer)) {
             $this->_getHelper()->log(
@@ -409,6 +399,23 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         if (! $quote->getId()) {
             $this->_getHelper()->log("Quote #$quoteId not found in database. Redirect to home page.");
+            $controller->getResponse()->setRedirect(Mage::getBaseUrl());
+            return;
+        }
+
+        // Get store id from quote.
+        $storeId = $quote->getStore()->getId();
+        $returnKey = $this->_getRestHelper()->getReturnKey($storeId);
+
+        if (! $this->_getRestHelper()->checkResponseHash($rawData, $returnKey)) {
+            // authentication failed
+            $ip = $this->_getHelper()->getIpAddress();
+
+            $this->_getHelper()->log(
+
+                "{$ip} tries to access payzen/payment/restReturn page without valid signature with parameters: " . print_r($rawData, true),
+                Zend_Log::ERR
+            );
             $controller->getResponse()->setRedirect(Mage::getBaseUrl());
             return;
         }
@@ -436,9 +443,6 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             $this->_getHelper()->log("Found order #{$order->getIncrementId()} for quote #{$quoteId}.");
         }
 
-        // Get store id from order.
-        $storeId = $order->getStore()->getId();
-
         if ($order->getStatus() === 'pending_payment') {
             // Order waiting for payment.
             $this->_getHelper()->log("Order #{$order->getIncrementId()} is waiting for payment.");
@@ -455,6 +459,11 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
                 // Display success page.
                 $controller->redirectResponse($order, self::SUCCESS, true /* IPN URL warn in TEST mode */);
+            } elseif ($this->isSofort($response) && $response->getTransStatus() == 'NOT_CREATED') {
+                // Case of Sofort payment, display only success page.
+                $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has not been processed yet.");
+
+                $controller->redirectResponse($order, self::SUCCESS, true);
             } else {
                 $this->_getHelper()->log("Payment for order #{$order->getIncrementId()} has been refused/cancelled.");
 
@@ -521,21 +530,6 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             return;
         }
 
-        $test = $this->_getHelper()->getCommonConfigData('ctx_mode') === 'TEST';
-        $privateKey = $this->_getPassword($test);
-
-        if (! $this->_getRestHelper()->checkResponseHash($post, $privateKey)) {
-            // Authentication failed.
-            $ip = $this->_getHelper()->getIpAddress();
-
-            $this->_getHelper()->log(
-                "{$ip} tries to access payzen/payment/restCheck page without valid signature.",
-                Zend_Log::ERR
-            );
-            $controller->getResponse()->setBody('<span style="display:none">KO-An error occurred while computing the signature.'."\n".'</span>');
-            return;
-        }
-
         // Wrap payment result to use traditional order creation tunnel.
         $data = $this->_getRestHelper()->convertRestResult($answer);
         $response = new Lyranetwork_Payzen_Model_Api_Response($data, null, null, null);
@@ -547,6 +541,22 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         if (! $quote->getId()) {
             $this->_getHelper()->log("Quote #$quoteId not found in database.");
             $controller->getResponse()->setBody($response->getOutputForPlatform('order_not_found'));
+            return;
+        }
+
+        // Get store id from quote.
+        $storeId = $quote->getStore()->getId();
+        $privateKey = $this->_getRestHelper()->getPassword($storeId);
+
+        if (! $this->_getRestHelper()->checkResponseHash($post, $privateKey)) {
+            // Authentication failed.
+            $ip = $this->_getHelper()->getIpAddress();
+
+            $this->_getHelper()->log(
+                "{$ip} tries to access payzen/payment/restCheck page without valid signature with parameters: " . print_r($post, true),
+                Zend_Log::ERR
+            );
+            $controller->getResponse()->setBody('<span style="display:none">KO-An error occurred while computing the signature.'."\n".'</span>');
             return;
         }
 
@@ -564,9 +574,6 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         $quote->getPayment()->unsAdditionalInformation(self::TOKEN);
         $quote->getPayment()->unsAdditionalInformation(self::TOKEN_DATA . '_identifier');
         $quote->getPayment()->unsAdditionalInformation(self::TOKEN . '_identifier');
-
-        // Get store id from quote.
-        $storeId = $quote->getStore()->getId();
 
         // Init app with correct store ID.
         Mage::app()->init($storeId, 'store');
@@ -647,6 +654,83 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         }
     }
 
+    public function getCustomerAttribute($customer, $propertyName)
+    {
+        $propertyNameArray = explode('_', substr($propertyName, strlen('payzen') + 1));
+        $propertyNameArray = array_map('ucfirst', $propertyNameArray);
+        $functionName = 'getPayzen' . implode($propertyNameArray,'');
+
+        return $customer->$functionName();
+    }
+
+    public function deleteIdentifier($attribute, $maskedAttribute)
+    {
+        $session = Mage::getSingleton('customer/session');
+        $customer = $session->getCustomer();
+
+        if (! $identifier= $this->getCustomerAttribute($customer, $attribute)) {
+            $this->_getHelper()->log("Customer {$customer->getEmail()} doesn't have a saved {$attribute} attribute.");
+            return false;
+        }
+
+        try {
+            if ($this->_getRestHelper()->getPassword()) {
+                $requestData = array(
+                    'paymentMethodToken' => $identifier
+                );
+
+                // Perform REST request to cancel identifier.
+                $client = new Lyranetwork_Payzen_Model_Api_Rest(
+                    $this->_getHelper()->getCommonConfigData('rest_url'),
+                    $this->_getHelper()->getCommonConfigData('site_id'),
+                    $this->_getRestHelper()->getPassword()
+                );
+
+                $cancelIdentifierResponse = $client->post('V4/Token/Cancel', json_encode($requestData));
+                $this->_getRestHelper()->checkResult($cancelIdentifierResponse);
+            } else {
+                // Client has not configured private key in module backend.
+                $this->_getHelper()->log("Identifier for customer {$customer->getEmail()} cannot be deleted on gateway: private key is not configured. Let's just delete it from Magento.");
+            }
+
+            // Delete identifier from Magento.
+            $this->deleteIdentifierAttribute($customer, $attribute, $maskedAttribute);
+
+            return true;
+        } catch (\Exception $e) {
+            $invalidIdentCodes = array('PSP_030', 'PSP_031', 'SP_561', 'PSP_607');
+
+            if (in_array($e->getCode(), $invalidIdentCodes)) {
+                // The identifier is invalid or doesn't exist.
+                $this->_getHelper()->log(
+                    "Identifier for customer {$customer->getEmail()} is invalid or doesn't exist. Let's delete it from Magento",
+                    Zend_Log::WARN
+                );
+
+                // Delete identifier from Magento.
+                $this->deleteIdentifierAttribute($customer, $attribute, $maskedAttribute);
+
+                return true;
+            } else {
+                $this->_getHelper()->log(
+                    "Identifier for customer {$customer->getEmail()} couldn't be deleted on gateway. Error occurred: {$e->getMessage()}",
+                    Zend_Log::ERR
+                );
+
+                return false;
+            }
+        }
+    }
+
+    private function deleteIdentifierAttribute($customer, $attribute, $maskedAttribute)
+    {
+        $customer->setData($attribute, null);
+        $customer->setData($maskedAttribute, null);
+
+        $customer->save();
+        $this->_getHelper()->log("Identifier for customer {$customer->getEmail()} successfully deleted.");
+    }
+
     private function _isPaymentSuccessfullyProcessed(Lyranetwork_Payzen_Model_Api_Response $response)
     {
         if ($response->isAcceptedPayment()) {
@@ -702,11 +786,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         $this->_getHelper()->log("Saving confirmed order #{$order->getIncrementId()} and sending e-mail if not disabled.");
         $order->save();
 
-        $sendEmail = true;
-        if ($info = $response->get('order_info')) {
-            $sendEmail = (bool) substr($info, strlen('send_confirmation='));
-        }
-
+        $sendEmail = ($response->getExtInfo('send_confirmation') ? (bool) $response->getExtInfo('send_confirmation') : true);
         if ($sendEmail) {
             $order->sendNewOrderEmail();
         }
@@ -716,7 +796,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
      * Update order payment information.
      *
      * @param Mage_Sales_Model_Order $order
-     * @param Lyranetwork_Payzen_Model_Api_Response|Lyranetwork_Payzen_Model_Api_Ws_ResultWrapper $response
+     * @param Lyranetwork_Payzen_Model_Api_Response $response
      */
     public function updatePaymentInfo(Mage_Sales_Model_Order $order, $response)
     {
@@ -994,7 +1074,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             $matches = array();
             if (preg_match('#^([A-Z]{2}[0-9]{2}[A-Z0-9]{10,30})(_[A-Z0-9]{8,11})?$#i', $number, $matches)) {
                 // IBAN(_BIC).
-                $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . '/' : ''; // BIC
+                $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . '/' : ''; // BIC.
 
                 $iban = $matches[1];
                 $masked .= substr($iban, 0, 4) . str_repeat('X', strlen($iban) - 8) . substr($iban, -4);
@@ -1010,7 +1090,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 }
             }
 
-            $customer->setData('payzen_masked_card', $masked);
+            $customer->setData('payzen_masked_card', $response->get('card_brand') . '|' . $masked);
 
             $customer->save();
 
@@ -1044,13 +1124,13 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             $matches = array();
             if (preg_match('#^([A-Z]{2}[0-9]{2}[A-Z0-9]{10,30})(_[A-Z0-9]{8,11})?$#i', $number, $matches)) {
                 // IBAN(_BIC).
-                $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . '/' : ''; // BIC
+                $masked .= isset($matches[2]) ? str_replace('_', '', $matches[2]) . '/' : ''; // BIC.
 
                 $iban = $matches[1];
                 $masked .= substr($iban, 0, 4) . str_repeat('X', strlen($iban) - 8) . substr($iban, -4);
             }
 
-            $customer->setData('payzen_sepa_iban', $masked);
+            $customer->setData('payzen_sepa_iban', $response->get('card_brand') . '|' . $masked);
 
             $customer->save();
 
@@ -1203,7 +1283,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     /**
      * Get new order state and status according to the gateway response.
      *
-     * @param  Lyranetwork_Payzen_Model_Api_Response|Lyranetwork_Payzen_Model_Api_Ws_ResultWrapper $response
+     * @param  Lyranetwork_Payzen_Model_Api_Response $response
      * @param  Mage_Sales_Model_Order $order
      * @param  boolean $ignoreFraud
      * @return Varien_Object
@@ -1338,13 +1418,5 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         }
 
         return $onePage;
-    }
-
-    private function _getPassword($isTest = true)
-    {
-        $standard = Mage::getModel('payzen/payment_standard');
-        $crypted = $standard->getConfigData($isTest ? 'rest_private_key_test' : 'rest_private_key_prod');
-
-        return Mage::helper('core')->decrypt($crypted);
     }
 }

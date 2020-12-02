@@ -10,19 +10,23 @@
 
 class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
 {
-    public function convertRestResult($answer)
+    public function convertRestResult($answer, $isTransaction = false)
     {
         if (! is_array($answer) || empty($answer)) {
             return array();
         }
 
-        $transactions = $this->getProperty($answer, 'transactions');
+        if ($isTransaction){
+            $transaction = $answer;
+        } else{
+            $transactions = $this->getProperty($answer, 'transactions');
 
-        if (! is_array($transactions) || empty($transactions)) {
-            return array();
+            if (! is_array($transactions) || empty($transactions)) {
+                return array();
+            }
+
+            $transaction = $transactions[0];
         }
-
-        $transaction = $transactions[0];
 
         $response = array();
 
@@ -40,7 +44,9 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
         }
 
         $response['vads_amount'] = $this->getProperty($transaction, 'amount');
-        $response['vads_currency'] = Lyranetwork_Payzen_Model_Api_Api::getCurrencyNumCode($this->getProperty($transaction, 'currency'));
+
+        $currency = Lyranetwork_Payzen_Model_Api_Api::findCurrency($this->getProperty($transaction, 'currency'));
+        $response['vads_currency'] = Lyranetwork_Payzen_Model_Api_Api::getCurrencyNumCode($currency->getAlpha3());
 
         if ($paymentToken = $this->getProperty($transaction, 'paymentMethodToken')) {
             $response['vads_identifier'] = $paymentToken;
@@ -74,7 +80,7 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
             $response['vads_warranty_result'] = $this->getProperty($transactionDetails, 'liabilityShift');
 
             if ($cardDetails = $this->getProperty($transactionDetails, 'cardDetails')) {
-                $response['vads_trans_id'] = $this->getProperty($cardDetails, 'legacyTransId'); // deprecated
+                $response['vads_trans_id'] = $this->getProperty($cardDetails, 'legacyTransId'); // Deprecated.
                 $response['vads_presentation_date'] = $this->getProperty($cardDetails, 'expectedCaptureDate');
 
                 $response['vads_card_brand'] = $this->getProperty($cardDetails, 'effectiveBrand');
@@ -119,6 +125,25 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
         return $response;
     }
 
+    public function checkResult($response, $expectedStatuses = array())
+    {
+        $answer = $response['answer'];
+
+        if ($response['status'] != 'SUCCESS') {
+            $errorMessage = $answer['errorCode'];
+
+            if (isset($answer['detailedErrorMessage']) && ! empty($answer['detailedErrorMessage'])) {
+                $errorMessage .= ' : ' . $answer['detailedErrorMessage'];
+            }
+
+            throw new Exception( "({$errorMessage}).");
+        } elseif (! empty($expectedStatuses) && ! in_array($answer['detailedStatus'], $expectedStatuses)) {
+            throw new UnexpectedValueException(
+                "Unexpected transaction status returned ({$answer['detailedStatus']})."
+            );
+        }
+    }
+
     private function getProperty($paymentResult, $key)
     {
         if (isset($paymentResult[$key])) {
@@ -137,25 +162,25 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
     {
         $supportedSignAlgos = array('sha256_hmac');
 
-        // check if the hash algorithm is supported
+        // Check if the hash algorithm is supported.
         if (! in_array($data['kr-hash-algorithm'], $supportedSignAlgos)) {
-            $this->_getHelper->log('Hash algorithm is not supported: ' . $data['kr-hash-algorithm'], \Psr\Log\LogLevel::ERROR);
+            $this->_getHelper()->log('Hash algorithm is not supported: ' . $data['kr-hash-algorithm'], \Psr\Log\LogLevel::ERROR);
             return false;
         }
 
-        // on some servers, / can be escaped
+        // On some servers, / can be escaped.
         $krAnswer = str_replace('\/', '/', $data['kr-answer']);
 
         $hash = hash_hmac('sha256', $krAnswer, $key);
 
-        // return true if calculated hash and sent hash are the same
+        // Return true if calculated hash and sent hash are the same.
         return ($hash === $data['kr-hash']);
     }
 
-    private function _getPassword($isTest = true)
+    public function getPassword($storeId = null)
     {
-        $standard = Mage::getModel('payzen/payment_standard');
-        $crypted = $standard->getConfigData($isTest ? 'rest_private_key_test' : 'rest_private_key_prod');
+        $isTest = $this->_getHelper()->getCommonConfigData('ctx_mode', $storeId) === 'TEST';
+        $crypted = $this->_getHelper()->getCommonConfigData($isTest ? 'rest_private_key_test' : 'rest_private_key_prod', $storeId);
 
         return Mage::helper('core')->decrypt($crypted);
     }
@@ -166,12 +191,72 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
      * @param boolean $isTest
      * @return string
      */
-    public function getReturnKey($isTest = true)
+    public function getReturnKey($storeId = null)
     {
-        $standard = Mage::getModel('payzen/payment_standard');
-        $crypted = $standard->getConfigData($isTest ? 'rest_return_key_test' : 'rest_return_key_prod');
+        $isTest = $this->_getHelper()->getCommonConfigData('ctx_mode', $storeId) === 'TEST';
+        $crypted = $this->_getHelper()->getCommonConfigData($isTest ? 'rest_return_key_test' : 'rest_return_key_prod', $storeId);
 
         return Mage::helper('core')->decrypt($crypted);
+    }
+
+    public function checkIdentifier($identifier, $customerEmail)
+    {
+        try {
+            $requestData = array(
+                'paymentMethodToken' => $identifier
+            );
+
+            // Perform REST request to check identifier.
+            $client = new Lyranetwork_Payzen_Model_Api_Rest(
+                $this->_getHelper()->getCommonConfigData('rest_url'),
+                $this->_getHelper()->getCommonConfigData('site_id'),
+                $this->getPassword()
+            );
+
+            $checkIdentifierResponse = $client->post('V4/Token/Get', json_encode($requestData));
+            $this->checkResult($checkIdentifierResponse);
+
+            $cancellationDate = $this->getProperty($checkIdentifierResponse['answer'], 'cancellationDate');
+            if ($cancellationDate && (strtotime($cancellationDate) <= time())) {
+                $this->_getHelper()->log(
+                    "Saved identifier for customer {$customerEmail} is expired on payment gateway in date of: {$cancellationDate}.",
+                    Zend_Log::WARN
+                );
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            $invalidIdentCodes = array('PSP_030', 'PSP_031', 'PSP_561', 'PSP_607');
+
+            if (in_array($e->getCode(), $invalidIdentCodes)) {
+                // The identifier is invalid or doesn't exist.
+                $this->_getHelper()->log(
+                    "Identifier for customer {$customerEmail} is invalid or doesn't exist: {$e->getMessage()}.",
+                    Zend_Log::WARN
+                );
+                return false;
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    public function setSessionValidPaymentByToken($customer)
+    {
+        try {
+            $isValidIdentifier = $this->checkIdentifier($customer->getPayzenIdentifier(), $customer->getEmail());
+        } catch (\Exception $e) {
+            $this->_getHelper()->log(
+                "Saved identifier for customer {$customer->getEmail()} couldn't be verified on gateway. Error occurred: {$e->getMessage()}",
+                Zend_Log::ERR
+            );
+
+            // Unable to validate alias online, we cannot disable feature.
+            $isValidIdentifier = true;
+        }
+
+        Mage::getSingleton('checkout/session')->setValidAlias($isValidIdentifier);
     }
 
     protected function _getHelper()

@@ -27,11 +27,8 @@ class Lyranetwork_Payzen_Model_Field_Choozeo_PaymentOptions extends Lyranetwork_
                     continue;
                 }
 
-                if (! empty($value['amount_min']) && (! is_numeric($value['amount_min']) || $value['amount_min'] < 0)) {
-                    $this->_throwError('Minimum amount', $i);
-                } elseif (! empty($value['amount_max']) && (! is_numeric($value['amount_max']) || $value['amount_max'] < 0)) {
-                    $this->_throwError('Maximum amount', $i);
-                }
+                $this->checkAmount($value['amount_min'], 'Minimum amount', $i);
+                $this->checkAmount($value['amount_max'], 'Maximum amount', $i);
             }
         }
 

@@ -120,7 +120,7 @@ class Lyranetwork_Payzen_Adminhtml_Payzen_PaymentController extends Mage_Adminht
                 if ($this->_getDataHelper()->isMaintenanceMode()) {
                     $message = $this->__('The shop is in maintenance mode.The automatic notification cannot work.');
                 } else {
-                    $message = $this->__('The automatic validation hasn\'t worked. Have you correctly set up the notification URL in your PayZen Back Office?');
+                    $message = $this->__('The automatic validation has not worked. Have you correctly set up the notification URL in your PayZen Back Office?');
                     $message .= '<br /><br />';
                     $message .= $this->__('For understanding the problem, please read the documentation of the module:<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
