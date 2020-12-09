@@ -130,17 +130,17 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
         $answer = $response['answer'];
 
         if ($response['status'] != 'SUCCESS') {
-            $errorMessage = $answer['errorCode'];
+            $errorMessage = $answer['errorMessage'] . ' (' . $answer['errorCode'] . ').';
 
             if (isset($answer['detailedErrorMessage']) && ! empty($answer['detailedErrorMessage'])) {
-                $errorMessage .= ' : ' . $answer['detailedErrorMessage'];
+                $errorMessage .= ' Detailed message: ' . $answer['detailedErrorMessage'] . ($answer['detailedErrorCode'] ?
+                    ' (' . $answer['detailedErrorCode'] . ').' : '');
             }
 
-            throw new Exception( "({$errorMessage}).");
+            throw new Lyranetwork_Payzen_Model_RestException($errorMessage, $answer['errorCode']);
         } elseif (! empty($expectedStatuses) && ! in_array($answer['detailedStatus'], $expectedStatuses)) {
-            throw new UnexpectedValueException(
-                "Unexpected transaction status returned ({$answer['detailedStatus']})."
-            );
+            $errorMessage = $this->_getHelper()->__("Unexpected transaction status received (%s).", $answer['detailedStatus']);
+            throw new UnexpectedValueException($errorMessage);
         }
     }
 
@@ -164,7 +164,7 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
 
         // Check if the hash algorithm is supported.
         if (! in_array($data['kr-hash-algorithm'], $supportedSignAlgos)) {
-            $this->_getHelper()->log('Hash algorithm is not supported: ' . $data['kr-hash-algorithm'], \Psr\Log\LogLevel::ERROR);
+            $this->_getHelper()->log('Hash algorithm is not supported: ' . $data['kr-hash-algorithm'], Zend_Log::ERR);
             return false;
         }
 
@@ -226,7 +226,7 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $invalidIdentCodes = array('PSP_030', 'PSP_031', 'PSP_561', 'PSP_607');
 
             if (in_array($e->getCode(), $invalidIdentCodes)) {
@@ -246,7 +246,7 @@ class Lyranetwork_Payzen_Helper_Rest extends Mage_Core_Helper_Abstract
     {
         try {
             $isValidIdentifier = $this->checkIdentifier($customer->getPayzenIdentifier(), $customer->getEmail());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->_getHelper()->log(
                 "Saved identifier for customer {$customer->getEmail()} couldn't be verified on gateway. Error occurred: {$e->getMessage()}",
                 Zend_Log::ERR

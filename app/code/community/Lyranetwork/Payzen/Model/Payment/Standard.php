@@ -283,7 +283,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
                 $quote->getPayment()->setAdditionalInformation($tokenName, $token);
                 $quote->getPayment()->save();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->_getHelper()->log($e->getMessage());
             $token = false;
         }
