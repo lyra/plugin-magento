@@ -91,7 +91,7 @@ if (! class_exists('Lyranetwork_Payzen_Model_Api_Response', false)) {
          */
         public function __construct($params, $ctx_mode, $key_test, $key_prod, $algo = Lyranetwork_Payzen_Model_Api_Api::ALGO_SHA1)
         {
-            $this->rawResponse = Lyranetwork_Payzen_Model_Api_Api::uncharm($params);
+            $this->rawResponse = $params;
             $this->certificate = trim(($ctx_mode == 'PRODUCTION') ? $key_prod : $key_test);
 
             if (in_array($algo, Lyranetwork_Payzen_Model_Api_Api::$SUPPORTED_ALGOS)) {

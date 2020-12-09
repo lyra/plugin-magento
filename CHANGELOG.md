@@ -1,3 +1,7 @@
+1.12.1, 2020-12-09:
+- Bug fix: Manage PSP_100 errors when calling REST web services.
+- Bug fix: Error 500 due to obsolete function (get_magic_quotes_gpc) in PHP 7.4.
+
 1.12.0, 2020-12-02:
 - Reorganize backend (REST API keys moved to general configuration section).
 - Do payment from backend by redirection in all cases.
