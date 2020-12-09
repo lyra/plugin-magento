@@ -697,7 +697,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             $this->deleteIdentifierAttribute($customer, $attribute, $maskedAttribute);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $invalidIdentCodes = array('PSP_030', 'PSP_031', 'SP_561', 'PSP_607');
 
             if (in_array($e->getCode(), $invalidIdentCodes)) {
