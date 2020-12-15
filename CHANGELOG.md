@@ -1,3 +1,8 @@
+2.5.1, 2020-12-15:
+- Display warning message on payment in iframe mode enabling.
+- Bug fix: Manage PSP_100 errors when calling REST web services.
+- Bug fix: Error 500 due to obsolete function (get_magic_quotes_gpc) in PHP 7.4.
+
 2.5.0, 2020-11-25:
 - [embedded] Bug fix: Empty cart to avoid double payments with REST API.
 - [franfinance] Added new FranFinance submodule.
