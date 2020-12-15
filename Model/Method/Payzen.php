@@ -476,7 +476,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // Client has not configured private key in module backend, let Magento accept order offline.
         if (! $this->restHelper->getPrivateKey($storeId)) {
-            $this->dataHelper->log("Cannot get online payment information for order #{$order->getIncrementId()}: private key is not configured, let Magento accepts the payment.");
+            $this->dataHelper->log("Cannot get online payment information for order #{$order->getIncrementId()}: private key is not configured, let Magento accept the payment.");
 
             return true;
         }
@@ -511,7 +511,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             // Check operation type.
             $transType = $getPaymentDetails['answer']['operationType'];
             if ($transType !== 'DEBIT') {
-                throw new \Exception("Unexpected transaction type returned ($transType).");
+                throw new \UnexpectedValueException("Unexpected transaction type returned ($transType).");
             }
 
             $this->dataHelper->log("Updating payment information for accepted order #{$order->getIncrementId()}.");
@@ -556,26 +556,35 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             exit;
         } catch(\UnexpectedValueException $e) {
             $this->dataHelper->log(
-                "getPaymentDetails error with code {$e->getCode()}: {$e->getMessage()}.",
+                "Get payment details error: {$e->getMessage()}.",
                 \Psr\Log\LogLevel::ERROR
             );
 
             throw new \Exception($e->getMessage());
         } catch (\Exception $e) {
             $this->dataHelper->log(
-                "Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Get payment details exception with code {$e->getCode()}: {$e->getMessage()}",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            if ($e->getCode() <= -1) { // Manage cUrl errors.
-                $message = __("Please consult the PayZen logs for more details.");
+            if ($e->getCode() === 'PSP_100') {
+                // Merchant does not subscribe to REST WS option, accept payment offline.
+                $this->dataHelper->log("Cannot get online payment information for order #{$order->getIncrementId()}: REST API not available for merchant, let Magento accept the payment.");
+
+                return true;
             } else {
-                $message = $e->getMessage();
+                $message = __('Payment review error') . ': ';
+
+                if ($e->getCode() <= -1) {
+                    // Manage cUrl errors.
+                    $message .= __('Please consult the PayZen logs for more details.');
+                } else {
+                    $message .= $e->getMessage();
+                }
+
+                $this->messageManager->addError($message);
+                throw $e;
             }
-
-            $this->messageManager->addError($message);
-
-            throw $e;
         }
     }
 
@@ -595,7 +604,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
-        // Client has not configured private key in module backend, let Magento accept order offline.
+        // Client has not configured private key in module backend, let Magento cancel order offline.
         if (! $this->restHelper->getPrivateKey($storeId)) {
             $this->dataHelper->log("Cannot cancel payment online for order #{$order->getIncrementId()}: private key is not configured, let Magento cancel the payment.");
 
@@ -655,26 +664,36 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             return true; // Let Magento cancel order.
         } catch(\UnexpectedValueException $e) {
             $this->dataHelper->log(
-                "cancelPayment error with code {$e->getCode()}: {$e->getMessage()}.",
+                "Cancel payment error: {$e->getMessage()}.",
                 \Psr\Log\LogLevel::ERROR
             );
 
             throw new \Exception($e->getMessage());
         } catch (\Exception $e) {
             $this->dataHelper->log(
-                "Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Cancel payment exception with code {$e->getCode()}: {$e->getMessage()}",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            if ($e->getCode() <= -1) { // Manage cUrl errors.
-                $message = __("Please consult the PayZen logs for more details.");
+            if ($e->getCode() === 'PSP_100') {
+                // Merchant does not subscribe to REST WS option, deny payment offline.
+                $this->dataHelper->log("Cannot cancel payment online for order #{$order->getIncrementId()}: REST API not available for merchant, let Magento cancel the payment.");
+
+                $this->messageManager->addWarning(__('Payment is cancelled only in Magento. Please, consider cancelling the payment in PayZen Back Office.'));
+                return true;
             } else {
-                $message = $e->getMessage();
+                $message = __('Cancellation error') . ': ';
+
+                if ($e->getCode() <= -1) {
+                    // Manage cUrl errors.
+                    $message .= __('Please consult the PayZen logs for more details.');
+                } else {
+                    $message .= $e->getMessage();
+                }
+
+                $this->messageManager->addError($message);
+                throw $e;
             }
-
-            $this->messageManager->addError($message);
-
-            throw $e;
         }
     }
 
@@ -693,16 +712,16 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $storeId = $order->getStore()->getId();
 
         $uuidArray = [];
-        $onlineValidatePayment = true;
 
         if (! $this->restHelper->getPrivateKey($storeId)) {
-            // Client has not configured private key in module backend, let Magento validate payment offline.
-            $this->dataHelper->log("Cannot validate online payment for order #{$order->getIncrementId()}: private key is not configured, let Magento validate payment.");
-            $this->messageManager->addWarning(__('Payment is validated only in Magento. Please, consider validating the payment in PayZen Back Office.'));
-            $onlineValidatePayment = false;
-        } else {
-            $this->dataHelper->log("Validate payment online for order #{$order->getIncrementId()}.");
+            // Client has not configured private key in module backend, let's update order offline.
+            $this->dataHelper->log("Cannot validate online payment for order #{$order->getIncrementId()}: private key is not configured, let's validate order offline.");
+            $this->validatePaymentOffline($order);
+
+            return;
         }
+
+        $this->dataHelper->log("Validate payment online for order #{$order->getIncrementId()}.");
 
         try {
             // Get choosen payment option if any.
@@ -710,93 +729,35 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $multi = (stripos($payment->getMethod(), 'payzen_multi') === 0) && is_array($option) && ! empty($option);
             $count = $multi ? (int) $option['count'] : 1;
 
-            if ($onlineValidatePayment) {
-                // Retrieve saved transaction UUID.
-                $savedUuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
+            // Retrieve saved transaction UUID.
+            $savedUuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
 
-                if (! $savedUuid || ($count > 1)) {
-                    $uuidArray = $this->getPaymentDetails($order);
-                } else {
-                    $uuidArray[] = $savedUuid;
-                }
-
-                $first = true;
-                foreach ($uuidArray as $uuid) {
-                    $requestData = [
-                        'uuid' => $uuid,
-                        'comment' => $this->getUserInfo()
-                    ];
-
-                    // Perform our request.
-                    $client = new PayzenRest(
-                        $this->dataHelper->getCommonConfigData('rest_url', $storeId),
-                        $this->dataHelper->getCommonConfigData('site_id', $storeId),
-                        $this->restHelper->getPrivateKey($storeId)
-                    );
-
-                    $validatePaymentResponse = $client->post('V4/Transaction/Validate', json_encode($requestData));
-
-                    $this->restHelper->checkResult($validatePaymentResponse, ['WAITING_AUTHORISATION', 'AUTHORISED']);
-
-                    // Wrap payment result to use traditional order creation tunnel.
-                    $data = $this->restHelper->convertRestResult($validatePaymentResponse['answer'], true);
-
-                    // Load API response.
-                    $response = $this->payzenResponseFactory->create(
-                        [
-                            'params' => $data,
-                            'ctx_mode' => null,
-                            'key_test' => null,
-                            'key_prod' => null,
-                            'algo' => null
-                        ]
-                    );
-
-                    $transId = $order->getPayment()->getCcTransId() . '-' . $response->get('sequence_number');
-
-                    if ($first) { // Single payment or first transaction for payment in installments.
-                        $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
-
-                        $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
-                        $order->setState($stateObject->getState())
-                              ->setStatus($stateObject->getStatus());
-                    }
-
-                    $order->addStatusHistoryComment(__('Transaction %1 has been validated.', $transId));
-
-                    // Update transaction status.
-                    $txn = $this->transactionResource->loadObjectByTxnId(
-                        $this->transaction,
-                        $order->getId(),
-                        $order->getPayment()->getId(),
-                        $transId
-                    );
-
-                    if ($txn && $txn->getId()) {
-                        $data = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
-                        $data['Transaction Status'] = $response->getTransStatus();
-
-                        $txn->setAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $data);
-                        $txn->save();
-                    }
-
-                    $first = false;
-                }
+            if (! $savedUuid || ($count > 1)) {
+                $uuidArray = $this->getPaymentDetails($order);
             } else {
-                // Wrap payment result to use traditional order creation tunnel.
-                $data = ['vads_trans_status' => 'AUTHORISED'];
+                $uuidArray[] = $savedUuid;
+            }
 
-                $txn = $this->transactionResource->loadObjectByTxnId(
-                    $this->transaction,
-                    $order->getId(),
-                    $order->getPayment()->getId(),
-                    $order->getPayment()->getLastTransId()
+            $first = true;
+            foreach ($uuidArray as $uuid) {
+                $requestData = [
+                    'uuid' => $uuid,
+                    'comment' => $this->getUserInfo()
+                ];
+
+                // Perform our request.
+                $client = new PayzenRest(
+                    $this->dataHelper->getCommonConfigData('rest_url', $storeId),
+                    $this->dataHelper->getCommonConfigData('site_id', $storeId),
+                    $this->restHelper->getPrivateKey($storeId)
                 );
 
-                if ($txn && $txn->getId()) {
-                    $txnData = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
-                    $data['vads_card_brand'] = $txnData['Means of payment'];
-                }
+                $validatePaymentResponse = $client->post('V4/Transaction/Validate', json_encode($requestData));
+
+                $this->restHelper->checkResult($validatePaymentResponse, ['WAITING_AUTHORISATION', 'AUTHORISED']);
+
+                // Wrap payment result to use traditional order creation tunnel.
+                $data = $this->restHelper->convertRestResult($validatePaymentResponse['answer'], true);
 
                 // Load API response.
                 $response = $this->payzenResponseFactory->create(
@@ -809,42 +770,120 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     ]
                 );
 
-                $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
+                $transId = $order->getPayment()->getCcTransId() . '-' . $response->get('sequence_number');
 
-                $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
-                $order->setState($stateObject->getState())
-                      ->setStatus($stateObject->getStatus());
+                if ($first) { // Single payment or first transaction for payment in installments.
+                    $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
 
-                $order->addStatusHistoryComment(__('Order %1 has been validated.', $order->getIncrementId()));
+                    $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
+                    $order->setState($stateObject->getState())
+                          ->setStatus($stateObject->getStatus());
+                }
+
+                $order->addStatusHistoryComment(__('Transaction %1 has been validated.', $transId));
+
+                // Update transaction status.
+                $txn = $this->transactionResource->loadObjectByTxnId(
+                    $this->transaction,
+                    $order->getId(),
+                    $order->getPayment()->getId(),
+                    $transId
+                );
+
+                if ($txn && $txn->getId()) {
+                    $data = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+                    $data['Transaction Status'] = $response->getTransStatus();
+
+                    $txn->setAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $data);
+                    $txn->save();
+                }
+
+                $first = false;
             }
-
-            $this->dataHelper->log("Updating payment information for validated order #{$order->getIncrementId()}.");
 
             // Try to create invoice.
             $this->paymentHelper->createInvoice($order);
-
             $order->save();
+
+            $this->dataHelper->log("Payment information updated for validated order #{$order->getIncrementId()}.");
             $this->messageManager->addSuccess(__('Payment validated successfully.'));
         } catch(\UnexpectedValueException $e) {
             $this->dataHelper->log(
-                "validatePayment error with code {$e->getCode()}: {$e->getMessage()}.",
+                "Validate payment error: {$e->getMessage()}.",
                 \Psr\Log\LogLevel::ERROR
             );
+
+            throw new \Exception($e->getMessage());
         } catch (\Exception $e) {
             $this->dataHelper->log(
-                "Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Validate payment exception with code {$e->getCode()}: {$e->getMessage()}",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            $message = __("We cannot update the payment right now.");
-            if ($e->getCode() <= -1) { // Manage cUrl errors.
-                $message .= ' ' . __("Please consult the PayZen logs for more details.");
-            } else {
-                $message .= ' ' . $e->getMessage();
-            }
+            if ($e->getCode() === 'PSP_100') {
+                // Merchant does not subscribe to REST WS option, validate payment offline.
+                $this->dataHelper->log("Cannot validate online payment for order #{$order->getIncrementId()}: REST API not available for merchant, let's validate order offline.");
+                $this->validatePaymentOffline($order, true);
 
-            $this->messageManager->addError($message);
+                return;
+            } else {
+                $message = __('Validation error') . ': ';
+
+                if ($e->getCode() <= -1) {
+                    // Manage cUrl errors.
+                    $message .= __('Please consult the PayZen logs for more details.');
+                } else {
+                    $message .= $e->getMessage();
+                }
+
+                $this->messageManager->addError($message);
+            }
         }
+    }
+
+    protected function validatePaymentOffline($order)
+    {
+        $this->messageManager->addWarning(__('Payment is validated only in Magento. Please, consider validating the payment in PayZen Back Office.'));
+
+        // Wrap payment result to use traditional order creation tunnel.
+        $data = ['vads_trans_status' => 'AUTHORISED'];
+
+        $txn = $this->transactionResource->loadObjectByTxnId(
+            $this->transaction,
+            $order->getId(),
+            $order->getPayment()->getId(),
+            $order->getPayment()->getLastTransId()
+        );
+
+        if ($txn && $txn->getId()) {
+            $txnData = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+            $data['vads_card_brand'] = $txnData['Means of payment'];
+        }
+
+        // Load API response.
+        $response = $this->payzenResponseFactory->create(
+            [
+                'params' => $data,
+                'ctx_mode' => null,
+                'key_test' => null,
+                'key_prod' => null,
+                'algo' => null
+            ]
+        );
+
+        $stateObject = $this->paymentHelper->nextOrderState($order, $response, true);
+
+        $this->dataHelper->log("Order #{$order->getIncrementId()}, new state : {$stateObject->getState()}, new status : {$stateObject->getStatus()}.");
+        $order->setState($stateObject->getState())
+              ->setStatus($stateObject->getStatus());
+
+        $order->addStatusHistoryComment(__('Order %1 has been validated.', $order->getIncrementId()));
+
+        // Try to create invoice.
+        $this->paymentHelper->createInvoice($order);
+        $order->save();
+
+        $this->dataHelper->log("Payment information updated for validated order #{$order->getIncrementId()}.");
     }
 
     /**
@@ -1040,7 +1079,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 $transType = $refundPaymentResponse['answer']['operationType'];
 
                 if ($transType !== 'CREDIT') {
-                    throw new \Exception("Unexpected transaction type returned ($transType).");
+                    throw new \UnexpectedValueException("Unexpected transaction type returned ($transType).");
                 }
 
                 // Create refund transaction in Magento.
@@ -1065,33 +1104,11 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     $this->dataHelper->log("Online payment cancel for order #{$order->getIncrementId()} is successful.");
                 } else {
                     // Partial transaction cancel, call update WS.
-                    $timestamp = time();
-
-                    $captureDelay = $this->getConfigData('capture_delay', $storeId); // Get submodule specific param.
-                    if (! is_numeric($captureDelay)) {
-                        // Get general param.
-                        $captureDelay = $this->dataHelper->getCommonConfigData('capture_delay', $storeId);
-                    }
-
-                    $expectedCaptureDate = (is_numeric($captureDelay)) ? new \DateTime('@' . strtotime("+$captureDelay days", $timestamp)) : null;
-
-                    $validationMode = $this->getConfigData('validation_mode', $storeId); // Get submodule specific param.
-                    if ($validationMode === '-1') {
-                        // Get general param.
-                        $validationMode = $this->dataHelper->getCommonConfigData('validation_mode', $storeId);
-                    }
-
-                    if ($validationMode !== '') {
-                        $validationMode = ($validationMode == '1') ? 'YES' : 'NO';
-                    }
-
                     $requestData = [
                         'uuid' => $uuid,
                         'cardUpdate' => [
                             'amount' => $transAmount - $amountInCents,
-                            'currency' => $currency->getAlpha3(),
-                            'expectedCaptureDate' => $expectedCaptureDate,
-                            'manualValidation' => $validationMode
+                            'currency' => $currency->getAlpha3()
                         ],
                         'comment' => $commentText
                     ];
@@ -1110,21 +1127,35 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 }
             }
         } catch(\UnexpectedValueException $e) {
-            $this->dataHelper->log("refund error with code {$e->getCode()}: {$e->getMessage()}.", \Psr\Log\LogLevel::ERROR);
-        } catch (\Exception $e) {
             $this->dataHelper->log(
-                "Exception with code {$e->getCode()}: {$e->getMessage()}",
+                "Refund payment error: {$e->getMessage()}.",
                 \Psr\Log\LogLevel::ERROR
             );
 
-            $message = __('Refund error') . ':';
-            if ($e->getCode() <= -1) { // Manage cUrl errors.
-                $message .= ' ' . __('Please consult the PayZen logs for more details.');
-            } else {
-                $message .= ' ' . $e->getMessage();
-            }
+            throw new \Exception($e->getMessage());
+        } catch (\Exception $e) {
+            $this->dataHelper->log(
+                "Refund payment exception with code {$e->getCode()}: {$e->getMessage()}",
+                \Psr\Log\LogLevel::ERROR
+            );
 
-            throw new \Exception($message);
+            if ($e->getCode() === 'PSP_083') {
+                throw new \Exception(__('Chargebacks cannot be refunded.'));
+            } elseif ($e->getCode() === 'PSP_100') {
+                // Merchant does not subscribe to REST WS option, refund payment offline.
+                $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
+                $this->messageManager->addWarning($notice);
+                // Magento will do an offline refund.
+            } else {
+                $message = __('Refund error') . ': ';
+                if ($e->getCode() <= -1) { // Manage cUrl errors.
+                    $message .= __('Please consult the PayZen logs for more details.');
+                } else {
+                    $message .= $e->getMessage();
+                }
+
+                throw new \Exception($message);
+            }
         }
 
         $order->save();

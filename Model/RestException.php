@@ -9,6 +9,18 @@
  */
 namespace Lyranetwork\Payzen\Model;
 
-class WsException extends \Exception
+class RestException extends \Exception
 {
+    protected $code;
+
+    /**
+     * @param message[optional]
+     * @param code[optional]
+     */
+    public function __construct($message, $code = null)
+    {
+        parent::__construct($message, null);
+
+        $this->code = $code;
+    }
 }

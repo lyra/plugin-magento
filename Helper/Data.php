@@ -403,26 +403,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Check if server has requirements to do WS operations.
-     *
-     * @throws \Lyranetwork\Payzen\Model\WsException
-     */
-    public function checkWsRequirements()
-    {
-        if (! extension_loaded('soap')) {
-            throw new \Lyranetwork\Payzen\Model\WsException(
-                'SOAP extension for PHP must be enabled on the server in order to use PayZen web services.'
-            );
-        }
-
-        if (! extension_loaded('openssl')) {
-            throw new \Lyranetwork\Payzen\Model\WsException(
-                'OPENSSL extension for PHP must be enabled on the server in order to use PayZen web services.'
-            );
-        }
-    }
-
-    /**
      * Unserialize data using JSON or PHP unserialize function if error.
      *
      * @param string $string

@@ -15,7 +15,7 @@
         <payzen>
             <general>
                 <support_email>support@payzen.eu</support_email>
-                <plugin_version>2.5.0</plugin_version>
+                <plugin_version>2.5.1</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_2.x</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -26,7 +26,6 @@
                 <ctx_mode>TEST</ctx_mode>
                 <sign_algo>SHA-256</sign_algo>
                 <gateway_url>https://secure.payzen.eu/vads-payment/</gateway_url>
-                <wsdl_url>https://secure.payzen.eu/vads-ws/v5?wsdl</wsdl_url>
                 <notify_url>payzen/payment/check</notify_url>
 
                 <rest_private_key_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />

@@ -114,6 +114,7 @@
             <field id="card_info_mode" translate="label comment" type="select" sortOrder="241" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Card data entry mode]]></label>
                 <comment><![CDATA[Select how the credit card information will be entered. Attention, to use embedded payment fields, you must ensure that you have subscribed to this option with PayZen.]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Standard\CardInfoMode</frontend_model>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\CardInfoMode</source_model>
                 <config_path>payment/payzen_standard/card_info_mode</config_path>
             </field>
