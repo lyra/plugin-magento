@@ -164,10 +164,11 @@ class Rest
         if ($response['status'] !== 'SUCCESS') {
             $msg = $answer['errorMessage'] . ' (' . $answer['errorCode'] . ').';
             if (isset($answer['detailedErrorMessage']) && ! empty($answer['detailedErrorMessage'])) {
-                $msg .= ' Detailed message: ' . $answer['detailedErrorMessage'] .' (' . $answer['detailedErrorCode'] . ').';
+                $msg .= ' Detailed message: ' . $answer['detailedErrorMessage'] . ($answer['detailedErrorCode'] ?
+                    ' (' . $answer['detailedErrorCode'] . ').' : '');
             }
 
-            throw new \Exception($msg);
+            throw new \Lyranetwork\Payzen\Model\RestException($msg, $answer['errorCode']);
         } elseif (! empty($expectedStatuses) && ! in_array($answer['detailedStatus'], $expectedStatuses)) {
             throw new \UnexpectedValueException(
                 "Unexpected transaction status returned ({$answer['detailedStatus']})."
