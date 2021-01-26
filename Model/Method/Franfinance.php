@@ -121,9 +121,9 @@ class Franfinance extends Payzen
 
         if ($code && isset($options[$code])) {
             return $options[$code];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function canUseForCountry($country)

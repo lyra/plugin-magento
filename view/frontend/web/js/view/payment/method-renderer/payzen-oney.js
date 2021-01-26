@@ -51,9 +51,9 @@ define(
             isPlaceOrderActionAllowed: function () {
                 if ($.cookie('payzen_oney_error')) {
                     return false;
-                } else {
-                    return this._super();
                 }
+
+                return this._super();
             }
         });
     }

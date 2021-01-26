@@ -28,7 +28,7 @@ define(
 
                 return this;
             },
-            
+
             getData: function () {
                 var data = this._super();
                 data['additional_data']['payzen_gift_cc_type'] = this.payzenCcType();

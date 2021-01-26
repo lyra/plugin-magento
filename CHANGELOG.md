@@ -1,3 +1,7 @@
+2.5.2, 2021-01-05:
+- [embedded] Bug fix: Use the last version of PrototypeJS library when embedded payment fields option is enabled.
+- Minor code fixes.
+
 2.5.1, 2020-12-15:
 - Display warning message on payment in iframe mode enabling.
 - Bug fix: Manage PSP_100 errors when calling REST web services.

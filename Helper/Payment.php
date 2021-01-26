@@ -784,32 +784,33 @@ class Payment
      * @param string $type
      * @param string $transactionId
      * @param array $additionalInfo
-     * @param string $parentTransactionId
      * @return null|\Magento\Sales\Model\Order\Payment\Transaction
      */
-    public function addTransaction($payment, $type, $transactionId, $additionalInfo)
+    public function addTransaction($payment, $type, $gatewayTransactionId, $additionalInfo)
     {
-        $parentTxn = $this->transactionRepository->getByTransactionId(
-            $transactionId,
-            $payment->getId(),
-            $payment->getOrder()->getId()
-        );
+        $transactionId = $gatewayTransactionId;
 
-        if ($parentTxn && $parentTxn->getId() && ($parentTxn->getTxnType() !== $type)) {
-            $payment->setTransactionId($this->transactionManager->generateTransactionId($payment, $type, $parentTxn));
-            $payment->setShouldCloseParentTransaction(true);
+        if ($type !== \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH) {
+            $parentTxn = $this->transactionRepository->getByTransactionId(
+                $gatewayTransactionId,
+                $payment->getId(),
+                $payment->getOrder()->getId()
+            );
+
+            if ($parentTxn && $parentTxn->getId() && ($parentTxn->getTxnType() !== $type)) {
+                $transactionId = $this->transactionManager->generateTransactionId($payment, $type, $parentTxn);
+                $payment->setShouldCloseParentTransaction(true);
+            }
         } else {
-            $payment->setTransactionId($transactionId);
+            $payment->setIsTransactionClosed(0);
         }
+
+        $payment->setTransactionId($transactionId);
 
         $payment->setTransactionAdditionalInfo(
             \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
             $additionalInfo
         );
-
-        if ($type == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH) {
-            $payment->setIsTransactionClosed(0);
-        }
 
         $txnExists = $this->transactionManager->isTransactionExists(
             $payment->getTransactionId(),

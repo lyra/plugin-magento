@@ -19,7 +19,7 @@ define(
         return Component.extend({
             defaults: {
                 template: 'Lyranetwork_Payzen/payment/payzen-choozeo',
-                payzenChoozeoOption: window.checkoutConfig.payment.payzen_choozeo.availableOptions ? 
+                payzenChoozeoOption: window.checkoutConfig.payment.payzen_choozeo.availableOptions ?
                     window.checkoutConfig.payment.payzen_choozeo.availableOptions[0]['key'] : null
             },
 

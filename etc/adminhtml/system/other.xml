@@ -99,7 +99,7 @@
                 <config_path>payment/payzen_other/other_payment_means</config_path>
                 <comment><![CDATA[Click on &laquo; Add &raquo; button to configure one or more payment means.<br /><b>Label: </b>The label of the means of payment to display on your site.<br /><b>Means of payment: </b>Choose the means of payment you want to propose.<br /><b>Countries: </b>Countries where the means of payment will be available. Leave blank to authorize all countries.<br /><b>Min. amount: </b>Minimum amount to enable the means of payment.<br /><b>Max. amount: </b>Maximum amount to enable the means of payment.<br /><b>Capture delay: </b>The number of days before the bank capture. Enter value only if different from PayZen general configuration.<br /><b>Validation mode: </b>If manual is selected, you will have to confirm payments manually in your PayZen Back Office.<br /><b>Cart data: </b>If you disable this option, the shopping cart details will not be sent to the gateway. Attention, in some cases, this option has to be enabled. For more information, refer to the module documentation.]]></comment>
             </field>
-            
+
             <field id="added_payment_means" translate="label comment" sortOrder="1133" showInDefault="1" showInWebsite="1" showInStore="1">
                <label><![CDATA[Add payment means]]></label>
                <comment><![CDATA[Click on &laquo; Add &raquo; button to add one or more new payment means.<br /><b>Code: </b>The code of the means of payment as expected by PayZen gateway.<br /><b>Label: </b>The default label of the means of payment.]]></comment>

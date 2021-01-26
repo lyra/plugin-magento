@@ -109,7 +109,6 @@ class Response extends \Magento\Backend\App\Action
             if ($checkUrlWarn) {
                 // Order not validated by notification URL. In TEST mode, user is webmaster.
                 // So display a warning about notification URL not working.
-
                 if ($this->dataHelper->isMaintenanceMode()) {
                     $message = __('The shop is in maintenance mode.The automatic notification cannot work.');
                 } else {
