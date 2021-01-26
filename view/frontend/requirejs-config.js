@@ -1,4 +1,3 @@
-<!--
 /**
  * Copyright © Lyra Network.
  * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
@@ -7,10 +6,11 @@
  * @copyright Lyra Network
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
--->
 
-<iframe id="payzen_iframe"
-        style="display: none;"
-        class="payzen-iframe"
-        data-bind="attr: {src: $parent.getIframeLoaderUrl()}">
-</iframe>
+var config = {
+    map: {
+        '*': {
+            'prototype': 'Lyranetwork_Payzen/js/legacy-build.min'
+        }
+    }
+};

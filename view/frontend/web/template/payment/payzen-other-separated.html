@@ -18,11 +18,11 @@
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {id: $parent.getOptionCode(option.key)}, 
+               data-bind="attr: {id: $parent.getOptionCode(option.key)},
                           value: $parent.getOptionCode(option.key),
                           checked: $parent.isChecked,
-                          click: function() { $parent.selectOptionPaymentMethod(option.key); 
-                                              $parent.payzenOtherOption(option.key); 
+                          click: function() { $parent.selectOptionPaymentMethod(option.key);
+                                              $parent.payzenOtherOption(option.key);
                                               return true; },
                           visible: $parent.isRadioButtonVisible()" />
 

@@ -41,7 +41,7 @@
         <fieldset class="fieldset payment method" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 10px;">
             <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
         </fieldset>
-        
+
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->

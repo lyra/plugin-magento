@@ -59,7 +59,7 @@ class ChoozeoPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\C
     public function getArrayRows()
     {
         /** @var array[string][string] $options */
-        $options =[
+        $options = [
             'EPNF_3X' => 'Choozeo 3X CB',
             'EPNF_4X' => 'Choozeo 4X CB'
         ];

@@ -152,9 +152,9 @@ class Rest
         $code = $this->getProperty($transaction, 'errorCode');
         if ($code) {
             return ucfirst($this->getProperty($transaction, 'errorMessage')) . ' (' . $code . ').';
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function checkResult($response, $expectedStatuses = array())

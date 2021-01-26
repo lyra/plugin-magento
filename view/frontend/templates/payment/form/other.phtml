@@ -37,14 +37,14 @@ if ($block->regroupPaymentMeans()) :
 
         $first = false;
         $ccImageSrc = $block->getCcTypeImageSrc($code);
-        
+
         $label = $ccImageSrc ? '<img alt="' . $block->escapeHtml($label) . '"
                                      src="' . $block->escapeHtml($ccImageSrc) . '"
                                      title="' . $block->escapeHtml($label) . '" />'
                 : "<span>" . $block->escapeHtml($label) . "</span>";
-        
+
         $html .= '<label for="payzen_other_cc_type_' . $block->escapeHtml($code) . '">'
-                    . $label . 
+                    . $label .
                   '</label>';
         $html .= '</div>';
     }

@@ -108,12 +108,12 @@ class Checkout
         } elseif ($scope == 'stores') {
             $collection->addAttributeToFilter('store_id', $scopeId);
         }
+
         $collection->load();
 
         foreach ($collection as $customer) {
             if (! preg_match(self::CUST_ID_REGEX, $customer->getId())) {
                 // A customer ID doesn't match gateway rules.
-
                 $msg = '';
                 $msg .= __(
                     'Customer ID &laquo; %1 &raquo; does not match PayZen specifications.',
@@ -157,7 +157,6 @@ class Checkout
     {
         if (! preg_match(self::ORDER_ID_REGEX, $orderId)) {
             // The potential next order id doesn't match gateway rules.
-
             $msg = '';
             $msg .= __(
                 'The next order ID  &laquo; %1 &raquo; does not match PayZen specifications.',
@@ -180,12 +179,12 @@ class Checkout
         } elseif ($scope == 'stores') {
             $collection->addStoreFilter($scopeId);
         }
+
         $collection->load();
 
         foreach ($collection as $product) {
             if (! preg_match(self::PRODUCT_REF_REGEX, $product->getId())) {
                 // Product id doesn't match gateway rules.
-
                 $msg = '';
                 $msg .= __(
                     'Product reference &laquo; %1 &raquo; does not match PayZen specifications.',
@@ -343,6 +342,7 @@ class Checkout
                     }
 
                     // Break intentionally omitted.
+
                 case 'RECLAIM_IN_STATION':
                     // It's recommended to put a specific logic here.
                     $address = $order->getShippingAddress()->getStreetLine(1);
@@ -378,8 +378,8 @@ class Checkout
             $payzenRequest->set('cust_country', 'FR');
             $payzenRequest->set('ship_to_country', 'FR');
 
-            $payzenRequest->set('ship_to_type', $shippingMethod['type']);
-            $payzenRequest->set('ship_to_speed', $shippingMethod['speed']);
+            $payzenRequest->set('ship_to_type', empty($shippingMethod['type']) ? null : $shippingMethod['type']);
+            $payzenRequest->set('ship_to_speed', empty($shippingMethod['speed']) ? null : $shippingMethod['speed']);
 
             if ($shippingMethod['speed'] === 'PRIORITY') {
                 $payzenRequest->set('ship_to_delay', $shippingMethod['delay']);
