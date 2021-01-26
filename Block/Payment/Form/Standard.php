@@ -34,9 +34,9 @@ class Standard extends Payzen
             return 'AMEX';
         } elseif (in_array($code, $cbCards)) {
             return 'CB';
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function isLocalCcType()

@@ -223,6 +223,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             // ... and order total in base currency
             $amount = $order->getBaseGrandTotal();
         }
+
         $this->payzenRequest->set('currency', $currency->getNum());
 
         // Set the amount to pay.
@@ -453,9 +454,9 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $dataObject = $this->dataObjectFactory->create();
             $dataObject->addData($data->getAdditionalData()); // Magento v >= 2.1
             return $dataObject;
-        } else {
-            return $data;
         }
+
+        return $data;
     }
 
     /**

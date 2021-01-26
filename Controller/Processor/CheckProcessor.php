@@ -122,7 +122,6 @@ class CheckProcessor
 
                 if ($response->get('operation_type') == 'CREDIT') {
                     // This is a refund: create credit memo?
-
                     $expiry = '';
                     if ($response->get('expiry_month') && $response->get('expiry_year')) {
                         $expiry = str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' .

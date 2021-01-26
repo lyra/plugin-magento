@@ -122,9 +122,9 @@ class Other extends Payzen
 
         if ($code && $options[$code]) {
             return $options[$code];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

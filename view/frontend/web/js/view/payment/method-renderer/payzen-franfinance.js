@@ -19,7 +19,7 @@ define(
         return Component.extend({
             defaults: {
                 template: 'Lyranetwork_Payzen/payment/payzen-franfinance',
-                payzenFranfinanceOption: window.checkoutConfig.payment.payzen_franfinance.availableOptions ? 
+                payzenFranfinanceOption: window.checkoutConfig.payment.payzen_franfinance.availableOptions ?
                     window.checkoutConfig.payment.payzen_franfinance.availableOptions[0]['key'] : null
             },
 

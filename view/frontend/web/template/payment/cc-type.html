@@ -26,8 +26,8 @@
             <li class="item" data-bind="css: {'_active': true}" style="display: inline-block; padding-right: 20px; padding-bottom: 6px;">
                 <input type="radio"
                        class="radio"
-                       data-bind="attr: {id: $parent.getCode() + '_cc_type_' + card.value, 
-                                         checked: (card.value == $parent.payzenCcType()), 
+                       data-bind="attr: {id: $parent.getCode() + '_cc_type_' + card.value,
+                                         checked: (card.value == $parent.payzenCcType()),
                                          name: 'payment[' + $parent.getCode() + '_cc_type]'
                                         },
                                   value: card.value,

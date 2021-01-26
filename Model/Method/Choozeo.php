@@ -84,9 +84,9 @@ class Choozeo extends Payzen
         if ($this->getConfigData('allowspecific') == 1) {
             $availableCountries = explode(',', $this->getConfigData('specificcountry'));
             return in_array($country, $availableCountries);
-        } else {
-            return in_array($country, ChoozeoCountry::$availableCountries);
         }
+
+        return in_array($country, ChoozeoCountry::$availableCountries);
     }
 
 

@@ -32,8 +32,8 @@ class View
                         'class' =>'go'
                     ]
                 );
-                // Break omitted intentionally.
 
+            // Break omitted intentionally.
             case 'payment_review':
                 $orderView->removeButton('accept_payment');
                 break;

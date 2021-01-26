@@ -230,9 +230,9 @@ class Multi extends Payzen
 
         if ($code && isset($options[$code])) {
             return $options[$code];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
