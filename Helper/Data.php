@@ -79,11 +79,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $filesystem;
 
     /**
-     * @var \Magento\Config\Model\Config\Structure
-     */
-    protected $configStructure;
-
-    /**
      * @var \Lyranetwork\Payzen\Model\Logger\Payzen
      */
     protected $logger;
@@ -120,7 +115,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\MaintenanceMode $maintenanceMode
      * @param \Magento\Config\Model\ResourceModel\Config $resourceConfig
      * @param \Magento\Framework\Filesystem $filesystem
-     * @param \Magento\Config\Model\Config\Structure $configStructure
      * @param \Lyranetwork\Payzen\Model\Logger\Payzen
      * @param \Magento\Framework\App\State $appState
      * @param \Zend\Http\PhpEnvironment\RemoteAddress $remoteAddress
@@ -135,7 +129,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\MaintenanceMode $maintenanceMode,
         \Magento\Config\Model\ResourceModel\Config $resourceConfig,
         \Magento\Framework\Filesystem $filesystem,
-        \Magento\Config\Model\Config\Structure $configStructure,
         \Lyranetwork\Payzen\Model\Logger\Payzen $logger,
         \Magento\Framework\App\State $appState,
         \Zend\Http\PhpEnvironment\RemoteAddress $remoteAddress,
@@ -150,7 +143,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->maintenanceMode = $maintenanceMode;
         $this->resourceConfig = $resourceConfig;
         $this->filesystem = $filesystem;
-        $this->configStructure = $configStructure;
         $this->logger = $logger;
         $this->appState = $appState;
         $this->remoteAddress = $remoteAddress;
@@ -331,7 +323,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $parts = explode('/', $path);
         $parentPath = 'payment/' . $parts[1] . '/' . $parts[2]; // We need the second level group.
 
-        return __($this->configStructure->getElement($parentPath)->getLabel())->render();
+        $configStructure = $this->objectManager->create('Magento\Config\Model\Config\Structure');
+        return __($configStructure->getElement($parentPath)->getLabel())->render();
     }
 
     /**

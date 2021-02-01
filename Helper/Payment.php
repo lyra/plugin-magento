@@ -385,7 +385,11 @@ class Payment
             // Get choosen payment option if any.
             $option = @unserialize($order->getPayment()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION));
 
-            if ($response->get('sequence_number') == 1 && (stripos($order->getPayment()->getMethod(), 'payzen_multi') === 0)
+            // Check if it's the first installment.
+            $isFirstInstallment = ($response->get('sequence_number') == 1)
+                || (strpos($response->get('payment_config'), 'MULTI') !== false);
+
+            if ($isFirstInstallment && (stripos($order->getPayment()->getMethod(), 'payzen_multi') === 0)
                 && is_array($option) && ! empty($option)) {
                 $count = (int) $option['count'];
 
@@ -398,18 +402,20 @@ class Payment
                 // Installment amount, double cast to avoid rounding.
                 $installmentAmount = (int) (string) (($totalAmount - $firstAmount) / ($count - 1));
 
-                for ($i = 1; $i <= $count; $i++) {
+                $firstSeqNum = $response->get('sequence_number') ? (int) $response->get('sequence_number') : 1;
+
+                for ($i = $firstSeqNum; $i < $firstSeqNum + $count; $i++) {
                     $transactionId = $response->get('trans_id') . '-' . $i;
 
                     $delay = (int) $option['period'] * ($i - 1);
                     $date->setTimestamp(strtotime("+$delay days", $timestamp));
 
                     switch (true) {
-                        case ($i == 1): // First transaction.
+                        case ($i == $firstSeqNum): // First transaction.
                             $amount = $firstAmount;
                             break;
 
-                        case ($i == $count): // Last transaction.
+                        case ($i == $firstSeqNum + $count - 1): // Last transaction.
                             $amount = $totalAmount - $firstAmount - $installmentAmount * ($i - 2);
                             break;
 
@@ -443,8 +449,8 @@ class Payment
                             \IntlDateFormatter::NONE
                         ),
                         'Transaction ID' => $transactionId,
-                        'Transaction UUID' =>  ($i == 1) ? $response->get('trans_uuid') : '',
-                        'Transaction Status' => ($i == 1) ? $response->getTransStatus() : $this->getNextTransStatus($response->getTransStatus()),
+                        'Transaction UUID' => ($i == $firstSeqNum) ? $response->get('trans_uuid') : '',
+                        'Transaction Status' => ($i == $firstSeqNum) ? $response->getTransStatus() : $this->getNextTransStatus($response->getTransStatus()),
                         'Means of payment' => $response->get('card_brand'),
                         'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,

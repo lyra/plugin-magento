@@ -51,11 +51,13 @@ class NotifyUrl extends Label
             ->getUrl($element->getValue(), $params);
         $element->setValue($notifyUrl);
 
-        $warnImg = $this->getViewFileUrl('Lyranetwork_Payzen::images/warn.png');
-        $comment = '<img src="' . $warnImg . '" style="vertical-align: middle; padding-right: 5px; height: 30px;"/>';
-        $comment .= '<span style="color: red; font-weight: bold; display: inline-block; width: 88%; vertical-align: middle;">'
-            . $element->getComment() . '</span>';
-        $element->setComment($comment);
+        if (strpos($element->getComment(), '<img') === false) {
+            $warnImg = $this->getViewFileUrl('Lyranetwork_Payzen::images/warn.png');
+            $comment = '<img src="' . $warnImg . '" style="vertical-align: middle; padding-right: 5px; height: 30px;"/>';
+            $comment .= '<span style="color: red; font-weight: bold; display: inline-block; width: 88%; vertical-align: middle;">'
+                . $element->getComment() . '</span>';
+            $element->setComment($comment);
+        }
 
         return parent::render($element);
     }
