@@ -252,7 +252,7 @@
 
 "The configuration of the PayZen module has been successfully reset.","La configuration du module PayZen a été réinitialisée avec succès."
 "The field &laquo; %1 &raquo; is invalid: please check column &laquo; %2 &raquo; of the option %3 in section &laquo; %4 &raquo;.","Le champ &laquo; %1 &raquo; est invalide: veuillez vérifier la colonne &laquo; %2 &raquo; de l'option %3 dans la section &laquo; %4 &raquo;."
-"Invalid value for field &laquo; %s &raquo; in section &laquo; %s &raquo;.","Valeur invalide pour le champ &laquo; %s &raquo; dans la section &laquo; %s &raquo;."
+"Invalid value for field &laquo; %1 &raquo; in section &laquo; %2 &raquo;.","Valeur invalide pour le champ &laquo; %1 &raquo; dans la section &laquo; %2 &raquo;."
 "The field &laquo; %1 &raquo; is required for section &laquo; %2 &raquo;.","Le champ &laquo; %1 &raquo; est obligatoire pour la section &laquo; %2 &raquo;."
 "You cannot enable several options with the same means of payment.","Vous ne pouvez pas activer plusieurs options avec le même moyen de paiement."
 "Too many card types are selected.","Trop de types de carte sont sélectionnés."

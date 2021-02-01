@@ -1,3 +1,7 @@
+2.5.3, 2021-02-01:
+- Fix installment information when saving the payment details in the Magento Back Office.
+- Workarround to avoid conflict with "Payment & Shipping restrictions" plugin.
+
 2.5.2, 2021-01-05:
 - [embedded] Bug fix: Use the last version of PrototypeJS library when embedded payment fields option is enabled.
 - Minor code fixes.
