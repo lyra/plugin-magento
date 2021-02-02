@@ -1,3 +1,6 @@
+2.5.4, 2021-02-02:
+- Fix installment details errors introduced in 2.5.3 version.
+
 2.5.3, 2021-02-01:
 - Fix installment information when saving the payment details in the Magento Back Office.
 - Workarround to avoid conflict with "Payment & Shipping restrictions" plugin.
