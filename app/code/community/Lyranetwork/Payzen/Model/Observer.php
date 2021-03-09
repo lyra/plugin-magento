@@ -116,7 +116,7 @@ class Lyranetwork_Payzen_Model_Observer
                         'width' => '50px',
                         'options' => $methods,
                         'option_groups' => $groupedMethods,
-                        'filter_index' => version_compare(Mage::getVersion(), '1.4.1.1', '<') ? '_table_payment_method.value' : 'payment.method'
+                        'filter_index' => version_compare(Mage::getVersion(), '1.4.1.1', '<') ? '_table_payment_method.value' : 'payzen_payment.method'
                     ), 'status'
                 );
 
@@ -175,9 +175,9 @@ class Lyranetwork_Payzen_Model_Observer
             $paymentTable = $collection->getTable('sales/order_payment');
 
             $collection->getSelect()->joinLeft(
-                array('payment' => $paymentTable),
-                '(payment.parent_id = main_table.entity_id AND payment.entity_id = (SELECT min(p.entity_id) FROM ' . $paymentTable . ' p WHERE p.parent_id = main_table.entity_id))',
-                array('payment_method' => 'payment.method')
+                array('payzen_payment' => $paymentTable),
+                '(payzen_payment.parent_id = main_table.entity_id AND payzen_payment.entity_id = (SELECT min(p.entity_id) FROM ' . $paymentTable . ' p WHERE p.parent_id = main_table.entity_id))',
+                array('payment_method' => 'payzen_payment.method')
             );
         }
 

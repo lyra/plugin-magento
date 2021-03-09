@@ -154,7 +154,9 @@ class Lyranetwork_Payzen_PaymentController extends Mage_Core_Controller_Front_Ac
             $quote->getPayment()->unsAdditionalInformation(Lyranetwork_Payzen_Helper_Payment::TOKEN . '_identifier');
 
             // Disable quote.
-            $quote->setIsActive(false)->save();
+            if ($quote->getIsActive()) {
+                $quote->setIsActive(false)->save();
+            }
             $this->_getDataHelper()->log("Cleared quote, reserved order ID: #{$quote->getReservedOrderId()}.");
         }
 

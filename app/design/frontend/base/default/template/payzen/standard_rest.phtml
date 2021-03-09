@@ -188,29 +188,17 @@ $popinAttr = $isPopin ? 'kr-popin' : '';
         return method;
     };
 
-    /* var payzenDoLoadRestScript = function() {
-        if (payzenSelectedMethod() === 'payzen_standard') {
-            // Load script immediately.
-            payzenLoadRestScript.defer(true);
-        } else {
-            // Load script after method is selected.
-            Event.observe($('p_method_payzen_standard'), 'change', function() {
-                payzenLoadRestScript(true);
-            });
-        }
-    }; */
-
     var payzenClickDoPayment = function(KR) {
-        if ($$('.kr-popin-button').length > 0) { // Popin mode.
-            if (typeof checkout !== 'undefined') { // Default Magento checkout.
-                checkout.setLoadWaiting(false, false);
-                checkout.gotoSection('payment', true);
-            } else {
-                $('onestepcheckout-place-order-loading').hide();
-                $('onestepcheckout-button-place-order').disabled = false;
-                $('onestepcheckout-button-place-order').addClassName('onestepcheckout-btn-checkout');
-                $('onestepcheckout-button-place-order').removeClassName('place-order-loader');
-            }
+        if ($$('div[kr-popin]').length > 0) { // Popin mode.
+             if (typeof checkout !== 'undefined') { // Default Magento checkout.
+                 checkout.setLoadWaiting(false, false);
+                 checkout.gotoSection('payment', true);
+             } else {
+                 $('onestepcheckout-place-order-loading').hide();
+                 $('onestepcheckout-button-place-order').disabled = false;
+                 $('onestepcheckout-button-place-order').addClassName('onestepcheckout-btn-checkout');
+                 $('onestepcheckout-button-place-order').removeClassName('place-order-loader');
+             }
 
             KR.openPopin();
         } else {
@@ -309,7 +297,7 @@ $popinAttr = $isPopin ? 'kr-popin' : '';
                             }
                         };
 
-                        if ($$('.kr-popin-button').length > 0) { // Popin mode, no form validation.
+                        if ($$('div[kr-popin]').length > 0) { // Popin mode, no form validation.
                             payzenOneStepCheckoutProceed();
                         } else {
                             KR.validateForm().then(function(v) {

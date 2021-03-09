@@ -46,14 +46,7 @@ abstract class Lyranetwork_Payzen_Block_Abstract extends Mage_Payment_Block_Form
 
     public function getCcTypeImageSrc($card)
     {
-        $card = strtolower($card);
-
-        $path = Mage::getBaseDir('media') . DS . 'payzen' . DS . 'ct' . DS . $card . '.png';
-        if ($this->_getHelper()->fileExists($path)) {
-            return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'payzen/ct/' . $card . '.png';
-        } else {
-            return false;
-        }
+        return $this->_getHelper()->getCommonConfigData('logo_url') . strtolower($card) . '.png';
     }
 
     protected function _getModel()
@@ -74,5 +67,15 @@ abstract class Lyranetwork_Payzen_Block_Abstract extends Mage_Payment_Block_Form
     protected function _getHelper()
     {
         return Mage::helper('payzen');
+    }
+
+    /**
+     * Get checkout session namespace
+     *
+     * @return Mage_Checkout_Model_Session
+     */
+    protected function _getCheckout()
+    {
+        return Mage::getSingleton('checkout/session');
     }
 }
