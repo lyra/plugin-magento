@@ -27,11 +27,9 @@
                           visible: $parent.isRadioButtonVisible()" />
 
         <label data-bind="attr: {for: $parent.getOptionCode(option.key)}" class="label  payzen-card">
-            <!--ko if: option.icon -->
-            <img data-bind="attr: {src: option.icon, title: option.label}"
+            <img data-bind="attr: {src: option.icon}"
                  class="payment-icon"
                  style="height: 36px;"/>
-            <!--/ko-->
 
             <span data-bind="text: option.label"></span>
         </label>

@@ -17,12 +17,12 @@
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {for: getCode()}" class="label">
             <!-- Other logo. -->
-            <img data-bind="attr: {src: getModuleLogoUrl()}"
-                 class="payment-icon"
-                 alt="PayZen"
-                 style="width: 76px;"
-            />
-
+            <!-- ko if: getModuleLogoUrl() -->
+                <img data-bind="attr: {src: getModuleLogoUrl()}"
+                     class="payment-icon"
+                     style="width: 76px;"
+                />
+            <!--/ko-->
             <span data-bind="text: getTitle()"></span>
         </label>
     </div>
@@ -57,7 +57,7 @@
                                    " />
                             <label data-bind="attr: {for: $parent.getCode() + '_' + option.key}">
                                 <!--ko if: option.icon -->
-                                <img data-bind="attr: {src: option.icon, title: option.label}" style="max-height: 35px; max-width: 90px; vertical-align: middle;">
+                                <img data-bind="attr: {src: option.icon, alt: option.key}" style="max-height: 35px; max-width: 90px; vertical-align: middle;">
                                 <!--/ko-->
 
                                 <span style="display: inline !important;" data-bind="text: option.label"></span>

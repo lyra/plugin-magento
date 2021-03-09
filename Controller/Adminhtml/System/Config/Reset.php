@@ -58,7 +58,7 @@ class Reset extends \Magento\Backend\App\AbstractAction
         // Clear cache.
         $this->cache->clean();
 
-        $this->messageManager->addSuccess(
+        $this->messageManager->addSuccessMessage(
             __('The configuration of the PayZen module has been successfully reset.')
         );
 

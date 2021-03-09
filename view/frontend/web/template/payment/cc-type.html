@@ -36,7 +36,7 @@
 
                 <label data-bind="attr: {for: $parent.getCode() + '_cc_type_' + card.value}">
                     <!--ko if: card.icon -->
-                    <img data-bind="attr: {src: card.icon, title: card.label}" style="max-height: 35px; max-width: 90px; vertical-align: middle;">
+                    <img data-bind="attr: {src: card.icon, title: card.label, alt: option.key}" style="max-height: 35px; max-width: 90px; vertical-align: middle;">
                     <!--/ko-->
 
                     <!--ko ifnot: card.icon -->
