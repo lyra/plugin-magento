@@ -16,6 +16,7 @@ class Franfinance extends Payzen
 
     protected $_canUseInternal = false;
 
+    protected $needsCartData = true;
     protected $currencies = ['EUR'];
     protected $countries = ['FR', 'GP', 'MQ', 'GF', 'RE', 'YT'];
 

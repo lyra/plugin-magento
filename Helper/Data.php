@@ -12,6 +12,8 @@ namespace Lyranetwork\Payzen\Helper;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Gift\AddedCards;
+use Lyranetwork\Payzen\Model\Method\Gift;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -475,26 +477,40 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Return card logo source path if exists, else return false.
+     * Return card logo source path from upload directory or the online logo.
      * @param string $card
-     * @param boolean $cc
      *
      * @return string|boolean
      */
-    public function getCcTypeImageSrc($card, $cc = true)
+    public function getCcTypeImageSrc($card)
     {
-        if ($cc) {
-            $card = 'cc/' . strtolower($card) . '.png';
-        }
+        $name = strtolower($card) . '.png';
 
-        if ($this->isUploadFileImageExists($card)) {
+        if ($this->isUploadFileImageExists('cc/' . $card)) {
             return $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
-                'payzen/images/' . $card;
+                'payzen/images/cc/' . $name;
         } else {
-            $asset = $this->assetRepo->createAsset('Lyranetwork_Payzen::images/' . $card);
+            return $this->getCommonConfigData('logo_url') . $name;
+        }
+    }
+
+    /**
+     * Return submodule logo source path if exists, return false elsewhere.
+     * @param string $card
+     *
+     * @return string|boolean
+     */
+    public function getLogoImageSrc($name)
+    {
+        if ($this->isUploadFileImageExists($name)) {
+            return $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
+                'payzen/images/' . $name;
+        } else {
+            // Default logo from the installed plugin.
+            $asset = $this->assetRepo->createAsset('Lyranetwork_Payzen::images/' . $name);
 
             if ($this->isPublishFileImageExists($asset->getRelativeSourceFilePath())) {
-                return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $card);
+                return $this->getViewFileUrl('Lyranetwork_Payzen::images/' . $name);
             }
         }
 

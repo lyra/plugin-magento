@@ -86,7 +86,7 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
     {
         $fileName = $this->method->getConfigData('module_logo');
 
-        return $this->getCcTypeImageSrc($fileName, false);
+        return $this->dataHelper->getLogoImageSrc($fileName);
     }
 
     protected function getAvailableCcTypes()
@@ -118,9 +118,9 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
         return $this->method->getEntryMode();
     }
 
-    protected function getCcTypeImageSrc($card, $cc = true)
+    protected function getCcTypeImageSrc($card)
     {
-        return $this->dataHelper->getCcTypeImageSrc($card, $cc);
+        return $this->dataHelper->getCcTypeImageSrc($card);
     }
 
     protected function renderMaskedPan($maskedPan)

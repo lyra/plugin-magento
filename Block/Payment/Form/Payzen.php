@@ -37,7 +37,7 @@ abstract class Payzen extends \Magento\Payment\Block\Form
             return false;
         }
 
-        return $this->getCcTypeImageSrc($fileName, false);
+        return $this->dataHelper->getLogoImageSrc($fileName);
     }
 
     public function getConfigData($name)
@@ -69,9 +69,9 @@ abstract class Payzen extends \Magento\Payment\Block\Form
         return parent::_toHtml();
     }
 
-    public function getCcTypeImageSrc($card, $cc = true)
+    public function getCcTypeImageSrc($card)
     {
-        return $this->dataHelper->getCcTypeImageSrc($card, $cc);
+        return $this->dataHelper->getCcTypeImageSrc($card);
     }
 
     public function getCurrentCustomer()
