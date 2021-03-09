@@ -1,10 +1,16 @@
+1.12.2, 2021-03-09:
+- Fix installment information when saving the payment details in the Magento Back Office.
+- Use online payment means logos.
+- Fix payment table name in request when adding payment method column in Magento Back Office.
+- Bug fix: Do not display payment card fields for payment from Magento Back Office.
+
 1.12.1, 2020-12-09:
 - Bug fix: Manage PSP_100 errors when calling REST web services.
 - Bug fix: Error 500 due to obsolete function (get_magic_quotes_gpc) in PHP 7.4.
 
 1.12.0, 2020-12-02:
-- Reorganize backend (REST API keys moved to general configuration section).
-- Do payment from backend by redirection in all cases.
+- Reorganize Magento Back Office (REST API keys moved to general configuration section).
+- Do payment from Magento Back Office by redirection in all cases.
 - Refund payment using REST API.
 - Payment validation using REST API.
 - Accept and deny payment using REST API.
@@ -59,7 +65,7 @@
 - [embedded] Bug fix: default placeholders for embedded fields not translated with material theme.
 - [embedded] Bug fix: currency and effective currency fields are inverted in REST API response.
 - Bug fix: use correct class name for SOAP WS API classes.
-- Disabled other payment means for backend payment.
+- Disabled other payment means for Magento Back Office payment.
 
 1.10.0, 2019-08-28:
 - Bug fix: Accept UNDER_VERIFICATION transaction status for refunds.
@@ -78,7 +84,7 @@
 - Bug fix: fatal error on order view occurring when there is a format error in payment form.
 - Bug fix: translations broken and performance decrease.
 - Improve code relative to currency check to avoid conflict with One Page Checkout plugin.
-- Send Magento username and IP to gateway for backend WS operations.
+- Send Magento username and IP to gateway for Magento Back Office WS operations.
 - Do not send cart data if it contains more than 85 different items.
 - Fix some plugin translations.
 - Added specific error message for chargebacks refund.
@@ -90,7 +96,7 @@
 - [paypal] Bug fix: error when refunding a PayPal payment.
 - Fix new signature algorithm name (HMAC-SHA-256).
 - Send Magento phone number as vads\_cell\_phone (required for some payment means).
-- Possibility to validate *all* transactions of a payment in installments from Magento backend.
+- Possibility to validate *all* transactions of a payment in installments from Magento Back Office.
 - Save transaction UUID in order payment details.
 - Improve "Shipping options" configuration field management.
 - Added Spanish translation.
@@ -99,20 +105,20 @@
 - Improve error message after a failed payment.
 
 1.9.1, 2018-07-06:
-- Bug fix: Fixed setTitle() function name in payment from backend WS call.
+- Bug fix: Fixed setTitle() function name in payment from Magento Back Office WS call.
 - [shatwo] Enable HMAC-SHA-256 signature algorithm by default.
 - Ignore spaces at the beginning and the end of certificates on return signature processing.
 
 1.9.0, 2018-05-23:
-- Bug fix: fix error during payment from backend caused by clearing quote data.
+- Bug fix: fix error during payment from Magento Back Office caused by clearing quote data.
 - Bug fix: relative to reloading "Shipping method" field in 1-Click component.
 - Bug fix: consider 3 DS options in all payment submodules.
-- Bug fix: correct function name in WS call when paying from backend.
+- Bug fix: correct function name in WS call when paying from Magento Back Office.
 - Enable signature algorithm selection (SHA-1 or HMAC-SHA-256).
 - [fullcb] Adding Full CB means of payment as submodule.
 - [sepa] Adding SEPA means of payment as submodule.
 - [sofort] Update SOFORT Banking payment logo.
-- Improve backend configuration screen.
+- Improve Magento Back Office configuration screen.
 - [sofort] New "Pending funds transfer" order status for SEPA and SOFORT payments.
 
 1.8.0, 2017-09-25:
@@ -126,12 +132,12 @@
 - Hide masked card number in frontend order details.
 - Add a confirmation message before module configuration reset.
 - Add V PAY card type.
-- Disable Internet banking and redirection methods for backend orders.
+- Disable Internet banking and redirection methods for Magento Back Office orders.
 - Display masked card number to identify card to be used in 1-Click payment.
 - Set vads_action_mode to "IFRAME" when iframe mode is enabled (no longer use vads_theme_config).
-- Only display payment cards that allow manual payment for backend payment.
+- Only display payment cards that allow manual payment for Magento Back Office payment.
 - Add help link on CVV field.
-- Display card brand user choice if any in backend order details.
+- Display card brand user choice if any in Magento Back Office order details.
 - Restrict payment submodules to specific currencies.
 - [cofinoga] Remove obsolete 3x CB Cofinoga means of payment.
 - Empty cart after a successful payment when 3 steps checkout module is used.
@@ -140,23 +146,23 @@
 - Bug fix: relative to category and product loading when generating HTML form.
 
 1.7.0, 2017-01-12:
-- Bug fix: when 1-Click is enabled, the payment from backend was sending REGISTER_PAY as action (instead of PAYMENT).
+- Bug fix: when 1-Click is enabled, the payment from Magento Back Office was sending REGISTER_PAY as action (instead of PAYMENT).
 - Bug fix: cart is emptied after a failed payment in guest mode.
 - [oney] Bug fix: FacilyPay Oney method is not available when user is disconnected.
 - Bug fix: when iframe mode is enabled, payment page is displayed in iframe inside a blank page for 1-Click payments.
 - Bug fix: optimize collection loading to avoid memory overflow errors.
-- Bug fix: do not send order confirmation by e-mail if "Email Order Confirmation" option is unchecked (for backend orders only).
+- Bug fix: do not send order confirmation by e-mail if "Email Order Confirmation" option is unchecked (for Magento Back Office orders only).
 - Bug fix: when iframe mode is enabled, payment page is displayed in iframe inside a blank page in Magento 1.4.x versions.
 - Remove control over certificate format modified on the gateway.
 - Adding "PRIORITY" as a possible value for "Rapidity" field in shipping options configuration.
 - Adding field "Delay" to shipping options configuration.
 - Use "Processing" as label for "Fraud Suspected" order status in frontend context.
 - [oney] Do not check FacilyPay Oney data for Gift card payment submodule.
-- [oney] FacilyPay Oney is now available for DOM. Merchant can configure allowed countries in module backend.
+- [oney] FacilyPay Oney is now available for DOM. Merchant can configure allowed countries in module Magento Back Office.
 - [oney] Compliance with Modial Relay shipping module when using FacilyPay Oney method.
 - [oney] Display FacilyPay Oney payment review in checkout process and cap Oney fees as requested by Oney.
-- [multi] Display all transactions in backend order detail view for payment in installments.
-- Reorganize module backend options.
+- [multi] Display all transactions in Magento Back Office order detail view for payment in installments.
+- Reorganize module Magento Back Office options.
 - Only load parent categories to associate them with PayZen categories in module configuration.
 - Possibility to disable 3DS for each customer group.
 - [multi] Possibility to enable card type selection on merchant website for payment in installments submodule.
@@ -169,7 +175,7 @@
 
 1.6.2, 2016-06-01:
 - Bug fix: problem with "Payment Method" column in orders grid added by the module.
-- [giropay] Bug fix: problem with Giropay payment redirection from backend.
+- [giropay] Bug fix: problem with Giropay payment redirection from Magento Back Office.
 - Improve of english and german translations.
 - Improve of label fields display on admin panel.
 - Do not post disabled and hidden settings to improve performance.
@@ -187,12 +193,12 @@
 - [giropay] Adding Giropay means of payment as submodule.
 
 1.6.0, 2015-10-28:
-- Bug fix: consider the store ID chosen for payment from Magento backend.
+- Bug fix: consider the store ID chosen for payment from Magento Back Office.
 - 1-Click payment (require PayZen payment by identifier option).
 - [oney] Ability to choose (force) FacilyPay Oney payment option from Magento frontend.
 - Adding product category to product label sent to gateway (when shopping cart data are sent).
 - Possibility to configure capture delay and validation mode in submodules.
-- Management of risk assessment module (saving module results, accept / deny transactions from Magento backend).
+- Management of risk assessment module (saving module results, accept / deny transactions from Magento Back Office).
 - [postfinance] Adding PostFinance means of payment as submodule.
 
 1.5.4, 2015-07-13:
@@ -209,7 +215,7 @@
 - Consideration of Magento configuration scope for product categories in the module admin panel.
 - [sofort] Ability to choose many countries in SOFORT Banking submodule configuration.
 - Saving the results of risk controls in order details.
-- Ability to accept or deny orders when fraud suspected from Magento backend.
+- Ability to accept or deny orders when fraud suspected from Magento Back Office.
 - Adding EN translations for gateway responses.
 - Dynamic translation of gateway responses in order details.
 - Specific notice message about notification URL in maintenance mode.
@@ -231,7 +237,7 @@
 - Bug fix: in multistore mode, shopping cart was emptied for failed / cancelled orders (except in main store).
 - Bug fix: cart items were not loaded correctly for Magento v 1.5 or lower (Fatal error: Call to a member function getCategoryIds() on a non-object).
 - Bug fix: rounding problem causing difference between order total amount and the sum of cart items amounts.
-- Displaying of payment methods labels instead of their codes in payment method column of backend orders grid.
+- Displaying of payment methods labels instead of their codes in payment method column of Magento Back Office orders grid.
 - [sofort] Adding SOFORT Banking means of payment as submodule.
 - Ability to restrict different payment means by minimum / maximum amount for each customer group.
 
@@ -250,7 +256,7 @@
 
 1.3, 2013-12-03:
 - [cofinoga] Adding 3x CB Cofinoga means of payment as submodule.
-- Ability to pay backend orders with this payment module.
+- Ability to pay Magento Back Office orders with this payment module.
 - Ability to make refunds for payments generating one PayZen transaction.
 
 1.2, 2013-04-23:

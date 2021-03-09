@@ -21,6 +21,10 @@
     display: inline-block;
 }
 
+.payzen-card {
+    margin: 10px;
+}
+
 .payzen-card label, .payzen-option label {
     float: none !important;
     max-width: none !important;
@@ -28,13 +32,12 @@
 }
 
 .payzen-card label img {
-    margin-right: 10px;
     max-height: 30px;
     vertical-align: middle;
 }
 
 .payzen-card label span {
-    margin-right: 10px;
     height: 30px;
     vertical-align: middle;
+    display: block;
 }

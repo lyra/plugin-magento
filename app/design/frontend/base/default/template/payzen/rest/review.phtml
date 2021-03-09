@@ -38,7 +38,8 @@
             };
         };
 
-        if ($$('.kr-popin-button').length > 0) { // Popin mode, no form validation.
+        // Use the ready wrapper to check popin existence.
+        if ($$('div[kr-popin]').length > 0) { // Popin mode, no form validation.
             payzenCheckoutProceed();
         } else {
             KR.validateForm().then(function(v) {

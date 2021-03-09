@@ -41,6 +41,10 @@ label[for=p_method_payzen_ideal],label[for=p_method_payzen_other],
     display: inline-block;
 }
 
+.payzen-card {
+    margin: 10px;
+}
+
 .payzen-option {
     padding-bottom: 5px;
 }
@@ -58,14 +62,12 @@ label[for=p_method_payzen_ideal],label[for=p_method_payzen_other],
 }
 
 .payzen-card label img {
-    margin-right: 10px;
     max-height: 30px;
     max-width: 90px;
     vertical-align: middle;
 }
 
 .payzen-card label span {
-    margin-right: 10px;
     height: 30px;
     vertical-align: middle;
     display: block;

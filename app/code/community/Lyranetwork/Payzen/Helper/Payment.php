@@ -80,7 +80,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         // Inactivate quote.
         $quote = Mage::getModel('sales/quote')->load($order->getQuoteId());
-        if ($quote->getId()) {
+        if ($quote->getId() && $quote->getIsActive()) {
             $quote->setIsActive(false)->save();
         }
 
@@ -144,7 +144,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
         $this->_getHelper()->log("Request authenticated for order #{$order->getIncrementId()}.");
 
-        if ($order->getStatus() === 'pending_payment') {
+        if ($this->isPending($order)) {
             // Order waiting for payment.
             $this->_getHelper()->log("Order #{$order->getIncrementId()} is waiting for payment.");
 
@@ -255,7 +255,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         $this->_getHelper()->log("Request authenticated for order #{$order->getIncrementId()}.");
 
         $reviewStatuses = array('payment_review', 'payzen_to_validate', 'fraud', 'payzen_pending_transfer');
-        if ($order->getStatus() === 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
+        if ($this->isPending($order) || in_array($order->getStatus(), $reviewStatuses)) {
             // Order waiting for payment.
             $this->_getHelper()->log("Order #{$order->getIncrementId()} is waiting for payment.");
 
@@ -426,8 +426,6 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         $quote->getPayment()->unsAdditionalInformation(self::TOKEN_DATA . '_identifier');
         $quote->getPayment()->unsAdditionalInformation(self::TOKEN . '_identifier');
 
-        $quote->setIsActive(false)->save();
-
         $this->_getHelper()->log("Request authenticated for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
         $order = Mage::getModel('sales/order');
@@ -443,7 +441,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             $this->_getHelper()->log("Found order #{$order->getIncrementId()} for quote #{$quoteId}.");
         }
 
-        if ($order->getStatus() === 'pending_payment') {
+        if ($this->isPending($order)) {
             // Order waiting for payment.
             $this->_getHelper()->log("Order #{$order->getIncrementId()} is waiting for payment.");
 
@@ -592,7 +590,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         }
 
         $reviewStatuses = array('payment_review', 'payzen_to_validate', 'fraud');
-        if (($order->getStatus() === 'pending_payment') || $order->isCanceled() || in_array($order->getStatus(), $reviewStatuses)) {
+        if (($this->isPending($order)) || $order->isCanceled() || in_array($order->getStatus(), $reviewStatuses)) {
             // Order waiting for payment.
             $this->_getHelper()->log("Try to save payment result for order #{$order->getIncrementId()}.");
 
@@ -656,9 +654,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
 
     public function getCustomerAttribute($customer, $propertyName)
     {
-        $propertyNameArray = explode('_', substr($propertyName, strlen('payzen') + 1));
+        $propertyNameArray = explode('_', $propertyName);
         $propertyNameArray = array_map('ucfirst', $propertyNameArray);
-        $functionName = 'getPayzen' . implode($propertyNameArray,'');
+        $functionName = 'get' . implode('', $propertyNameArray);
 
         return $customer->$functionName();
     }
@@ -750,6 +748,8 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     {
         $this->_getHelper()->log("Saving payment for order #{$order->getIncrementId()}.");
 
+        $holded = $order->getStatus() === 'holded';
+
         // Update authorized amount.
         $order->getPayment()->setAmountAuthorized($order->getTotalDue());
         $order->getPayment()->setBaseAmountAuthorized($order->getBaseTotalDue());
@@ -784,6 +784,12 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
         $this->createInvoice($order);
 
         $this->_getHelper()->log("Saving confirmed order #{$order->getIncrementId()} and sending e-mail if not disabled.");
+
+        // Reset order on-hold.
+        if ($holded && $order->canHold()) {
+            $order->hold();
+        }
+
         $order->save();
 
         $sendEmail = ($response->getExtInfo('send_confirmation') ? (bool) $response->getExtInfo('send_confirmation') : true);
@@ -910,8 +916,14 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
             $totalAmount = $response->get('amount');
             $firstDate = strtotime($response->get('presentation_date') . ' UTC');
 
-            $option = @unserialize($order->getPayment()->getAdditionalData()); // Get choosen payment option if any.
-            if ($response->get('sequence_number') == 1 && (stripos($order->getPayment()->getMethod(), 'payzen_multi') === 0)
+            // Get choosen payment option if any.
+            $option = @unserialize($order->getPayment()->getAdditionalData());
+
+            // Check if it's the first installment.
+            $isFirstInstallment = ($response->get('sequence_number') == 1)
+                || (strpos($response->get('payment_config'), 'MULTI') !== false);
+
+            if ($isFirstInstallment && (stripos($order->getPayment()->getMethod(), 'payzen_multi') === 0)
                 && is_array($option) && ! empty($option)) {
                 $count = (int) $option['count'];
 
@@ -925,8 +937,9 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                 // Double cast to avoid rounding.
                 $installmentAmount = (int) (string) (($totalAmount - $firstAmount) / ($count - 1));
 
+                $firstSeqNum = $response->get('sequence_number') ? (int) $response->get('sequence_number') : 1;
                 for ($i = 1; $i <= $count; $i++) {
-                    $transactionId = $response->get('trans_id') . '-' . $i;
+                    $transactionId = $response->get('trans_id') . '-' . ($firstSeqNum + $i - 1);
 
                     $delay = (int) $option['period'] * ($i - 1);
                     $date = strtotime("+$delay days", $firstDate);
@@ -969,7 +982,7 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
                         'Amount' => $amountDetail,
                         'Presentation Date' => Mage::helper('core')->formatDate(date('Y-m-d', $date)),
                         'Transaction ID' => $transactionId,
-                        'Transaction UUID' =>  ($i === 1) ? $response->get('trans_uuid') : '',
+                        'Transaction UUID' => ($i === 1) ? $response->get('trans_uuid') : '',
                         'Transaction Status' => ($i === 1) ? $response->getTransStatus() :
                             $this->getNextInstallmentsTransStatus($response->getTransStatus()),
                         'Means of Payment' => $response->get('card_brand'),
@@ -1193,9 +1206,14 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     {
         $this->_getHelper()->log("Canceling order #{$order->getIncrementId()}.");
 
+        // Unhold order is possible.
+        if ($order->canUnhold()) {
+            $order->unhold();
+        }
+
         $order->registerCancellation($response->getMessage());
 
-        // Save gateway responses.
+        // Save gateway response.
         $this->updatePaymentInfo($order, $response);
         $order->save();
 
@@ -1214,7 +1232,8 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
      */
     public function addTransaction($payment, $type, $transactionId, $additionalInfo, $parentTransactionId = null)
     {
-        if (! $parentTransactionId) { // Not forcing parent transaction id.
+        // No forced parent transaction ID or this is an AUTH transaction.
+        if (! $parentTransactionId && ($type !== Mage_Sales_Model_Order_Payment_Transaction::TYPE_AUTH)) {
             $txn = Mage::getModel('sales/order_payment_transaction')
                 ->setOrderPaymentObject($payment)
                 ->loadByTxnId($transactionId);
@@ -1342,6 +1361,10 @@ class Lyranetwork_Payzen_Helper_Payment extends Mage_Core_Helper_Abstract
     public function isSepa($response)
     {
         return $response->get('card_brand') === 'SDD';
+    }
+
+    public function isPending($order) {
+        return in_array($order->getStatus(), array('pending_payment', 'holded'));
     }
 
     /**

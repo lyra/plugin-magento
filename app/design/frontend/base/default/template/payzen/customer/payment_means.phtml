@@ -27,15 +27,11 @@ $means = $this->getStoredPaymentMeans();
             <tbody>
               <?php foreach($means as $card): ?>
                 <tr>
-                    <?php if ($img = $this->getCcTypeImageSrc($card['brand'])): ?>
-                      <td><img alt="<?php echo $this->escapeHtml($card['brand']); ?>"
-                               style="max-height: 30px; max-width: 80px; vertical-align: middle;"
-                               src="<?php echo $this->escapeHtml($img); ?>"
-                               title="<?php echo $this->escapeHtml($card['brand']); ?>">
-                      </td>
-                    <?php else: ?>
-                      <td class="col"><span><?php echo $this->escapeHtml($card['brand']); ?></span></td>
-                    <?php endif ?>
+                    <td><img alt="<?php echo $this->escapeHtml($card['brand']); ?>"
+                             style="max-height: 30px; max-width: 80px; vertical-align: middle;"
+                             src="<?php echo $this->escapeHtml($this->getCcTypeImageSrc($card['brand'])); ?>"
+                             title="<?php echo $this->escapeHtml($card['brand']); ?>">
+                    </td>
                     <td class="col"><?php echo $this->escapeHtml($card['number']); ?></td>
                     <td class="col">
                         <a href="#" onclick="payzenConfirmDelete('<?php echo $this->escapeHtml($card['alias']); ?>', '<?php echo $this->escapeHtml($card['pm']); ?>')">
