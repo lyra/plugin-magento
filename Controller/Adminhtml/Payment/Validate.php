@@ -68,7 +68,7 @@ class Validate extends \Magento\Backend\App\Action implements \Magento\Framework
             $id = $this->getRequest()->getParam('order_id');
             $order = $this->orderRepository->get($id);
             if (! $order->getId()) {
-                $this->messageManager->addError(__('This order no longer exists.'));
+                $this->messageManager->addErrorMessage(__('This order no longer exists.'));
                 $resultRedirect->setPath('sales/*/');
 
                 return $resultRedirect;
@@ -87,9 +87,9 @@ class Validate extends \Magento\Backend\App\Action implements \Magento\Framework
             $payment->getMethodInstance()->validatePayment($payment);
 
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->messageManager->addError($e->getMessage());
+            $this->messageManager->addErrorMessage($e->getMessage());
         } catch (\Exception $e) {
-            $this->messageManager->addError(__('An error has occurred during the validation process.'));
+            $this->messageManager->addErrorMessage(__('An error has occurred during the validation process.'));
         }
 
         $resultRedirect->setPath('sales/order/view',['order_id' => $order->getId()]);

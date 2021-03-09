@@ -122,7 +122,7 @@ class Response extends \Magento\Framework\App\Action\Action
             if ($features['prodfaq']) {
                 // Display going to production message.
                 $message = __('<u><p>GOING INTO PRODUCTION:</u></p> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
-                $this->messageManager->addNotice($message);
+                $this->messageManager->addNoticeMessage($message);
             }
 
             if ($checkUrlWarn) {
@@ -132,11 +132,11 @@ class Response extends \Magento\Framework\App\Action\Action
                     $message = __('The shop is in maintenance mode.The automatic notification cannot work.');
                 } else {
                     $message = __('The automatic validation has not worked. Have you correctly set up the notification URL in your PayZen Back Office?');
-                    $message .= '<br /><br />';
+                    $message .= '&nbsp;<br /><br />';
                     $message .= __('For understanding the problem, please read the documentation of the module:<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
 
-                $this->messageManager->addError($message);
+                $this->messageManager->addErrorMessage($message);
             }
         }
 
@@ -151,7 +151,7 @@ class Response extends \Magento\Framework\App\Action\Action
             $resultRedirect = $this->createResult('checkout/onepage/success', ['_scope' => $storeId]);
         } else {
             if ($case === Payment::FAILURE) {
-                $this->messageManager->addWarning(__('Your payment was not accepted. Please, try to re-order.'));
+                $this->messageManager->addWarningMessage(__('Your payment was not accepted. Please, try to re-order.'));
             }
 
             $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow re-order quicker.");

@@ -111,7 +111,7 @@ class Redirect extends \Magento\Backend\App\Action
     {
         // Clear all messages in session.
         $this->messageManager->getMessages(true);
-        $this->messageManager->addError($msg);
+        $this->messageManager->addErrorMessage($msg);
 
         $this->dataHelper->log($msg . ' Redirecting to backend create order page.');
 

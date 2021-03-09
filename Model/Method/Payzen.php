@@ -544,7 +544,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->paymentHelper->createInvoice($order);
 
             $order->save();
-            $this->messageManager->addSuccess(__('The payment has been accepted.'));
+            $this->messageManager->addSuccessMessage(__('The payment has been accepted.'));
 
             $redirectUrl = $this->urlBuilder->getUrl(
                 'sales/order/view',
@@ -583,7 +583,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     $message .= $e->getMessage();
                 }
 
-                $this->messageManager->addError($message);
+                $this->messageManager->addErrorMessage($message);
                 throw $e;
             }
         }
@@ -609,7 +609,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         if (! $this->restHelper->getPrivateKey($storeId)) {
             $this->dataHelper->log("Cannot cancel payment online for order #{$order->getIncrementId()}: private key is not configured, let Magento cancel the payment.");
 
-            $this->messageManager->addWarning(__('Payment is cancelled only in Magento. Please, consider cancelling the payment in PayZen Back Office.'));
+            $this->messageManager->addWarningMessage(__('Payment is cancelled only in Magento. Please, consider cancelling the payment in PayZen Back Office.'));
             return true;
         }
 
@@ -680,7 +680,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 // Merchant does not subscribe to REST WS option, deny payment offline.
                 $this->dataHelper->log("Cannot cancel payment online for order #{$order->getIncrementId()}: REST API not available for merchant, let Magento cancel the payment.");
 
-                $this->messageManager->addWarning(__('Payment is cancelled only in Magento. Please, consider cancelling the payment in PayZen Back Office.'));
+                $this->messageManager->addWarningMessage(__('Payment is cancelled only in Magento. Please, consider cancelling the payment in PayZen Back Office.'));
                 return true;
             } else {
                 $message = __('Cancellation error') . ': ';
@@ -692,7 +692,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     $message .= $e->getMessage();
                 }
 
-                $this->messageManager->addError($message);
+                $this->messageManager->addErrorMessage($message);
                 throw $e;
             }
         }
@@ -807,7 +807,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $order->save();
 
             $this->dataHelper->log("Payment information updated for validated order #{$order->getIncrementId()}.");
-            $this->messageManager->addSuccess(__('Payment validated successfully.'));
+            $this->messageManager->addSuccessMessage(__('Payment validated successfully.'));
         } catch(\UnexpectedValueException $e) {
             $this->dataHelper->log(
                 "Validate payment error: {$e->getMessage()}.",
@@ -837,14 +837,14 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     $message .= $e->getMessage();
                 }
 
-                $this->messageManager->addError($message);
+                $this->messageManager->addErrorMessage($message);
             }
         }
     }
 
     protected function validatePaymentOffline($order)
     {
-        $this->messageManager->addWarning(__('Payment is validated only in Magento. Please, consider validating the payment in PayZen Back Office.'));
+        $this->messageManager->addWarningMessage(__('Payment is validated only in Magento. Please, consider validating the payment in PayZen Back Office.'));
 
         // Wrap payment result to use traditional order creation tunnel.
         $data = ['vads_trans_status' => 'AUTHORISED'];
@@ -1145,7 +1145,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             } elseif ($e->getCode() === 'PSP_100') {
                 // Merchant does not subscribe to REST WS option, refund payment offline.
                 $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
-                $this->messageManager->addWarning($notice);
+                $this->messageManager->addWarningMessage($notice);
                 // Magento will do an offline refund.
             } else {
                 $message = __('Refund error') . ': ';

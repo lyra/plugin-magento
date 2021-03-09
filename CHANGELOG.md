@@ -1,3 +1,7 @@
+2.5.5, 2021-03-09:
+- Use online payment means logos.
+- [franfinance] Send cart details for FranFinance payments.
+
 2.5.4, 2021-02-02:
 - Fix installment details errors introduced in 2.5.3 version.
 

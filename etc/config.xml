@@ -15,7 +15,7 @@
         <payzen>
             <general>
                 <support_email>support@payzen.eu</support_email>
-                <plugin_version>2.5.4</plugin_version>
+                <plugin_version>2.5.5</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_2.x</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -35,6 +35,7 @@
                 <rest_notify_url>payzen/payment_rest/check</rest_notify_url>
                 <rest_url>https://api.payzen.eu/api-payment/</rest_url>
                 <static_url>https://static.payzen.eu/static/</static_url>
+                <logo_url>https://secure.payzen.eu/static/latest/images/type-carte/</logo_url>
 
                 <language>fr</language>
                 <validation_mode></validation_mode>
