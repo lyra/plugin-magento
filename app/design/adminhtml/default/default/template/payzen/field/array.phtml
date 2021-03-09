@@ -32,7 +32,7 @@ $htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getEleme
     var arrayRow<?php echo $htmlId ?> = {
         // Define row prototypeJS template.
         template : new Template(
-            '<tr id="#{_id}">'
+            '<tr id="#{_id}<?php echo $htmlId ?>">'
                 <?php foreach ($this->_columns as $columnName => $column): ?>
                     +'<td>'
                         +'<?php echo $this->_renderCellTemplate($columnName) ?>'
@@ -73,7 +73,7 @@ $htmlId = $this->getHtmlId() ? $this->getHtmlId() : uniqid('_' . $this->getEleme
     $addAfterId = "headings{$htmlId}";
     foreach ($this->getArrayRows() as $rowId => $row) {
         echo "arrayRow{$htmlId}.add(" . $row->toJson() . ", '{$addAfterId}');\n";
-        $addAfterId = $rowId;
+        $addAfterId = $rowId . $htmlId;
     }
     ?>
 

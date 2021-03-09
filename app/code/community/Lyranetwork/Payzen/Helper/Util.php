@@ -402,13 +402,13 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                         $payzenRequest->set('ship_to_country', 'FR');
                     }
 
-                    $payzenRequest->set('ship_to_delivery_company_name', $shippingMethod['oney_label']);
+                    $payzenRequest->set('ship_to_delivery_company_name', empty($shippingMethod['oney_label']) ? null : $shippingMethod['oney_label']);
 
                     break;
             }
 
-            $payzenRequest->set('ship_to_type', $shippingMethod['type']);
-            $payzenRequest->set('ship_to_speed', $shippingMethod['speed']);
+            $payzenRequest->set('ship_to_type', empty($shippingMethod['type']) ? null : $shippingMethod['type']);
+            $payzenRequest->set('ship_to_speed', empty($shippingMethod['speed']) ? null : $shippingMethod['speed']);
 
             if ($shippingMethod['speed'] === 'PRIORITY') {
                 $payzenRequest->set('ship_to_delay', $shippingMethod['delay']);

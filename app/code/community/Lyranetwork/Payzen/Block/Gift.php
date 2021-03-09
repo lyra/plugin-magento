@@ -31,7 +31,7 @@ class Lyranetwork_Payzen_Block_Gift extends Lyranetwork_Payzen_Block_Abstract
         if ($this->_getHelper()->fileExists($path)) {
             return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'payzen/gift/' . $card . '.png';
         } else {
-            return false;
+            return $this->_getHelper()->getCommonConfigData('logo_url') . $card . '.png';;
         }
     }
 }

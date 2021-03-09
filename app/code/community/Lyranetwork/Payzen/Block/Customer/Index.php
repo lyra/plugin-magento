@@ -38,7 +38,7 @@ class Lyranetwork_Payzen_Block_Customer_Index extends Mage_Core_Block_Template
             $card['alias'] = $aliasId;
             $card['pm'] = $maskedId;
 
-            $maskedPan = Mage::helper('payzen/payment')->getCustomerAttribute($customer,$maskedId);
+            $maskedPan = Mage::helper('payzen/payment')->getCustomerAttribute($customer, $maskedId);
             $pos = strpos($maskedPan, '|');
 
             if ($pos !== false) {

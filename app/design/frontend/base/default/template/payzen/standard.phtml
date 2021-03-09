@@ -42,13 +42,7 @@ if ($this->isLocalCcType()) :
         $first = false;
 
         $html .= '<label for="payzen_standard_cc_type_' . $code . '">';
-
-        if ($this->getCcTypeImageSrc($code)) {
-            $html .= '<img alt="' . $label . '" src="' . $this->getCcTypeImageSrc($code) . '" title="' . $label . '" />';
-        } else {
-            $html .= '<span>' . $label . '<span/>';
-        }
-
+        $html .= '<img alt="' . $label . '" src="' . $this->getCcTypeImageSrc($code) . '" title="' . $label . '" />';
         $html .= '</label></div>';
 
         $network = $this->getCcTypeNetwork($code);
@@ -92,7 +86,8 @@ if ($pos !== false) {
     <li class="payzen-standard-id-block">
         <input type="hidden" value="1" name="payment[payzen_standard_use_identifier]" disabled="disabled">
         <?php
-            if ($brand && ($img = $this->getCcTypeImageSrc($brand))) {
+            if ($brand) {
+                $img = $this->getCcTypeImageSrc($brand);
                 $brand = '<img alt="' . $this->escapeHtml($brand) . '" style="max-height: 25px; max-width: 30px; vertical-align: middle; display:inline!important"
                           src="' . $this->escapeHtml($img) . '" title=" ' . $this->escapeHtml($brand).'">';
             }
