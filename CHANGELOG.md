@@ -1,3 +1,7 @@
+1.12.3, 2021-04-27:
+- Update 3DS management option description.
+- Improve REST API keys configuration display.
+
 1.12.2, 2021-03-09:
 - Fix installment information when saving the payment details in the Magento Back Office.
 - Use online payment means logos.
