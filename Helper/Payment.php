@@ -190,9 +190,12 @@ class Payment
 
         $this->dataHelper->log("Saving confirmed order #{$order->getIncrementId()} and sending e-mail if not disabled.");
         $order->save();
+        $this->dataHelper->log("Confirmed order #{$order->getIncrementId()} has been saved.");
 
         if ($order->getSendEmail() === null /* not set */ || $order->getSendEmail() /* set to true */) {
+            $this->dataHelper->log("Sending e-mail for order #{$order->getIncrementId()}.");
             $this->orderSender->send($order);
+            $this->dataHelper->log("E-mail for order #{$order->getIncrementId()} has been sent.");
         }
     }
 
@@ -251,6 +254,8 @@ class Payment
 
     public function updatePaymentInfo(\Magento\Sales\Model\Order $order, \Lyranetwork\Payzen\Model\Api\PayzenResponse $response)
     {
+        $this->dataHelper->log("Updating payment information for order #{$order->getIncrementId()}.");
+
         // Set common payment information.
         $order->getPayment()
             ->setCcTransId($response->get('trans_id'))
@@ -509,6 +514,8 @@ class Payment
         $order->getPayment()
             ->setTransactionId(null)
             ->setSkipTransactionCreation(true);
+
+       $this->dataHelper->log("Payment information updated for order #{$order->getIncrementId()}.");
     }
 
     private function getThreedsStatus($status)
@@ -724,6 +731,7 @@ class Payment
 
         if (! $autoCapture || ($order->getStatus() !== 'processing') || ! $order->canInvoice()) {
             // Creating invoice not allowed.
+            $this->dataHelper->log("Creating invoice not allowed for order #{$order->getIncrementId()}.");
             return;
         }
 
@@ -757,6 +765,8 @@ class Payment
 
         // Add history entry.
         $order->addStatusHistoryComment(__('Invoice %1 was created.', $invoice->getIncrementId()));
+
+        $this->dataHelper->log("Invoice created for order #{$order->getIncrementId()}.");
     }
 
     /**
@@ -775,7 +785,10 @@ class Payment
 
         // Save gateway responses.
         $this->updatePaymentInfo($order, $response);
+
+        $this->dataHelper->log("Saving cancelled order #{$order->getIncrementId()}.");
         $order->save();
+        $this->dataHelper->log("Order #{$order->getIncrementId()} has been cancelled.");
 
         $this->eventManager->dispatch('order_cancel_after', [
             'order' => $order

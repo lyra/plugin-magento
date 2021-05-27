@@ -1,4 +1,3 @@
-<?php
 /**
  * Copyright © Lyra Network.
  * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
@@ -7,21 +6,11 @@
  * @copyright Lyra Network
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-?>
 
-<html>
-<head></head>
-
-<body>
-<?php echo $block->getLoaderHtml(); ?>
-
-<script>
-    if (window.top) {
-        window.top.location = "<?php echo $block->getForwardUrl(); ?>";
-    } else {
-        window.location = "<?php echo $block->getForwardUrl(); ?>";
+var config = {
+    map: {
+        '*': {
+            'contactSupportComponent': 'Lyranetwork_Payzen/js/support'
+        }
     }
-</script>
-
-</body>
-</html>
+};

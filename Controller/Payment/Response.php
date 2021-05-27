@@ -121,7 +121,7 @@ class Response extends \Magento\Framework\App\Action\Action
             $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
             if ($features['prodfaq']) {
                 // Display going to production message.
-                $message = __('<u><p>GOING INTO PRODUCTION:</u></p> You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
+                $message = __('GOING INTO PRODUCTION: You want to know how to put your shop into production mode, please read chapters &laquo; Proceeding to test phase &raquo; and &laquo; Shifting the shop to production mode &raquo; in the documentation of the module.');
                 $this->messageManager->addNoticeMessage($message);
             }
 
@@ -132,8 +132,8 @@ class Response extends \Magento\Framework\App\Action\Action
                     $message = __('The shop is in maintenance mode.The automatic notification cannot work.');
                 } else {
                     $message = __('The automatic validation has not worked. Have you correctly set up the notification URL in your PayZen Back Office?');
-                    $message .= '&nbsp;<br /><br />';
-                    $message .= __('For understanding the problem, please read the documentation of the module:<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
+                    $message .= '&nbsp;';
+                    $message .= __('For understanding the problem, please read the documentation of the module:&nbsp;&nbsp;&nbsp;- Chapter &laquo; To read carefully before going further &raquo;&nbsp;&nbsp;&nbsp;- Chapter &laquo; Notification URL settings &raquo;');
                 }
 
                 $this->messageManager->addErrorMessage($message);

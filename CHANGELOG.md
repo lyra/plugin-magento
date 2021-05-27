@@ -1,3 +1,9 @@
+2.5.6, 2021-05-27:
+- Possibility to open support issue from the plugin configuration panel or an order details page.
+- Update 3DS management option description.
+- Improve REST API keys configuration display.
+- Improve plugin logs.
+
 2.5.5, 2021-03-09:
 - Use online payment means logos.
 - [franfinance] Send cart details for FranFinance payments.

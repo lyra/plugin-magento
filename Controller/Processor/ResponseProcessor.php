@@ -111,7 +111,7 @@ class ResponseProcessor
                     'warn' => false
                 ];
             } elseif ($order->isCanceled() && ! $response->isAcceptedPayment()) {
-                $this->dataHelper->log("Order #{$order->getIncrementId()} cancelation is confirmed.");
+                $this->dataHelper->log("Order #{$order->getIncrementId()} cancellation is confirmed.");
 
                 $case = $response->isCancelledPayment() ? Payment::CANCEL : Payment::FAILURE;
                 return [

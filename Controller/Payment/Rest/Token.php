@@ -105,6 +105,8 @@ class Token extends \Magento\Framework\App\Action\Action
         $quote->collectTotals();
         $this->quoteRepository->save($quote);
 
+        $this->dataHelper->log("Updating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
+
         $token = $quote->getPayment()->getMethodInstance()->getRestApiFormToken();
 
         if (! $token) {
@@ -114,6 +116,8 @@ class Token extends \Magento\Framework\App\Action\Action
         $data = new DataObject();
         $data->setData('success', true);
         $data->setData('token', $token);
+
+        $this->dataHelper->log("Form token updated for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
         return $this->resultJsonFactory->create()->setData($data->getData());
     }

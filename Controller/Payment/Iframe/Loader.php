@@ -39,13 +39,13 @@ class Loader extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-        // Check if it is a canceled order.
+        // Check if it is a cancelled order.
         if ($this->getRequest()->getParam('mode', false) === 'cancel') {
             // Load order.
             $checkout = $this->dataHelper->getCheckout();
             $lastIncrementId = $checkout->getData('payzen_last_real_id');
 
-            $this->dataHelper->log("Payment within iframe is canceled for order #{$lastIncrementId}.");
+            $this->dataHelper->log("Payment within iframe is cancelled for order #{$lastIncrementId}.");
 
             $lastIncrementId = $checkout->getData('payzen_last_real_id');
             $order = $this->orderFactory->create();

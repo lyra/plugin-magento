@@ -91,11 +91,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     protected $restHelper;
 
     /**
-     * @var \Magento\Framework\App\ProductMetadataInterface
-     */
-    protected $productMetadata;
-
-    /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
@@ -134,7 +129,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
-     * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
@@ -162,7 +156,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
-        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
@@ -182,7 +175,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->paymentHelper = $paymentHelper;
         $this->checkoutHelper = $checkoutHelper;
         $this->restHelper = $restHelper;
-        $this->productMetadata = $productMetadata;
         $this->messageManager = $messageManager;
         $this->dirReader = $dirReader;
         $this->dataObjectFactory = $dataObjectFactory;
@@ -230,10 +222,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->payzenRequest->set('amount', $currency->convertAmountToInteger($amount));
 
         // Contrib info.
-        $cmsParam = $this->dataHelper->getCommonConfigData('cms_identifier') . '_'
-            . $this->dataHelper->getCommonConfigData('plugin_version');
-        $cmsVersion = $this->productMetadata->getVersion(); // Will return the Magento version.
-        $this->payzenRequest->set('contrib', $cmsParam . '/' . $cmsVersion . '/' . PHP_VERSION);
+        $this->payzenRequest->set('contrib',  $this->dataHelper->getContribParam());
 
         // Set config parameters.
         $configFields = [
@@ -543,7 +532,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             // Try to create invoice.
             $this->paymentHelper->createInvoice($order);
 
+            $this->dataHelper->log("Saving accepted order #{$order->getIncrementId()}.");
             $order->save();
+            $this->dataHelper->log("Accepted order #{$order->getIncrementId()} has been saved.");
+
             $this->messageManager->addSuccessMessage(__('The payment has been accepted.'));
 
             $redirectUrl = $this->urlBuilder->getUrl(
@@ -804,7 +796,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
             // Try to create invoice.
             $this->paymentHelper->createInvoice($order);
+
+            $this->dataHelper->log("Saving validated order #{$order->getIncrementId()}.");
             $order->save();
+            $this->dataHelper->log("Valdiated order #{$order->getIncrementId()} has been saved.");
 
             $this->dataHelper->log("Payment information updated for validated order #{$order->getIncrementId()}.");
             $this->messageManager->addSuccessMessage(__('Payment validated successfully.'));
@@ -882,7 +877,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // Try to create invoice.
         $this->paymentHelper->createInvoice($order);
+
+        $this->dataHelper->log("Saving validated order #{$order->getIncrementId()}.");
         $order->save();
+        $this->dataHelper->log("Validated order #{$order->getIncrementId()} has been saved.");;
 
         $this->dataHelper->log("Payment information updated for validated order #{$order->getIncrementId()}.");
     }
@@ -1159,7 +1157,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             }
         }
 
+        $this->dataHelper->log("Saving refunded order #{$order->getIncrementId()}.");
         $order->save();
+        $this->dataHelper->log("Refunded order #{$order->getIncrementId()} has been saved.");
+
         return $this;
     }
 

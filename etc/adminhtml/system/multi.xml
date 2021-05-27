@@ -130,7 +130,7 @@
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Multi\MultiPaymentOptions</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Multi\MultiPaymentOptions</backend_model>
                 <config_path>payment/payzen_multi/multi_payment_options</config_path>
-                <comment><![CDATA[Click on &laquo; Add &raquo; button to configure one or more payment options.<br /><b>Label: </b>The option label to display on the frontend.<br /><b>Min. amount: </b>Minimum amount to enable the payment option.<br /><b>Max. amount: </b>Maximum amount to enable the payment option.<br /><b>Contract: </b>ID of the contract to use with the option.<br /><b>Count: </b>Total number of installments.<br /><b>Period: </b>Delay (in days) between installments.<br /><b>1st installment: </b>Amount of first installment, in percentage of total amount. If empty, all installments will have the same amount.]]></comment>
+                <comment><![CDATA[Click on &laquo; Add &raquo; button to configure one or more payment options.<br /><b>Label: </b>The option label to display on the frontend.<br /><b>Min. amount: </b>Minimum amount to enable the payment option.<br /><b>Max. amount: </b>Maximum amount to enable the payment option.<br /><b>Contract: </b>ID of the contract to use with the option (leave blank preferably).<br /><b>Count: </b>Total number of installments.<br /><b>Period: </b>Delay (in days) between installments.<br /><b>1st installment: </b>Amount of first installment, in percentage of total amount. If empty, all installments will have the same amount.]]></comment>
             </field>
         </group>
     </group>
