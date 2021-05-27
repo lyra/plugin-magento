@@ -176,11 +176,13 @@ class CheckProcessor
                     $this->paymentHelper->updatePaymentInfo($order, $response);
                 }
 
+                $this->dataHelper->log("Saving confirmed order #{$order->getIncrementId()}.");
                 $order->save();
+                $this->dataHelper->log("Confirmed order #{$order->getIncrementId()} has been saved.");
 
                 return 'payment_ok_already_done';
             } elseif ($order->isCanceled() && ! $response->isAcceptedPayment()) {
-                $this->dataHelper->log("Order #{$order->getIncrementId()} cancelation is confirmed.");
+                $this->dataHelper->log("Order #{$order->getIncrementId()} cancellation is confirmed.");
                 return 'payment_ko_already_done';
             } else {
                 // Error case, the payment result and the order status do not match.

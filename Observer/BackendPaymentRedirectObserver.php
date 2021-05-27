@@ -81,7 +81,10 @@ class BackendPaymentRedirectObserver implements ObserverInterface
 
             if (! $flag) {
                 $order->setSendEmail($flag);
+
+                $this->dataHelper->log("Saving backend order #{$order->getIncrementId()}.");
                 $order->save();
+                $this->dataHelper->log("Backend order #{$order->getIncrementId()} has been saved.");
             }
 
             $redirectUrl = $this->urlBuilder->getUrl(

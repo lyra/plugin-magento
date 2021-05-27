@@ -44,7 +44,6 @@ class Oney extends Payzen
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
-     * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
@@ -73,7 +72,6 @@ class Oney extends Payzen
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
-        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
@@ -104,7 +102,6 @@ class Oney extends Payzen
             $paymentHelper,
             $checkoutHelper,
             $restHelper,
-            $productMetadata,
             $messageManager,
             $dirReader,
             $dataObjectFactory,

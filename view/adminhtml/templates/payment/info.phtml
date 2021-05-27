@@ -117,9 +117,81 @@ if ($payment->getCcTransId()) {
         echo '<b>' . __('Advanced Risk Assessment Result:') . '</b>';
 
         foreach ($riskAssessment as $value) {
+            if (! $value) {
+                continue;
+            }
+
             echo '<br />&nbsp;&nbsp;- ' . $block->escapeHtml($block->translate($value, 'risk_assessment'));
         }
     }
+
+    echo '<br /><br />';
+
+    // Display contact support link.
+    $order = $payment->getOrder();
+    $info = $block->getStoreInfo($order);
+
+    $orderAdminDate = $block->formatDate(
+        $block->getOrderAdminDate($order->getCreatedAt()),
+        \IntlDateFormatter::MEDIUM,
+        true
+    );
+
+    $script = '
+        <script>
+        require(
+            [
+                \'jquery\',
+                \'contactSupportComponent\'
+            ],
+            function ($, component) {
+                $(\'contact-support\') .on(\'sendmail\', function(e) {
+                    $(\'body\').trigger(\'processStart\');
+                    $.ajax({
+                        method: \'POST\',
+                        url: \''. $block->escapeUrl($block->sendMailUrl()) . '\',
+                        data: e.originalEvent.detail,
+                        showLoader: true,
+                        success: function() {
+                            location.reload();
+                        },
+                        always: function() {
+                            $(\'body\').trigger(\'processStop\');
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <contact-support
+            shop-id="' . $info['shop-id'] . '"
+            context-mode="'. $info['context-mode']. '"
+            sign-algo="' . $info['sign-algo'] . '"
+            contrib="' . $info['contrib'] . '"
+            integration-mode="' . $info['integration-mode'] . '"
+            plugins="' . $info['plugins'] . '"
+            title=""
+            first-name="' . $info['first-name'] . '"
+            last-name="' . $info['last-name'] . '"
+            from-email="' . $info['from-email'] . '"
+            to-email="' . $info['to-email'] . '"
+            cc-emails=""
+            phone-number=""
+            language="' . $info['language'] . '"
+            is-order="true"
+            transaction-uuid="' . $block->escapeHtml($payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID)) . '"
+            order-id="' . $block->escapeHtml($order->getIncrementId()) . '"
+            order-number="' . $block->escapeHtml($order->getIncrementId()) . '"
+            order-status="' . $block->escapeHtml($order->getStatusLabel()) . '"
+            order-date="' . $block->escapeHtml($orderAdminDate) . '"
+            order-amount="' . $block->escapeHtml($order->formatPrice($order->getGrandTotal())) . '"
+            cart-amount=""
+            shipping-fees="' . $block->escapeHtml($order->formatPrice($order->getShippingAmount())) . '"
+            order-discounts="' . $block->escapeHtml($order->getDiscountDescription() . ' ' . $order->formatPrice($order->getDiscountAmount())) . '"
+            order-carrier="' . $block->escapeHtml($order->getShippingDescription()) . '">
+        </contact-support>';
+
+    echo $script;
 
     echo '<br />';
 }
