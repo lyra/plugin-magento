@@ -17,6 +17,12 @@
         </arguments>
     </type>
 
+    <type name="Lyranetwork\Payzen\Controller\Adminhtml\System\Config\Support">
+        <arguments>
+            <argument name="cache" xsi:type="object">Magento\Framework\App\Cache\Type\Config</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Sales\Model\AdminOrder\Create">
         <arguments>
             <argument name="emailSender" xsi:type="object">Lyranetwork\Payzen\Model\AdminOrder\EmailSender</argument>

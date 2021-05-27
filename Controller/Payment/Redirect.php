@@ -81,8 +81,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
 
         // Check that there is an order to pay.
         if (empty($lastIncrementId)) {
-            $this->dataHelper->log("No order to pay. It may be a direct access to redirection page." .
-                     " [IP = {$this->dataHelper->getIpAddress()}].");
+            $this->dataHelper->log("No order to pay. It may be a direct access to redirection page.");
             throw new OrderException('Order not found in session.');
         }
 
@@ -91,15 +90,13 @@ class Redirect extends \Magento\Framework\App\Action\Action
 
         // Check that there is products in cart.
         if (! $order->getTotalDue()) {
-            $this->dataHelper->log("Payment attempt with no amount. [Order = {$order->getIncrementId()}]" .
-                     " [IP = {$this->dataHelper->getIpAddress()}].");
+            $this->dataHelper->log("Payment attempt with no amount. [Order = {$order->getIncrementId()}].");
             throw new OrderException('Order total is empty.');
         }
 
         // Check that order is not processed yet.
         if (! $checkout->getLastSuccessQuoteId()) {
-            $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getIncrementId()}]" .
-                     " [IP = {$this->dataHelper->getIpAddress()}].");
+            $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getIncrementId()}].");
             throw new OrderException('Order payment already processed.');
         }
 

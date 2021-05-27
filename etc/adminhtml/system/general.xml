@@ -60,6 +60,12 @@
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payzen/general/enable_logs</config_path>
             </field>
+
+            <field id="contact_support" translate="label button_label comment" sortOrder="117" showInDefault="1" showInWebsite="1" showInStore="1">
+                <button_label>Contact support</button_label>
+                <button_url><![CDATA[payzen/system_config/support]]></button_url>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ContactSupport</frontend_model>
+            </field>
         </group>
 
         <group id="payzen_platform_access" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -120,59 +126,71 @@
 
         <group id="payzen_rest_api_keys" translate="label comment" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[REST API KEYS]]></label>
-            <comment><![CDATA[Configure this section if you are using order operations from Magento backend or if you are using &laquo; Embedded payment fields &raquo; mode. <br />REST API keys are available in your PayZen Back Office (menu: Settings > Shops > REST API keys).]]></comment>
+            <comment><![CDATA[REST API keys are available in your PayZen Back Office (menu: Settings > Shops > REST API keys).]]></comment>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
-            <field id="rest_private_key_test" translate="label" type="obscure" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_descr" translate="comment" type="label" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="1">
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
+                <comment><![CDATA[Configure this section if you are using order operations from Magento Back Office or if you are using embedded payment fields or popin modes.]]></comment>
+                <config_path>payzen/general/rest_descr</config_path>
+            </field>
+
+            <field id="rest_private_key_test" translate="label" type="obscure" sortOrder="132" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Test password</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <config_path>payzen/general/rest_private_key_test</config_path>
             </field>
 
-            <field id="rest_private_key_prod" translate="label" type="obscure" sortOrder="132" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_private_key_prod" translate="label" type="obscure" sortOrder="133" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Production password</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <config_path>payzen/general/rest_private_key_prod</config_path>
             </field>
 
-            <field id="rest_public_key_test" translate="label" type="text" sortOrder="133" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_url" translate="label comment" type="text" sortOrder="134" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>REST API server URL</label>
+                <config_path>payzen/general/rest_url</config_path>
+            </field>
+
+            <field id="rest_embedded_descr" translate="comment" type="label" sortOrder="135" showInDefault="1" showInWebsite="1" showInStore="1">
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
+                <comment><![CDATA[Configure this section only if you are using embedded payment fields or popin modes.]]></comment>
+                <config_path>payzen/general/rest_embedded_descr</config_path>
+            </field>
+
+            <field id="rest_public_key_test" translate="label" type="text" sortOrder="136" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Public test key</label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
                 <config_path>payzen/general/rest_public_key_test</config_path>
             </field>
 
-            <field id="rest_public_key_prod" translate="label" type="text" sortOrder="134" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_public_key_prod" translate="label" type="text" sortOrder="137" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Public production key</label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
                 <config_path>payzen/general/rest_public_key_prod</config_path>
             </field>
 
-            <field id="rest_return_key_test" translate="label" type="obscure" sortOrder="135" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_return_key_test" translate="label" type="obscure" sortOrder="138" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>HMAC-SHA-256 test key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <config_path>payzen/general/rest_return_key_test</config_path>
             </field>
 
-            <field id="rest_return_key_prod" translate="label" type="obscure" sortOrder="136" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_return_key_prod" translate="label" type="obscure" sortOrder="139" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>HMAC-SHA-256 production key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <config_path>payzen/general/rest_return_key_prod</config_path>
             </field>
 
-            <field id="rest_notify_url" translate="label comment" type="label" sortOrder="137" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_notify_url" translate="label comment" type="label" sortOrder="1310" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>REST API Notification URL</label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\NotifyUrl</frontend_model>
                 <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
                 <config_path>payzen/general/rest_notify_url</config_path>
             </field>
 
-            <field id="rest_url" translate="label comment" type="text" sortOrder="138" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>REST API server URL</label>
-                <config_path>payzen/general/rest_url</config_path>
-            </field>
-
-            <field id="static_url" translate="label comment" type="text" sortOrder="139" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="static_url" translate="label comment" type="text" sortOrder="1311" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>JavaScript client URL</label>
                 <config_path>payzen/general/static_url</config_path>
             </field>
@@ -240,13 +258,13 @@
         </group>
 
         <group id="payzen_selective_3ds" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label><![CDATA[SELECTIVE 3DS]]></label>
+            <label><![CDATA[CUSTOM 3DS]]></label>
             <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="threeds_min_amount" translate="label comment" type="text" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Disable 3DS]]></label>
-                <comment><![CDATA[Amount below which 3DS will be disabled. Needs subscription to selective 3DS option. For more information, refer to the module documentation.]]></comment>
+                <label><![CDATA[Manage 3DS]]></label>
+                <comment><![CDATA[Amount below which customer could be exempt from strong authentication. Needs subscription to « Selective 3DS1 » or « Frictionless 3DS2 » options. For more information, refer to the module documentation.]]></comment>
                 <config_path>payzen/general/threeds_min_amount</config_path>
             </field>
         </group>

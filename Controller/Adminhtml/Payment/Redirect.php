@@ -81,21 +81,19 @@ class Redirect extends \Magento\Backend\App\Action
             $order = $this->orderRepository->get($id);
         } catch (\Exception $e) {
             $this->dataHelper->log("No order to pay. It may be a direct access to redirection page."
-                . " [Order = {$id}] [IP = {$this->dataHelper->getIpAddress()}].");
+                . " [Order = {$id}].");
             throw new OrderException('Order not found in session.');
         }
 
         // Check that there is products in cart.
         if (! $order->getTotalDue()) {
-            $this->dataHelper->log("Payment attempt with no amount. [Order = {$order->getIncrementId()}]"
-                . " [IP = {$this->dataHelper->getIpAddress()}].");
+            $this->dataHelper->log("Payment attempt with no amount. [Order = {$order->getIncrementId()}].");
             throw new OrderException('Order total is empty.');
         }
 
         // Check that order is not processed yet.
         if (! $this->dataHelper->getCheckout()->getLastSuccessQuoteId()) {
-            $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getIncrementId()}]"
-                . " [IP = {$this->dataHelper->getIpAddress()}].");
+            $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getIncrementId()}].");
             throw new OrderException('Order payment already processed.');
         }
 

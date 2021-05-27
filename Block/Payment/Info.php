@@ -29,19 +29,27 @@ class Info extends \Magento\Payment\Block\Info
     protected $trsCollectionFactory;
 
     /**
+     * @var \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ContactSupport
+     */
+    protected $supportBlock;
+
+    /**
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $trsCollectionFactory
+     * @param \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ContactSupport $supportBlock
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $trsCollectionFactory,
+        \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ContactSupport $supportBlock,
         array $data = []
     ) {
         $this->localeResolver = $localeResolver;
         $this->trsCollectionFactory = $trsCollectionFactory;
+        $this->supportBlock = $supportBlock;
 
         parent::__construct($context, $data);
     }
@@ -173,5 +181,15 @@ class Info extends \Magento\Payment\Block\Info
     {
         $lang = strtolower(substr($this->localeResolver->getLocale(), 0, 2));
         return PayzenResponse::translate($code, $type, $lang, $appendCode);
+    }
+
+    public function getStoreInfo($order)
+    {
+        return $this->supportBlock->getStoreInfo($order);
+    }
+
+    public function sendMailUrl()
+    {
+        return $this->supportBlock->sendMailUrl();
     }
 }

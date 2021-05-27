@@ -45,7 +45,6 @@ class Standard extends Payzen
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
-     * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
@@ -75,7 +74,6 @@ class Standard extends Payzen
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
-        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
@@ -108,7 +106,6 @@ class Standard extends Payzen
             $paymentHelper,
             $checkoutHelper,
             $restHelper,
-            $productMetadata,
             $messageManager,
             $dirReader,
             $dataObjectFactory,
@@ -365,11 +362,6 @@ class Standard extends Payzen
             $strongAuth = 'DISABLED';
         }
 
-        // Version.
-        $cmsParam = $this->dataHelper->getCommonConfigData('cms_identifier') . '_'
-            . $this->dataHelper->getCommonConfigData('plugin_version');
-        $cmsVersion = $this->productMetadata->getVersion(); // Will return the Magento version.
-
         $billingAddress = $quote->getBillingAddress();
 
         if (! $quote->getReservedOrderId()) {
@@ -403,7 +395,7 @@ class Standard extends Payzen
                     'paymentSource' => 'EC'
                 ]
             ],
-            'contrib' => $cmsParam . '/' . $cmsVersion . '/' . PHP_VERSION,
+            'contrib' =>  $this->dataHelper->getContribParam(),
             'strongAuthentication' => $strongAuth,
             'currency' => $currency->getAlpha3(),
             'amount' => $currency->convertAmountToInteger($amount),
@@ -432,6 +424,10 @@ class Standard extends Payzen
             $data['transactionOptions']['cardOptions']['retry'] = $this->getConfigData('rest_attempts');
         }
 
+        $params = json_encode($data);
+        $this->dataHelper->log("Creating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}"
+            . " with parameters: {$params}");
+
         try {
             // Perform our request.
             $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
@@ -440,7 +436,7 @@ class Standard extends Payzen
                 $this->restHelper->getPrivateKey()
             );
 
-            $response = $client->post('V4/Charge/CreatePayment', json_encode($data));
+            $response = $client->post('V4/Charge/CreatePayment', $params);
 
             if ($response['status'] !== 'SUCCESS') {
                 $msg = "Error while creating payment form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}: "

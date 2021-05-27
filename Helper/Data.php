@@ -9,11 +9,10 @@
  */
 namespace Lyranetwork\Payzen\Helper;
 
+use Lyranetwork\Payzen\Model\Api\PayzenApi;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Gift\AddedCards;
-use Lyranetwork\Payzen\Model\Method\Gift;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -111,6 +110,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $paymentHelper;
 
     /**
+     * @var \Magento\Framework\App\ProductMetadataInterface
+     */
+    protected $productMetadata;
+
+    /**
      * @param \Lyranetwork\Payzen\Helper\Context $context
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -123,6 +127,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\Filesystem\Io\File $file
      * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Payment\Helper\Data $paymentHelper
+     * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
      */
     public function __construct(
         \Lyranetwork\Payzen\Helper\Context $context,
@@ -136,7 +141,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Zend\Http\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\Filesystem\Io\File $file,
         \Magento\Framework\View\Asset\Repository $assetRepo,
-        \Magento\Payment\Helper\Data $paymentHelper
+        \Magento\Payment\Helper\Data $paymentHelper,
+        \Magento\Framework\App\ProductMetadataInterface $productMetadata
     ) {
         parent::__construct($context);
 
@@ -151,6 +157,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->file = $file;
         $this->assetRepo = $assetRepo;
         $this->paymentHelper = $paymentHelper;
+        $this->productMetadata = $productMetadata;
     }
 
     /**
@@ -163,10 +170,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCommonConfigData($field, $storeId = null)
     {
         if ($storeId === null && $this->isBackend()) {
-            $storeId = $this->getCheckoutStoreId();
+            if ($this->_request->getParam('section', null) === 'payment') {
+                $configWebsiteId = $this->_request->getParam('website', null);
+                $configStoreId = $this->_request->getParam('store', null);
+
+                if ($configWebsiteId !== null) {
+                    $scope = ScopeInterface::SCOPE_WEBSITE;
+                    $storeId = $configWebsiteId;
+                } elseif ($configStoreId !== null) {
+                    $scope = ScopeInterface::SCOPE_STORE;
+                    $storeId = $configWebsiteId;
+                } else {
+                    $scope = 'default';
+                }
+            } else {
+                $scope = ScopeInterface::SCOPE_STORE;
+                $storeId = $this->getCheckoutStoreId();
+            }
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
         }
 
-        $value = $this->scopeConfig->getValue('payzen/general/' . $field, ScopeInterface::SCOPE_STORE, $storeId);
+        $value = $this->scopeConfig->getValue('payzen/general/' . $field, $scope, $storeId);
         return is_string($value) ? trim($value) : $value;
     }
 
@@ -429,11 +454,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $currentMethod = $this->getCallerMethod();
         $version = $this->getCommonConfigData('plugin_version');
+        $ipAddress = "[IP = {$this->getIpAddress()}]";
 
         $log = '';
         $log .= 'payzen ' . $version;
         $log .= ' - ' . $currentMethod;
         $log .= ' : ' . $message;
+        $log .= ' ' . $ipAddress;
 
         $this->logger->log($level, $log);
     }
@@ -540,5 +567,70 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $sepaMethod = $this->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_SEPA);
 
         return $standardMethod->isOneClickActive() || $sepaMethod->isOneClickActive();
+    }
+
+    private function convertCardDataEntryMode($code) {
+        switch ($code) {
+            case '1':
+                return 'REDIRECT';
+
+            case '2':
+                return 'MERCHANT';
+
+            case '3':
+                return 'IFRAME';
+
+            case '4':
+                return'REST';
+
+            case '5':
+                return 'POPIN';
+
+            default:
+                return 'REDIRECT';
+        }
+    }
+
+    public function getCardDataEntryMode($storeId = null)
+    {
+        if (! $this->isBackend()) {
+            // Only backend is managed by this function.
+            throw \BadMethodCallException('Call this function only from backend code.');
+        }
+
+        if ($storeId === null) {
+            if ($this->_request->getParam('section', null) === 'payment') {
+                $configWebsiteId = $this->_request->getParam('website', null);
+                $configStoreId = $this->_request->getParam('store', null);
+
+                if ($configWebsiteId !== null) {
+                    $scope = ScopeInterface::SCOPE_WEBSITE;
+                    $storeId = $configWebsiteId;
+                } elseif ($configStoreId !== null) {
+                    $scope = ScopeInterface::SCOPE_STORE;
+                    $storeId = $configWebsiteId;
+                } else {
+                    $scope = 'default';
+                }
+            } else {
+                $scope = ScopeInterface::SCOPE_STORE;
+                $storeId = $this->getCheckoutStoreId();
+            }
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+        }
+
+        $value = $this->scopeConfig->getValue('payment/payzen_standard/card_info_mode', $scope, $storeId);
+        return $this->convertCardDataEntryMode($value);
+    }
+
+    public function getContribParam() {
+        $cmsParam = $this->getCommonConfigData('cms_identifier') . '_'
+            . $this->getCommonConfigData('plugin_version');
+
+        // Will return the Magento version.
+        $cmsVersion = $this->productMetadata->getVersion();
+
+        return $cmsParam . '/' . $cmsVersion . '/' . PayzenApi::phpVersion();
     }
 }

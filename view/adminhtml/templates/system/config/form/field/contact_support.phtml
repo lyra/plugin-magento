@@ -1,0 +1,53 @@
+<?php
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Magento 2. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+$info = $block->getStoreInfo();
+?>
+
+<script>
+require(
+    [
+        'jquery',
+        'contactSupportComponent'
+    ],
+    function ($, component) {
+        $('contact-support').on('sendmail', function(e) {
+            $('body').trigger('processStart');
+            $.ajax({
+                method: 'POST',
+                url: '<?php echo $block->escapeUrl($block->getButtonUrl()); ?>',
+                data: e.originalEvent.detail,
+                showLoader: true,
+                success: function() {
+                    location.reload();
+                },
+                always: function() {
+                    $('body').trigger('processStop');
+                }
+            });
+        });
+    });
+</script>
+
+<contact-support
+    shop-id="<?php echo $info['shop-id']; ?>"
+    context-mode="<?php echo $info['context-mode']; ?>"
+    sign-algo="<?php echo $info['sign-algo']; ?>"
+    contrib="<?php echo $info['contrib'] ?>"
+    integration-mode="<?php echo $info['integration-mode']; ?>"
+    plugins="<?php echo $info['plugins']; ?>"
+    title=""
+    first-name="<?php echo $info['first-name']; ?>"
+    last-name="<?php echo $info['last-name']; ?>"
+    from-email="<?php echo $info['from-email'] ?>"
+    to-email="<?php echo $info['to-email']; ?>"
+    cc-emails=""
+    phone-number=""
+    language="<?php echo $info['language']; ?>"
+></contact-support>
