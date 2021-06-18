@@ -160,7 +160,8 @@ class Response extends \Magento\Framework\App\Action\Action
                 $quote->setIsActive(true)->setReservedOrderId(null);
                 $this->quoteRepository->save($quote);
 
-                $checkout->replaceQuote($quote);
+                $checkout->replaceQuote($quote)->unsLastRealOrderId();
+                $this->_eventManager->dispatch('restore_quote', ['order' => $order, 'quote' => $quote]);
             }
 
             $this->dataHelper->log("Redirecting to cart page for order #{$order->getIncrementId()}.");
