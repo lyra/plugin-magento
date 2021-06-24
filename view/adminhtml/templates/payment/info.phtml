@@ -125,19 +125,23 @@ if ($payment->getCcTransId()) {
         }
     }
 
-    echo '<br /><br />';
-
     // Display contact support link.
-    $order = $payment->getOrder();
-    $info = $block->getStoreInfo($order);
+    // Get configured features.
+    $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
 
-    $orderAdminDate = $block->formatDate(
-        $block->getOrderAdminDate($order->getCreatedAt()),
-        \IntlDateFormatter::MEDIUM,
-        true
-    );
+    if ($features['support']) {
+        echo '<br /><br />';
 
-    $script = '
+        $order = $payment->getOrder();
+        $info = $block->getStoreInfo($order);
+
+        $orderAdminDate = $block->formatDate(
+            $block->getOrderAdminDate($order->getCreatedAt()),
+            \IntlDateFormatter::MEDIUM,
+            true
+        );
+
+        $script = '
         <script>
         require(
             [
@@ -191,7 +195,8 @@ if ($payment->getCcTransId()) {
             order-carrier="' . $block->escapeHtml($order->getShippingDescription()) . '">
         </contact-support>';
 
-    echo $script;
+        echo $script;
+    }
 
     echo '<br />';
 }
