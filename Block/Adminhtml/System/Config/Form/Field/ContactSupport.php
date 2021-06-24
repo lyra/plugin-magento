@@ -104,6 +104,13 @@ class ContactSupport extends \Magento\Config\Block\System\Config\Form\Field
      */
     public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
+        // Get configured features.
+        $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
+
+        if (! $features['support']) {
+            return '';
+        }
+
         $element->unsScope()
             ->unsCanUseWebsiteValue()
             ->unsCanUseDefaultValue();

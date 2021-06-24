@@ -42,6 +42,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'restrictmulti' => false,
         'shatwo' => true,
         'embedded' => true,
+        'support' => true,
 
         'multi' => true,
         'gift' => true,
@@ -631,6 +632,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         // Will return the Magento version.
         $cmsVersion = $this->productMetadata->getVersion();
 
-        return $cmsParam . '/' . $cmsVersion . '/' . PayzenApi::phpVersion();
+        return $cmsParam . '/' . $cmsVersion . '/' . PayzenApi::shortPhpVersion();
     }
 }

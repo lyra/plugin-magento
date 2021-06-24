@@ -1,3 +1,7 @@
+2.5.7, 2021-06-24:
+- Send the relevant part of the current PHP version in vads_contrib field.
+- Improve support e-mail display.
+
 2.5.6, 2021-05-27:
 - Possibility to open support issue from the plugin configuration panel or an order details page.
 - Update 3DS management option description.
