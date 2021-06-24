@@ -30,8 +30,7 @@
 
             <field id="support_email" translate="label" type="label" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Contact us]]></label>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <config_path>payzen/general/support_email</config_path>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ContactUs</frontend_model>
             </field>
 
             <field id="plugin_version" translate="label" type="label" sortOrder="113" showInDefault="1" showInWebsite="1" showInStore="1">
