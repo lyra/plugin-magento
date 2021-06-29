@@ -69,7 +69,7 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
 
         $contrib = $this->_getHelper()->getCommonConfigData('cms_identifier') . '_' .
             $this->_getHelper()->getCommonConfigData('plugin_version') . '/';
-        $this->_payzenRequest->set('contrib', $contrib . Mage::getVersion() . '/' . PHP_VERSION);
+        $this->_payzenRequest->set('contrib', $contrib . Mage::getVersion() . '/' . Lyranetwork_Payzen_Model_Api_Api::shortPhpVersion());
 
         // Set config parameters.
         $configFields = array('site_id', 'key_test', 'key_prod', 'ctx_mode', 'capture_delay', 'validation_mode',
