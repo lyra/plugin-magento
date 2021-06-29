@@ -14,7 +14,7 @@
     <!-- Version. -->
     <modules>
         <Lyranetwork_Payzen>
-            <version>1.12.3</version>
+            <version>1.12.4</version>
         </Lyranetwork_Payzen>
     </modules>
 
@@ -499,8 +499,7 @@
         <payment>
             <payzen>
                 <developed_by>Lyra Network</developed_by>
-                <support_email>support@payzen.eu</support_email>
-                <plugin_version>1.12.3</plugin_version>
+                <plugin_version>1.12.4</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_1.4-1.9</cms_identifier>
                 <enable_logs>1</enable_logs>

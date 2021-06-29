@@ -1,3 +1,7 @@
+1.12.4, 2021-06-29:
+- Send the relevant part of the current PHP version in vads\_contrib field.
+- Improve support e-mails display.
+
 1.12.3, 2021-04-27:
 - Update 3DS management option description.
 - Improve REST API keys configuration display.

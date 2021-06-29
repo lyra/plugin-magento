@@ -184,7 +184,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
                     'paymentSource' => 'EC'
                 )
             ),
-            'contrib' => $contrib . Mage::getVersion() . '/' . PHP_VERSION,
+            'contrib' => $contrib . Mage::getVersion() . '/' . Lyranetwork_Payzen_Model_Api_Api::shortPhpVersion(),
             'strongAuthentication' => $strongAuth,
             'currency' => $currency->getAlpha3(),
             'amount' => $currency->convertAmountToInteger($amount),
