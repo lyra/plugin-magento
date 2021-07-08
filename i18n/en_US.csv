@@ -280,6 +280,7 @@
 "Expiration Date","Expiration Date"
 "Card Number","Card Number"
 "3DS Authentication","3DS Authentication"
+"Authorized amount","Authorized amount"
 "Authentication Type","Authentication Type"
 "3DS Certificate","3DS Certificate"
 "Fraud Control Result:","Fraud Control Result:"
