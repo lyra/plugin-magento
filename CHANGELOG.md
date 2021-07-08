@@ -1,3 +1,6 @@
+2.5.8, 2021-07-08:
+- Display authorized amount in order details when it is available.
+
 2.5.7, 2021-06-24:
 - Send the relevant part of the current PHP version in vads_contrib field.
 - Improve support e-mail display.

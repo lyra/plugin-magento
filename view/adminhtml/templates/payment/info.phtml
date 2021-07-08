@@ -66,6 +66,11 @@ if ($payment->getCcTransId()) {
         echo '<br />';
     }
 
+    // Authorized amount.
+    if ($authorizedAmount = $payment->getAdditionalInformation('authorized_amount')) {
+        echo '<b>' . __('Authorized amount') . ': </b>' . $authorizedAmount . '<br />';
+    }
+
     if ($payment->getCcType() === 'MULTI') { // Multi brand.
         echo $block->getMultiPaymentDetailsHtml();
     } else {

@@ -274,6 +274,13 @@ class Payment
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE, $restErrorMsg);
         }
 
+        $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
+
+        // Authorized amount.
+        if ($authorizedAmount = $response->get('authorized_amount')) {
+            $order->getPayment()->setAdditionalInformation('authorized_amount', $currency->convertAmountToFloat($authorizedAmount) . ' ' . $currency->getAlpha3());
+        }
+
         // 3DS authentication result.
         $threedsCavv = '';
         $threedsStatus = '';
@@ -321,8 +328,6 @@ class Payment
         if ($response->get('card_brand') === 'MULTI') { // Multi brand.
             $data = json_decode($response->get('payment_seq'));
             $transactions = $data->{'transactions'};
-
-            $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
 
             $userChoice = [];
 
@@ -384,7 +389,6 @@ class Payment
             $date = new \DateTime();
 
             // Total payment amount.
-            $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
             $totalAmount = (int) $response->get('amount');
 
             // Get choosen payment option if any.
