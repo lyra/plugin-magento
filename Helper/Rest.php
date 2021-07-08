@@ -108,6 +108,7 @@ class Rest
 
                 if ($authorizationResponse = $this->getProperty($cardDetails, 'authorizationResponse')) {
                     $response['vads_auth_result'] = $this->getProperty($authorizationResponse, 'authorizationResult');
+                    $response['vads_authorized_amount'] = $this->getProperty($authorizationResponse, 'amount');
                 }
 
                 if (($authenticationResponse = self::getProperty($cardDetails, 'authenticationResponse'))
