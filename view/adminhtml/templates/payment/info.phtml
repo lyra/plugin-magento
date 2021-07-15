@@ -71,6 +71,11 @@ if ($payment->getCcTransId()) {
         echo '<b>' . __('Authorized amount') . ': </b>' . $authorizedAmount . '<br />';
     }
 
+    // Store installments number/config.
+    if ($installmentsNumber = $payment->getAdditionalInformation('payment_option_code')) {
+        echo '<b>' . __('Installments number') . ': </b>' . $installmentsNumber . '<br />';
+    }
+
     if ($payment->getCcType() === 'MULTI') { // Multi brand.
         echo $block->getMultiPaymentDetailsHtml();
     } else {

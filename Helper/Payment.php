@@ -281,6 +281,11 @@ class Payment
             $order->getPayment()->setAdditionalInformation('authorized_amount', $currency->convertAmountToFloat($authorizedAmount) . ' ' . $currency->getAlpha3());
         }
 
+        // Store installments number/config.
+        if (($installmentsNumber = $response->get('payment_option_code')) && is_numeric($installmentsNumber)) {
+            $order->getPayment()->setAdditionalInformation('payment_option_code', $installmentsNumber);
+        }
+
         // 3DS authentication result.
         $threedsCavv = '';
         $threedsStatus = '';
