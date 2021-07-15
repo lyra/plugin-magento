@@ -34,6 +34,11 @@ class Token extends \Magento\Framework\App\Action\Action
     protected $restHelper;
 
     /**
+     * @var \Lyranetwork\Payzen\Model\Method\Standard
+     */
+    protected $standardMethod;
+
+    /**
      * @var \Magento\Checkout\Helper\Data
      */
     protected $checkoutHelper;
@@ -59,6 +64,7 @@ class Token extends \Magento\Framework\App\Action\Action
      * @param \Magento\CheckoutAgreements\Model\AgreementsValidator $agreementsValidator
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
+     * @param \Lyranetwork\Payzen\Model\Method\Standard $standardMethod
      * @param \Magento\Checkout\Helper\Data $checkoutHelper
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
@@ -70,6 +76,7 @@ class Token extends \Magento\Framework\App\Action\Action
         \Magento\CheckoutAgreements\Model\AgreementsValidator $agreementsValidator,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
+        \Lyranetwork\Payzen\Model\Method\Standard $standardMethod,
         \Magento\Checkout\Helper\Data $checkoutHelper,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
@@ -79,6 +86,7 @@ class Token extends \Magento\Framework\App\Action\Action
         $this->agreementsValidator = $agreementsValidator;
         $this->dataHelper = $dataHelper;
         $this->restHelper = $restHelper;
+        $this->standardMethod = $standardMethod;
         $this->checkoutHelper = $checkoutHelper;
         $this->customerSession = $customerSession;
         $this->quoteRepository = $quoteRepository;
@@ -107,7 +115,7 @@ class Token extends \Magento\Framework\App\Action\Action
 
         $this->dataHelper->log("Updating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
-        $token = $quote->getPayment()->getMethodInstance()->getRestApiFormToken();
+        $token = $this->standardMethod->getRestApiFormToken();
 
         if (! $token) {
             return $this->ajaxErrorResponse();

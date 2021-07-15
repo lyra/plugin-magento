@@ -339,7 +339,7 @@ class Standard extends Payzen
         $amount = $quote->getGrandTotal();
 
         // Currency.
-        $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getOrderCurrencyCode());
+        $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
         if ($currency == null) {
             // If currency is not supported, use base currency.
             $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
