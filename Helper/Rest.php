@@ -89,10 +89,16 @@ class Rest
             $effectiveCurrency = PayzenApi::getCurrencyNumCode($this->getProperty($transactionDetails, 'effectiveCurrency'));
 
             if ($effectiveAmount && $effectiveCurrency) {
-                $response['vads_effective_amount'] = $response['vads_amount'];
-                $response['vads_effective_currency'] = $response['vads_currency'];
-                $response['vads_amount'] = $effectiveAmount;
-                $response['vads_currency'] = $effectiveCurrency;
+                // Invert only if there is currency conversion.
+                if ($effectiveCurrency !== $response['vads_currency']) {
+                    $response['vads_effective_amount'] = $response['vads_amount'];
+                    $response['vads_effective_currency'] = $response['vads_currency'];
+                    $response['vads_amount'] = $effectiveAmount;
+                    $response['vads_currency'] = $effectiveCurrency;
+                } else {
+                    $response['vads_effective_amount'] = $effectiveAmount;
+                    $response['vads_effective_currency'] = $effectiveCurrency;
+                }
             }
 
             $response['vads_warranty_result'] = $this->getProperty($transactionDetails, 'liabilityShift');
@@ -105,6 +111,9 @@ class Rest
                 $response['vads_card_number'] = $this->getProperty($cardDetails, 'pan');
                 $response['vads_expiry_month'] = $this->getProperty($cardDetails, 'expiryMonth');
                 $response['vads_expiry_year'] = $this->getProperty($cardDetails, 'expiryYear');
+
+                $response['vads_payment_option_code'] = $this->getProperty($cardDetails, 'installmentNumber');
+
 
                 if ($authorizationResponse = $this->getProperty($cardDetails, 'authorizationResponse')) {
                     $response['vads_auth_result'] = $this->getProperty($authorizationResponse, 'authorizationResult');

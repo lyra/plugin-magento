@@ -24,6 +24,34 @@ define(
     function ($, Component, url, storage, quote, setPaymentInformationAction, additionalValidators, errorProcessor, fullScreenLoader) {
         'use strict';
 
+        var me = this;
+
+        $(function() {
+            $('div.opc-estimated-wrapper div.estimated-block span.estimated-price').on('DOMSubtreeModified', function() {
+                $.when().done(function () {
+                    storage.post(
+                        url.build('payzen/payment_rest/token?form_key=' + $.mage.cookies.get('form_key'))
+                    ).done(function (response) {
+                        if (response.token) {
+                            KR.setFormConfig({
+                                formToken: response.token,
+                                language: me.getLanguage()
+                            }).then(
+                                function(v) {
+                                    console.log('Form token successfully updated.');
+                                }
+                            );
+                        } else {
+                            // Should not happen, this case is managed by failure callback.
+                            console.log('Empty form token returned by refresh.');
+                        }
+                    }).fail(function (response) {
+                        console.log('Error: Failed to update form token.');
+                    })
+                })
+            })
+        });
+
         // Use default messages for these errors.
         const DFAULT_MESSAGES = [
             'CLIENT_300', 'CLIENT_304', 'CLIENT_502', 'PSP_539'

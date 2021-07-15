@@ -1,3 +1,7 @@
+2.5.9, 2021-07-15:
+- [embedded] Bug fix: Fix displayed installment amount in multi payment option.
+- Display installments number in order details when it is available.
+
 2.5.8, 2021-07-08:
 - Display authorized amount in order details when it is available.
 
