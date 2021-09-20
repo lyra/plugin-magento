@@ -34,11 +34,6 @@ class Lyranetwork_Payzen_Model_Payment_Oney3x4x extends Lyranetwork_Payzen_Model
         return true;
     }
 
-    protected function _isNewOneyApi()
-    {
-        return true;
-    }
-
     /**
      * Assign data to info model instance.
      *

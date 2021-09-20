@@ -1,3 +1,7 @@
+1.12.5, 2021-09-20:
+- [oney] Deleted FacilyPay Oney submodule.
+- Remove obsolete code.
+
 1.12.4, 2021-06-29:
 - Send the relevant part of the current PHP version in vads\_contrib field.
 - Improve support e-mails display.

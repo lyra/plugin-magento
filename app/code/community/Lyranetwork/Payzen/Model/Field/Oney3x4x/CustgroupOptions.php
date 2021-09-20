@@ -10,14 +10,12 @@
 
 class Lyranetwork_Payzen_Model_Field_Oney3x4x_CustgroupOptions extends Lyranetwork_Payzen_Model_Field_CustgroupOptions
 {
-    protected $_methodCode = 'oney3x4x';
-
     protected function _beforeSave()
     {
         $values = $this->getValue();
 
-        $data = $this->getGroups('payzen_' . $this->_methodCode); // Get data of Oney 3x/4x config group.
-        if ($data['fields'][$this->_methodCode . '_active']['value']) { // Oney 3x/4x is activated.
+        $data = $this->getGroups('payzen_oney3x4x'); // Get data of Oney 3x/4x config group.
+        if ($data['fields']['oney3x4x_active']['value']) { // Oney 3x/4x is activated.
             foreach ($values as $value) {
                 if (empty($value) || ($value['code'] !== 'all')) {
                     continue;

@@ -30,13 +30,6 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $paymentCards = explode(',', $this->getConfigData('payment_cards'));
             $paymentCards = in_array('', $paymentCards) ? '' : implode(';', $paymentCards);
 
-            if ($paymentCards && $this->getConfigData('use_oney_in_standard')) {
-                $testMode = $this->_payzenRequest->get('ctx_mode') === 'TEST';
-
-                // Add FacilyPay Oney payment cards.
-                $paymentCards .= ';' . ($testMode ? 'ONEY_SANDBOX' : 'ONEY');
-            }
-
             $this->_payzenRequest->set('payment_cards', $paymentCards);
         }
 
@@ -85,14 +78,6 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         }
     }
 
-    protected function _proposeOney()
-    {
-        $info = $this->getInfoInstance();
-
-        return (! $info->getCcType() && $this->getConfigData('use_oney_in_standard'))
-            || in_array($info->getCcType(), array('ONEY_SANDBOX', 'ONEY'));
-    }
-
     private function _getFormTokenData($quote, $useIdentifier = false)
     {
         $amount = $quote->getGrandTotal();
@@ -134,6 +119,8 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
         $shippingAddress = $quote->getShippingAddress();
 
         $methodCode = Mage::helper('payzen/util')->toPayzenCarrier($shippingAddress->getShippingMethod());
+        $carrierCode = substr($methodCode['code'], 0, strpos($methodCode['code'], '_'));
+        $carrierName = Mage::getStoreConfig('carriers/' . $carrierCode . '/title');
 
         $contrib = $this->_getHelper()->getCommonConfigData('cms_identifier') . '_' .
             $this->_getHelper()->getCommonConfigData('plugin_version') . '/';
@@ -172,7 +159,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
                         $shippingAddress->getRegionCode() : $shippingAddress->getRegion(),
                     'phoneNumber' => $shippingAddress->getTelephone(),
                     'country' => $shippingAddress->getCountryId(),
-                    'deliveryCompanyName' => $methodCode['oney_label'],
+                    'deliveryCompanyName' => $carrierName,
                     'shippingMethod' => $methodCode['type'],
                     'shippingSpeed' => $methodCode['speed']
                 )
@@ -312,15 +299,7 @@ class Lyranetwork_Payzen_Model_Payment_Standard extends Lyranetwork_Payzen_Model
             $cards = explode(',', $cards);
         } else {
             $cards = array_keys($allCards);
-            $cards = array_diff($cards, array('ONEY_SANDBOX', 'ONEY'));
-        }
-
-        if (! $this->_getHelper()->isAdmin() && $this->isLocalCcType()
-            && $this->getConfigData('use_oney_in_standard')
-        ) {
-            $testMode = $this->_getHelper()->getCommonConfigData('ctx_mode') === 'TEST';
-
-            $cards[] = $testMode ? 'ONEY_SANDBOX' : 'ONEY';
+            $cards = array_diff($cards, array('ONEY_3X_4X'));
         }
 
         $availCards = array();

@@ -28,19 +28,16 @@ class Lyranetwork_Payzen_Model_Field_Oney3x4x_PaymentOptions extends Lyranetwork
     public function _beforeSave()
     {
         $values = $this->getValue();
-        $methodCode = strpos($this->_eventPrefix, '3x4x') ? 'oney3x4x' : 'oney';
 
-        $data = $this->getGroups('payzen_' . $methodCode); // Get data of method config group.
-        if ($data['fields'][$methodCode . '_active']['value']) { // Method is activated.
-            if ($this->_isEmpty($values) && ($methodCode === 'oney3x4x')) { // Check if it's 3x/4x Oney method.
+        $data = $this->getGroups('payzen_oney3x4x'); // Get data of method config group.
+        if ($data['fields']['oney3x4x_active']['value']) { // Method is activated.
+            if ($this->_isEmpty($values)) {
                 $field = Mage::helper('payzen')->__((string) $this->getFieldConfig()->label);
                 $group = Mage::helper('payzen')->getConfigGroupTitle($this->getGroupId());
                 $msg = Mage::helper('payzen')->__('The field &laquo; %s &raquo; is required for section &laquo; %s &raquo;.', $field, $group);
 
                 // Throw exception.
                 Mage::throwException($msg);
-            } elseif($this->_isEmpty($values)) {
-                $this->setValue(array());
             } else {
                 $i = 0;
                 foreach ($values as $value) {
