@@ -9,7 +9,7 @@
  */
 
 /**
- * Custom renderer for FacilyPay Oney payment options field.
+ * Custom renderer for Oney payment options field.
  */
 class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Oney3x4x_PaymentOptions
     extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
@@ -63,38 +63,5 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Oney3x4x_PaymentOpt
         $this->_addButtonLabel = Mage::helper('payzen')->__('Add');
 
         parent::__construct();
-    }
-
-    /**
-     * Render block HTML.
-     *
-     * @return string
-     */
-    protected function _toHtml()
-    {
-        $script = '';
-
-        if ($this->getElement()->getCanUseWebsiteValue() || $this->getElement()->getCanUseDefaultValue()) {
-            $script .= '
-                <script type="text/javascript">
-                  document.observe("dom:loaded", function() {';
-
-            if ($this->getElement()->getDisabled()) {
-                $script .= '
-                    toggleValueElements({checked: true}, $("payment_payzen_oney_oney_payment_options").parentNode);';
-            }
-
-            $script .= '
-                    Event.observe($("payment_payzen_oney_oney_enable_payment_options"), "change", function() {
-                      toggleValueElements(
-                        $("payment_payzen_oney_oney_payment_options_inherit"),
-                        $("payment_payzen_oney_oney_payment_options").parentNode
-                      );
-                    });
-                  });
-                </script>';
-        }
-
-        return '<div id="' . $this->getElement()->getId() . '">' . parent::_toHtml() . "\n" . $script . '</div>';
     }
 }

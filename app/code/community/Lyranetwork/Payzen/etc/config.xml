@@ -14,7 +14,7 @@
     <!-- Version. -->
     <modules>
         <Lyranetwork_Payzen>
-            <version>1.12.4</version>
+            <version>1.12.5</version>
         </Lyranetwork_Payzen>
     </modules>
 
@@ -499,7 +499,7 @@
         <payment>
             <payzen>
                 <developed_by>Lyra Network</developed_by>
-                <plugin_version>1.12.4</plugin_version>
+                <plugin_version>1.12.5</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_1.4-1.9</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -547,7 +547,6 @@
 
                 <validation_mode>-1</validation_mode>
                 <payment_cards></payment_cards>
-                <use_oney_in_standard>0</use_oney_in_standard>
 
                 <card_info_mode>1</card_info_mode>
                 <one_click_active>0</one_click_active>
@@ -617,23 +616,6 @@
 
                 <validation_mode>-1</validation_mode>
             </payzen_oney3x4x>
-
-            <payzen_oney>
-                <model>payzen/payment_oney</model>
-                <group>payzen</group>
-
-                <active>0</active>
-                <allowspecific>0</allowspecific>
-                <specificcountry>FR,GF,GP,MQ,RE,YT</specificcountry>
-                <title>Payment with FacilyPay Oney</title>
-                <sort_order>6</sort_order>
-                <module_logo>oney.png</module_logo>
-                <payment_action>authorize</payment_action>
-
-                <validation_mode>-1</validation_mode>
-
-                <enable_payment_options>0</enable_payment_options>
-            </payzen_oney>
 
             <payzen_fullcb>
                 <model>payzen/payment_fullcb</model>

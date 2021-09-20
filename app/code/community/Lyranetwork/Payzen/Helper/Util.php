@@ -17,14 +17,6 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
     const CART_MAX_NB_PRODUCTS = 85;
 
     public static $address_regex = array(
-        'oney' => array(
-            'name' => "#^[A-ZÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,63}$#ui",
-            'street' => "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui",
-            'zip' => '#^[0-9]{5}$#',
-            'city' => "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,127}$#ui",
-            'country' => '#^FR|GP|MQ|GF|RE|YT$#i',
-            'phone' => '#^[0-9]{10}$#'
-        ),
         'oney3x4x' => array(
             'name' => "#^[A-ZÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,63}$#ui",
             'street' => "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui",
@@ -42,19 +34,6 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
             'phone' => '#^(0|33)[0-9]{9}$#'
         )
     );
-
-    /**
-     * Normalize shipping method name.
-     *
-     * @param  string $name
-     * @return string normalized name
-     */
-    public function normalizeShipMethodName($name)
-    {
-        $notAllowed = "#[^A-ZÇ0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]#ui";
-
-        return substr(preg_replace($notAllowed, '', $name), 0, 127);
-    }
 
     public function checkCustormers($scope, $scopeId)
     {
@@ -303,7 +282,7 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
         $payzenRequest->set('totalamount_vat', $taxAmount);
     }
 
-    public function setAdditionalShippingData($order, &$payzenRequest, $useOney = false, $newOneyApi = false)
+    public function setAdditionalShippingData($order, &$payzenRequest, $useOney = false)
     {
         // By default, clients are protected.
         $payzenRequest->set('cust_status', 'PRIVATE');
@@ -322,6 +301,8 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
             $payzenRequest->set('ship_to_speed', 'EXPRESS');
         } else {
             $shippingMethod = $this->toPayzenCarrier($order->getShippingMethod());
+            $carrierCode = substr($shippingMethod['code'], 0, strpos($shippingMethod['code'], '_'));
+            $carrierName = Mage::getStoreConfig('carriers/' . $carrierCode . '/title');
 
             // Delivery point name.
             $name = '';
@@ -335,8 +316,6 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                     } else {
                         $name = $order->getShippingDescription();
 
-                        $carrierCode = substr($shippingMethod['code'], 0, strpos($shippingMethod['code'], '_'));
-                        $carrierName = Mage::getStoreConfig('carriers/' . $carrierCode . '/title');
                         if ($carrierName) {
                             $name = str_replace($carrierName . ' - ', '', $name);
                         }
@@ -351,8 +330,7 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                 case 'RECLAIM_IN_SHOP':
                     if ($useOney) {
                         // Modify address to send it to Oney server.
-                        $address = $newOneyApi ? '' : $name;
-                        $address .= $order->getShippingAddress()->getStreet(1);
+                        $address = $order->getShippingAddress()->getStreet(1);
                         $address .= $order->getShippingAddress()->getStreet(2) ?
                             ' ' . $order->getShippingAddress()->getStreet(2) : '';
 
@@ -360,9 +338,8 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                         $payzenRequest->set('ship_to_zip', $order->getShippingAddress()->getPostcode());
                         $payzenRequest->set('ship_to_city', $order->getShippingAddress()->getCity());
 
-                        $street2 = $newOneyApi ? $name : null;
-                        $payzenRequest->set('ship_to_street2', $street2);
-                        $payzenRequest->set('ship_to_state', null); // Not sent to FacilyPay Oney.
+                        $payzenRequest->set('ship_to_street2', $name);
+                        $payzenRequest->set('ship_to_state', null); // Not sent to Oney.
 
                         // Send fr even address is in DOM-TOM unless form is rejected.
                         $payzenRequest->set('cust_country', 'FR');
@@ -395,14 +372,14 @@ class Lyranetwork_Payzen_Helper_Util extends Mage_Core_Helper_Abstract
                             ' ' . $order->getShippingAddress()->getStreet(2) : '';
 
                         $payzenRequest->set('ship_to_street', $address);
-                        $payzenRequest->set('ship_to_street2', null); // Not sent to FacilyPay Oney.
+                        $payzenRequest->set('ship_to_street2', null); // Not sent to Oney.
 
                         // Send fr even address is in DOM-TOM unless form is rejected.
                         $payzenRequest->set('cust_country', 'FR');
                         $payzenRequest->set('ship_to_country', 'FR');
                     }
 
-                    $payzenRequest->set('ship_to_delivery_company_name', empty($shippingMethod['oney_label']) ? null : $shippingMethod['oney_label']);
+                    $payzenRequest->set('ship_to_delivery_company_name', $carrierName);
 
                     break;
             }
