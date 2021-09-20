@@ -33,14 +33,6 @@ class Lyranetwork_Payzen_Model_Field_ShipOptions extends Lyranetwork_Payzen_Mode
                     unset($values[$id]);
                     continue;
                 }
-
-                if (empty($value['oney_label']) || ! preg_match($deliveryCompanyRegex, $value['oney_label'])) {
-                    $this->_throwError(
-                        'FacilyPay Oney label',
-                        $i,
-                        'Use 127 alphanumeric characters, accentuated characters and these special characters: space, slash, hyphen, apostrophe.'
-                    );
-                }
             }
 
             $this->setValue($values);

@@ -47,11 +47,6 @@ class Lyranetwork_Payzen_Adminhtml_Payzen_ConfigController extends Mage_Adminhtm
             // Get sales_flat_order_payment table name & execute update query.
             $table = $resource->getTableName('sales/order_payment');
 
-            // FacilyPay Oney case.
-            $query = "UPDATE `{$table}` SET method = 'payzen_oney' WHERE cc_type LIKE 'ONEY%'
-                AND (method = 'vads' OR method = 'payzen')";
-            $writeConnection->query($query);
-
             $query = "UPDATE `{$table}` SET method = 'payzen_standard' WHERE method = 'vads' OR method = 'payzen'";
             $writeConnection->query($query);
 

@@ -19,7 +19,7 @@ class Lyranetwork_Payzen_Model_Source_PaymentCards
         );
 
         foreach (Lyranetwork_Payzen_Model_Api_Api::getSupportedCardTypes() as $code => $name) {
-            if ($code === 'ONEY_SANDBOX' || $code === 'ONEY') {
+            if ($code === 'ONEY_3X_4X') {
                 continue;
             }
 

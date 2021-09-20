@@ -24,13 +24,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_ShipOptions
                 'renderer' => new Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_Column_Label
             )
         );
-        $this->addColumn(
-            'oney_label',
-            array(
-                'label' => Mage::helper('payzen')->__('Name'),
-                'style' => 'width: 210px;'
-            )
-        );
 
         $options = array(
             'options' => array(
@@ -120,7 +113,6 @@ class Lyranetwork_Payzen_Block_Adminhtml_System_Config_Field_ShipOptions
                 $value[uniqid('_' . $code . '_')] = array(
                     'code' => $code,
                     'title' => $name,
-                    'oney_label' => Mage::helper('payzen/util')->normalizeShipMethodName($name),
                     'type' => 'PACKAGE_DELIVERY_COMPANY',
                     'speed' => 'STANDARD',
                     'mark' => '*'

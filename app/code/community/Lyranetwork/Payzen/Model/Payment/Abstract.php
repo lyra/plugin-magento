@@ -192,8 +192,8 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
             Mage::helper('payzen/util')->setCartData($order, $this->_payzenRequest, $this->needsCartData || $this->_proposeOney());
         }
 
-        // Set other data specific to FacilyPay Oney payment ond risk assessment module.
-        Mage::helper('payzen/util')->setAdditionalShippingData($order, $this->_payzenRequest, $this->_proposeOney(), $this->_isNewOneyApi());
+        // Set other data specific to Oney payment ond risk assessment module.
+        Mage::helper('payzen/util')->setAdditionalShippingData($order, $this->_payzenRequest, $this->_proposeOney());
 
         $paramsToLog = $this->_payzenRequest->getRequestFieldsArray(true);
         $this->_getHelper()->log('Payment parameters: ' . print_r($paramsToLog, true));
@@ -204,11 +204,6 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
     abstract protected function _setExtraFields($order);
 
     protected function _proposeOney()
-    {
-        return false;
-    }
-
-    protected function _isNewOneyApi()
     {
         return false;
     }
@@ -614,34 +609,6 @@ abstract class Lyranetwork_Payzen_Model_Payment_Abstract extends Mage_Payment_Mo
         $order->save();
 
         $this->_getHelper()->log("Payment information updated for validated order #{$order->getIncrementId()}.");
-    }
-
-    /**
-     * Validate payment method information object.
-     * @deprecated to be removed in the next version.
-     *
-     * @param  Mage_Payment_Model_Info $info
-     * @return Mage_Payment_Model_Abstract
-     */
-    public function validate()
-    {
-        if ($this->_proposeOney()) {
-            $info = $this->getInfoInstance();
-            if ($info instanceof Mage_Sales_Model_Order_Payment) {
-                $billingAddress = $info->getOrder()->getBillingAddress();
-                $shippingAddress = $info->getOrder()->getIsVirtual() ? null : $info->getOrder()->getShippingAddress();
-            } else {
-                $billingAddress = $info->getQuote()->getBillingAddress();
-                $shippingAddress = $info->getQuote()->isVirtual() ? null : $info->getQuote()->getShippingAddress();
-            }
-
-            Mage::helper('payzen/util')->checkAddressValidity($billingAddress, 'oney');
-            Mage::helper('payzen/util')->checkAddressValidity($shippingAddress, 'oney');
-
-            return $this;
-        } else {
-            return parent::validate();
-        }
     }
 
     /**
