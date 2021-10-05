@@ -29,7 +29,7 @@ class Payment
     // Key to save choosen Full CB option.
     const FULLCB_OPTION = 'payzen_fullcb_option';
 
-    // Key to save choosen FranFinance option.
+    // Key to save choosen Franfinance option.
     const FRANFINANCE_OPTION = 'payzen_franfinance_option';
 
     // Key to save choosen other payment means.

@@ -16,7 +16,7 @@
             <group id="payzen" translate="comment" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[PayZen]]></label>
                 <comment><![CDATA[Accept payments by credit cards with PayZen.]]></comment>
-                <attribute type="expanded">1</attribute>
+                <attribute type="expanded">0</attribute>
                 <fieldset_css>complex payzen-section</fieldset_css>
                 <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 

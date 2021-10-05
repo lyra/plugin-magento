@@ -26,6 +26,12 @@ a.payzen-payment-link {
     font-size: 16px;
 }
 
+.kr-form-error span a {
+    all: inherit !important;
+    text-decoration: underline !important;
+    cursor: pointer !important;
+}
+
 .payzen-multi fieldset div.field {
     float: left;
     width: 50%;

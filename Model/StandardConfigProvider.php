@@ -76,6 +76,10 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
 
     private function getRestFormToken()
     {
+        if (! $this->method->isAvailable()) {
+            return false;
+        }
+
         if (! $this->method->isRestMode()) {
             return false;
         }

@@ -14,11 +14,10 @@
     <group id="payzen_general" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
         <label><![CDATA[GENERAL CONFIGURATION]]></label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
-        <attribute type="expanded">1</attribute>
+        <attribute type="expanded">0</attribute>
 
         <group id="payzen_module_information" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[MODULE INFORMATION]]></label>
-            <attribute type="expanded">1</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="developed_by" translate="label" type="label" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -69,7 +68,6 @@
 
         <group id="payzen_platform_access" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[PAYMENT GATEWAY ACCESS]]></label>
-            <attribute type="expanded">1</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="site_id" translate="label comment" type="text" sortOrder="121" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -126,7 +124,6 @@
         <group id="payzen_rest_api_keys" translate="label comment" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[REST API KEYS]]></label>
             <comment><![CDATA[REST API keys are available in your PayZen Back Office (menu: Settings > Shops > REST API keys).]]></comment>
-            <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="rest_descr" translate="comment" type="label" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -197,7 +194,6 @@
 
         <group id="payzen_payment_page" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[PAYMENT PAGE]]></label>
-            <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="language" translate="label comment" type="select" sortOrder="141" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -232,7 +228,6 @@
 
         <group id="payzen_payment_page_customize" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[PAYMENT PAGE CUSTOMIZE]]></label>
-            <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="theme_config" translate="label comment" type="text" sortOrder="151" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -258,7 +253,6 @@
 
         <group id="payzen_selective_3ds" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[CUSTOM 3DS]]></label>
-            <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="threeds_min_amount" translate="label comment" type="text" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -270,7 +264,6 @@
 
         <group id="payzen_return_options" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[RETURN TO SHOP]]></label>
-            <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="redirect_enabled" translate="label comment" type="select" sortOrder="171" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -343,7 +336,6 @@
 
         <group id="payzen_additional_options" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="0" showInStore="1">
             <label><![CDATA[ADDITIONAL OPTIONS]]></label>
-            <attribute type="expanded">0</attribute>
             <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
 
             <field id="send_cart_detail" translate="label comment" type="select" sortOrder="181" showInDefault="1" showInWebsite="1" showInStore="1">

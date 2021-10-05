@@ -1,3 +1,13 @@
+2.5.10, 2021-10-05:
+- [embedded] Bug fix: Do not refresh payment page automatically after an unrecoverable error.
+- [embedded] Bug fix: Update payment token only if embedded payment is enabled.
+- [embedded] Bug fix: Do not try to create form token if amount or currency are invalid.
+- [embedded] Check standard submodule availability before creating form token.
+- [oney] Bug fix: Do not check shipping country restriction for Oney payment in case of virtual quote.
+- [franfinance] Send information about shipping method for Franfinance payment method.
+- Dispatch restore_quote event when payment is not successful.
+- Do not expand plugin configuration by default in Magento Back Office.
+
 2.5.9, 2021-07-15:
 - [embedded] Bug fix: Fix displayed installment amount in multi payment option.
 - Display installments number in order details when it is available.
@@ -17,7 +27,7 @@
 
 2.5.5, 2021-03-09:
 - Use online payment means logos.
-- [franfinance] Send cart details for FranFinance payments.
+- [franfinance] Send cart details for Franfinance payments.
 
 2.5.4, 2021-02-02:
 - Fix installment details errors introduced in 2.5.3 version.
@@ -37,7 +47,7 @@
 
 2.5.0, 2020-11-25:
 - [embedded] Bug fix: Empty cart to avoid double payments with REST API.
-- [franfinance] Added new FranFinance submodule.
+- [franfinance] Added new Franfinance submodule.
 - [oney] Added payment in 3 or 4 times Oney submodule.
 - [sepa] Possibility to enable payment by alias in SEPA submodule.
 - [embedded] Possibility to display embedded payment fields in a popin.

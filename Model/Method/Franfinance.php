@@ -17,18 +17,20 @@ class Franfinance extends Payzen
     protected $_canUseInternal = false;
 
     protected $needsCartData = true;
+    protected $needsShippingMethodData = true;
+
     protected $currencies = ['EUR'];
     protected $countries = ['FR', 'GP', 'MQ', 'GF', 'RE', 'YT'];
 
     protected function setExtraFields($order)
     {
-        // Override with FranFinance specific params.
+        // Override with Franfinance specific params.
         $this->payzenRequest->set('validation_mode', '0');
         $this->payzenRequest->set('capture_delay', '0');
 
         $info = $this->getInfoInstance();
 
-        // Override with selected FranFinance payment card.
+        // Override with selected Franfinance payment card.
         $option = @unserialize($info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::FRANFINANCE_OPTION));
         $this->payzenRequest->set('payment_cards', $option['payment_means']);
 

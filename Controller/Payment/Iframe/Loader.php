@@ -61,7 +61,10 @@ class Loader extends \Magento\Framework\App\Action\Action
                 if ($quote->getId()) {
                     $quote->setIsActive(true)->setReservedOrderId(null);
                     $this->quoteRepository->save($quote);
-                    $checkout->replaceQuote($quote);
+
+                    // To comply with Magento\Checkout\Model\Session::restoreQuote() method.
+                    $checkout->replaceQuote($quote)->unsLastRealOrderId();
+                    $this->_eventManager->dispatch('restore_quote', ['order' => $order, 'quote' => $quote]);
                 }
             }
         }

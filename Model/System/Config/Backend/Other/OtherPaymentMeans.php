@@ -78,9 +78,17 @@ class OtherPaymentMeans extends ConfigArraySerialized
                     $values[$key] = $value;
                 }
 
-                $this->checkAmount($value['minimum'], 'Min. amount', $i);
-                $this->checkAmount($value['maximum'], 'Max. amount', $i);
-                $this->checkDecimal($value['capture_delay'], 'Capture delay', $i);
+                if (isset($value['minimum'])) {
+                    $this->checkAmount($value['minimum'], 'Min. amount', $i);
+                }
+
+                if (isset($value['maximum'])) {
+                    $this->checkAmount($value['maximum'], 'Max. amount', $i);
+                }
+
+                if (isset($value['capture_delay'])) {
+                    $this->checkDecimal($value['capture_delay'], 'Capture delay', $i);
+                }
 
                 $options[] = $value;
             }
