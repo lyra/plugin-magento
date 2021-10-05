@@ -30,8 +30,13 @@ class FranfinancePaymentOptions extends \Lyranetwork\Payzen\Model\System\Config\
                     $this->throwException('Label', $i);
                 }
 
-                $this->checkAmount($value['amount_min'], 'Minimum amount', $i);
-                $this->checkAmount($value['amount_max'], 'Maximum amount', $i);
+                if (isset($value['amount_min'])) {
+                    $this->checkAmount($value['amount_min'], 'Minimum amount', $i);
+                }
+
+                if (isset($value['amount_max'])) {
+                    $this->checkAmount($value['amount_max'], 'Maximum amount', $i);
+                }
             }
         }
 

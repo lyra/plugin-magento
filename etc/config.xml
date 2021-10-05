@@ -15,7 +15,7 @@
         <payzen>
             <general>
                 <support_email><![CDATA[support@payzen.eu]]></support_email>
-                <plugin_version>2.5.9</plugin_version>
+                <plugin_version>2.5.10</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_2.x</cms_identifier>
                 <enable_logs>1</enable_logs>
@@ -163,7 +163,7 @@
                 <payment_action>authorize</payment_action>
 
                 <active>0</active>
-                <title>Payment with FranFinance</title>
+                <title>Payment with Franfinance</title>
                 <sort_order>7</sort_order>
                 <module_logo>franfinance-logo.png</module_logo>
 

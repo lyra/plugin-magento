@@ -60,10 +60,19 @@ class OneyPaymentOptions extends ConfigArraySerialized
                     $this->throwException('Code', $i);
                 }
 
-                $this->checkAmount($value['minimum'], 'Min. amount', $i);
-                $this->checkAmount($value['maximum'], 'Max. amount', $i);
+                if (isset($value['minimum'])) {
+                    $this->checkAmount($value['minimum'], 'Min. amount', $i);
+                }
+
+                if (isset($value['maximum'])) {
+                    $this->checkAmount($value['maximum'], 'Max. amount', $i);
+                }
+
                 $this->checkMandatoryDecimal($value['count'], 'Count', $i);
-                $this->checkRate($value['rate'], 'Rate', $i);
+
+                if (isset($value['rate'])) {
+                    $this->checkRate($value['rate'], 'Rate', $i);
+                }
             }
         }
 

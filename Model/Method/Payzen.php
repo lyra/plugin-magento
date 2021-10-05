@@ -34,6 +34,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $currencies = [];
     protected $needsCartData = false;
+    protected $needsShippingMethodData = false;
 
     /**
      * @var \Magento\Framework\Locale\ResolverInterface
@@ -319,6 +320,11 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->checkoutHelper->setCartData($order, $this->payzenRequest);
         }
 
+        // Add information about delivery mode.
+        if ($this->needsShippingMethodData /* Shipping method data are mandatory for the payment method. */) {
+            $this->checkoutHelper->setAdditionalShippingData($order, $this->payzenRequest);
+        }
+
         $paramsToLog = $this->payzenRequest->getRequestFieldsArray(true);
         $this->dataHelper->log('Payment parameters: ' . json_encode($paramsToLog));
 
@@ -326,11 +332,6 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     abstract protected function setExtraFields($order);
-
-    protected function sendOneyFields()
-    {
-        return false;
-    }
 
     /**
      * Retrieve information from payment configuration.

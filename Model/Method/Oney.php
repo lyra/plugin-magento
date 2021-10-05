@@ -18,6 +18,7 @@ class Oney extends Payzen
     protected $_canRefund = false;
     protected $_canRefundInvoicePartial = false;
     protected $needsCartData = true;
+    protected $needsShippingMethodData = true;
 
     protected $currencies = ['EUR'];
 
@@ -122,9 +123,6 @@ class Oney extends Payzen
         // Set Oney payment option.
         $option = @unserialize($info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION));
         $this->payzenRequest->set('payment_option_code', $option['code']);
-
-        // Set other data specific to Oney payment.
-        $this->checkoutHelper->setOneyData($order, $this->payzenRequest);
     }
 
     /**
@@ -211,7 +209,8 @@ class Oney extends Payzen
         }
 
         // Check shipping country, billing country is checked in parent::isAvailable method.
-        if (! $this->canUseForCountry($quote->getShippingAddress()->getCountry())) {
+        if (! $quote->isVirtual() && $quote->getShippingAddress()
+            && ! $this->canUseForCountry($quote->getShippingAddress()->getCountry())) {
             return false;
         }
 
@@ -248,7 +247,7 @@ class Oney extends Payzen
         }
 
         if (! $quote->isVirtual() && $quote->getShippingAddress()->getShippingMethod()) {
-            $shippingMethod = $this->checkoutHelper->toOneyCarrier($quote->getShippingAddress()->getShippingMethod());
+            $shippingMethod = $this->checkoutHelper->toPayzenCarrier($quote->getShippingAddress()->getShippingMethod());
             if (! $shippingMethod) {
                 // Selected shipping method is not mapped in configuration panel.
                 $this->dataHelper->log('Shipping method "' . $quote->getShippingAddress()->getShippingMethod() . '" is not correctly mapped in module configuration panel. Module is not displayed.', Zend_Log::WARN);

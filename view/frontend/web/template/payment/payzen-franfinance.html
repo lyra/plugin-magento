@@ -16,7 +16,7 @@
                class="radio"
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {for: getCode()}" class="label">
-            <!-- FranFinance logo. -->
+            <!-- Franfinance logo. -->
             <!-- ko if: getModuleLogoUrl() -->
                 <img data-bind="attr: {src: getModuleLogoUrl()}"
                      class="payment-icon"
@@ -74,11 +74,11 @@
                 <button class="action primary checkout"
                         type="submit"
                         data-bind="click: placeOrder,
-                                   attr: {title: $t('Pay with FranFinance')},
+                                   attr: {title: $t('Pay with Franfinance')},
                                    css: {disabled: !isPlaceOrderActionAllowed()},
                                    enable: (getCode() == isChecked())"
                         disabled>
-                    <span data-bind="i18n: 'Pay with FranFinance'"></span>
+                    <span data-bind="i18n: 'Pay with Franfinance'"></span>
                 </button>
             </div>
         </div>
