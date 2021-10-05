@@ -331,12 +331,16 @@ class Standard extends Payzen
         $quote = $this->dataHelper->getCheckoutQuote();
 
         if (! $quote || ! $quote->getId()) {
-            $this->dataHelper->log('Cannot create form token. Empty quote passed.', \Psr\Log\LogLevel::WARNING);
+            $this->dataHelper->log('Cannot create a form token. Empty quote passed.');
             return false;
         }
 
         // Amount in current order currency.
         $amount = $quote->getGrandTotal();
+        if ($amount <= 0) {
+            $this->dataHelper->log('Cannot create a form token. Invalid amount passed.');
+            return false;
+        }
 
         // Currency.
         $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
@@ -346,6 +350,11 @@ class Standard extends Payzen
 
             // ... and order total in base currency.
             $amount = $quote->getBaseGrandTotal();
+        }
+
+        if ($currency == null) {
+            $this->dataHelper->log('Cannot create a form token. Unsupported currency passed.');
+            return false;
         }
 
         // Check if capture_delay and validation_mode are overriden in standard submodule.

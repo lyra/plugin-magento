@@ -9,7 +9,7 @@ Namely, it enables the following payment methods:
 * [choozeo] PayZen - Choozeo payment
 * [oney] PayZen - Payment in 3 or 4 times Oney
 * [fullcb] PayZen - Full CB payment
-* [franfinance] PayZen - FranFinance payment
+* [franfinance] PayZen - Franfinance payment
 * [sepa] PayZen - SEPA payment
 * [paypal] PayZen - PayPal payment
 * [other] PayZen - Other payment means

@@ -10,7 +10,7 @@
 namespace Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Franfinance;
 
 /**
- * Custom renderer for the FranFinance payment options field.
+ * Custom renderer for the Franfinance payment options field.
  */
 class FranfinancePaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\FieldArray\ConfigFieldArray
 {

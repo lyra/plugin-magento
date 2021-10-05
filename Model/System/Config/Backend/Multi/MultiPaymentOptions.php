@@ -33,8 +33,13 @@ class MultiPaymentOptions extends ConfigArraySerialized
                     $this->throwException('Label', $i);
                 }
 
-                $this->checkAmount($value['minimum'], 'Min. amount', $i);
-                $this->checkAmount($value['maximum'], 'Max. amount', $i);
+                if (isset($value['minimum'])) {
+                    $this->checkAmount($value['minimum'], 'Min. amount', $i);
+                }
+
+                if (isset($value['maximum'])) {
+                    $this->checkAmount($value['maximum'], 'Max. amount', $i);
+                }
 
                 if (! empty($value['contract']) && ! preg_match('#^[^;=]+$#', $value['contract'])) {
                     $this->throwException('Contract', $i);
@@ -43,7 +48,9 @@ class MultiPaymentOptions extends ConfigArraySerialized
                 $this->checkMandatoryDecimal($value['count'], 'Count', $i);
                 $this->checkMandatoryDecimal($value['period'], 'Period', $i);
 
-                $this->checkRate($value['first'], '1st installment', $i);
+                if (isset($value['first'])) {
+                    $this->checkRate($value['first'], '1st installment', $i);
+                }
 
                 $options[] = $value;
             }

@@ -204,7 +204,7 @@ class Checkout
         $this->checkProducts($scope, $scopeId);
     }
 
-    public function toOneyCarrier($methodCode)
+    public function toPayzenCarrier($methodCode)
     {
         $shippingMapping = $this->dataHelper->unserialize($this->dataHelper->getCommonConfigData('ship_options'));
 
@@ -309,28 +309,42 @@ class Checkout
         $payzenRequest->set('totalamount_vat', $taxAmount);
     }
 
-    public function setOneyData($order, &$payzenRequest)
+    public function setAdditionalShippingData($order, &$payzenRequest)
     {
-        // By default, clients are private.
+        // By default, Magento customers are private.
         $payzenRequest->set('cust_status', 'PRIVATE');
         $payzenRequest->set('ship_to_status', 'PRIVATE');
+
+        // If this is Oney 3x/4x.
+        $useOney = $payzenRequest->get('payment_cards') === 'ONEY_3X_4X';
+
+        $notAllowedCharsRegex = '#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ -]#ui';
 
         if ($order->getIsVirtual() || ! $order->getShippingMethod()) { // There is no shipping method.
             $payzenRequest->set('ship_to_type', 'ETICKET');
             $payzenRequest->set('ship_to_speed', 'EXPRESS');
         } else {
-            $shippingMethod = $this->toOneyCarrier($order->getShippingMethod());
+            $shippingMethod = $this->toPayzenCarrier($order->getShippingMethod());
 
-            $storeId = $this->dataHelper->getCheckoutStoreId();
-            $carriers = $this->shippingConfig->getAllCarriers($storeId);
+            if (! $shippingMethod) {
+                $this->dataHelper->log(
+                    'Cannot get mapped data for the order shipping method: ' . $order->getShippingMethod(),
+                    \Psr\Log\LogLevel::WARNING
+                );
+                return;
+            }
+
+            // Get carrier name.
+            $carriers = $this->shippingConfig->getAllCarriers($this->dataHelper->getCheckoutStoreId());
             $carrierCode = substr($shippingMethod['code'], 0, strpos($shippingMethod['code'], '_'));
             $carrierName = $carriers[$carrierCode]->getConfigData('title');
 
             // Delivery point name.
             $name = '';
             switch ($shippingMethod['type']) {
-                case 'RECLAIM_IN_SHOP':
                 case 'RELAY_POINT':
+                case 'RECLAIM_IN_STATION':
+                case 'RECLAIM_IN_SHOP':
                     $name = $order->getShippingDescription();
 
                     if ($carrierName) {
@@ -338,51 +352,56 @@ class Checkout
                     }
 
                     if (strpos($name, '<')) {
-                        $name = substr($name, 0, strpos($name, '<')); // Remove html elements.
+                        $name = substr($name, 0, strpos($name, '<')); // Remove HTML elements.
                     }
 
-                    // Break intentionally omitted.
-
-                case 'RECLAIM_IN_STATION':
-                    // It's recommended to put a specific logic here.
+                    // Modify address to send it to Oney server.
                     $address = $order->getShippingAddress()->getStreetLine(1);
-                    $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' .
-                         $order->getShippingAddress()->getStreetLine(2) : '';
+                    $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' . $order->getShippingAddress()->getStreetLine(2) : '';
 
                     $payzenRequest->set('ship_to_street', $address);
-                    $payzenRequest->set('ship_to_zip', $order->getShippingAddress()->getPostcode());
-                    $payzenRequest->set('ship_to_city', $order->getShippingAddress()->getCity());
+                    $payzenRequest->set('ship_to_street2', $name);
 
-                    $street2 = ($shippingMethod['type'] == 'RELAY_POINT') ? $name : null;
-                    $payzenRequest->set('ship_to_street2', $street2);
-                    $payzenRequest->set('ship_to_state', null);
+                    if (empty($name)) {
+                        $name = substr($order->getShippingDescription(), 0, 55);
+                    }
 
-                    $method = $carrierName . ' ' . $address;
-                    $payzenRequest->set('ship_to_delivery_company_name', $method);
+                    // Send delivery point name, address, postcode and city in field ship_to_delivery_company_name.
+                    $name .= ' ' . $address;
+                    $name .= ' ' . $order->getShippingAddress()->getPostcode();
+                    $name .= ' ' . $order->getShippingAddress()->getCity();
+
+                    // Delete not allowed chars.
+                    $payzenRequest->set('ship_to_delivery_company_name', preg_replace($notAllowedCharsRegex, ' ', $name));
+
                     break;
 
                 default:
-                    $address = '';
-                    $address .= $order->getShippingAddress()->getStreetLine(1);
-                    $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' .
-                         $order->getShippingAddress()->getStreetLine(2) : '';
+                    if ($useOney) {
+                        $address = $order->getShippingAddress()->getStreetLine(1);
+                        $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' . $order->getShippingAddress()->getStreetLine(2) : '';
 
-                    $payzenRequest->set('ship_to_street', $address);
-                    $payzenRequest->set('ship_to_street2', null); // Not sent to Oney.
+                        $payzenRequest->set('ship_to_street', $address);
+                        $payzenRequest->set('ship_to_street2', null); // Not sent to FacilyPay Oney.
+                    }
 
-                    $payzenRequest->set('ship_to_delivery_company_name', $carrierName);
+                    $payzenRequest->set('ship_to_delivery_company_name', preg_replace($notAllowedCharsRegex, ' ', $carrierName));
+
                     break;
             }
-
-            // Send FR even if address is in DOM-TOM, otherwise form is rejected.
-            $payzenRequest->set('cust_country', 'FR');
-            $payzenRequest->set('ship_to_country', 'FR');
 
             $payzenRequest->set('ship_to_type', empty($shippingMethod['type']) ? null : $shippingMethod['type']);
             $payzenRequest->set('ship_to_speed', empty($shippingMethod['speed']) ? null : $shippingMethod['speed']);
 
             if ($shippingMethod['speed'] === 'PRIORITY') {
-                $payzenRequest->set('ship_to_delay', $shippingMethod['delay']);
+                $payzenRequest->set('ship_to_delay', empty($shippingMethod['delay']) ? null : $shippingMethod['delay']);
+            }
+
+            if ($useOney) { // Modify address to be sent to Oney.
+                $payzenRequest->set('cust_country', 'FR'); // Send FR even address is in DOM-TOM unless form is rejected.
+
+                $payzenRequest->set('ship_to_state', null); // Not sent to Oney.
+                $payzenRequest->set('ship_to_country', 'FR'); // Send FR even address is in DOM-TOM unless form is rejected.
             }
         }
     }

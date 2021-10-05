@@ -17,8 +17,6 @@ class ShipOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serial
         $oneyContract = isset($data['fields']['oney_contract']['value']) && $data['fields']['oney_contract']['value'];
 
         if ($oneyContract) {
-            $deliveryCompanyRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ /'-]{1,127}$#ui";
-
             $values = $this->getValue();
 
             if (! is_array($values) || empty($values)) {
@@ -35,11 +33,6 @@ class ShipOptions extends \Lyranetwork\Payzen\Model\System\Config\Backend\Serial
                     if (! isset($value['type']) || empty($value['type'])
                         || ! isset($value['speed']) || empty($value['speed'])) {
                         unset($values[$id]);
-                        continue;
-                    }
-
-                    if (empty($value['oney_label']) || ! preg_match($deliveryCompanyRegex, $value['oney_label'])) {
-                        $this->throwException('FacilyPay Oney label', $i);
                     }
                 }
 
