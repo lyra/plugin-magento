@@ -24,11 +24,7 @@
 </form>
 
 <script>
-    require([
-        'jquery'
-    ], function($) {
-        $(function() {
-            $('#payzen_payment_form').submit();
-        });
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("payzen_payment_form").submit();
     });
 </script>
