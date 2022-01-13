@@ -24,7 +24,7 @@ class UpdateOtherPaymentObserver implements ObserverInterface
     {
         $payment = $observer->getDataObject();
 
-        if ($payment->getMethod() != 'payzen_other') {
+        if ($payment->getMethod() !== 'payzen_other') {
             // Not payzen other payment, do nothing.
             return $this;
         }

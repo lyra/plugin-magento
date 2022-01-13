@@ -15,7 +15,7 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'mage/url'
     ],
-    function ($, Component, url) {
+    function($, Component, url) {
         'use strict';
 
         // Reload payment page to update Oney error message cookie.
@@ -68,7 +68,7 @@ define(
                 redirectAfterPlaceOrder: false
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
 
                 return $.extend(true, data, {
@@ -76,32 +76,32 @@ define(
                 });
             },
 
-            showLabel: function () {
+            showLabel: function() {
                 return false;
             },
 
-            getCheckoutRedirectUrl: function () {
+            getCheckoutRedirectUrl: function() {
                 return window.checkoutConfig.payment[this.item.method].checkoutRedirectUrl;
             },
 
-            getModuleLogoUrl: function () {
+            getModuleLogoUrl: function() {
                 return window.checkoutConfig.payment[this.item.method].moduleLogoUrl;
             },
 
-            getAvailableCcTypes: function () {
+            getAvailableCcTypes: function() {
                 return window.checkoutConfig.payment[this.item.method].availableCcTypes;
             },
 
-            getEntryMode: function () {
+            getEntryMode: function() {
                 return window.checkoutConfig.payment[this.item.method].entryMode;
             },
 
-            afterPlaceOrder: function () {
+            afterPlaceOrder: function() {
                 // Order placed with payment_pending status, redirect to gateway.
                 $.mage.redirect(this.getCheckoutRedirectUrl());
             },
 
-            getPaymentMeansUrl: function () {
+            getPaymentMeansUrl: function() {
                 return url.build('payzen/customer/index');
             }
         });

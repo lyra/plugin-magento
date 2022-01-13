@@ -103,9 +103,9 @@ class Checkout
         // Check customer IDs.
         $collection = $this->customerCollectionFactory->create();
 
-        if ($scope == 'websites') {
+        if ($scope === 'websites') {
             $collection->addAttributeToFilter('website_id', $scopeId);
-        } elseif ($scope == 'stores') {
+        } elseif ($scope === 'stores') {
             $collection->addAttributeToFilter('store_id', $scopeId);
         }
 
@@ -129,7 +129,7 @@ class Checkout
     public function checkOrders($scope, $scopeId)
     {
         // Check order IDs.
-        if ($scope == 'stores') {
+        if ($scope === 'stores') {
             // Store context.
             $incrementId = $this->eavConfig->getEntityType(\Magento\Sales\Model\Order::ENTITY)->fetchNewIncrementId(
                 $scopeId
@@ -141,7 +141,7 @@ class Checkout
             $stores = $this->storeManager->getStores();
 
             foreach ($stores as $store) {
-                if ($scope == 'websites' && $store->getWebsiteId() != $scopeId) {
+                if (($scope === 'websites') && ($store->getWebsiteId() != $scopeId)) {
                     continue;
                 }
 
@@ -174,9 +174,9 @@ class Checkout
         $collection = $this->productCollectionFactory->create();
         $collection->addAttributeToSelect('name');
 
-        if ($scope == 'websites') {
+        if ($scope === 'websites') {
             $collection->addWebsiteFilter($scopeId);
-        } elseif ($scope == 'stores') {
+        } elseif ($scope === 'stores') {
             $collection->addStoreFilter($scopeId);
         }
 

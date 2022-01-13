@@ -24,7 +24,7 @@ class UpdateMultiPaymentObserver implements ObserverInterface
     {
         $payment = $observer->getDataObject();
 
-        if ($payment->getMethod() != 'payzen_multi') {
+        if ($payment->getMethod() !== 'payzen_multi') {
             // Not payzen multiple payment, do nothing.
             return $this;
         }

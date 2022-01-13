@@ -14,7 +14,7 @@ define(
         'jquery',
         'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract'
     ],
-    function ($, Component) {
+    function($, Component) {
         'use strict';
 
         return Component.extend({
@@ -23,14 +23,14 @@ define(
                 payzenUseIdentifier: 1,
             },
 
-            initObservable: function () {
+            initObservable: function() {
                 this._super();
                 this.observe('payzenUseIdentifier');
 
                 return this;
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
 
                 if (this.isOneClick()) {
@@ -40,15 +40,15 @@ define(
                 return data;
             },
 
-            isOneClick: function () {
+            isOneClick: function() {
                 return window.checkoutConfig.payment[this.item.method].oneClick || false;
             },
 
-            getMaskedPan: function () {
+            getMaskedPan: function() {
                 return window.checkoutConfig.payment[this.item.method].maskedPan || null;
             },
 
-            updatePaymentBlock: function (blockName) {
+            updatePaymentBlock: function(blockName) {
                 $('.payment-method._active .payment-method-content .payzen-identifier li.payzen-sepa-block').hide();
                 $('li.payzen-sepa-' + blockName + '-block').show();
             },

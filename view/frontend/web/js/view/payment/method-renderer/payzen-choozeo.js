@@ -13,7 +13,7 @@ define(
     [
         'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract'
     ],
-    function (Component) {
+    function(Component) {
         'use strict';
 
         return Component.extend({
@@ -23,23 +23,23 @@ define(
                     window.checkoutConfig.payment.payzen_choozeo.availableOptions[0]['key'] : null
             },
 
-            initObservable: function () {
+            initObservable: function() {
                 this._super().observe('payzenChoozeoOption');
                 return this;
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
                 data['additional_data']['payzen_choozeo_option'] = this.payzenChoozeoOption();
 
                 return data;
             },
 
-            showLabel: function () {
+            showLabel: function() {
                 return true;
             },
 
-            getAvailableOptions: function () {
+            getAvailableOptions: function() {
                 return window.checkoutConfig.payment.payzen_choozeo.availableOptions;
             }
         });

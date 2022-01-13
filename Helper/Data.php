@@ -232,7 +232,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isBackend()
     {
-        return $this->appState->getAreaCode() == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE;
+        return $this->appState->getAreaCode() === \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE;
     }
 
     /**

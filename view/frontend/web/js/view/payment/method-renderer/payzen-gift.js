@@ -13,7 +13,7 @@ define(
     [
         'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract'
     ],
-    function (Component) {
+    function(Component) {
         'use strict';
 
         return Component.extend({
@@ -23,20 +23,20 @@ define(
                     window.checkoutConfig.payment.payzen_gift.availableCcTypes[0]['value'] : null
             },
 
-            initObservable: function () {
+            initObservable: function() {
                 this._super().observe('payzenCcType');
 
                 return this;
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
                 data['additional_data']['payzen_gift_cc_type'] = this.payzenCcType();
 
                 return data;
             },
 
-            showLabel: function () {
+            showLabel: function() {
                 return true;
             }
         });

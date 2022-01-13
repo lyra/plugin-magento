@@ -59,6 +59,11 @@ class Token extends \Magento\Framework\App\Action\Action
     protected $resultJsonFactory;
 
     /**
+     * @var \Magento\Quote\Model\SubmitQuoteValidator
+     */
+    protected $submitQuoteValidator;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
      * @param \Magento\CheckoutAgreements\Model\AgreementsValidator $agreementsValidator
@@ -69,6 +74,7 @@ class Token extends \Magento\Framework\App\Action\Action
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param \Magento\Quote\Model\SubmitQuoteValidator $submitQuoteValidator
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -80,7 +86,8 @@ class Token extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Helper\Data $checkoutHelper,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Quote\Model\SubmitQuoteValidator $submitQuoteValidator
     ) {
         $this->formKeyValidator = $formKeyValidator;
         $this->agreementsValidator = $agreementsValidator;
@@ -91,6 +98,7 @@ class Token extends \Magento\Framework\App\Action\Action
         $this->customerSession = $customerSession;
         $this->quoteRepository = $quoteRepository;
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->submitQuoteValidator = $submitQuoteValidator;
 
         parent::__construct($context);
     }
@@ -99,12 +107,9 @@ class Token extends \Magento\Framework\App\Action\Action
     {
         if (! $this->formKeyValidator->validate($this->getRequest()) || $this->expireAjax()) {
             $result = $this->resultJsonFactory->create();
-            $result->setStatusHeader(401, '1.1', 'Session Expired');
+            $result->setStatusHeader(401, '1.1', 'Session expired');
 
-            $data = new DataObject();
-            $data->setData('success', false);
-
-            return $result->setData($data->getData());
+            return $result;
         }
 
         $quote = $this->dataHelper->getCheckoutQuote();
@@ -113,10 +118,17 @@ class Token extends \Magento\Framework\App\Action\Action
         $quote->collectTotals();
         $this->quoteRepository->save($quote);
 
+        try {
+            $this->submitQuoteValidator->validateQuote($quote);
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            return $this->ajaxErrorResponse($e->getMessage());
+        } catch (\Exception $e) {
+            return $this->ajaxErrorResponse();
+        }
+
         $this->dataHelper->log("Updating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
         $token = $this->standardMethod->getRestApiFormToken();
-
         if (! $token) {
             return $this->ajaxErrorResponse();
         }
@@ -133,14 +145,17 @@ class Token extends \Magento\Framework\App\Action\Action
     /**
      * @return \Magento\Framework\Controller\Result\Json
      */
-    private function ajaxErrorResponse()
+    private function ajaxErrorResponse($message = null)
     {
         $result = $this->resultJsonFactory->create();
-        $result->setStatusHeader(500, '1.1', 'Internal Server Error');
+        if ($message) {
+            $result->setStatusHeader(400, '1.1', 'Bad request');
+        } else {
+            $result->setStatusHeader(500, '1.1', 'Internal server error');
+        }
 
         $data = new DataObject();
-        $data->setData('success', false);
-        $data->setData('message', __('An error has occurred during the payment process.'));
+        $data->setData('message', $message ? $message : __('An error has occurred during the payment process.'));
 
         return $result->setData($data->getData());
     }
