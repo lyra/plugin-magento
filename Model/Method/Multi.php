@@ -133,7 +133,7 @@ class Multi extends Payzen
         $option = @unserialize($info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION));
 
         $amount = $this->payzenRequest->get('amount');
-        $first = ($option['first'] != '') ? round(($option['first'] / 100) * $amount) : null;
+        $first = ! empty($option['first']) ? round(($option['first'] / 100) * $amount) : null;
         $this->payzenRequest->setMultiPayment($amount, $first, $option['count'], $option['period']);
         $this->payzenRequest->set('contracts', ($option['contract']) ? 'CB=' . $option['contract'] : null);
 

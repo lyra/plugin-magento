@@ -19,37 +19,24 @@ define(
         'Magento_Checkout/js/action/set-payment-information',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/model/error-processor',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'Magento_Checkout/js/action/get-totals',
+        'Magento_Customer/js/customer-data'
     ],
-    function ($, Component, url, storage, quote, setPaymentInformationAction, additionalValidators, errorProcessor, fullScreenLoader) {
+    function(
+        $,
+        Component,
+        url,
+        storage,
+        quote,
+        setPaymentInformationAction,
+        additionalValidators,
+        errorProcessor,
+        fullScreenLoader,
+        getTotalsAction,
+        customerData
+    ) {
         'use strict';
-
-        // Update embedded payment token if order amount has changed.
-        $('div.opc-estimated-wrapper div.estimated-block span.estimated-price').on('DOMSubtreeModified', function() {
-            if ($('div.kr-embedded').length > 0) {
-                $.when().done(function () {
-                    storage.post(
-                        url.build('payzen/payment_rest/token?form_key=' + $.mage.cookies.get('form_key'))
-                    ).done(function (response) {
-                        if (response.token) {
-                            KR.setFormConfig({
-                                formToken: response.token,
-                                language: window.checkoutConfig.payment.payzen_standard.language || null
-                            }).then(
-                                function(v) {
-                                    console.log('Form token successfully updated.');
-                                }
-                            );
-                        } else {
-                            // Should not happen, this case is managed by failure callback.
-                            console.log('Empty form token returned by refresh.');
-                        }
-                    }).fail(function (response) {
-                        console.log('Error: Failed to update form token.');
-                    });
-                });
-            }
-        });
 
         // Use default messages for these errors.
         const DFAULT_MESSAGES = [
@@ -83,7 +70,7 @@ define(
             },
 
             en: {
-	            RELOAD_LINK: 'Please refresh the page.',
+                RELOAD_LINK: 'Please refresh the page.',
                 CLIENT_001: 'Payment is refused. Try to pay with another card.',
                 CLIENT_101: 'Payment is cancelled.',
                 CLIENT_301: 'The card number is invalid. Please check the number and try again.',
@@ -153,7 +140,7 @@ define(
                 iframeDisplayed: false
             },
 
-            initObservable: function () {
+            initObservable: function() {
                 this._super();
                 this.observe('payzenCcType');
                 this.observe('payzenUseIdentifier');
@@ -161,7 +148,7 @@ define(
                 return this;
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
 
                 if (this.isOneClick()) {
@@ -175,39 +162,62 @@ define(
                 return data;
             },
 
-            getIframeLoaderUrl: function () {
+            getIframeLoaderUrl: function() {
                 return window.checkoutConfig.payment[this.item.method].iframeLoaderUrl || null;
             },
 
-            isOneClick: function () {
+            isOneClick: function() {
                 return window.checkoutConfig.payment[this.item.method].oneClick || false;
             },
 
-            getMaskedPan: function () {
+            getMaskedPan: function() {
                 return window.checkoutConfig.payment[this.item.method].maskedPan || null;
             },
 
-            getRestFormToken: function () {
+            getRestFormToken: function() {
                 return window.checkoutConfig.payment.payzen_standard.restFormToken || null;
             },
 
-            getLanguage: function () {
+            getLanguage: function() {
                 return window.checkoutConfig.payment.payzen_standard.language || null;
             },
 
-            updatePaymentBlock: function (blockName) {
+            updatePaymentBlock: function(blockName) {
                 $('.payment-method._active .payment-method-content .payzen-identifier li.payzen-block').hide();
                 $('li.payzen-standard-' + blockName + '-block').show();
             },
 
-            initRestEvents: function (elts) { // To be called after kr-embedded div is added to DOM.
+            initRestEvents: function(elts) { // To be called after kr-embedded div is added to DOM.
                 if (!elts || !elts.length) {
                     return;
                 }
 
                 var me = this;
 
-                require(['krypton'], function (KR) {
+                // Workarround to fix Magento bug: update order summary when modifying minicart.
+                $(document).on('ajax:updateCartItemQty ajax:removeFromCart', function() {
+                    me.payload = null;
+                    getTotalsAction([]);
+                });
+
+                // Update embedded payment token if order amount has changed.
+                quote.totals.subscribe(function(totals) {
+                    var newPayload = me.getPayload();
+	                if (me.payload && (me.payload === newPayload)) {
+	                    // Unchanged payload, do not refresh.
+	                    return;
+	                }
+
+	                if (quote.paymentMethod().method !== 'payzen_standard') {
+	                    // Not our payment method, do not refresh.
+                        return;
+                    }
+
+                    me.payload = newPayload;
+                    me.refreshToken(false);
+                });
+
+                require(['krypton'], function(KR) {
                     KR.setFormConfig({
                         formToken: me.getRestFormToken(),
                         language: me.getLanguage()
@@ -218,7 +228,7 @@ define(
                                 $('#payzen_rest_form .kr-form-error').html('');
                             });
 
-                            KR.onError(function (e) {
+                            KR.onError(function(e) {
                                 fullScreenLoader.stopLoader();
                                 me.isPlaceOrderActionAllowed(true);
 
@@ -240,19 +250,24 @@ define(
 
                                 $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
                             });
+
+                            KR.onSubmit(function(e) {
+                                customerData.invalidate(['cart']);
+                                return true;
+                            });
                         }
                     );
                 });
             },
 
-            placeOrderClick: function () {
+            placeOrderClick: function() {
                 var me = this;
 
                 if (((me.getEntryMode() == 4) || (me.getEntryMode() == 5)) && me.getRestFormToken()) {
                     // Embedded or popin mode.
                     $('#payzen_rest_form .kr-form-error').html('');
 
-                    if (!additionalValidators.validate()) {
+                    if (!me.validate() || !additionalValidators.validate()) {
                         return;
                     }
 
@@ -262,13 +277,7 @@ define(
                         me.isPlaceOrderActionAllowed(false);
                     }
 
-                    var newPayload = JSON.stringify({
-                        cartId: quote.getQuoteId(),
-                        email: quote.guestEmail,
-                        paymentMethod: me.getData(),
-                        billingAddress: quote.billingAddress()
-                    });
-
+                    var newPayload = me.getPayload();
                     if (me.payload && (me.payload === newPayload)) {
                         if (isPopin) {
                             KR.openPopin();
@@ -280,9 +289,9 @@ define(
 
                         $.when(
                             setPaymentInformationAction(me.messageContainer, me.getData())
-                        ).done(function () {
-                            me.refreshToken();
-                        }).fail(function (response) {
+                        ).done(function() {
+                            me.refreshToken(true);
+                        }).fail(function(response) {
                             errorProcessor.process(response, me.messageContainer);
                             fullScreenLoader.stopLoader();
                             me.isPlaceOrderActionAllowed(true);
@@ -293,18 +302,22 @@ define(
                 }
             },
 
-            refreshToken: function () {
+            refreshToken: function(withSubmit) {
                 var me = this;
 
                 storage.post(
                     url.build('payzen/payment_rest/token?form_key=' + $.mage.cookies.get('form_key'))
-                ).done(function (response) {
+                ).done(function(response) {
                     if (response.token) {
                         KR.setFormConfig({
                             formToken: response.token,
                             language: me.getLanguage()
                         }).then(
                             function(v) {
+                                if (!withSubmit) {
+                                    return;
+                                }
+
                                 var KR = v.KR;
                                 if ($('.kr-popin-button').length > 0) {
                                     KR.openPopin();
@@ -317,14 +330,33 @@ define(
                         // Should not happen, this case is managed by failure callback.
                         console.log('Empty form token returned by refresh.');
                     }
-                }).fail(function (response) {
-                    errorProcessor.process(response, me.messageContainer);
+                }).fail(function(response) {
+                    if (!withSubmit) {
+                        errorProcessor.process(response, me.messageContainer);
+                    }
+
+                    me.payload = null; // To be able to call server for next validation.
+
                     fullScreenLoader.stopLoader();
                     me.isPlaceOrderActionAllowed(true);
                 });
             },
 
-            translateError: function (code) {
+            getPayload: function() {
+                var me = this;
+
+                return JSON.stringify({
+                    cartId: quote.getQuoteId(),
+                    totals: quote.getTotals(),
+                    shippingAddress: quote.shippingAddress(),
+                    shippingMethod: quote.shippingMethod(),
+                    billingAddress: quote.billingAddress(),
+                    paymentMethod: quote.paymentMethod(),
+                    paymentData: me.getData()
+                });
+            },
+
+            translateError: function(code) {
                 var lang = this.getLanguage();
                 var messages = ERROR_MESSAGES.hasOwnProperty(lang) ? ERROR_MESSAGES[lang] : ERROR_MESSAGES['en'];
 
@@ -336,7 +368,7 @@ define(
                 return messages[code];
             },
 
-            initIframeEvents: function (elts) { // To be called after iframe loading.
+            initIframeEvents: function(elts) { // To be called after iframe loading.
                 if (!elts || !elts.length) {
                     return;
                 }
@@ -362,7 +394,7 @@ define(
                 }, null, 'change');
             },
 
-            afterPlaceOrder: function () {
+            afterPlaceOrder: function() {
                 var me = this;
 
                 if (me.getEntryMode() == 3) { // Iframe mode.

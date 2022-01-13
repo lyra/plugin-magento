@@ -86,7 +86,7 @@ class Info extends \Magento\Payment\Block\Info
                     continue;
                 }
 
-                if ($key === 'result' && $allResults[$key] == '30') { // Append form error if any.
+                if (($key === 'result') && ((int)$allResults[$key] === 30)) { // Append form error if any.
                     $label .= ' ' . PayzenResponse::extraMessage($allResults['extra_result']);
                 }
 

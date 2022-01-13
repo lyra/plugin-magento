@@ -30,7 +30,7 @@ class Standard extends Payzen
             'VPAY'
         ];
 
-        if ($code == 'AMEX') {
+        if ($code === 'AMEX') {
             return 'AMEX';
         } elseif (in_array($code, $cbCards)) {
             return 'CB';

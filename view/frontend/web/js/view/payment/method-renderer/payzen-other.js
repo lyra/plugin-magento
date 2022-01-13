@@ -15,7 +15,7 @@ define(
         'Magento_Checkout/js/action/select-payment-method',
         'Magento_Checkout/js/checkout-data'
     ],
-    function (
+    function(
         Component,
         selectPaymentMethodAction,
         checkoutData
@@ -29,14 +29,14 @@ define(
                         window.checkoutConfig.payment.payzen_other.availableOptions[0]['key'] : null,
             },
 
-            initObservable: function () {
+            initObservable: function() {
                 this._super();
                 this.observe('payzenOtherOption');
 
                 return this;
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
 
                 data['additional_data']['payzen_other_option'] = this.payzenOtherOption();
@@ -47,21 +47,21 @@ define(
             /**
              * Get payment method code
              */
-            getOptionCode: function (option) {
+            getOptionCode: function(option) {
                 return this.getCode() + '_' + option;
             },
 
             /**
              * Get payment method data
              */
-            getOptionData: function (method) {
+            getOptionData: function(method) {
                 var data = this.getData();
                 data['method'] =  method;
 
                 return data;
             },
 
-            selectOptionPaymentMethod: function (option) {
+            selectOptionPaymentMethod: function(option) {
                 var method = this.getCode() + '_' + option;
 
                 selectPaymentMethodAction(this.getOptionData(method));
@@ -70,15 +70,15 @@ define(
                 return true;
             },
 
-            showLabel: function () {
+            showLabel: function() {
                 return true;
             },
 
-            getAvailableOptions: function () {
+            getAvailableOptions: function() {
                 return window.checkoutConfig.payment.payzen_other.availableOptions;
             },
 
-            getRegroupMode: function () {
+            getRegroupMode: function() {
                 return window.checkoutConfig.payment.payzen_other.regroupMode;
             }
         });

@@ -1,3 +1,9 @@
+2.5.11, 2022-01-13:
+- [embedded] Bug fix: Refresh minicart items count when payment is successful in Magento 2.4.x.
+- [embedded] Bug fix: Validate Magento quote data before payment submit with REST API.
+- [embedded] Update order summary and amount to pay with embedded payment fields when modifying minicart (workarround for a Magento bug).
+- Fix session recovery issues with POST mode related to Samesite cookie in Magento 2.4.x.
+
 2.5.10, 2021-10-05:
 - [embedded] Bug fix: Do not refresh payment page automatically after an unrecoverable error.
 - [embedded] Bug fix: Update payment token only if embedded payment is enabled.

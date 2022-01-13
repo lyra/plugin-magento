@@ -344,7 +344,7 @@ class Standard extends Payzen
 
         // Currency.
         $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
-        if ($currency == null) {
+        if (! $currency) {
             // If currency is not supported, use base currency.
             $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
 
@@ -352,7 +352,7 @@ class Standard extends Payzen
             $amount = $quote->getBaseGrandTotal();
         }
 
-        if ($currency == null) {
+        if (! $currency) {
             $this->dataHelper->log('Cannot create a form token. Unsupported currency passed.');
             return false;
         }

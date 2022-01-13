@@ -13,10 +13,10 @@ define([
     'jquery',
     'Magento_Ui/js/modal/modalToggle',
     'mage/translate'
-], function ($, modalToggle) {
+], function($, modalToggle) {
     'use strict';
 
-    return function (config, deleteButton) {
+    return function(config, deleteButton) {
         config.buttons = [{
             text: $.mage.__('Cancel'),
             class: 'action secondary cancel'
@@ -27,7 +27,7 @@ define([
             /**
              * Default action on button click.
              */
-            click: function (event) {
+            click: function(event) {
                 $(deleteButton.form).submit();
             }
         }];

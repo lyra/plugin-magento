@@ -209,7 +209,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         // Set currency.
         $currency = PayzenApi::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
-        if ($currency == null) {
+        if (! $currency) {
             // If currency is not supported, use base currency.
             $currency = PayzenApi::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
 
@@ -276,7 +276,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         // Activate 3ds?
         $threedsMpi = null;
         $threedsMinAmount = $this->dataHelper->getCommonConfigData('threeds_min_amount');
-        if ($threedsMinAmount != '' && $order->getTotalDue() < $threedsMinAmount) {
+        if (! empty($threedsMinAmount) && ($order->getTotalDue() < $threedsMinAmount)) {
             $threedsMpi = '2';
         }
 

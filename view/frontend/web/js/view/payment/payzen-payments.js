@@ -13,7 +13,7 @@ define(
         'Magento_Checkout/js/model/payment/renderer-list',
         'Magento_Checkout/js/view/payment/default'
     ],
-    function (Component, rendererList) {
+    function(Component, rendererList) {
         'use strict';
         rendererList.push(
             {

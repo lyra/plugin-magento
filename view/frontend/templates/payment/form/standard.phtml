@@ -61,13 +61,15 @@ if ($block->isLocalCcType()) :
         }
     }
 
-    if ($cbCards != '') {
+    if (! empty($cbCards)) {
         echo '<li class="payzen-standard-cc-block">' . $cbCards . '</li>';
     }
-    if ($amexCards != '') {
+
+    if (! empty($amexCards)) {
         echo '<li class="payzen-standard-cc-block">' . $amexCards . '</li>';
     }
-    if ($otherCards != '') {
+
+    if (! empty($otherCards)) {
         echo '<li class="payzen-standard-cc-block">' . $otherCards . '</li>';
     }
 endif;

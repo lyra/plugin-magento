@@ -13,7 +13,7 @@ define(
     [
         'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract'
     ],
-    function (Component) {
+    function(Component) {
         'use strict';
 
         return Component.extend({
@@ -23,19 +23,19 @@ define(
                     window.checkoutConfig.payment.payzen_fullcb.availableOptions[0]['key'] : null
             },
 
-            initObservable: function () {
+            initObservable: function() {
                 this._super().observe('payzenFullcbOption');
                 return this;
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
                 data['additional_data']['payzen_fullcb_option'] = this.payzenFullcbOption();
 
                 return data;
             },
 
-            getAvailableOptions: function () {
+            getAvailableOptions: function() {
                 return window.checkoutConfig.payment.payzen_fullcb.availableOptions;
             }
         });
