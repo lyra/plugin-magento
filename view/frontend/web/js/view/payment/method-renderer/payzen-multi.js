@@ -13,7 +13,7 @@ define(
     [
         'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract'
     ],
-    function (Component) {
+    function(Component) {
         'use strict';
 
         return Component.extend({
@@ -25,7 +25,7 @@ define(
                     window.checkoutConfig.payment.payzen_multi.availableCcTypes[0]['value'] : null
             },
 
-            initObservable: function () {
+            initObservable: function() {
                 this._super();
                 this.observe('payzenCcType');
                 this.observe('payzenMultiOption');
@@ -33,7 +33,7 @@ define(
                 return this;
             },
 
-            getData: function () {
+            getData: function() {
                 var data = this._super();
 
                 if (this.getEntryMode() == 2) { // Payment means selection on merchant site.
@@ -45,11 +45,11 @@ define(
                 return data;
             },
 
-            showLabel: function () {
+            showLabel: function() {
                 return true;
             },
 
-            getAvailableOptions: function () {
+            getAvailableOptions: function() {
                 return window.checkoutConfig.payment.payzen_multi.availableOptions;
             }
         });

@@ -81,7 +81,7 @@ class CheckProcessor
             'payzen_pending_transfer'
         ];
 
-        if ($order->getStatus() == 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
+        if ($order->getStatus() === 'pending_payment' || in_array($order->getStatus(), $reviewStatuses)) {
             // Order waiting for payment.
             $this->dataHelper->log("Order #{$order->getIncrementId()} is waiting payment update.");
             $this->dataHelper->log("Payment result for order #{$order->getIncrementId()}: " . ($response->get('error_message') ?: $response->getLogMessage()));
@@ -90,7 +90,7 @@ class CheckProcessor
                 $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has been confirmed by notification URL.");
 
                 $stateObject = $this->paymentHelper->nextOrderState($order, $response);
-                if ($order->getStatus() == $stateObject->getStatus()) {
+                if ($order->getStatus() === $stateObject->getStatus()) {
                     // Payment status is unchanged display notification url confirmation message.
                     return 'payment_ok_already_done';
                 } else {
@@ -120,7 +120,7 @@ class CheckProcessor
             if ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
                 $this->dataHelper->log("Order #{$order->getIncrementId()} is confirmed.");
 
-                if ($response->get('operation_type') == 'CREDIT') {
+                if ($response->get('operation_type') === 'CREDIT') {
                     // This is a refund: create credit memo?
                     $expiry = '';
                     if ($response->get('expiry_month') && $response->get('expiry_year')) {

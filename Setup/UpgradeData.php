@@ -85,7 +85,7 @@ class UpgradeData implements UpgradeDataInterface
                 ->where('status = ?', 'payzen_pending_transfer');
             $count = (int) $connection->fetchOne($select);
 
-            if ($count == 0) {
+            if ($count === 0) {
                 $connection->insert(
                     $setup->getTable('sales_order_status'),
                     [

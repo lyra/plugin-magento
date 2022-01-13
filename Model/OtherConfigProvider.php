@@ -37,7 +37,7 @@ class OtherConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
     {
         $config = parent::getConfig();
         $config['payment'][$this->method->getCode()]['availableOptions'] = $this->getAvailableOptions();
-        $config['payment'][$this->method->getCode()]['regroupMode'] = ($this->method->getRegroupMode() == '1');
+        $config['payment'][$this->method->getCode()]['regroupMode'] = ($this->method->getRegroupMode() == 1);
 
         return $config;
     }

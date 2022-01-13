@@ -20,7 +20,7 @@ class Paypal extends Payzen
 
     protected function setExtraFields($order)
     {
-        $testMode = $this->payzenRequest->get('ctx_mode') == 'TEST';
+        $testMode = $this->payzenRequest->get('ctx_mode') === 'TEST';
 
         // Override with PayPal payment cards.
         $this->payzenRequest->set('payment_cards', $testMode ? 'PAYPAL_SB' : 'PAYPAL');

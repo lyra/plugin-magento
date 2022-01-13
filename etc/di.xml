@@ -29,4 +29,8 @@
     <type name="Magento\Framework\App\Request\CsrfValidator">
         <plugin name="payzen_skip_csrf_validator" type="Lyranetwork\Payzen\Controller\Plugin\CsrfValidator" />
     </type>
+
+    <type name="Magento\Framework\Session\SessionStartChecker">
+        <plugin name="payzen_session_checker" type="Lyranetwork\Payzen\Controller\Plugin\SessionChecker" />
+    </type>
 </config>

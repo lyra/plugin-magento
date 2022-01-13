@@ -13,7 +13,7 @@ define(
     [
         'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-abstract'
     ],
-    function (Component) {
+    function(Component) {
         'use strict';
 
         return Component.extend({

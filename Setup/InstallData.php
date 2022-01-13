@@ -77,7 +77,7 @@ class InstallData implements InstallDataInterface
             ->where('status = ?', 'payzen_to_validate');
         $count = (int) $connection->fetchOne($select);
 
-        if ($count == 0) {
+        if ($count === 0) {
             $connection->insert(
                 $setup->getTable('sales_order_status'),
                 [
