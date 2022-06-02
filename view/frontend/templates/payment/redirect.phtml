@@ -28,6 +28,9 @@
         'jquery'
     ], function($) {
         $(function() {
+            $('#payzen_payment_form').submit(function() {
+                $('#payzen_payment_form_btn').prop('disabled', true);
+            });
             $('#payzen_payment_form').submit();
         });
     });

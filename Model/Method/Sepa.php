@@ -230,7 +230,7 @@ class Sepa extends Payzen
         $availableCountries = $this->sepaCountries->getCountryCodes();
 
         if ($this->getConfigData('allowspecific') == 1) {
-            $availableCountries = explode(',', $this->getConfigData('specificcountry'));
+            $availableCountries = $this->dataHelper->explode(',', $this->getConfigData('specificcountry'));
         }
 
         return in_array($country, $availableCountries);

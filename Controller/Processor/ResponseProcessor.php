@@ -92,7 +92,7 @@ class ResponseProcessor
             // Payment already processed.
             $this->dataHelper->log("Order #{$order->getIncrementId()} has already been processed.");
 
-            $storeId = $this->dataHelper->getCheckoutStoreId();
+            $storeId = $order->getStore()->getId();
             $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $storeId);
             $successStatuses = [
                 $acceptedStatus,

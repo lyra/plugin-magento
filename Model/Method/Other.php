@@ -14,6 +14,8 @@ class Other extends Payzen
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_OTHER;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Other::class;
 
+    protected $_canUseInternal = false;
+
     protected $_canRefund = false;
     protected $_canRefundInvoicePartial = false;
 
@@ -93,7 +95,7 @@ class Other extends Payzen
         $amount = $quote ? $quote->getBaseGrandTotal() : null;
         $country = $quote ? $quote->getBillingAddress()->getCountryId() : null;
 
-        $means = array();
+        $means = [];
         if (is_array($configMeans) && ! empty($configMeans)) {
             foreach ($configMeans as $code => $value) {
                 if (empty($value)) {
@@ -135,7 +137,7 @@ class Other extends Payzen
     public function getAddedPaymentMeans()
     {
         $configAddedPaymentMeans = $this->dataHelper->unserialize($this->getConfigData('added_payment_means')); // The user-added payment means.
-        $addedPaymentMeans = array();
+        $addedPaymentMeans = [];
         if (is_array($configAddedPaymentMeans) && ! empty($configAddedPaymentMeans)) {
             foreach ($configAddedPaymentMeans as $value) {
                 if (empty($value)) {

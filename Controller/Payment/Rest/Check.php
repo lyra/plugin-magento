@@ -50,12 +50,18 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
     protected $restHelper;
 
     /**
+     * @var \Magento\Checkout\Model\Type\Onepage
+     */
+    protected $onepage;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Lyranetwork\Payzen\Controller\Processor\CheckProcessor $checkProcessor
      * @param \Magento\Framework\Controller\Result\RawFactory $rawResultFactory
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Quote\Api\CartManagementInterface $quoteManagement
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \Magento\Checkout\Model\Type\Onepage $onepage
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -63,11 +69,13 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         \Magento\Framework\Controller\Result\RawFactory $rawResultFactory,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Quote\Api\CartManagementInterface $quoteManagement,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Magento\Checkout\Model\Type\Onepage $onepage
     ) {
         $this->restHelper = $restHelper;
         $this->quoteManagement = $quoteManagement;
         $this->quoteRepository = $quoteRepository;
+        $this->onepage = $onepage;
         $this->dataHelper = $checkProcessor->getDataHelper();
         $this->storeManager = $checkProcessor->getStoreManager();
         $this->orderFactory = $checkProcessor->getOrderFactory();
@@ -98,18 +106,19 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             [
                 'params' => $data,
                 'ctx_mode' => null,
-                'key_test' => null,
-                'key_prod' => null,
+                'key_test' => '',
+                'key_prod' => '',
                 'algo' => null
             ]
         );
 
         $quoteId = (int) $response->getExtInfo('quote_id');
-        $quote = $this->quoteRepository->get($quoteId);
-        if (! $quote->getId()) {
+        if (! $quoteId || ! $this->quoteRepository->get($quoteId)->getId()) {
             $this->dataHelper->log("Quote not found with ID #{$quoteId}.", \Psr\Log\LogLevel::ERROR);
             throw new ResponseException($response->getOutputForGateway('order_not_found'));
         }
+
+        $quote = $this->quoteRepository->get($quoteId);
 
         // Disable quote.
         if ($quote->getIsActive()) {
@@ -129,7 +138,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         $order = $this->orderFactory->create();
         $order->loadByIncrementId($quote->getReservedOrderId());
         if (! $order->getId()) {
-            $this->getOnepageForQuote($quote)->saveOrder();
+            $this->saveOrderForQuote($quote);
 
             // Dispatch save order event.
             $result = new DataObject();
@@ -179,15 +188,13 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         ];
     }
 
-    private function getOnepageForQuote($quote)
+    protected function saveOrderForQuote($quote)
     {
-        $onepage = $this->_objectManager->get(\Magento\Checkout\Model\Type\Onepage::class);
-        $onepage->setQuote($quote);
-
+        $this->onepage->setQuote($quote);
         if ($quote->getCustomerId()) {
-            $onepage->getCustomerSession()->loginById($quote->getCustomerId());
+            $this->onepage->getCustomerSession()->loginById($quote->getCustomerId());
         }
 
-        return $onepage;
+        $this->onepage->saveOrder();
     }
 }

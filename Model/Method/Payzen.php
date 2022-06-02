@@ -269,7 +269,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->payzenRequest->set('language', $this->getPaymentLanguage());
 
         // Available_languages is given as csv by magento.
-        $availableLanguages = explode(',', $this->dataHelper->getCommonConfigData('available_languages'));
+        $availableLanguages = $this->dataHelper->explode(',', $this->dataHelper->getCommonConfigData('available_languages'));
         $availableLanguages = in_array('', $availableLanguages) ? '' : implode(';', $availableLanguages);
         $this->payzenRequest->set('available_languages', $availableLanguages);
 
@@ -518,8 +518,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 [
                     'params' => $data,
                     'ctx_mode' => null,
-                    'key_test' => null,
-                    'key_prod' => null,
+                    'key_test' => '',
+                    'key_prod' => '',
                     'algo' => null
                 ]
             );
@@ -758,8 +758,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                     [
                         'params' => $data,
                         'ctx_mode' => null,
-                        'key_test' => null,
-                        'key_prod' => null,
+                        'key_test' => '',
+                        'key_prod' => '',
                         'algo' => null
                     ]
                 );
@@ -862,8 +862,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             [
                 'params' => $data,
                 'ctx_mode' => null,
-                'key_test' => null,
-                'key_prod' => null,
+                'key_test' => '',
+                'key_prod' => '',
                 'algo' => null
             ]
         );
@@ -911,6 +911,24 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $stateObject->setIsNotified(false);
 
         return $this;
+    }
+
+    /**
+     * To check billing country is allowed for the payment method
+     *
+     * @param string $country
+     * @return bool
+     */
+    public function canUseForCountry($country)
+    {
+        if ($this->getConfigData('allowspecific') == 1) {
+            $availableCountries = $this->dataHelper->explode(',', $this->getConfigData('specificcountry'));
+            if (! in_array($country, $availableCountries)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

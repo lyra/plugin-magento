@@ -56,11 +56,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     ];
 
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    protected $objectManager;
-
-    /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
@@ -116,8 +111,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $productMetadata;
 
     /**
+     * @var \Magento\Config\Model\Config\Structure
+     */
+    protected $configStructure;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
+     * \Magento\Backend\Model\Session\Quote
+     */
+    protected $backendSession;
+
+    /**
      * @param \Lyranetwork\Payzen\Helper\Context $context
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\App\MaintenanceMode $maintenanceMode
      * @param \Magento\Config\Model\ResourceModel\Config $resourceConfig
@@ -129,10 +138,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
+     * @param \Magento\Config\Model\Config\Structure $configStructure
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Backend\Model\Session\Quote $backendSession
      */
     public function __construct(
         \Lyranetwork\Payzen\Helper\Context $context,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\MaintenanceMode $maintenanceMode,
         \Magento\Config\Model\ResourceModel\Config $resourceConfig,
@@ -143,11 +154,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Filesystem\Io\File $file,
         \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Payment\Helper\Data $paymentHelper,
-        \Magento\Framework\App\ProductMetadataInterface $productMetadata
+        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
+        \Magento\Config\Model\Config\Structure $configStructure,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Backend\Model\Session\Quote $backendSession
     ) {
         parent::__construct($context);
 
-        $this->objectManager = $objectManager;
         $this->storeManager = $storeManager;
         $this->maintenanceMode = $maintenanceMode;
         $this->resourceConfig = $resourceConfig;
@@ -159,6 +172,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->assetRepo = $assetRepo;
         $this->paymentHelper = $paymentHelper;
         $this->productMetadata = $productMetadata;
+        $this->configStructure = $configStructure;
+        $this->checkoutSession = $checkoutSession;
+        $this->backendSession = $backendSession;
     }
 
     /**
@@ -252,12 +268,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCheckout()
     {
-        $sessionClass = \Magento\Checkout\Model\Session::class;
-        if ($this->isBackend()) {
-            $sessionClass = \Magento\Backend\Model\Session\Quote::class;
-        }
-
-        return $this->objectManager->get($sessionClass);
+        return $this->isBackend() ? $this->backendSession : $this->checkoutSession;
     }
 
     /**
@@ -351,8 +362,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $parts = explode('/', $path);
         $parentPath = 'payment/' . $parts[1] . '/' . $parts[2]; // We need the second level group.
 
-        $configStructure = $this->objectManager->create('Magento\Config\Model\Config\Structure');
-        return __($configStructure->getElement($parentPath)->getLabel())->render();
+        return __($this->configStructure->getElement($parentPath)->getLabel())->render();
     }
 
     /**
@@ -431,6 +441,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function unserialize($string)
     {
+        if ($string === null) {
+            return [];
+        }
+
         $result = json_decode($string, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -439,6 +453,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $result;
+    }
+
+    /**
+     * Break a string into an array.
+     *
+     * @param string $separator
+     * @param string $string
+     * @return array
+     */
+    public function explode($separator, $string)
+    {
+        if ($string === null) {
+            return [];
+        }
+        
+         return explode($separator, $string);
     }
 
     /**

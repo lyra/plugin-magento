@@ -15,6 +15,8 @@ class Oney extends Payzen
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_ONEY;
     protected $_formBlockType = \Lyranetwork\Payzen\Block\Payment\Form\Oney::class;
 
+    protected $_canUseInternal = false;
+
     protected $_canRefund = false;
     protected $_canRefundInvoicePartial = false;
     protected $needsCartData = true;
@@ -269,7 +271,7 @@ class Oney extends Payzen
         $availableCountries = $this->oneyCountries->getCountryCodes();
 
         if ($this->getConfigData('allowspecific') == 1) {
-            $availableCountries = explode(',', $this->getConfigData('specificcountry'));
+            $availableCountries = $this->dataHelper->explode(',', $this->getConfigData('specificcountry'));
         }
 
         return in_array($country, $availableCountries);
