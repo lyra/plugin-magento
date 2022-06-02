@@ -1,3 +1,10 @@
+2.5.12, 2022-06-02:
+- Bug fix: Fix session recovery issues on return page in Magento 2.4.x.
+- Bug fix: Fix error when receiving IPN on cancellation calls.
+- Add CSP configuration.
+- Adapt code to PHP 8.x.
+- Update list of supported payment means.
+
 2.5.11, 2022-01-13:
 - [embedded] Bug fix: Refresh minicart items count when payment is successful in Magento 2.4.x.
 - [embedded] Bug fix: Validate Magento quote data before payment submit with REST API.

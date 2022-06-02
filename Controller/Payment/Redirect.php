@@ -106,11 +106,6 @@ class Redirect extends \Magento\Framework\App\Action\Action
             $this->dataHelper->log('Saving last real order ID in session: '. $lastIncrementId);
         }
 
-        // Clear quote data.
-        $checkout->unsLastQuoteId()
-            ->unsLastSuccessQuoteId()
-            ->clearHelperData();
-
         return $order;
     }
 

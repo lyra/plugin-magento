@@ -39,7 +39,8 @@
         <div class="actions <?php echo $block->escapeHtml($block->getHeaderCssClass()); ?>" style="margin-top: 3em;">
             <button title="<?php echo $block->escapeHtml(__('Send')); ?>"
                     type="submit" class="action-default scalable primary"
-                    data-ui-id="widget-button-4">
+                    data-ui-id="widget-button-4"
+                    id="payzen_payment_form_btn">
                 <span><?php echo $block->escapeHtml(__('Send')); ?></span>
             </button>
         </div>
@@ -51,6 +52,9 @@
         'jquery'
     ], function($) {
         $(function() {
+            $('#payzen_payment_form').submit(function() {
+                $('#payzen_payment_form_btn').prop('disabled', true);
+            });
             $('#payzen_payment_form').submit();
         });
     });
