@@ -208,7 +208,7 @@ define(
 	                    return;
 	                }
 
-	                if (quote.paymentMethod().method !== 'payzen_standard') {
+	                if (!quote.paymentMethod() || !quote.paymentMethod().hasOwnProperty('method') || quote.paymentMethod().method !== 'payzen_standard') {
 	                    // Not our payment method, do not refresh.
                         return;
                     }

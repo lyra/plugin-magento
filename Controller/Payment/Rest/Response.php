@@ -35,12 +35,18 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
     protected $quoteManagement;
 
     /**
+     * @var \Magento\Checkout\Model\Type\Onepage
+     */
+    protected $onepage;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
      * @param \Lyranetwork\Payzen\Controller\Result\RedirectFactory $payzenRedirectFactory
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Quote\Api\CartManagementInterface $quoteManagement
+     * @param \Magento\Checkout\Model\Type\Onepage $onepage
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -48,10 +54,12 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
-        \Magento\Quote\Api\CartManagementInterface $quoteManagement
+        \Magento\Quote\Api\CartManagementInterface $quoteManagement,
+        \Magento\Checkout\Model\Type\Onepage $onepage
     ) {
         $this->restHelper = $restHelper;
         $this->quoteManagement = $quoteManagement;
+        $this->onepage = $onepage;
         $this->orderFactory = $responseProcessor->getOrderFactory();
         $this->payzenResponseFactory = $responseProcessor->getPayzenResponseFactory();
 
@@ -88,17 +96,18 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
             [
                 'params' => $data,
                 'ctx_mode' => null,
-                'key_test' => null,
-                'key_prod' => null,
+                'key_test' => '',
+                'key_prod' => '',
                 'algo' => null
             ]
         );
 
         $quoteId = (int) $response->getExtInfo('quote_id');
-        $quote = $this->quoteRepository->get($quoteId);
-        if (! $quote->getId()) {
+        if (! $quoteId || ! $this->quoteRepository->get($quoteId)->getId()) {
             throw new ResponseException("Quote #{$quoteId} not found in database.");
         }
+
+        $quote = $this->quoteRepository->get($quoteId);
 
         // Disable quote.
         if ($quote->getIsActive()) {
@@ -112,7 +121,8 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         $order->loadByIncrementId($quote->getReservedOrderId());
 
         if (! $order->getId()) {
-            $this->getOnepageForQuote($quote)->saveOrder();
+            // Reload onepage context.
+            $this->saveOrderForQuote($quote);
 
             // Dispatch save order event.
             $result = new DataObject();
@@ -154,11 +164,9 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         ];
     }
 
-    private function getOnepageForQuote($quote)
+    protected function saveOrderForQuote($quote)
     {
-        $onepage = $this->_objectManager->get(\Magento\Checkout\Model\Type\Onepage::class);
-        $onepage->setQuote($quote);
-
-        return $onepage;
+        $this->onepage->setQuote($quote);
+        $this->onepage->saveOrder();
     }
 }

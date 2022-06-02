@@ -167,7 +167,7 @@ class Rest
         return null;
     }
 
-    public function checkResult($response, $expectedStatuses = array())
+    public function checkResult($response, $expectedStatuses = [])
     {
         $answer = $response['answer'];
 

@@ -115,6 +115,7 @@ class Multi extends Payzen
         // Set payment_src to MOTO for backend payments.
         if ($this->dataHelper->isBackend()) {
             $this->payzenRequest->set('payment_src', 'MOTO');
+            $this->payzenRequest->set('return_mode', 'GET'); // Temporary workaround, TODO
         }
 
         $info = $this->getInfoInstance();
@@ -123,7 +124,7 @@ class Multi extends Payzen
             $this->payzenRequest->set('payment_cards', $info->getCcType());
         } else {
             // Payment_cards is given as csv by magento.
-            $paymentCards = explode(',', $this->getConfigData('payment_cards'));
+            $paymentCards = $this->dataHelper->explode(',', $this->getConfigData('payment_cards'));
             $paymentCards = in_array('', $paymentCards) ? '' : implode(';', $paymentCards);
 
             $this->payzenRequest->set('payment_cards', $paymentCards);

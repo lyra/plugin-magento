@@ -90,13 +90,16 @@ class Response extends \Magento\Framework\App\Action\Action
         $this->messageManager->getMessages(true);
 
         if ($order) {
+            // For Magento versions < 2.4.0.
             $this->dataHelper->getCheckout()
                 ->setLastQuoteId($order->getQuoteId())
                 ->setLastOrderId($order->getId());
         }
 
+        $storeId = $order->getStore()->getId() ? $order->getStore()->getId() : $this->dataHelper->getCheckoutStoreId();
+
         $this->dataHelper->log('Redirecting to one page checkout failure page.' . ($order ? " Order #{$order->getIncrementId()}." : ''));
-        return $this->createResult('checkout/onepage/failure', ['_scope' => $this->dataHelper->getCheckoutStoreId()]);
+        return $this->createResult('checkout/onepage/failure', ['_scope' => $storeId]);
     }
 
     /**

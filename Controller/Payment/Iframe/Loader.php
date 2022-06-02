@@ -47,7 +47,6 @@ class Loader extends \Magento\Framework\App\Action\Action
 
             $this->dataHelper->log("Payment within iframe is cancelled for order #{$lastIncrementId}.");
 
-            $lastIncrementId = $checkout->getData('payzen_last_real_id');
             $order = $this->orderFactory->create();
             $order->loadByIncrementId($lastIncrementId);
 

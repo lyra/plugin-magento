@@ -9,9 +9,6 @@
  */
 namespace Lyranetwork\Payzen\Controller\Plugin;
 
-use Magento\Framework\App\Request\Http;
-use Magento\Framework\Session\SessionStartChecker;
-
 /**
  * Class: SessionChecker
  *
@@ -27,14 +24,14 @@ class SessionChecker
     ];
 
     /**
-     * @var Http
+     * @var \Magento\Framework\App\Request\Http
      */
     private $request;
 
     /**
-     * @param Http $request
+     * @param \Magento\Framework\App\Request\Http $request
      */
-    public function __construct(Http $request)
+    public function __construct(\Magento\Framework\App\Request\Http $request)
     {
         $this->request = $request;
     }
@@ -50,14 +47,14 @@ class SessionChecker
             return false;
         }
 
-        $inArray = true;
-        foreach (self::PAYMENT_RETURN_PATHS as $path) {
-            if (strpos((string)$this->request->getPathInfo(), $path) !== false) {
-                $inArray = false;
-                break;
+        if ($this->request->getFrontName() == \Magento\Framework\App\Area::AREA_FRONTEND) {
+            foreach (self::PAYMENT_RETURN_PATHS as $path) {
+                if (strpos((string)$this->request->getPathInfo(), $path) !== false) {
+                    return false;
+                }
             }
         }
 
-        return $inArray;
+        return true;
     }
 }

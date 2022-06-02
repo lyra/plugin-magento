@@ -12,10 +12,20 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
+        <csp>
+            <mode>
+                <storefront>
+                    <report_only>0</report_only>
+                </storefront>
+                <admin>
+                    <report_only>0</report_only>
+                </admin>
+            </mode>
+        </csp>
         <payzen>
             <general>
                 <support_email><![CDATA[support@payzen.eu]]></support_email>
-                <plugin_version>2.5.11</plugin_version>
+                <plugin_version>2.5.12</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_2.x</cms_identifier>
                 <enable_logs>1</enable_logs>

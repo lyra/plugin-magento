@@ -335,7 +335,7 @@ class Checkout
             }
 
             // Get carrier name.
-            $carriers = $this->shippingConfig->getAllCarriers($this->dataHelper->getCheckoutStoreId());
+            $carriers = $this->shippingConfig->getAllCarriers($order->getStore()->getId());
             $carrierCode = substr($shippingMethod['code'], 0, strpos($shippingMethod['code'], '_'));
             $carrierName = $carriers[$carrierCode]->getConfigData('title');
 

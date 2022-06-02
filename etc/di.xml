@@ -30,6 +30,10 @@
         <plugin name="payzen_skip_csrf_validator" type="Lyranetwork\Payzen\Controller\Plugin\CsrfValidator" />
     </type>
 
+    <type name="Magento\Backend\App\Request\BackendValidator">
+        <plugin name="payzen_skip_backend_csrf_validator" type="Lyranetwork\Payzen\Controller\Plugin\CsrfValidator" />
+    </type>
+
     <type name="Magento\Framework\Session\SessionStartChecker">
         <plugin name="payzen_session_checker" type="Lyranetwork\Payzen\Controller\Plugin\SessionChecker" />
     </type>
