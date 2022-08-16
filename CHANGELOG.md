@@ -1,3 +1,7 @@
+2.5.13, 2022-08-16:
+- Allow module to be installed when using php 8.1 or higher.
+- [oney] Update supported phone number format.
+
 2.5.12, 2022-06-02:
 - Bug fix: Fix session recovery issues on return page in Magento 2.4.x.
 - Bug fix: Fix error when receiving IPN on cancellation calls.

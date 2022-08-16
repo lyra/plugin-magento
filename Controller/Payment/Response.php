@@ -96,7 +96,7 @@ class Response extends \Magento\Framework\App\Action\Action
                 ->setLastOrderId($order->getId());
         }
 
-        $storeId = $order->getStore()->getId() ? $order->getStore()->getId() : $this->dataHelper->getCheckoutStoreId();
+        $storeId = ($order && $order->getStore()->getId()) ? $order->getStore()->getId() : $this->dataHelper->getCheckoutStoreId();
 
         $this->dataHelper->log('Redirecting to one page checkout failure page.' . ($order ? " Order #{$order->getIncrementId()}." : ''));
         return $this->createResult('checkout/onepage/failure', ['_scope' => $storeId]);

@@ -280,6 +280,9 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $threedsMpi = '2';
         }
 
+        // Sanitize phone number before sending it to the gateway.
+        $telephone = str_replace([' ', '.', '-'], '', $order->getBillingAddress()->getTelephone());
+
         $this->payzenRequest->set('threeds_mpi', $threedsMpi);
 
         $this->payzenRequest->set('cust_email', $order->getCustomerEmail());
@@ -293,8 +296,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->payzenRequest->set('cust_city', $order->getBillingAddress()->getCity());
         $this->payzenRequest->set('cust_state', $order->getBillingAddress()->getRegionCode());
         $this->payzenRequest->set('cust_country', $order->getBillingAddress()->getCountryId());
-        $this->payzenRequest->set('cust_phone', $order->getBillingAddress()->getTelephone());
-        $this->payzenRequest->set('cust_cell_phone', $order->getBillingAddress()->getTelephone());
+        $this->payzenRequest->set('cust_phone', $telephone);
+        $this->payzenRequest->set('cust_cell_phone', $telephone);
 
         $address = $order->getShippingAddress();
         if (is_object($address)) { // Shipping is supported.
@@ -305,7 +308,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->payzenRequest->set('ship_to_street2', $address->getStreetLine(2));
             $this->payzenRequest->set('ship_to_state', $address->getRegionCode());
             $this->payzenRequest->set('ship_to_country', $address->getCountryId());
-            $this->payzenRequest->set('ship_to_phone_num', $address->getTelephone());
+            $this->payzenRequest->set('ship_to_phone_num', str_replace([' ', '.', '-'], '', $address->getTelephone()));
             $this->payzenRequest->set('ship_to_zip', $address->getPostcode());
         }
 
@@ -800,7 +803,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
             $this->dataHelper->log("Saving validated order #{$order->getIncrementId()}.");
             $order->save();
-            $this->dataHelper->log("Valdiated order #{$order->getIncrementId()} has been saved.");
+            $this->dataHelper->log("Validated order #{$order->getIncrementId()} has been saved.");
 
             $this->dataHelper->log("Payment information updated for validated order #{$order->getIncrementId()}.");
             $this->messageManager->addSuccessMessage(__('Payment validated successfully.'));
