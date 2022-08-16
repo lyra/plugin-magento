@@ -194,6 +194,8 @@
 "Field","Field"
 "Placeholder","Placeholder"
 "Texts to use as placeholders for embedded payment fields.","Texts to use as placeholders for embedded payment fields."
+"Register card label","Register card label"
+"Label displayed to invite buyers to register their card data.","Label displayed to invite buyers to register their card data."
 "Payment attempts number","Payment attempts number"
 "Maximum number of payment retries after a failed payment (between 0 and 9). If blank, the gateway default value is 3.","Maximum number of payment retries after a failed payment (between 0 and 9). If blank, the gateway default value is 3."
 "ATTENTION: The payment in installments feature activation is subject to the prior agreement of Société Générale.<br />If you enable this feature while you have not the associated option, an error 10000 – INSTALLMENTS_NOT_ALLOWED or 07 - PAYMENT_CONFIG will occur and the buyer will not be able to pay.","ATTENTION: The payment in installments feature activation is subject to the prior agreement of Société Générale.<br />If you enable this feature while you have not the associated option, an error 10000 – INSTALLMENTS_NOT_ALLOWED or 07 - PAYMENT_CONFIG will occur and the buyer will not be able to pay."

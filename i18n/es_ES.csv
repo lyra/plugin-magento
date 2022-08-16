@@ -193,6 +193,8 @@
 "Field","Compo"
 "Placeholder","Marcador de posición"
 "Texts to use as placeholders for embedded payment fields.","Textos a usar como marcadores de posición para campos de pago incrustados."
+"Register card label","Etiqueta de registro de la tarjeta"
+"Label displayed to invite buyers to register their card data.","Etiqueta mostrada para invitar a los compradores a registrar los datos de la tarjeta."
 "Payment attempts number","Número de intentos de pago"
 "Maximum number of payment retries after a failed payment (between 0 and 10). Leave blank to use gateway configuration.","Número máximo de intentos de pago después de un pago fallido (entre 0 y 10). Deje en blanco para usar la configuración del portal."
 "ATTENTION: The payment in installments feature activation is subject to the prior agreement of Société Générale.<br />If you enable this feature while you have not the associated option, an error 10000 – INSTALLMENTS_NOT_ALLOWED or 07 - PAYMENT_CONFIG will occur and the buyer will not be able to pay.","ATENCIÓN: La activación de la función de pago en N vencimientos está sujeta al acuerdo previo de Societé Générale.<br />Si habilita esta función cuando no tiene la opción asociada, ocurrirá un error 10000 – INSTALLMENTS_NOT_ALLOWED o 07 - PAYMENT_CONFIG y el comprador no podrá pagar."

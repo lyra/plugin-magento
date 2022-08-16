@@ -47,7 +47,7 @@ class SessionChecker
             return false;
         }
 
-        if ($this->request->getFrontName() == \Magento\Framework\App\Area::AREA_FRONTEND) {
+        if ($this->request->getFrontName() === 'payzen') {
             foreach (self::PAYMENT_RETURN_PATHS as $path) {
                 if (strpos((string)$this->request->getPathInfo(), $path) !== false) {
                     return false;

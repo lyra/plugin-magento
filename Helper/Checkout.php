@@ -398,6 +398,7 @@ class Checkout
             }
 
             if ($useOney) { // Modify address to be sent to Oney.
+                // TODO update parameters sent to Oney.
                 $payzenRequest->set('cust_country', 'FR'); // Send FR even address is in DOM-TOM unless form is rejected.
 
                 $payzenRequest->set('ship_to_state', null); // Not sent to Oney.
@@ -414,7 +415,7 @@ class Checkout
 
         // Oney validation regular expressions.
         $nameRegex = "#^[A-ZÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,63}$#ui";
-        $phoneRegex = "#^[0-9]{10}$#";
+        $phoneRegex = "#^(\(\+(33|34)\)|00(33|34)|\+(33|34)|(33|34)|\+(33|34)\(0\)|0)[0-9]{9}$#";
         $cityRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '-]{1,127}$#ui";
         $streetRegex = "#^[A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ/ '.,-]{1,127}$#ui";
         $countryRegex = "#^FR|GP|MQ|GF|RE|YT$#i";
@@ -423,9 +424,12 @@ class Checkout
         // Address type.
         $addressType = ($address->getAddressType() === 'billing') ? 'billing address' : 'delivery address';
 
+        // Sainitize phone number before applying the regex.
+        $telephone = str_replace([' ', '.', '-'], '', $address->getTelephone());
+
         $this->checkFieldValidity($address->getLastname(), $nameRegex, 'Last Name', $addressType);
         $this->checkFieldValidity($address->getFirstname(), $nameRegex, 'First Name', $addressType);
-        $this->checkFieldValidity($address->getTelephone(), $phoneRegex, 'Telephone', $addressType, false);
+        $this->checkFieldValidity($telephone, $phoneRegex, 'Telephone', $addressType, false);
         $this->checkFieldValidity($address->getStreetLine(1), $streetRegex, 'Address', $addressType);
         $this->checkFieldValidity($address->getStreetLine(2), $streetRegex, 'Address', $addressType, false);
         $this->checkFieldValidity($address->getPostcode(), $zipRegex, 'Postcode', $addressType);
@@ -448,6 +452,11 @@ class Checkout
             $replaceRegex = preg_replace("/{(.*?)}/", '', $regex);
             $replaceRegex = str_replace(array('^', '$'), '', $replaceRegex);
             $invalidChars = preg_replace($replaceRegex, '', $field);
+
+            if (empty($invalidChars)) {
+                $this->setErrorMsg($invalidMsg, $fieldName, $addressType);
+                return;
+            }
 
             $arr = str_split($invalidChars);
             $invalidChars = '';

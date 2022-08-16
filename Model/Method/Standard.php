@@ -423,8 +423,8 @@ class Standard extends Payzen
                 'address2' => $shippingAddress->getStreetLine(2),
                 'zipCode' => $shippingAddress->getPostcode(),
                 'city' => $shippingAddress->getCity(),
-                'state' => $shippingAddress->getregion(),
-                'phoneNumber' => $shippingAddress->gettelephone(),
+                'state' => $shippingAddress->getRegion(),
+                'phoneNumber' => $shippingAddress->getTelephone(),
                 'country' => $shippingAddress->getCountryId()
             );
         }
