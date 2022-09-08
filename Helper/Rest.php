@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Helper;
 
-use Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 
 class Rest
 {
@@ -70,6 +70,11 @@ class Rest
 
         $response['vads_amount'] = $this->getProperty($transaction, 'amount');
         $response['vads_currency'] = PayzenApi::getCurrencyNumCode($this->getProperty($transaction, 'currency'));
+
+        if ($paymentToken = $this->getProperty($transaction, 'paymentMethodToken')) {
+            $response['vads_identifier'] = $paymentToken;
+            $response['vads_identifier_status'] = 'CREATED';
+        }
 
         if ($orderDetails = $this->getProperty($answer, 'orderDetails')) {
             $response['vads_order_id'] = $this->getProperty($orderDetails, 'orderId');
@@ -177,7 +182,7 @@ class Rest
                 $msg .= ' Detailed message: ' . $answer['detailedErrorMessage'] . ($answer['detailedErrorCode'] ?
                     ' (' . $answer['detailedErrorCode'] . ').' : '');
             }
-
+            $this->dataHelper->log('Hash algorithm is not supported: ' . print_r($answer, true), \Psr\Log\LogLevel::ERROR);
             throw new \Lyranetwork\Payzen\Model\RestException($msg, $answer['errorCode']);
         } elseif (! empty($expectedStatuses) && ! in_array($answer['detailedStatus'], $expectedStatuses)) {
             throw new \UnexpectedValueException(
@@ -253,7 +258,7 @@ class Rest
             ];
 
             // Perform REST request to check identifier.
-            $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
+            $client = new \Lyranetwork\Payzen\Model\Api\Rest\Api(
                 $this->dataHelper->getCommonConfigData('rest_url'),
                 $this->dataHelper->getCommonConfigData('site_id'),
                 $this->getPrivateKey()

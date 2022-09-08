@@ -1,3 +1,8 @@
+2.6.0, 2022-09-08:
+- [embedded] Possibility to enable payment by alias with embedded payment fields.
+- Update list of supported payment means.
+- Added Portuguese translation.
+
 2.5.13, 2022-08-16:
 - Allow module to be installed when using php 8.1 or higher.
 - [oney] Update supported phone number format.

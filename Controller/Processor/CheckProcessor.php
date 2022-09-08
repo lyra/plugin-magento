@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
 
-use \Lyranetwork\Payzen\Model\Api\PayzenApi;
+use \Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 use Lyranetwork\Payzen\Model\ResponseException;
 
 class CheckProcessor
@@ -40,7 +40,7 @@ class CheckProcessor
     protected $orderFactory;
 
     /**
-     * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
+     * @var \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory
      */
     protected $payzenResponseFactory;
 
@@ -50,7 +50,7 @@ class CheckProcessor
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
+     * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -58,7 +58,7 @@ class CheckProcessor
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Magento\Sales\Model\OrderFactory $orderFactory,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
+        \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
     ) {
         $this->storeManager = $storeManager;
         $this->emulation = $emulation;
@@ -70,7 +70,7 @@ class CheckProcessor
 
     public function execute(
         \Magento\Sales\Model\Order $order,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+        \Lyranetwork\Payzen\Model\Api\Form\Response $response
     ) {
         $this->dataHelper->log("Request authenticated for order #{$order->getIncrementId()}.");
 

@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Block\Payment\Rest;
 
-use Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 
 class Head extends \Magento\Framework\View\Element\Template
 {
@@ -106,6 +106,11 @@ class Head extends \Magento\Framework\View\Element\Template
         }
 
         return null;
+    }
+
+    public function getCardLabel()
+    {
+        return $this->method->getConfigData('rest_card_register_label') ? $this->method->getConfigData('rest_card_register_label') : null;
     }
 
     /**

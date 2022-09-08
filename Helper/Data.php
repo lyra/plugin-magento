@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Helper;
 
-use Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;

@@ -80,6 +80,10 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
             return false;
         }
 
+        if (! $this->method->isOneClickActive()) {
+            return false;
+        }
+
         if (! $this->method->isRestMode()) {
             return false;
         }

@@ -26,7 +26,7 @@ class ChoozeoPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\C
         $this->addColumn(
             'label',
             [
-                'label' => __('Label'),
+                'label' => __('Label '),
                 'style' => 'width: 160px;',
                 'renderer' => $this->getLabelRenderer('_title')
             ]

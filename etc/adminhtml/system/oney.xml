@@ -36,14 +36,14 @@
             </field>
 
             <field id="sort_order" translate="label comment" type="text" sortOrder="613" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Sort order]]></label>
+                <label><![CDATA[Sort order ]]></label>
                 <comment><![CDATA[In the payment methods list.]]></comment>
                 <config_path>payment/payzen_oney/sort_order</config_path>
             </field>
 
             <field id="module_logo" translate="label comment" type="image" sortOrder="614" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Logo]]></label>
-                <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
+                <comment><![CDATA[Allowed file types: jpeg, gif, png. ]]></comment>
                 <config_path>payment/payzen_oney/module_logo</config_path>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Logo</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>

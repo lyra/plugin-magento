@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Helper;
 
-use Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 
 class Payment
 {
@@ -153,11 +153,11 @@ class Payment
      * Update order status and eventually create invoice.
      *
      * @param \Magento\Sales\Model\Order $order
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+     * @param \Lyranetwork\Payzen\Model\Api\Form\Response $response
      */
     public function registerOrder(
         \Magento\Sales\Model\Order $order,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+        \Lyranetwork\Payzen\Model\Api\Form\Response $response
     ) {
         $this->dataHelper->log("Saving payment for order #{$order->getIncrementId()}.");
 
@@ -203,13 +203,13 @@ class Payment
      * Get new order state and status according to gateway response.
      *
      * @param \Magento\Sales\Model\Order $order
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+     * @param \Lyranetwork\Payzen\Model\Api\Form\Response $response
      * @param boolean $ignoreFraud
      * @return \Magento\Framework\DataObject
      */
     public function nextOrderState(
         \Magento\Sales\Model\Order $order,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response,
+        \Lyranetwork\Payzen\Model\Api\Form\Response $response,
         $ignoreFraud = false
     ) {
         if ($response->isToValidatePayment()) {
@@ -252,7 +252,7 @@ class Payment
         return $stateObject;
     }
 
-    public function updatePaymentInfo(\Magento\Sales\Model\Order $order, \Lyranetwork\Payzen\Model\Api\PayzenResponse $response)
+    public function updatePaymentInfo(\Magento\Sales\Model\Order $order, \Lyranetwork\Payzen\Model\Api\Form\Response $response)
     {
         $this->dataHelper->log("Updating payment information for order #{$order->getIncrementId()}.");
 
@@ -549,7 +549,7 @@ class Payment
 
     public function saveIdentifier(
         \Magento\Sales\Model\Order $order,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+        \Lyranetwork\Payzen\Model\Api\Form\Response $response
     ) {
         if (! $order->getCustomerId()) {
             return;
@@ -591,7 +591,7 @@ class Payment
 
     public function saveSepaIdentifier(
         \Magento\Sales\Model\Order $order,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+        \Lyranetwork\Payzen\Model\Api\Form\Response $response
     ) {
         if (! $order->getCustomerId()) {
             return;
@@ -649,7 +649,7 @@ class Payment
                 $requestData = ['paymentMethodToken' => $identifier];
 
                 // Perform REST request to cancel identifier.
-                $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
+                $client = new \Lyranetwork\Payzen\Model\Api\Rest\Api(
                     $this->dataHelper->getCommonConfigData('rest_url'),
                     $this->dataHelper->getCommonConfigData('site_id'),
                     $this->restHelper->getPrivateKey()
@@ -782,11 +782,11 @@ class Payment
      * Cancel order.
      *
      * @param \Magento\Sales\Model\Order $order
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+     * @param \Lyranetwork\Payzen\Model\Api\Form\Response $response
      */
     public function cancelOrder(
         \Magento\Sales\Model\Order $order,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponse $response
+        \Lyranetwork\Payzen\Model\Api\Form\Response $response
     ) {
         $this->dataHelper->log("Canceling order #{$order->getIncrementId()}.");
 

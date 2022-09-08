@@ -30,7 +30,8 @@ if ($cvvLabel = $block->getPlaceholder('cvv')) {
         kr-public-key="<?php echo $block->escapeUrl($block->getPublicKey()); ?>"
         kr-post-url-success="<?php echo $block->escapeUrl($block->getReturnUrl()); ?>"
         kr-post-url-refused="<?php echo $block->escapeUrl($block->getReturnUrl()); ?>"
-        kr-language="<?php echo $block->escapeUrl($block->getLanguage()); ?>"></script>
+        kr-language="<?php echo $block->escapeUrl($block->getLanguage()); ?>"
+        kr-label-do-register="<?php echo $block->escapeUrl($block->getCardLabel()); ?>"></script>
 
 <link rel="stylesheet" href="<?php echo $block->escapeUrl($block->getStaticUrl()); ?>js/krypton-client/V4.0/ext/<?php echo $block->escapeUrl($block->getTheme()); ?>-reset.css">
 <script src="<?php echo $block->escapeUrl($block->getStaticUrl()); ?>js/krypton-client/V4.0/ext/<?php echo $block->escapeUrl($block->getTheme()); ?>.js"></script>

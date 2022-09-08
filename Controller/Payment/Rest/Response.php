@@ -20,7 +20,7 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
     protected $orderFactory;
 
     /**
-     * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
+     * @var \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory
      */
     protected $payzenResponseFactory;
 

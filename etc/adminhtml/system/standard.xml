@@ -34,14 +34,14 @@
             </field>
 
             <field id="sort_order" translate="label comment" type="text" sortOrder="213" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Sort order]]></label>
+                <label><![CDATA[Sort order ]]></label>
                 <comment><![CDATA[In the payment methods list.]]></comment>
                 <config_path>payment/payzen_standard/sort_order</config_path>
             </field>
 
             <field id="module_logo" translate="label comment" type="image" sortOrder="214" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Logo]]></label>
-                <comment><![CDATA[Allowed file types: jpeg, gif, png.]]></comment>
+                <comment><![CDATA[Allowed file types: jpeg, gif, png. ]]></comment>
                 <config_path>payment/payzen_standard/module_logo</config_path>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Logo</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Logo</backend_model>
@@ -124,9 +124,6 @@
                 <comment><![CDATA[The payment by token allows to pay orders without re-entering bank data at each payment. The <b>Payment by token</b> option should be enabled on your PayZen store to use this feature.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payment/payzen_standard/oneclick_active</config_path>
-                <depends>
-                    <field id="card_info_mode" separator=",">1,2,3</field>
-                </depends>
             </field>
 
             <field id="rest_theme" translate="label comment" type="select" sortOrder="244" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -150,7 +147,16 @@
                 </depends>
             </field>
 
-            <field id="rest_attempts" translate="label comment" type="text" sortOrder="246" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_card_register_label" translate="label comment" type="text" sortOrder="246" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Register card label]]></label>
+                <comment><![CDATA[Label displayed to invite buyers to register their card data.]]></comment>
+                <config_path>payment/payzen_standard/rest_card_register_label</config_path>
+                <depends>
+                    <field id="card_info_mode" separator=",">4,5</field>
+                </depends>
+            </field>
+
+            <field id="rest_attempts" translate="label comment" type="text" sortOrder="247" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Payment attempts number]]></label>
                 <comment><![CDATA[Maximum number of payment retries after a failed payment (between 0 and 9). If blank, the gateway default value is 3.]]></comment>
                 <config_path>payment/payzen_standard/rest_attempts</config_path>

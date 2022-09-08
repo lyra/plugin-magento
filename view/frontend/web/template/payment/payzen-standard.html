@@ -48,7 +48,7 @@
                 <!-- ko template: { name: 'Lyranetwork_Payzen/payment/rest', data: $parent, afterRender: function(elts) { $data.initRestEvents(elts); } } --><!-- /ko -->
             <!--/ko-->
 
-            <!-- ko if: isOneClick() -->
+            <!-- ko if: isOneClick() && !getRestFormToken() -->
                 <ul class="payzen-identifier">
                     <li class="payzen-standard-cc-block payzen-block">
                         <!-- ko if: (getEntryMode() == 2) --><!-- Payment means selection on merchant site. -->

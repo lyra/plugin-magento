@@ -9,8 +9,10 @@
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
-use Lyranetwork\Payzen\Model\Api\PayzenApi;
-use Lyranetwork\Payzen\Model\Api\PayzenRest;
+use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
+use Lyranetwork\Payzen\Model\Api\Rest\Api as PayzenRest;
+use Lyranetwork\Payzen\Model\Api\Refund\Api as PayzenRefund;
+use Lyranetwork\Payzen\Model\Api\Refund\OrderInfo as PayzenOrderInfo;
 
 abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 {
@@ -42,12 +44,12 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     protected $localeResolver;
 
     /**
-     * @var \Lyranetwork\Payzen\Model\Api\PayzenRequest
+     * @var \Lyranetwork\Payzen\Model\Api\Form\Request
      */
     protected $payzenRequest;
 
     /**
-     * @var \Lyranetwork\Payzen\Model\Api\PayzenResponse
+     * @var \Lyranetwork\Payzen\Model\Api\Form\Response
      */
     protected $payzenResponse;
 
@@ -92,6 +94,11 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     protected $restHelper;
 
     /**
+     * @var \Lyranetwork\Payzen\Helper\Refund
+     */
+    protected $refundHelper;
+
+    /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
@@ -120,8 +127,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenRequest $payzenRequest
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
+     * @param \Lyranetwork\Payzen\Model\Api\Form\Request $payzenRequest
+     * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
      * @param \Magento\Sales\Model\Order\Payment\Transaction $transaction
      * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource
      * @param \Magento\Framework\UrlInterface $urlBuilder
@@ -130,6 +137,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
+     * @param \Lyranetwork\Payzen\Helper\Refund $refundHelper
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
@@ -147,8 +155,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
-        \Lyranetwork\Payzen\Model\Api\PayzenRequestFactory $payzenRequestFactory,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory,
+        \Lyranetwork\Payzen\Model\Api\Form\RequestFactory $payzenRequestFactory,
+        \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory,
         \Magento\Sales\Model\Order\Payment\Transaction $transaction,
         \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource,
         \Magento\Framework\UrlInterface $urlBuilder,
@@ -157,6 +165,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
+        \Lyranetwork\Payzen\Helper\Refund $refundHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
@@ -176,6 +185,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->paymentHelper = $paymentHelper;
         $this->checkoutHelper = $checkoutHelper;
         $this->restHelper = $restHelper;
+        $this->refundHelper = $refundHelper;
         $this->messageManager = $messageManager;
         $this->dirReader = $dirReader;
         $this->dataObjectFactory = $dataObjectFactory;
@@ -1043,126 +1053,32 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $storeId = $order->getStore()->getId();
 
-        $this->dataHelper->log("Start refund of {$amount} {$order->getOrderCurrencyCode()} for order " .
-             "#{$order->getIncrementId()} with {$this->_code} payment method.");
-
         try {
-            // Get currency.
-            $currency = PayzenApi::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
-
-            // Retrieve transaction UUID.
-            $uuid = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TRANS_UUID);
-            if (! $uuid) { // Retro compatibility.
-                // Get UUID from Order.
-                $uuidArray = $this->getPaymentDetails($order);
-                $uuid = reset($uuidArray);
-            }
-
-            $requestData = ['uuid' => $uuid];
-
-            // Perform our request.
-            $client = new PayzenRest(
-                $this->dataHelper->getCommonConfigData('rest_url', $storeId),
-                $this->dataHelper->getCommonConfigData('site_id', $storeId),
-                $this->restHelper->getPrivateKey($storeId)
-            );
-
-            $getPaymentDetails = $client->post('V4/Transaction/Get', json_encode($requestData));
-
-            $this->restHelper->checkResult($getPaymentDetails);
-
-            $transStatus = $getPaymentDetails['answer']['detailedStatus'];
-            $amountInCents = $currency->convertAmountToInteger($amount);
-
             $commentText = $this->getUserInfo();
-
             foreach ($payment->getCreditmemo()->getComments() as $comment) {
                 $commentText .= '; ' . $comment->getComment();
             }
 
-            if ($transStatus === 'CAPTURED') { // Transaction captured, we can do refund.
-                $requestData = [
-                    'uuid' => $uuid,
-                    'amount' => $amountInCents,
-                    'resolutionMode' => 'REFUND_ONLY',
-                    'currency' => $currency->getAlpha3(),
-                    'comment' => $commentText
-                ];
+           $payzenOrderInfo = new PayzenOrderInfo();
+           $payzenOrderInfo->setOrderRemoteId($order->getIncrementId());
+           $payzenOrderInfo->setOrderId($order->getIncrementId());
+           $payzenOrderInfo->setOrderCurrencyIsoCode($order->getOrderCurrencyCode());
+           $payzenOrderInfo->setOrderCurrencySign($order->getOrderCurrencyCode());
+           $payzenOrderInfo->setOrderUserInfo($commentText);
 
-                $refundPaymentResponse = $client->post('V4/Transaction/CancelOrRefund', json_encode($requestData));
-
-                // Pending or accepted payment.
-                $successStatuses = array_merge(PayzenApi::getSuccessStatuses(), PayzenApi::getPendingStatuses());
-
-                $this->restHelper->checkResult($refundPaymentResponse, $successStatuses);
-
-                // Check operation type.
-                $transType = $refundPaymentResponse['answer']['operationType'];
-
-                if ($transType !== 'CREDIT') {
-                    throw new \UnexpectedValueException("Unexpected transaction type returned ($transType).");
-                }
-
-                // Create refund transaction in Magento.
-                $this->createRefundTransaction($payment, $refundPaymentResponse['answer']);
-
-                $this->dataHelper->log("Online money refund for order #{$order->getIncrementId()} is successful.");
-            } else {
-                $transAmount = $getPaymentDetails['answer']['amount'];
-
-                if ($amountInCents >= $transAmount) { // Transaction cancel.
-                    $requestData = [
-                        'uuid' => $uuid,
-                        'resolutionMode' => 'CANCELLATION_ONLY',
-                        'comment' => $commentText
-                    ];
-
-                    $cancelPaymentResponse = $client->post('V4/Transaction/CancelOrRefund', json_encode($requestData));
-
-                    $this->restHelper->checkResult($cancelPaymentResponse, ['CANCELLED']);
-
-                    $order->cancel();
-                    $this->dataHelper->log("Online payment cancel for order #{$order->getIncrementId()} is successful.");
-                } else {
-                    // Partial transaction cancel, call update WS.
-                    $requestData = [
-                        'uuid' => $uuid,
-                        'cardUpdate' => [
-                            'amount' => $transAmount - $amountInCents,
-                            'currency' => $currency->getAlpha3()
-                        ],
-                        'comment' => $commentText
-                    ];
-
-                    $updatePaymentResponse = $client->post('V4/Transaction/Update', json_encode($requestData));
-
-                    $this->restHelper->checkResult($updatePaymentResponse,
-                        [
-                            'AUTHORISED',
-                            'AUTHORISED_TO_VALIDATE',
-                            'WAITING_AUTHORISATION',
-                            'WAITING_AUTHORISATION_TO_VALIDATE'
-                        ]
-                    );
-                    $this->dataHelper->log("Online payment update for order #{$order->getIncrementId()} is successful.");
-                }
-            }
-        } catch(\UnexpectedValueException $e) {
-            $this->dataHelper->log(
-                "Refund payment error: {$e->getMessage()}.",
-                \Psr\Log\LogLevel::ERROR
+            $refundApi = new PayzenRefund(
+                $this->refundHelper->setPayment($payment),
+                $this->restHelper->getPrivateKey($storeId),
+                $this->dataHelper->getCommonConfigData('rest_url', $storeId),
+                $this->dataHelper->getCommonConfigData('site_id', $storeId),
+                'Magento'
             );
 
-            throw new \Exception($e->getMessage());
+            // Do online refund.
+            $order->setPayment($payment);
+            $refundApi->refund($payzenOrderInfo, $amount);
         } catch (\Exception $e) {
-            $this->dataHelper->log(
-                "Refund payment exception with code {$e->getCode()}: {$e->getMessage()}",
-                \Psr\Log\LogLevel::ERROR
-            );
-
-            if ($e->getCode() === 'PSP_083') {
-                throw new \Exception(__('Chargebacks cannot be refunded.'));
-            } elseif ($e->getCode() === 'PSP_100') {
+            if ($e->getCode() === 'PSP_100') {
                 // Merchant does not subscribe to REST WS option, refund payment offline.
                 $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
                 $this->messageManager->addWarningMessage($notice);
@@ -1179,57 +1095,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             }
         }
 
-        $this->dataHelper->log("Saving refunded order #{$order->getIncrementId()}.");
         $order->save();
         $this->dataHelper->log("Refunded order #{$order->getIncrementId()} has been saved.");
 
         return $this;
-    }
-
-    private function createRefundTransaction($payment, $refundResponse)
-    {
-        $response = $this->restHelper->convertRestResult($refundResponse, true);
-
-        // Save transaction details to sales_payment_transaction.
-        $transactionId = $response['vads_trans_id']. '-' . $response['vads_sequence_number'];
-
-        $expiry = '';
-        if ($response['vads_expiry_month'] && $response['vads_expiry_year']) {
-            $expiry = str_pad($response['vads_expiry_month'], 2, '0', STR_PAD_LEFT) . ' / ' .
-                $response['vads_expiry_year'];
-        }
-
-        // Save paid amount.
-        $currency = PayzenApi::findCurrencyByNumCode($response['vads_currency']);
-        $amount = round($currency->convertAmountToFloat($response['vads_amount']), $currency->getDecimals());
-
-        $amountDetail = $amount . ' ' . $currency->getAlpha3();
-
-        if (isset($response['vads_effective_currency']) &&
-            ($response['vads_currency'] !== $response['vads_effective_currency'])) {
-                $effectiveCurrency = PayzenApi::findCurrencyByNumCode($response['vads_effective_currency']);
-
-            $effectiveAmount = round(
-                $effectiveCurrency->convertAmountToFloat($response['vads_effective_amount']),
-                $effectiveCurrency->getDecimals()
-            );
-
-            $amountDetail = $effectiveAmount . ' ' . $effectiveCurrency->getAlpha3() . ' (' . $amountDetail . ')';
-        }
-
-        $additionalInfo = [
-            'Transaction Type' => 'CREDIT',
-            'Amount' => $amountDetail,
-            'Transaction ID' => $transactionId,
-            'Transaction UUID' => $response['vads_trans_uuid'],
-            'Transaction Status' => $response['vads_trans_status'],
-            'Means of payment' => $response['vads_card_brand'],
-            'Card Number' => $response['vads_card_number'],
-            'Expiration Date' => $expiry
-        ];
-
-        $transactionType = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND;
-        $this->paymentHelper->addTransaction($payment, $transactionType, $transactionId, $additionalInfo);
     }
 
     protected function getPaymentDetails($order, $uuidOnly = true)

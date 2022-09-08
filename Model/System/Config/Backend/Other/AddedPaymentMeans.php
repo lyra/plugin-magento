@@ -61,7 +61,7 @@ class AddedPaymentMeans extends \Lyranetwork\Payzen\Model\System\Config\Backend\
         $usedCards = [];
 
         // Get supported payment means.
-        $supportedCards = \Lyranetwork\Payzen\Model\Api\PayzenApi::getSupportedCardTypes();
+        $supportedCards = \Lyranetwork\Payzen\Model\Api\Form\Api::getSupportedCardTypes();
 
         foreach ($value as $key => $card) {
             $i++;

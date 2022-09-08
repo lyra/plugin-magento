@@ -26,7 +26,7 @@ class FullcbPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Co
         $this->addColumn(
             'label',
             [
-                'label' => __('Label'),
+                'label' => __('Label '),
                 'style' => 'width: 220px;',
             ]
         );
@@ -47,7 +47,7 @@ class FullcbPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Co
         $this->addColumn(
             'rate',
             [
-                'label' => __('Rate'),
+                'label' => __('Rate '),
                 'style' => 'width: 100px;'
             ]
         );

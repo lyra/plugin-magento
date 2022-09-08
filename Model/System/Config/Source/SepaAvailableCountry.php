@@ -13,12 +13,6 @@ class SepaAvailableCountry implements \Magento\Framework\Option\ArrayInterface
 {
     protected $translate;
 
-    protected $_availableCountries = [
-        'FI', 'AT', 'PT', 'BE', 'BG', 'ES', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FR', 'GF', 'DE', 'GI', 'GR',
-        'GP', 'HU', 'IS', 'IE', 'LV', 'LI', 'LT', 'LU', 'PT', 'MT', 'MQ', 'YT', 'MC', 'NL', 'NO', 'PL',
-        'RE', 'RO', 'BL', 'MF', 'PM', 'SM', 'SK', 'SE', 'CH', 'GB'
-    ];
-
     public function __construct(
         \Magento\Framework\Locale\TranslatedLists $translate
     ) {
@@ -27,8 +21,10 @@ class SepaAvailableCountry implements \Magento\Framework\Option\ArrayInterface
 
     public function toOptionArray()
     {
+        $sepaCountries = \Lyranetwork\Payzen\Model\Api\Form\Api::getSepaCountries();
         $result = [];
-        foreach ($this->_availableCountries as $code) {
+
+        foreach ($sepaCountries as $code) {
             $name = $this->translate->getCountryTranslation($code);
 
             if (empty($name)) {
@@ -43,10 +39,4 @@ class SepaAvailableCountry implements \Magento\Framework\Option\ArrayInterface
 
         return $result;
     }
-
-    public function getCountryCodes()
-    {
-        return $this->_availableCountries;
-    }
-
 }
