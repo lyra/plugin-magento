@@ -40,7 +40,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
     protected $quoteRepository;
 
     /**
-     * @var \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory
+     * @var \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory
      */
     protected $payzenResponseFactory;
 

@@ -38,8 +38,8 @@ class Oney extends Payzen
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenRequest $payzenRequest
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
+     * @param \Lyranetwork\Payzen\Model\Api\Form\Request $payzenRequest
+     * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
      * @param \Magento\Sales\Model\Order\Payment\Transaction $transaction
      * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource
      * @param \Magento\Framework\UrlInterface $urlBuilder
@@ -47,6 +47,8 @@ class Oney extends Payzen
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
+     * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
+     * @param \Lyranetwork\Payzen\Helper\Refund $refundHelper
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
@@ -65,8 +67,8 @@ class Oney extends Payzen
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
-        \Lyranetwork\Payzen\Model\Api\PayzenRequestFactory $payzenRequestFactory,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory,
+        \Lyranetwork\Payzen\Model\Api\Form\RequestFactory $payzenRequestFactory,
+        \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory,
         \Magento\Sales\Model\Order\Payment\Transaction $transaction,
         \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource,
         \Magento\Framework\UrlInterface $urlBuilder,
@@ -75,6 +77,7 @@ class Oney extends Payzen
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
+        \Lyranetwork\Payzen\Helper\Refund $refundHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
@@ -105,6 +108,7 @@ class Oney extends Payzen
             $paymentHelper,
             $checkoutHelper,
             $restHelper,
+            $refundHelper,
             $messageManager,
             $dirReader,
             $dataObjectFactory,

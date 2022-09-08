@@ -92,7 +92,7 @@ class ShipOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form
                     [
                         'STANDARD' => 'Standard',
                         'EXPRESS' => 'Express',
-                        'PRIORITY' => 'Priority'
+                        'PRIORITY' => 'Priority '
                     ]
                 )
             ]

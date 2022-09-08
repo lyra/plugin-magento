@@ -35,8 +35,8 @@ class Standard extends Payzen
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenRequest $payzenRequest
-     * @param \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory
+     * @param \Lyranetwork\Payzen\Model\Api\Form\Request $payzenRequest
+     * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
      * @param \Magento\Sales\Model\Order\Payment\Transaction $transaction
      * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource
      * @param \Magento\Framework\UrlInterface $urlBuilder
@@ -45,6 +45,7 @@ class Standard extends Payzen
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
+     * @param \Lyranetwork\Payzen\Helper\Refund $refundHelper
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Framework\Module\Dir\Reader $dirReader
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
@@ -64,8 +65,8 @@ class Standard extends Payzen
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
-        \Lyranetwork\Payzen\Model\Api\PayzenRequestFactory $payzenRequestFactory,
-        \Lyranetwork\Payzen\Model\Api\PayzenResponseFactory $payzenResponseFactory,
+        \Lyranetwork\Payzen\Model\Api\Form\RequestFactory $payzenRequestFactory,
+        \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory,
         \Magento\Sales\Model\Order\Payment\Transaction $transaction,
         \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction $transactionResource,
         \Magento\Framework\UrlInterface $urlBuilder,
@@ -74,6 +75,7 @@ class Standard extends Payzen
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Checkout $checkoutHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
+        \Lyranetwork\Payzen\Helper\Refund $refundHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
@@ -106,6 +108,7 @@ class Standard extends Payzen
             $paymentHelper,
             $checkoutHelper,
             $restHelper,
+            $refundHelper,
             $messageManager,
             $dirReader,
             $dataObjectFactory,
@@ -189,7 +192,7 @@ class Standard extends Payzen
         }
 
         // All cards.
-        $allCards = \Lyranetwork\Payzen\Model\Api\PayzenApi::getSupportedCardTypes();
+        $allCards = \Lyranetwork\Payzen\Model\Api\Form\Api::getSupportedCardTypes();
 
         // Selected cards from module configuration.
         $cards = $this->getConfigData('payment_cards');
@@ -327,27 +330,15 @@ class Standard extends Payzen
         return $this->getConfigData('card_info_mode');
     }
 
-    public function getRestApiFormToken()
+    protected function getRestApiFormTokenData($quote)
     {
-        $quote = $this->dataHelper->getCheckoutQuote();
-
-        if (! $quote || ! $quote->getId()) {
-            $this->dataHelper->log('Cannot create a form token. Empty quote passed.');
-            return false;
-        }
-
-        // Amount in current order currency.
         $amount = $quote->getGrandTotal();
-        if ($amount <= 0) {
-            $this->dataHelper->log('Cannot create a form token. Invalid amount passed.');
-            return false;
-        }
 
         // Currency.
-        $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
+        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());  
         if (! $currency) {
             // If currency is not supported, use base currency.
-            $currency = \Lyranetwork\Payzen\Model\Api\PayzenApi::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
+            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
 
             // ... and order total in base currency.
             $amount = $quote->getBaseGrandTotal();
@@ -430,17 +421,42 @@ class Standard extends Payzen
         }
 
         // Set the maximum attempts number in case of failed payment.
-        if ($this->getConfigData('rest_attempts')) {
+        if ($this->getConfigData('rest_attempts') !== null) {
             $data['transactionOptions']['cardOptions']['retry'] = $this->getConfigData('rest_attempts');
         }
 
-        $params = json_encode($data);
+        $customer = $quote->getCustomerId() ? $this->customerRepository->getById($quote->getCustomerId()) : null;
+
+        if ($this->isOneClickActive() && $customer) {
+            $data['formAction'] = 'CUSTOMER_WALLET';
+        }
+
+        return json_encode($data);
+    }
+
+    public function getRestApiFormToken()
+    {
+        $quote = $this->dataHelper->getCheckoutQuote();
+
+        if (! $quote || ! $quote->getId()) {
+            $this->dataHelper->log('Cannot create a form token. Empty quote passed.');
+            return false;
+        }
+
+        // Amount in current order currency.
+        if ($quote->getGrandTotal() <= 0) {
+            $this->dataHelper->log('Cannot create a form token. Invalid amount passed.');
+            return false;
+        }
+
+        $params = $this->getRestApiFormTokenData($quote);
+
         $this->dataHelper->log("Creating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}"
             . " with parameters: {$params}");
 
         try {
             // Perform our request.
-            $client = new \Lyranetwork\Payzen\Model\Api\PayzenRest(
+            $client = new \Lyranetwork\Payzen\Model\Api\Rest\Api(
                 $this->dataHelper->getCommonConfigData('rest_url'),
                 $this->dataHelper->getCommonConfigData('site_id'),
                 $this->restHelper->getPrivateKey()
@@ -472,11 +488,6 @@ class Standard extends Payzen
 
     public function isOneClickActive()
     {
-        // 1-Click enabled and not payment by embedded fields (REST API).
-        if (! $this->isRestMode() && $this->getConfigData('oneclick_active')) {
-            return true;
-        }
-
-        return false;
+        return $this->getConfigData('oneclick_active');
     }
 }

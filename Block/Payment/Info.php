@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Block\Payment;
 
-use Lyranetwork\Payzen\Model\Api\PayzenResponse;
+use Lyranetwork\Payzen\Model\Api\Form\Response as PayzenResponse;
 
 class Info extends \Magento\Payment\Block\Info
 {

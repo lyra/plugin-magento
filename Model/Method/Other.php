@@ -153,7 +153,7 @@ class Other extends Payzen
 
     public function getSupportedPaymentMeans()
     {
-        $supportedCards = \Lyranetwork\Payzen\Model\Api\PayzenApi::getSupportedCardTypes();
+        $supportedCards = \Lyranetwork\Payzen\Model\Api\Form\Api::getSupportedCardTypes();
 
         // Added payment means.
         $addedCards = $this->getAddedPaymentMeans();

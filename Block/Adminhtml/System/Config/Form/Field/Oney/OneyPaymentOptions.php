@@ -24,14 +24,14 @@ class OneyPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Conf
         $this->addColumn(
             'label',
             [
-                'label' => __('Label'),
+                'label' => __('Label '),
                 'style' => 'width: 150px;'
             ]
         );
         $this->addColumn(
             'code',
             [
-                'label' => __('Code'),
+                'label' => __('Code '),
                 'style' => 'width: 65px;'
             ]
         );
@@ -52,14 +52,14 @@ class OneyPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Conf
         $this->addColumn(
             'count',
             [
-                'label' => __('Count'),
+                'label' => __('Count '),
                 'style' => 'width: 65px;'
             ]
         );
         $this->addColumn(
             'rate',
             [
-                'label' => __('Rate'),
+                'label' => __('Rate '),
                 'style' => 'width: 70px;'
             ]
         );

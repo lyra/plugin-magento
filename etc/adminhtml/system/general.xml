@@ -47,13 +47,13 @@
             <field id="reset_module" translate="label button_label comment" sortOrder="115" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label><![CDATA[Reset the module]]></label>
                 <comment><![CDATA[Click this button to reset the module settings.]]></comment>
-                <button_label>Reset</button_label>
+                <button_label>Reset </button_label>
                 <button_url><![CDATA[payzen/system_config/reset]]></button_url>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\InitButton</frontend_model>
             </field>
 
             <field id="enable_logs" translate="label" type="select" sortOrder="116" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label><![CDATA[Logs]]></label>
+                <label><![CDATA[Logs ]]></label>
                 <comment><![CDATA[Enable / disable module logs.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payzen/general/enable_logs</config_path>

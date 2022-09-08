@@ -24,7 +24,7 @@ class MultiPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Con
         $this->addColumn(
             'label',
             [
-                'label' => __('Label'),
+                'label' => __('Label '),
                 'style' => 'width: 150px;'
             ]
         );
@@ -52,7 +52,7 @@ class MultiPaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\Con
         $this->addColumn(
             'count',
             [
-                'label' => __('Count'),
+                'label' => __('Count '),
                 'style' => 'width: 65px;'
             ]
         );

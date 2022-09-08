@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Helper;
 
-use Lyranetwork\Payzen\Model\Api\PayzenApi;
+use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class Checkout

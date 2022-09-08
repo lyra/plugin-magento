@@ -35,7 +35,7 @@
             </field>
 
             <field id="sort_order" translate="label comment" type="text" sortOrder="1113" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Sort order]]></label>
+                <label><![CDATA[Sort order ]]></label>
                 <comment><![CDATA[In the payment methods list.]]></comment>
                 <config_path>payment/payzen_other/sort_order</config_path>
             </field>

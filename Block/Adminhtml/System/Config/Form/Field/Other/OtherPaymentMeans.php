@@ -66,7 +66,7 @@ class OtherPaymentMeans extends \Lyranetwork\Payzen\Block\Adminhtml\System\Confi
         $this->addColumn(
             'label',
             [
-                'label' => __('Label'),
+                'label' => __('Label '),
                 'style' => 'width: 120px;'
             ]
         );

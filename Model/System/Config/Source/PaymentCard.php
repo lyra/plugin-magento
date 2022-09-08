@@ -20,7 +20,7 @@ class PaymentCard implements \Magento\Framework\Option\ArrayInterface
             ]
         ];
 
-        foreach (\Lyranetwork\Payzen\Model\Api\PayzenApi::getSupportedCardTypes() as $code => $name) {
+        foreach (\Lyranetwork\Payzen\Model\Api\Form\Api::getSupportedCardTypes() as $code => $name) {
             $options[] = [
                 'value' => $code,
                 'label' => $code . ' - ' . $name
