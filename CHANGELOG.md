@@ -1,3 +1,7 @@
+2.6.1, 2022-09-14:
+- [embedded] Bug Fix: Fix embedded fields displaying.
+- Minor code fixes.
+
 2.6.0, 2022-09-08:
 - [embedded] Possibility to enable payment by alias with embedded payment fields.
 - Update list of supported payment means.
