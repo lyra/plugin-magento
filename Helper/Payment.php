@@ -111,6 +111,11 @@ class Payment
     protected $timezone;
 
     /**
+     * @var \Magento\SalesRule\Model\Coupon\UpdateCouponUsages
+     */
+    protected $updateCouponUsages;
+
+    /**
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
      * @param \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface $transactionManager
@@ -122,6 +127,7 @@ class Payment
      * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
      * @param \Magento\Sales\Model\Order\Config $orderConfig
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+     * @param \Magento\SalesRule\Model\Coupon\UpdateCouponUsages $updateCouponUsages
      */
     public function __construct(
         \Magento\Framework\Event\ManagerInterface $eventManager,
@@ -134,7 +140,8 @@ class Payment
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \Magento\Sales\Model\Order\Config $orderConfig,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
+        \Magento\SalesRule\Model\Coupon\UpdateCouponUsages $updateCouponUsages
     ) {
         $this->eventManager = $eventManager;
         $this->transactionRepository = $transactionRepository;
@@ -147,6 +154,7 @@ class Payment
         $this->dataObjectFactory = $dataObjectFactory;
         $this->orderConfig = $orderConfig;
         $this->timezone = $timezone;
+        $this->updateCouponUsages = $updateCouponUsages;
     }
 
     /**
@@ -802,6 +810,8 @@ class Payment
         $this->eventManager->dispatch('order_cancel_after', [
             'order' => $order
         ]);
+
+        $this->updateCouponUsages->execute($order, false);
     }
 
     /**

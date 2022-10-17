@@ -1,5 +1,9 @@
+2.6.2, 2022-10-17:
+- Bug fix: Fix error related to number of times a coupon is used when payment is failed.
+- Bug fix: Fix error related to CURLOPT_SSL_VERIFYHOST supported values in REST API.
+
 2.6.1, 2022-09-14:
-- [embedded] Bug Fix: Fix embedded fields displaying.
+- [embedded] Bug fix: Fix embedded fields displaying.
 - Minor code fixes.
 
 2.6.0, 2022-09-08:

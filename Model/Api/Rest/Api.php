@@ -139,7 +139,7 @@ class Api
 
         // We disable SSL validation for test key because there is a lot of WAMP installations that do not handle certificates well.
         $test_mode = strpos($this->privateKey, 'testpassword_') !== false;
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, ! $test_mode);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, $test_mode ? 0 : 2);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, ! $test_mode);
 
         $raw_response = curl_exec($curl);
