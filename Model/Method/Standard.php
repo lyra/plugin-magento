@@ -335,7 +335,7 @@ class Standard extends Payzen
         $amount = $quote->getGrandTotal();
 
         // Currency.
-        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());  
+        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
         if (! $currency) {
             // If currency is not supported, use base currency.
             $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
@@ -365,10 +365,8 @@ class Standard extends Payzen
 
         $billingAddress = $quote->getBillingAddress();
 
-        if (! $quote->getReservedOrderId()) {
-            // Reserve order ID and save quote.
-            $quote->reserveOrderId()->save();
-        }
+        // Reserve order ID and save quote.
+        $quote->reserveOrderId()->save();
 
         $data = [
             'orderId' => $quote->getReservedOrderId(),
