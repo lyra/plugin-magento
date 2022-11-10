@@ -111,6 +111,9 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
 
         // Disable quote.
         if ($quote->getIsActive()) {
+            $quote->getPayment()->unsAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TOKEN_DATA);
+            $quote->getPayment()->unsAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TOKEN);
+
             $quote->setIsActive(false);
             $this->quoteRepository->save($quote);
             $this->dataHelper->log("Cleared quote, reserved order ID: #{$quote->getReservedOrderId()}.");

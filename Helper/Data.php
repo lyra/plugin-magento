@@ -241,6 +241,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->_getUrl('payzen/payment/response', $params);
     }
 
+    public function getRestReturnUrl()
+    {
+        return $this->_getUrl('payzen/payment_rest/response', ['_secure' => true]);
+    }
+
     /**
      * Return true if this is a backend session.
      *

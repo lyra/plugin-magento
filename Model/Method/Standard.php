@@ -432,7 +432,7 @@ class Standard extends Payzen
         return json_encode($data);
     }
 
-    public function getRestApiFormToken()
+    public function getRestApiFormToken($renew = false)
     {
         $quote = $this->dataHelper->getCheckoutQuote();
 
@@ -448,6 +448,26 @@ class Standard extends Payzen
         }
 
         $params = $this->getRestApiFormTokenData($quote);
+
+        $tokenDataName = \Lyranetwork\Payzen\Helper\Payment::TOKEN_DATA;
+        $tokenName = \Lyranetwork\Payzen\Helper\Payment::TOKEN;
+        $expireName = \Lyranetwork\Payzen\Helper\Payment::TOKEN_EXPIRE;
+
+        $expireTime = $quote->getPayment()->getAdditionalInformation($expireName);
+        if ($renew || ($expireTime && (time() >= $expireTime))) {
+            $quote->getPayment()->unsAdditionalInformation($tokenDataName);
+            $quote->getPayment()->unsAdditionalInformation($tokenName);
+        } else {
+            $lastTokenData = $quote->getPayment()->getAdditionalInformation($tokenDataName);
+            $lastToken = $quote->getPayment()->getAdditionalInformation($tokenName);
+
+            $tokenData = base64_encode(serialize($params));
+            if ($lastToken && $lastTokenData && ($lastTokenData === $tokenData)) {
+                // Cart data does not change from last payment attempt, do not re-create payment token.
+                $this->dataHelper->log("Cart data did not change since last payment attempt, use last created token for quote #{$quote->getId()}, reserved order ID #{$quote->getReservedOrderId()}.");
+                return $lastToken;
+            }
+        }
 
         $this->dataHelper->log("Creating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}"
             . " with parameters: {$params}");
@@ -475,8 +495,17 @@ class Standard extends Payzen
             } else {
                 $this->dataHelper->log("Form token created successfully for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
+                $token = $response['answer']['formToken'];
+                $tokenData = base64_encode(serialize($params));
+
+                $quote->getPayment()->setAdditionalInformation($tokenDataName, $tokenData);
+                $quote->getPayment()->setAdditionalInformation($tokenName, $token);
+                $quote->getPayment()->setAdditionalInformation($expireName, strtotime("+15 minutes", time()));
+
+                $quote->getPayment()->save();
+
                 // Payment form token created successfully.
-                return $response['answer']['formToken'];
+                return $token;
             }
         } catch (\Exception $e) {
             $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);
