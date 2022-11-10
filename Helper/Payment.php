@@ -15,7 +15,11 @@ class Payment
 {
     // Key to save if payment is by identifier.
     const IDENTIFIER = 'payzen_identifier';
-    const SEPA_IDENTIFIER = 'payzen_identifier';
+    const SEPA_IDENTIFIER = 'payzen_sepa_identifier'; // TODO ?????
+
+    const TOKEN_DATA = 'payzen_token_data'; // Key to save payment token data.
+    const TOKEN = 'payzen_token'; // Key to save payment token.
+    const TOKEN_EXPIRE = 'payzen_token_expire'; // Key to save payment token expected expiration delay.
 
     // Key to save choosen multi option.
     const MULTI_OPTION = 'payzen_multi_option';

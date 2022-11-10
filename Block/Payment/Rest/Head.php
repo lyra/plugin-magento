@@ -58,9 +58,7 @@ class Head extends \Magento\Framework\View\Element\Template
 
     public function getReturnUrl()
     {
-        return $this->_urlBuilder->getUrl('payzen/payment_rest/response', [
-            '_secure' => true
-        ]);
+        return $this->dataHelper->getRestReturnUrl();
     }
 
     public function getLanguage()

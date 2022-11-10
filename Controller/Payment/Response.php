@@ -157,9 +157,9 @@ class Response extends \Magento\Framework\App\Action\Action
                 $this->messageManager->addWarningMessage(__('Your payment was not accepted. Please, try to re-order.'));
             }
 
-            $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow re-order quicker.");
             $quote = $this->quoteRepository->get($order->getQuoteId());
             if ($quote->getId()) {
+                $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow re-order quicker.");
                 $quote->setIsActive(true)->setReservedOrderId(null);
                 $this->quoteRepository->save($quote);
 

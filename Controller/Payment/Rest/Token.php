@@ -128,7 +128,7 @@ class Token extends \Magento\Framework\App\Action\Action
 
         $this->dataHelper->log("Updating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
-        $token = $this->standardMethod->getRestApiFormToken();
+        $token = $this->standardMethod->getRestApiFormToken(true);
         if (! $token) {
             return $this->ajaxErrorResponse();
         }
