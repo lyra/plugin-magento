@@ -3,6 +3,7 @@
  * Copyright © Lyra Network and contributors.
  *
  * @author    Lyra Network (https://www.lyra.com/)
+ * @author    Simon Sprankel (https://github.com/sprankhub)
  * @copyright Lyra Network and contributors
  * @license   See COPYING.md for license details.
  */

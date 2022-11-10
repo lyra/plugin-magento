@@ -1,3 +1,8 @@
+2.6.3, 2022-11-10:
+- [embedded] Do not create payment token if quote data has not changed.
+- [embedded] Workarround to avoid the extra retry when the number of attempts is reached.
+- Minor code fixes.
+
 2.6.2, 2022-10-17:
 - Bug fix: Fix error related to number of times a coupon is used when payment is failed.
 - Bug fix: Fix error related to CURLOPT_SSL_VERIFYHOST supported values in REST API.
