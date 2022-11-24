@@ -253,10 +253,10 @@ define(
                             });
 
                             KR.onError(function(e) {
-                                var answer = e.metadata.answer;
+                                var answer = e.metadata.hasOwnProperty('answer') ? e.metadata.answer : null;
 
                                 // Force redirection to response page if possibility of retries is exhausted.
-                                if (answer.hasOwnProperty('clientAnswer') && (answer.clientAnswer.orderStatus == "UNPAID") && (answer.clientAnswer.orderCycle == "CLOSED")) {
+                                if (answer && (answer.clientAnswer.orderStatus == "UNPAID") && (answer.clientAnswer.orderCycle == "CLOSED")) {
                                     var data = {
                                         'kr-answer-type': 'V4/Payment',
                                         'kr-answer': JSON.stringify(answer.clientAnswer),
@@ -278,8 +278,12 @@ define(
                                         form.append(field);
                                     });
 
-                                    $(document.body).append(form);
-                                    form.submit();
+                                    KR.setFormConfig({ disabledForm: true}).then(
+                                        function(e) {
+                                            $(document.body).append(form);
+                                            form.submit();
+                                        }
+                                    );
                                 } else {
                                     fullScreenLoader.stopLoader();
                                     me.isPlaceOrderActionAllowed(true);

@@ -1,3 +1,7 @@
+2.6.4, 2022-11-24:
+- [embedded] Bug fix: Fix error related to invalid email format when customer checkout as guest.
+- Minor code fixes.
+
 2.6.3, 2022-11-10:
 - [embedded] Do not create payment token if quote data has not changed.
 - [embedded] Workarround to avoid the extra retry when the number of attempts is reached.

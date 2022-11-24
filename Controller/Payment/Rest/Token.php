@@ -116,6 +116,11 @@ class Token extends \Magento\Framework\App\Action\Action
         $this->setCheckoutMethod($quote);
 
         $quote->collectTotals();
+
+        if (! $quote->getCustomerEmail() && $quote->getBillingAddress()->getEmail()) {
+            $quote->setCustomerEmail($quote->getBillingAddress()->getEmail());
+        }
+
         $this->quoteRepository->save($quote);
 
         try {
