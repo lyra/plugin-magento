@@ -371,7 +371,7 @@ class Standard extends Payzen
         $data = [
             'orderId' => $quote->getReservedOrderId(),
             'customer' => [
-                'email' => $quote->getCustomerEmail(),
+                'email' => $quote->getCustomerEmail() ? $quote->getCustomerEmail() : $billingAddress->getEmail(),
                 'reference' => $quote->getCustomer()->getId(),
                 'billingDetails' => [
                     'language' => strtoupper($this->getPaymentLanguage()),
