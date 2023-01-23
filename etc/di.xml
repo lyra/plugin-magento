@@ -37,4 +37,8 @@
     <type name="Magento\Framework\Session\SessionStartChecker">
         <plugin name="payzen_session_checker" type="Lyranetwork\Payzen\Controller\Plugin\SessionChecker" />
     </type>
+
+    <type name="Magento\Framework\View\Asset\Minification">
+        <plugin name="payzen_exclude_js" type="Lyranetwork\Payzen\Controller\Plugin\JsExcluder" />
+    </type>
 </config>

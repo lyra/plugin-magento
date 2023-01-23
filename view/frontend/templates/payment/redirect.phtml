@@ -24,14 +24,10 @@
 </form>
 
 <script>
-    require([
-        'jquery'
-    ], function($) {
-        $(function() {
-            $('#payzen_payment_form').submit(function() {
-                $('#payzen_payment_form_btn').prop('disabled', true);
-            });
-            $('#payzen_payment_form').submit();
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("payzen_payment_form").submit(function() {
+            document.getElementById("payzen_payment_form_btn").prop('disabled', true);
         });
+        document.getElementById("payzen_payment_form").submit();
     });
 </script>
