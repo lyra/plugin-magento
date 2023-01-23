@@ -472,8 +472,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($string === null) {
             return [];
         }
-        
-         return explode($separator, $string);
+
+        return explode($separator, $string);
     }
 
     /**
