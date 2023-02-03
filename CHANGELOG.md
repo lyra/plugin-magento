@@ -1,3 +1,9 @@
+2.7.0, 2023-02-03:
+- [embedded] Added possibility to update order status on each payment attempt.
+- [embedded] Improve order and payment processing.
+- Added field for online module documentation.
+- Minor code fixes
+
 2.6.5, 2023-01-23:
 - Bug fix: Fix payment in iframe mode when JavaScript minification is enabled in Magento.
 - Update list of supported payment means.

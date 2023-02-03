@@ -102,53 +102,26 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
             ]
         );
 
-        $quoteId = (int) $response->getExtInfo('quote_id');
-        if (! $quoteId || ! $this->quoteRepository->get($quoteId)->getId()) {
-            throw new ResponseException("Quote #{$quoteId} not found in database.");
+        $orderId = (int) $response->get('order_id');
+        if (! $orderId) {
+            $this->dataHelper->log("Received empty Order ID.", \Psr\Log\LogLevel::ERROR);
+            throw new ResponseException('Order ID is empty.');
         }
 
-        $quote = $this->quoteRepository->get($quoteId);
-
-        // Disable quote.
-        if ($quote->getIsActive()) {
-            $quote->getPayment()->unsAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TOKEN_DATA);
-            $quote->getPayment()->unsAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TOKEN);
-
-            $quote->setIsActive(false);
-            $this->quoteRepository->save($quote);
-            $this->dataHelper->log("Cleared quote, reserved order ID: #{$quote->getReservedOrderId()}.");
-        }
-
-        // Token is created before order creation, search order by quote.
         $order = $this->orderFactory->create();
-        $order->loadByIncrementId($quote->getReservedOrderId());
+        $order->loadByIncrementId($orderId);
 
         if (! $order->getId()) {
-            // Reload onepage context.
-            $this->saveOrderForQuote($quote);
+            $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
+            throw new ResponseException("Order not found with ID #{$orderId}.");
+        }
 
-            // Dispatch save order event.
-            $result = new DataObject();
-            $result->setData('success', true);
-            $result->setData('error', false);
-
-            $this->_eventManager->dispatch(
-                'checkout_controller_onepage_saveOrder',
-                [
-                    'result' => $result,
-                    'action' => $this
-                ]
-            );
-
-            // Load newly created order.
-            $order->loadByIncrementId($quote->getReservedOrderId());
-            if (! $order->getId()) {
-                throw new ResponseException("Order cannot be created for quote #{$quoteId}.");
-            }
-
-            $this->dataHelper->log("Order #{$order->getIncrementId()} has been created for quote #{$quoteId}.");
-        } else {
-            $this->dataHelper->log("Found order #{$order->getIncrementId()} for quote #{$quoteId}.");
+        // Disable quote.
+        $quote = $this->quoteRepository->get($order->getQuoteId());
+        if ($quote->getIsActive()) {
+            $quote->setIsActive(false);
+            $this->quoteRepository->save($quote);
+            $this->dataHelper->log("Cleared quote, order ID: #{$orderId}.");
         }
 
         $storeId = $order->getStore()->getId();
@@ -165,11 +138,5 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
             'response' => $response,
             'order' => $order
         ];
-    }
-
-    protected function saveOrderForQuote($quote)
-    {
-        $this->onepage->setQuote($quote);
-        $this->onepage->saveOrder();
     }
 }

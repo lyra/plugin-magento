@@ -15,11 +15,10 @@ class Payment
 {
     // Key to save if payment is by identifier.
     const IDENTIFIER = 'payzen_identifier';
-    const SEPA_IDENTIFIER = 'payzen_sepa_identifier'; // TODO ?????
+    const SEPA_IDENTIFIER = 'payzen_sepa_identifier';
 
     const TOKEN_DATA = 'payzen_token_data'; // Key to save payment token data.
     const TOKEN = 'payzen_token'; // Key to save payment token.
-    const TOKEN_EXPIRE = 'payzen_token_expire'; // Key to save payment token expected expiration delay.
 
     // Key to save choosen multi option.
     const MULTI_OPTION = 'payzen_multi_option';
@@ -284,6 +283,8 @@ class Payment
             }
 
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE, $restErrorMsg);
+        } else {
+            $order->getPayment()->unsAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE);
         }
 
         $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
@@ -815,7 +816,11 @@ class Payment
             'order' => $order
         ]);
 
-        $this->updateCouponUsages->execute($order, false);
+        try {
+            $this->updateCouponUsages->execute($order, false);
+        } catch (\Exception $e) {
+            $this->dataHelper->log("Error occurred while updating coupon usage for order #{$order->getIncrementId()}: {$e->getMessage()}.");
+        }
     }
 
     /**

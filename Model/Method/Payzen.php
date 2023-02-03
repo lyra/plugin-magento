@@ -923,6 +923,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $stateObject->setStatus('pending_payment');
         $stateObject->setIsNotified(false);
 
+        $this->dataHelper->log("Order #{$order->getIncrementId()} has been placed.");
         return $this;
     }
 

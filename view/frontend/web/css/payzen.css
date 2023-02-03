@@ -107,3 +107,13 @@ button.kr-popin-button {
 .payzen-confirm-delete .modal-footer {
     text-align: right;
 }
+
+.loading-mask .loader p {
+    display: block;
+    font-size: 16px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -100px;
+}

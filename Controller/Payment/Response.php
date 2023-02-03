@@ -64,8 +64,12 @@ class Response extends \Magento\Framework\App\Action\Action
 
             $order = $data['order'];
             $response = $data['response'];
-
             $result = $this->responseProcessor->execute($order, $response);
+
+            $updateOrder = $this->getRequest()->getParam('payzen_update_order', false);
+            if ($updateOrder) {
+                return null;
+            }
 
             return $this->redirectResponse($order, $result['case'], $result['warn']);
         } catch (\Lyranetwork\Payzen\Model\ResponseException $e) {

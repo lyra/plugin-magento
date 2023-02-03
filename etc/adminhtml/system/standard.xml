@@ -164,6 +164,16 @@
                     <field id="card_info_mode" separator=",">4,5</field>
                 </depends>
             </field>
+
+            <field id="rest_update_order" translate="label comment" type="select" sortOrder="248" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Always update order status]]></label>
+                <comment><![CDATA[Possibility to update order status on each payment attempt.]]></comment>
+                <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                <config_path>payment/payzen_standard/rest_update_order</config_path>
+                <depends>
+                    <field id="card_info_mode" separator=",">4,5</field>
+                </depends>
+            </field>
         </group>
     </group>
 </include>

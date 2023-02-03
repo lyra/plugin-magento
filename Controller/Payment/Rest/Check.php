@@ -112,60 +112,64 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             ]
         );
 
-        $quoteId = (int) $response->getExtInfo('quote_id');
-        if (! $quoteId || ! $this->quoteRepository->get($quoteId)->getId()) {
-            $this->dataHelper->log("Quote not found with ID #{$quoteId}.", \Psr\Log\LogLevel::ERROR);
-            throw new ResponseException($response->getOutputForGateway('order_not_found'));
+        $orderId = (int) $response->get('order_id');
+        if (! $orderId) {
+            $this->dataHelper->log("Received empty Order ID.", \Psr\Log\LogLevel::ERROR);
+            throw new ResponseException('Order ID is empty.');
         }
 
-        $quote = $this->quoteRepository->get($quoteId);
+        $order = $this->orderFactory->create();
+        $order->loadByIncrementId($orderId);
+
+        if (! $order->getId()) {
+            // Backward compatibility with older versions.
+            if ($quoteId = (int) $response->getExtInfo('quote_id')) {
+                if ($this->quoteRepository->get($quoteId)->getId()) {
+                    $this->dataHelper->log("Quote not found with ID #{$quoteId}.", \Psr\Log\LogLevel::ERROR);
+                    throw new ResponseException($response->getOutputForGateway('order_not_found'));
+                }
+
+                $quote = $this->quoteRepository->get($quoteId);
+                $this->saveOrderForQuote($quote);
+
+                // Dispatch save order event.
+                $result = new DataObject();
+                $result->setData('success', true);
+                $result->setData('error', false);
+
+                $this->_eventManager->dispatch(
+                    'checkout_controller_onepage_saveOrder',
+                    [
+                        'result' => $result,
+                        'action' => $this
+                    ]
+                );
+
+                // Load newly created order.
+                $order->loadByIncrementId($quote->getReservedOrderId());
+                if (! $order->getId()) {
+                    $this->dataHelper->log("Order cannot be created. Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
+                    throw new ResponseException($response->getOutputForGateway('ko', 'Error when trying to create order.'));
+                }
+            } else {
+                $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
+                throw new ResponseException("Order not found with ID #{$orderId}.");
+            }
+        }
 
         // Disable quote.
+        $quote = $this->quoteRepository->get($order->getQuoteId());
         if ($quote->getIsActive()) {
-            $quote->getPayment()->unsAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TOKEN_DATA);
-            $quote->getPayment()->unsAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::TOKEN);
-
             $quote->setIsActive(false);
             $this->quoteRepository->save($quote);
-            $this->dataHelper->log("Cleared quote, reserved order ID: #{$quote->getReservedOrderId()}.");
+            $this->dataHelper->log("Cleared quote, order ID: #{$orderId}.");
         }
 
-        // Case of failure or expiration when retries are enabled, do nothing before last attempt.
-        if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED')) {
-            $this->dataHelper->log("Payment is not accepted but buyer can try to re-order. Do not create order at this time.
-                Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.");
+        // Case of failure or expiration when retries are enabled and Update Order option not is not enabled, do nothing before last attempt.
+        if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED') && ! $response->getExtInfo('update_order')) {
+            $this->dataHelper->log("Payment is not accepted but buyer can try to re-order. Do not process order at this time.
+                Order ID: #{$orderId}.");
             throw new ResponseException($response->getOutputForGateway('payment_ko_bis'));
-        }
-
-        // Token is created before order creation, search order by quote.
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($quote->getReservedOrderId());
-        if (! $order->getId()) {
-            $this->saveOrderForQuote($quote);
-
-            // Dispatch save order event.
-            $result = new DataObject();
-            $result->setData('success', true);
-            $result->setData('error', false);
-
-            $this->_eventManager->dispatch(
-                'checkout_controller_onepage_saveOrder',
-                [
-                    'result' => $result,
-                    'action' => $this
-                ]
-            );
-
-            // Load newly created order.
-            $order->loadByIncrementId($quote->getReservedOrderId());
-            if (! $order->getId()) {
-                $this->dataHelper->log("Order cannot be created. Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
-                throw new ResponseException($response->getOutputForGateway('ko', 'Error when trying to create order.'));
-            }
-
-            $this->dataHelper->log("Order #{$order->getIncrementId()} has been created for quote #{$quoteId}.");
-        } else {
-            $this->dataHelper->log("Found order #{$order->getIncrementId()} for quote #{$quoteId}.");
         }
 
         // Get store id from order.
@@ -193,11 +197,16 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
 
     protected function saveOrderForQuote($quote)
     {
-        $this->onepage->setQuote($quote);
-        if ($quote->getCustomerId()) {
-            $this->onepage->getCustomerSession()->loginById($quote->getCustomerId());
-        }
+        try {
+            $this->onepage->setQuote($quote);
+            if ($quote->getCustomerId()) {
+                $this->onepage->getCustomerSession()->loginById($quote->getCustomerId());
+            }
 
-        $this->onepage->saveOrder();
+            $this->onepage->saveOrder();
+        } catch (Exception $e) {
+            $this->dataHelper->log("Order cannot be created. Quote ID: #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
+            throw new ResponseException('Error when trying to create order.');
+        }
     }
 }
