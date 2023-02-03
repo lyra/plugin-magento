@@ -103,7 +103,31 @@ class ResponseProcessor
                 'payzen_pending_transfer' // For SEPA payments.
             ];
 
-            if ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
+            if ($order->isCanceled() && $response->isAcceptedPayment() && $response->getExtInfo('update_order')) {
+                $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has been confirmed by client return !" .
+                " This means the notification URL did not work.", \Psr\Log\LogLevel::WARNING);
+
+                // Un-cancel order items.
+                $orderItems = $order->getAllItems();
+                foreach ($orderItems as $item) {
+                    $item->setData("qty_canceled",0)->save();
+                }
+
+                // Save order and optionally create invoice.
+                $this->paymentHelper->registerOrder($order, $response);
+
+                // Un-cancel order items.
+                $orderItems = $order->getAllItems();
+                foreach ($orderItems as $item) {
+                    $item->setData("qty_canceled",0)->save();
+                }
+
+                // Display success page.
+                return [
+                    'case' => Payment::SUCCESS,
+                    'warn' => true // Notification URL warn in TEST mode.
+                ];
+            } elseif ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
                 $this->dataHelper->log("Order #{$order->getIncrementId()} is confirmed.");
 
                 return [

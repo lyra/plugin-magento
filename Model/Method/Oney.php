@@ -223,7 +223,7 @@ class Oney extends Payzen
         if ($quote->getCustomerId() && ! preg_match(Checkout::CUST_ID_REGEX, $quote->getCustomerId())) {
             // Customer id doesn't match Oney rules.
             $msg = 'Customer ID "%s" does not match gateway specifications. The regular expression for this field is %s. Oney means of payment cannot be used.';
-            $this->dataHelper->log(sprintf($msg, $quote->getCustomerId(), Checkout::CUST_ID_REGEX), Zend_Log::WARN);
+            $this->dataHelper->log(sprintf($msg, $quote->getCustomerId(), Checkout::CUST_ID_REGEX), \Psr\Log\LogLevel::WARNING);
             return false;
         }
 
@@ -233,7 +233,7 @@ class Oney extends Payzen
         if (! preg_match(Checkout::ORDER_ID_REGEX, $quote->getReservedOrderId())) {
             // Order id doesn't match Oney rules.
             $msg = 'The order ID "%s" does not match gateway specifications. The regular expression for this field is %s. Oney means of payment cannot be used.';
-            $this->dataHelper->log(sprintf($msg, $quote->getReservedOrderId(), Checkout::ORDER_ID_REGEX), Zend_Log::WARN);
+            $this->dataHelper->log(sprintf($msg, $quote->getReservedOrderId(), Checkout::ORDER_ID_REGEX), \Psr\Log\LogLevel::WARNING);
             return false;
         }
 
@@ -246,7 +246,7 @@ class Oney extends Payzen
             if (! preg_match(Checkout::PRODUCT_REF_REGEX, $item->getProductId())) {
                 // Product id doesn't match Oney rules.
                 $msg = 'Product reference "%s" does not match gateway specifications. The regular expression for this field is %s. Oney means of payment cannot be used.';
-                $this->dataHelper->log(sprintf($msg, $item->getProductId(), Checkout::PRODUCT_REF_REGEX), Zend_Log::WARN);
+                $this->dataHelper->log(sprintf($msg, $item->getProductId(), Checkout::PRODUCT_REF_REGEX), \Psr\Log\LogLevel::WARNING);
                 return false;
             }
         }
@@ -255,7 +255,7 @@ class Oney extends Payzen
             $shippingMethod = $this->checkoutHelper->toPayzenCarrier($quote->getShippingAddress()->getShippingMethod());
             if (! $shippingMethod) {
                 // Selected shipping method is not mapped in configuration panel.
-                $this->dataHelper->log('Shipping method "' . $quote->getShippingAddress()->getShippingMethod() . '" is not correctly mapped in module configuration panel. Module is not displayed.', Zend_Log::WARN);
+                $this->dataHelper->log('Shipping method "' . $quote->getShippingAddress()->getShippingMethod() . '" is not correctly mapped in module configuration panel. Module is not displayed.', \Psr\Log\LogLevel::WARNING);
                 return false;
             }
         }

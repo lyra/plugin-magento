@@ -117,7 +117,19 @@ class CheckProcessor
                 'complete' // Case of virtual orders.
             ];
 
-            if ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
+            if ($order->isCanceled() && $response->isAcceptedPayment() && $response->getExtInfo('update_order')) {
+                // Un-cancel order items.
+                $orderItems = $order->getAllItems();
+                foreach ($orderItems as $item) {
+                    $item->setData("qty_canceled",0)->save();
+                }
+
+                // Save order and optionally create invoice.
+                $this->paymentHelper->registerOrder($order, $response);
+
+                // Display notification URL confirmation message.
+                return 'payment_ok';
+            } elseif ($response->isAcceptedPayment() && in_array($order->getStatus(), $successStatuses)) {
                 $this->dataHelper->log("Order #{$order->getIncrementId()} is confirmed.");
 
                 if ($response->get('operation_type') === 'CREDIT') {

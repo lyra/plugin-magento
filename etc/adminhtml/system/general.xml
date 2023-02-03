@@ -64,6 +64,12 @@
                 <button_url><![CDATA[payzen/system_config/support]]></button_url>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ContactSupport</frontend_model>
             </field>
+
+            <field id="plugin_doc" translate="label" type="label" sortOrder="118" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Click to view the module configuration documentation]]></label>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\PluginDoc</frontend_model>
+                <config_path>payzen/general/plugin_doc</config_path>
+            </field>
         </group>
 
         <group id="payzen_platform_access" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">

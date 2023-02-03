@@ -56,6 +56,7 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
         // For payment via REST API.
         $config['payment'][$this->method->getCode()]['restFormToken'] = $this->getRestFormToken();
         $config['payment'][$this->method->getCode()]['language'] = $this->method->getPaymentLanguage();
+        $config['payment'][$this->method->getCode()]['updateOrder'] = $this->method->getConfigData('rest_update_order');
         $config['payment'][$this->method->getCode()]['restReturnUrl'] = $this->dataHelper->getRestReturnUrl();
 
         return $config;

@@ -365,11 +365,7 @@ class Standard extends Payzen
 
         $billingAddress = $quote->getBillingAddress();
 
-        // Reserve order ID and save quote.
-        $quote->reserveOrderId()->save();
-
         $data = [
-            'orderId' => $quote->getReservedOrderId(),
             'customer' => [
                 'email' => $quote->getCustomerEmail() ? $quote->getCustomerEmail() : $billingAddress->getEmail(),
                 'reference' => $quote->getCustomer()->getId(),
@@ -432,6 +428,105 @@ class Standard extends Payzen
         return json_encode($data);
     }
 
+    protected function getTokenDataForOrder($order)
+    {
+        $amount = $order->getGrandTotal();
+
+        // Currency.
+        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getQuoteCurrencyCode());
+        if (! $currency) {
+            // If currency is not supported, use base currency.
+            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
+
+            // ... and order total in base currency.
+            $amount = $order->getBaseGrandTotal();
+        }
+
+        if (! $currency) {
+            $this->dataHelper->log('Cannot create a form token. Unsupported currency passed.');
+            return false;
+        }
+
+        // Check if capture_delay and validation_mode are overriden in standard submodule.
+        $captureDelay = is_numeric($this->getConfigData('capture_delay')) ? $this->getConfigData('capture_delay') :
+            $this->dataHelper->getCommonConfigData('capture_delay');
+
+        $validationMode = ($this->getConfigData('validation_mode') !== '-1') ? $this->getConfigData('validation_mode') :
+            $this->dataHelper->getCommonConfigData('validation_mode');
+
+        // Activate 3DS?
+        $strongAuth = 'AUTO';
+        $threedsMinAmount = $this->dataHelper->getCommonConfigData('threeds_min_amount');
+        if ($threedsMinAmount && $order->getTotalDue() < $threedsMinAmount) {
+            $strongAuth = 'DISABLED';
+        }
+
+        $billingAddress = $order->getBillingAddress();
+
+        $data = [
+            'orderId' => $order->getIncrementId(),
+            'customer' => [
+                'email' => $order->getCustomerEmail() ? $order->getCustomerEmail() : $billingAddress->getEmail(),
+                'reference' => $order->getCustomerId(),
+                'billingDetails' => [
+                    'language' => strtoupper($this->getPaymentLanguage()),
+                    'title' => $billingAddress->getPrefix() ? $billingAddress->getPrefix() : null,
+                    'firstName' => $billingAddress->getFirstname(),
+                    'lastName' => $billingAddress->getLastname(),
+                    'address' => implode(' ', $billingAddress->getStreet()),
+                    'zipCode' => $billingAddress->getPostcode(),
+                    'city' => $billingAddress->getCity(),
+                    'state' => $billingAddress->getRegion(),
+                    'phoneNumber' => $billingAddress->getTelephone(),
+                    'cellPhoneNumber' => $billingAddress->getTelephone(),
+                    'country' => $billingAddress->getCountryId()
+                ]
+            ],
+            'transactionOptions' => [
+                'cardOptions' => [
+                    'captureDelay' => $captureDelay,
+                    'manualValidation' => $validationMode ? 'YES' : 'NO',
+                    'paymentSource' => 'EC'
+                ]
+            ],
+            'contrib' =>  $this->dataHelper->getContribParam(),
+            'strongAuthentication' => $strongAuth,
+            'currency' => $currency->getAlpha3(),
+            'amount' => $currency->convertAmountToInteger($amount),
+            'metadata' => [
+                'update_order' => $this->getConfigData('rest_update_order')
+            ]
+        ];
+
+        // Set shipping info.
+        if (($shippingAddress = $order->getShippingAddress()) && is_object($shippingAddress)) {
+            $data['customer']['shippingDetails'] = array(
+                'firstName' => $shippingAddress->getFirstname(),
+                'lastName' => $shippingAddress->getLastname(),
+                'address' => $shippingAddress->getStreetLine(1),
+                'address2' => $shippingAddress->getStreetLine(2),
+                'zipCode' => $shippingAddress->getPostcode(),
+                'city' => $shippingAddress->getCity(),
+                'state' => $shippingAddress->getRegion(),
+                'phoneNumber' => $shippingAddress->getTelephone(),
+                'country' => $shippingAddress->getCountryId()
+            );
+        }
+
+        // Set the maximum attempts number in case of failed payment.
+        if ($this->getConfigData('rest_attempts') !== null) {
+            $data['transactionOptions']['cardOptions']['retry'] = $this->getConfigData('rest_attempts');
+        }
+
+        $customer = $order->getCustomerId() ? $this->customerRepository->getById($order->getCustomerId()) : null;
+
+        if ($this->isOneClickActive() && $customer) {
+            $data['formAction'] = 'CUSTOMER_WALLET';
+        }
+
+        return json_encode($data);
+    }
+
     public function getRestApiFormToken($renew = false)
     {
         $quote = $this->dataHelper->getCheckoutQuote();
@@ -451,10 +546,8 @@ class Standard extends Payzen
 
         $tokenDataName = \Lyranetwork\Payzen\Helper\Payment::TOKEN_DATA;
         $tokenName = \Lyranetwork\Payzen\Helper\Payment::TOKEN;
-        $expireName = \Lyranetwork\Payzen\Helper\Payment::TOKEN_EXPIRE;
 
-        $expireTime = $quote->getPayment()->getAdditionalInformation($expireName);
-        if ($renew || ($expireTime && (time() >= $expireTime))) {
+        if ($renew) {
             $quote->getPayment()->unsAdditionalInformation($tokenDataName);
             $quote->getPayment()->unsAdditionalInformation($tokenName);
         } else {
@@ -464,13 +557,12 @@ class Standard extends Payzen
             $tokenData = base64_encode(serialize($params));
             if ($lastToken && $lastTokenData && ($lastTokenData === $tokenData)) {
                 // Cart data does not change from last payment attempt, do not re-create payment token.
-                $this->dataHelper->log("Cart data did not change since last payment attempt, use last created token for quote #{$quote->getId()}, reserved order ID #{$quote->getReservedOrderId()}.");
+                $this->dataHelper->log("Cart data did not change since last payment attempt, use last created token for quote #{$quote->getId()}.");
                 return $lastToken;
             }
         }
 
-        $this->dataHelper->log("Creating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}"
-            . " with parameters: {$params}");
+        $this->dataHelper->log("Creating form token for quote #{$quote->getId()} with parameters: {$params}");
 
         try {
             // Perform our request.
@@ -483,8 +575,7 @@ class Standard extends Payzen
             $response = $client->post('V4/Charge/CreatePayment', $params);
 
             if ($response['status'] !== 'SUCCESS') {
-                $msg = "Error while creating payment form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}: "
-                    . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
+                $msg = "Error while creating payment form token for quote #{$quote->getId()}: " . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
 
                 if (isset($response['answer']['detailedErrorMessage']) && ! empty($response['answer']['detailedErrorMessage'])) {
                     $msg .= ' Detailed message: ' . $response['answer']['detailedErrorMessage'] .' (' . $response['answer']['detailedErrorCode'] . ').';
@@ -493,19 +584,65 @@ class Standard extends Payzen
                 $this->dataHelper->log($msg, \Psr\Log\LogLevel::WARNING);
                 return false;
             } else {
-                $this->dataHelper->log("Form token created successfully for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
+                $this->dataHelper->log("Form token created successfully for quote #{$quote->getId()}.");
 
                 $token = $response['answer']['formToken'];
                 $tokenData = base64_encode(serialize($params));
 
                 $quote->getPayment()->setAdditionalInformation($tokenDataName, $tokenData);
                 $quote->getPayment()->setAdditionalInformation($tokenName, $token);
-                $quote->getPayment()->setAdditionalInformation($expireName, strtotime("+15 minutes", time()));
 
                 $quote->getPayment()->save();
 
                 // Payment form token created successfully.
                 return $token;
+            }
+        } catch (\Exception $e) {
+            $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);
+            return false;
+        }
+    }
+
+    public function getTokenForOrder($order)
+    {
+        if (! $order || ! $order->getId()) {
+            $this->dataHelper->log('Cannot create a form token. Invalid order passed.');
+            return false;
+        }
+
+        // Amount in current order currency.
+        if ($order->getGrandTotal() <= 0) {
+            $this->dataHelper->log('Cannot create a form token. Invalid amount passed.');
+            return false;
+        }
+
+        $params = $this->getTokenDataForOrder($order);
+        $this->dataHelper->log("Creating form token for order #{$order->getIncrementId()} with parameters: {$params}");
+
+        try {
+            // Perform our request.
+            $client = new \Lyranetwork\Payzen\Model\Api\Rest\Api(
+                $this->dataHelper->getCommonConfigData('rest_url'),
+                $this->dataHelper->getCommonConfigData('site_id'),
+                $this->restHelper->getPrivateKey()
+            );
+
+            $response = $client->post('V4/Charge/CreatePayment', $params);
+
+            if ($response['status'] !== 'SUCCESS') {
+                $msg = "Error while creating payment form token for order #{$order->getIncrementId()}: " . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
+
+                if (isset($response['answer']['detailedErrorMessage']) && ! empty($response['answer']['detailedErrorMessage'])) {
+                    $msg .= ' Detailed message: ' . $response['answer']['detailedErrorMessage'] .' (' . $response['answer']['detailedErrorCode'] . ').';
+                }
+
+                $this->dataHelper->log($msg, \Psr\Log\LogLevel::WARNING);
+                return false;
+            } else {
+                $this->dataHelper->log("Form token created successfully for order #{$order->getIncrementId()}.");
+
+                // Payment form token created successfully.
+                return $response['answer']['formToken'];
             }
         } catch (\Exception $e) {
             $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);

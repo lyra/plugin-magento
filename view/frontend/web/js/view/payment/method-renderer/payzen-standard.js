@@ -150,6 +150,9 @@ define(
             }
         };
 
+        var PLACE_ORDER= true;
+        var IS_VALID = false;
+
         return Component.extend({
             defaults: {
                 template: 'Lyranetwork_Payzen/payment/payzen-standard',
@@ -211,6 +214,47 @@ define(
                 $('li.payzen-standard-' + blockName + '-block').show();
             },
 
+            updateOrder: function() {
+                return (window.checkoutConfig.payment.payzen_standard.updateOrder
+                    && (window.checkoutConfig.payment.payzen_standard.updateOrder == '1'))
+                    || false;
+            },
+
+            manageError: function (e) {
+                var me = this;
+
+                if (! PLACE_ORDER) {
+                    storage.post(
+                        url.build('payzen/payment_rest/token?payzen_action=restore_cart&form_key=' + $.mage.cookies.get('form_key'))
+                    ).done(function(response) {
+                        console.log('Cart restored.');
+                    }).fail(function(response) {
+                        console.log('Cart could not be restored.');
+                    });
+                }
+
+                fullScreenLoader.stopLoader();
+                me.isPlaceOrderActionAllowed(true);
+
+                var msg = '';
+                if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
+                    msg = e.errorMessage;
+                    var endsWithDot = (msg.lastIndexOf('.') == (msg.length - 1) && msg.lastIndexOf('.') >= 0);
+                    msg += (endsWithDot ? '' : '.');
+                } else {
+                   msg = me.translateError(e.errorCode);
+                }
+
+                // Expiration errors, display a link to refresh the page.
+                if (EXPIRY_ERRORS.indexOf(e.errorCode) >= 0) {
+                    msg += ' <a href="#" onclick="window.location.reload(); return false;">'
+                        + me.translateError('RELOAD_LINK') + '</a>';
+                }
+
+                $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
+                return true;
+            },
+
             initRestEvents: function(elts) { // To be called after kr-embedded div is added to DOM.
                 if (!elts || !elts.length) {
                     return;
@@ -224,8 +268,13 @@ define(
                     getTotalsAction([]);
                 });
 
-                // Update embedded payment token if order amount has changed.
+                // Update embedded payment token if quote amount has changed.
                 quote.totals.subscribe(function (totals) {
+                    if (totals == null) {
+                       // Order has already been placed.
+                       return;
+                    }
+
                     var newPayload = me.getPayload();
                     if (me.payload && (me.payload === newPayload)) {
                         // Unchanged payload, do not refresh.
@@ -238,7 +287,7 @@ define(
                     }
 
                     me.payload = newPayload;
-                    me.refreshToken(false);
+                    me.refreshToken();
                 });
 
                 require(['krypton'], function(KR) {
@@ -253,117 +302,57 @@ define(
                             });
 
                             KR.onError(function(e) {
-                                var answer = e.metadata.hasOwnProperty('answer') ? e.metadata.answer : null;
-
-                                // Force redirection to response page if possibility of retries is exhausted.
-                                if (answer && (answer.clientAnswer.orderStatus == "UNPAID") && (answer.clientAnswer.orderCycle == "CLOSED")) {
-                                    var data = {
-                                        'kr-answer-type': 'V4/Payment',
-                                        'kr-answer': JSON.stringify(answer.clientAnswer),
-                                        'kr-hash': answer.hash,
-                                        'kr-hash-algorithm': answer.hashAlgorithm
-                                    };
-
-                                    var form = $('<form></form>');
-                                    form.attr("method", "post");
-                                    form.attr("action", me.getRestReturnUrl());
-
-                                    $.each(data, function(key, value) {
-                                        var field = $('<input></input>');
-
-                                        field.attr("type", "hidden");
-                                        field.attr("name", key);
-                                        field.attr("value", value);
-
-                                        form.append(field);
-                                    });
-
-                                    KR.setFormConfig({ disabledForm: true}).then(
-                                        function(e) {
-                                            $(document.body).append(form);
-                                            form.submit();
-                                        }
-                                    );
-                                } else {
-                                    fullScreenLoader.stopLoader();
-                                    me.isPlaceOrderActionAllowed(true);
-
-                                    var msg = '';
-                                    if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
-                                        msg = e.errorMessage;
-                                        var endsWithDot = (msg.lastIndexOf('.') == (msg.length - 1) && msg.lastIndexOf('.') >= 0);
-
-                                        msg += (endsWithDot ? '' : '.');
-                                    } else {
-                                        msg = me.translateError(e.errorCode);
-                                    }
-
-                                    // Expiration errors, display a link to refresh the page.
-                                    if (EXPIRY_ERRORS.indexOf(e.errorCode) >= 0) {
-                                        msg += ' <a href="#" onclick="window.location.reload(); return false;">'
-                                            + me.translateError('RELOAD_LINK') + '</a>';
-                                    }
-
-                                    $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
-                                }
-                            });
-
-                            KR.onSubmit(function(e) {
-                                customerData.invalidate(['cart']);
-                                return true;
-                            });
-                        }
-                    );
+                               return me.manageError(e);
+                          });
+                    })
                 });
             },
 
             placeOrderClick: function() {
                 var me = this;
 
-                if (((me.getEntryMode() == 4) || (me.getEntryMode() == 5)) && me.getRestFormToken()) {
-                    // Embedded or popin mode.
-                    $('#payzen_rest_form .kr-form-error').html('');
+                if (PLACE_ORDER) {
+                     if ((me.getEntryMode() == 4) && me.getRestFormToken() && !IS_VALID) {
+                        // Embedded mode.
+                        $('#payzen_rest_form .kr-form-error').html('');
 
-                    if (!me.validate() || !additionalValidators.validate()) {
-                        return;
+                        KR.validateForm().then(function(v) {
+                            IS_VALID = true;
+                            me.placeOrder();
+                        }).catch(function(v) {
+                            IS_VALID = false;
+                            var result = v.result;
+                            return result.doOnError();
+                        });
+                    } else {
+                        me.placeOrder();
                     }
-
-                    var isPopin = $('.kr-popin-button').length > 0;
-                    if (!isPopin) {
+                } else {
+                    if ($('.kr-popin-button').length == 0) {
                         fullScreenLoader.startLoader();
                         me.isPlaceOrderActionAllowed(false);
                     }
 
-                    var newPayload = me.getPayload();
-                    if (me.payload && (me.payload === newPayload)) {
-                        if (isPopin) {
-                            KR.openPopin();
-                        } else {
-                            KR.submit();
-                        }
-                    } else {
-                        me.payload = newPayload;
-
-                        $.when(
-                            setPaymentInformationAction(me.messageContainer, me.getData())
-                        ).done(function() {
-                            me.refreshToken(true);
-                        }).fail(function(response) {
-                            errorProcessor.process(response, me.messageContainer);
-                            fullScreenLoader.stopLoader();
-                            me.isPlaceOrderActionAllowed(true);
-                        });
-                    }
-                } else {
-                    me.placeOrder();
+                    me.submitEmbeddedForm();
                 }
             },
 
-            refreshToken: function(withSubmit) {
+            submitEmbeddedForm: function () {
+                var me = this;
+                if ($('.kr-popin-button').length > 0) {
+                     fullScreenLoader.stopLoader();
+                     me.isPlaceOrderActionAllowed(true);
+                     KR.openPopin();
+                } else {
+                     KR.submit();
+                }
+            },
+
+            refreshToken: function() {
                 var me = this;
 
                 storage.post(
-                    url.build('payzen/payment_rest/token?form_key=' + $.mage.cookies.get('form_key'))
+                    url.build('payzen/payment_rest/token?payzen_action=refresh_token&form_key=' + $.mage.cookies.get('form_key'))
                 ).done(function(response) {
                     if (response.token) {
                         KR.setFormConfig({
@@ -371,29 +360,98 @@ define(
                             language: me.getLanguage()
                         }).then(
                             function(v) {
-                                if (!withSubmit) {
-                                    return;
-                                }
-
-                                var KR = v.KR;
-                                if ($('.kr-popin-button').length > 0) {
-                                    KR.openPopin();
-                                } else {
-                                    KR.submit();
-                                }
+                                return;
                             }
                         );
                     } else {
                         // Should not happen, this case is managed by failure callback.
                         console.log('Empty form token returned by refresh.');
                     }
-                }).fail(function(response) {
-                    if (!withSubmit) {
-                        errorProcessor.process(response, me.messageContainer);
+                })
+            },
+
+            setToken: function() {
+                var me = this;
+
+                storage.post(
+                    url.build('payzen/payment_rest/token?payzen_action=set_token&form_key=' + $.mage.cookies.get('form_key'))
+                ).done(function(response) {
+                    if (response.token) {
+                        KR.setFormConfig({
+                            formToken: response.token,
+                            language: me.getLanguage()
+                        }).then(
+                            function(v) {
+                                let KR = v.KR;
+                                KR.onFocus(function(e) {
+                                    $('#payzen_rest_form .kr-form-error').html('');
+                                });
+
+                                KR.onError(function(e) {
+                                    if (!e.metadata.hasOwnProperty('answer')) {
+                                        return me.manageError(e);
+                                    }
+
+                                    var answer = e.metadata.answer;
+                                    var data = {
+                                        'kr-answer-type': 'V4/Payment',
+                                        'kr-answer': JSON.stringify(answer.clientAnswer),
+                                        'kr-hash': answer.hash,
+                                        'kr-hash-algorithm': answer.hashAlgorithm
+                                    };
+
+                                    // Force redirection to response page if possibility of retries is exhausted.
+                                    if (answer && (answer.clientAnswer.orderStatus == "UNPAID") && (answer.clientAnswer.orderCycle == "CLOSED")) {
+                                        var form = $('<form></form>');
+                                        form.attr("method", "post");
+                                        form.attr("action", me.getRestReturnUrl());
+
+                                        $.each(data, function(key, value) {
+                                            var field = $('<input></input>');
+
+                                            field.attr("type", "hidden");
+                                            field.attr("name", key);
+                                            field.attr("value", value);
+
+                                            form.append(field);
+                                        });
+
+                                        KR.setFormConfig({ disabledForm: true }).then(
+                                            function(e) {
+                                                $(document.body).append(form);
+                                                form.submit();
+                                            }
+                                        );
+                                    } else if (me.updateOrder()) {
+                                        // Ajax call to update order status.
+                                        data['payzen_update_order'] = true;
+
+                                        $.ajax({
+                                            url: me.getRestReturnUrl(),
+                                            type: "POST",
+                                            data: data,
+                                            success: function (resp) {
+                                               return me.manageError(e);
+                                            }
+                                        });
+                                    } else {
+                                        return me.manageError(e);
+                                    }
+                                });
+
+                                KR.onSubmit(function(e) {
+                                    customerData.invalidate(['cart']);
+                                    return true;
+                                });
+
+                                me.submitEmbeddedForm();
+                            }
+                        );
+                    } else {
+                        // Should not happen, this case is managed by failure callback.
+                        console.log('Empty form token returned.');
                     }
-
-                    me.payload = null; // To be able to call server for next validation.
-
+                }).fail(function(response) {
                     fullScreenLoader.stopLoader();
                     me.isPlaceOrderActionAllowed(true);
                 });
@@ -454,7 +512,22 @@ define(
             afterPlaceOrder: function() {
                 var me = this;
 
-                if (me.getEntryMode() == 3) { // Iframe mode.
+                if (((me.getEntryMode() == 4) || (me.getEntryMode() == 5)) && me.getRestFormToken()) {
+                    // Embedded or popin mode.
+                    $('#payzen_rest_form .kr-form-error').html('');
+
+                    fullScreenLoader.startLoader();
+                    me.isPlaceOrderActionAllowed(false);
+
+                    $.when(
+                        me.setToken()
+                    ).then(function() {
+                        PLACE_ORDER = false;
+                    }).fail(function(response) {
+                        // In case of error, switch to redirection mode.
+                        me._super();
+                    });
+                } else if (me.getEntryMode() == 3) { // Iframe mode.
                     // Iframe mode.
                     fullScreenLoader.stopLoader();
 

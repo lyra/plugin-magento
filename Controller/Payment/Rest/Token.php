@@ -29,29 +29,9 @@ class Token extends \Magento\Framework\App\Action\Action
     protected $dataHelper;
 
     /**
-     * @var \Lyranetwork\Payzen\Helper\Rest
-     */
-    protected $restHelper;
-
-    /**
      * @var \Lyranetwork\Payzen\Model\Method\Standard
      */
     protected $standardMethod;
-
-    /**
-     * @var \Magento\Checkout\Helper\Data
-     */
-    protected $checkoutHelper;
-
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
-
-    /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
-     */
-    protected $quoteRepository;
 
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory
@@ -59,48 +39,45 @@ class Token extends \Magento\Framework\App\Action\Action
     protected $resultJsonFactory;
 
     /**
-     * @var \Magento\Quote\Model\SubmitQuoteValidator
+     * @var \\Magento\Sales\Model\OrderFactory
      */
-    protected $submitQuoteValidator;
+    protected $orderFactory;
+
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    protected $quoteRepository;
+
+    const REFRESH_TOKEN = 'refresh_token';
+    const SET_TOKEN = 'set_token';
+    const RESTORE_CART = 'restore_cart';
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
-     * @param \Magento\CheckoutAgreements\Model\AgreementsValidator $agreementsValidator
+     * @para \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
-     * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Lyranetwork\Payzen\Model\Method\Standard $standardMethod
-     * @param \Magento\Checkout\Helper\Data $checkoutHelper
-     * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \Magento\Quote\Model\SubmitQuoteValidator $submitQuoteValidator
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
-        \Magento\CheckoutAgreements\Model\AgreementsValidator $agreementsValidator,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
-        \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Lyranetwork\Payzen\Model\Method\Standard $standardMethod,
-        \Magento\Checkout\Helper\Data $checkoutHelper,
-        \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Magento\Quote\Model\SubmitQuoteValidator $submitQuoteValidator
-    ) {
-        $this->formKeyValidator = $formKeyValidator;
-        $this->agreementsValidator = $agreementsValidator;
-        $this->dataHelper = $dataHelper;
-        $this->restHelper = $restHelper;
-        $this->standardMethod = $standardMethod;
-        $this->checkoutHelper = $checkoutHelper;
-        $this->customerSession = $customerSession;
-        $this->quoteRepository = $quoteRepository;
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->submitQuoteValidator = $submitQuoteValidator;
+        \Magento\Sales\Model\OrderFactory $orderFactory
+        ) {
+            $this->formKeyValidator = $formKeyValidator;
+            $this->dataHelper = $dataHelper;
+            $this->standardMethod = $standardMethod;
+            $this->quoteRepository = $quoteRepository;
+            $this->resultJsonFactory = $resultJsonFactory;
+            $this->orderFactory = $orderFactory;
 
-        parent::__construct($context);
+            parent::__construct($context);
     }
 
     public function execute()
@@ -108,32 +85,68 @@ class Token extends \Magento\Framework\App\Action\Action
         if (! $this->formKeyValidator->validate($this->getRequest()) || $this->expireAjax()) {
             $result = $this->resultJsonFactory->create();
             $result->setStatusHeader(401, '1.1', 'Session expired');
-
             return $result;
         }
 
-        $quote = $this->dataHelper->getCheckoutQuote();
-        $this->setCheckoutMethod($quote);
+        $token = null;
+        $checkout = $this->dataHelper->getCheckout();
+        $action = $this->getRequest()->getParam('payzen_action');
 
-        $quote->collectTotals();
+        switch ($action) {
+            case self::REFRESH_TOKEN:
+                // Refresh token from quote data.
+                $quote = $this->dataHelper->getCheckoutQuote();
+                $this->dataHelper->log("Updating form token for quote #{$quote->getId()}.");
 
-        if (! $quote->getCustomerEmail() && $quote->getBillingAddress()->getEmail()) {
-            $quote->setCustomerEmail($quote->getBillingAddress()->getEmail());
+                $token = $this->standardMethod->getRestApiFormToken(true);
+                if ($token) {
+                    $this->dataHelper->log("Form token updated for quote #{$quote->getId()}.");
+                }
+
+                break;
+
+            case self::SET_TOKEN:
+                // Create token from order data.
+                $lastIncrementId = $this->dataHelper->getCheckout()->getLastRealOrderId();
+
+                $checkout->setData('payzen_last_real_id', $lastIncrementId);
+                $this->dataHelper->log('Saving last real order ID in session: '. $lastIncrementId);
+
+                $order = $this->orderFactory->create();
+                $order->loadByIncrementId($lastIncrementId);
+
+                $token = $this->standardMethod->getTokenForOrder($order);
+                break;
+
+            case self::RESTORE_CART:
+                $lastIncrementId = $checkout->getData('payzen_last_real_id');
+                if (! $lastIncrementId) {
+                    return;
+                }
+
+                $order = $this->orderFactory->create();
+                $order->loadByIncrementId($lastIncrementId);
+                $quote = $this->quoteRepository->get($order->getQuoteId());
+
+                if ($quote->getId() && ! $quote->getIsActive() && ($this->standardMethod->getConfigData('rest_attempts') !== '0')) {
+                    $checkout->setData('payzen_last_real_id', null);
+
+                    $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow more payment attempts.");
+                    $quote->setIsActive(true)->setReservedOrderId(null);
+                    $this->quoteRepository->save($quote);
+
+                    // To comply with Magento\Checkout\Model\Session::restoreQuote() method.
+                    $checkout->replaceQuote($quote)->unsLastRealOrderId();
+                    $this->_eventManager->dispatch('restore_quote', ['order' => $order, 'quote' => $quote]);
+                }
+
+                return;
+
+            default;
+               $token = null;
+               break;
         }
 
-        $this->quoteRepository->save($quote);
-
-        try {
-            $this->submitQuoteValidator->validateQuote($quote);
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            return $this->ajaxErrorResponse($e->getMessage());
-        } catch (\Exception $e) {
-            return $this->ajaxErrorResponse();
-        }
-
-        $this->dataHelper->log("Updating form token for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
-
-        $token = $this->standardMethod->getRestApiFormToken(true);
         if (! $token) {
             return $this->ajaxErrorResponse();
         }
@@ -141,8 +154,6 @@ class Token extends \Magento\Framework\App\Action\Action
         $data = new DataObject();
         $data->setData('success', true);
         $data->setData('token', $token);
-
-        $this->dataHelper->log("Form token updated for quote #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.");
 
         return $this->resultJsonFactory->create()->setData($data->getData());
     }
@@ -155,6 +166,7 @@ class Token extends \Magento\Framework\App\Action\Action
         $result = $this->resultJsonFactory->create();
         if ($message) {
             $result->setStatusHeader(400, '1.1', 'Bad request');
+
         } else {
             $result->setStatusHeader(500, '1.1', 'Internal server error');
         }
@@ -172,26 +184,13 @@ class Token extends \Magento\Framework\App\Action\Action
      */
     protected function expireAjax()
     {
-        $quote = $this->dataHelper->getCheckoutQuote();
-        if (! $quote->hasItems() || $quote->getHasError() || ! $quote->validateMinimumAmount()) {
-            return true;
+        if ($this->getRequest()->getParam('payzen_action') == self::REFRESH_TOKEN) {
+            $quote = $this->dataHelper->getCheckoutQuote();
+            if (! $quote->hasItems() || $quote->getHasError() || ! $quote->validateMinimumAmount()) {
+                return true;
+            }
         }
 
         return false;
-    }
-
-    private function setCheckoutMethod($quote)
-    {
-        if ($quote->getCheckoutMethod()) {
-            return;
-        }
-
-        if ($this->customerSession->isLoggedIn()) {
-            $quote->setCheckoutMethod(\Magento\Checkout\Model\Type\Onepage::METHOD_CUSTOMER);
-        } elseif ($this->checkoutHelper->isAllowedGuestCheckout($quote)) {
-            $quote->setCheckoutMethod(\Magento\Checkout\Model\Type\Onepage::METHOD_GUEST);
-        } else {
-            $quote->setCheckoutMethod(\Magento\Checkout\Model\Type\Onepage::METHOD_REGISTER);
-        }
     }
 }
