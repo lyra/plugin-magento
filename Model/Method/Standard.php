@@ -349,12 +349,9 @@ class Standard extends Payzen
             return false;
         }
 
-        // Check if capture_delay and validation_mode are overriden in standard submodule.
+        // Check if capture_delay is overriden in standard submodule.
         $captureDelay = is_numeric($this->getConfigData('capture_delay')) ? $this->getConfigData('capture_delay') :
             $this->dataHelper->getCommonConfigData('capture_delay');
-
-        $validationMode = ($this->getConfigData('validation_mode') !== '-1') ? $this->getConfigData('validation_mode') :
-            $this->dataHelper->getCommonConfigData('validation_mode');
 
         // Activate 3DS?
         $strongAuth = 'AUTO';
@@ -386,7 +383,6 @@ class Standard extends Payzen
             'transactionOptions' => [
                 'cardOptions' => [
                     'captureDelay' => $captureDelay,
-                    'manualValidation' => $validationMode ? 'YES' : 'NO',
                     'paymentSource' => 'EC'
                 ]
             ],
@@ -398,6 +394,15 @@ class Standard extends Payzen
                 'quote_id' => $quote->getId()
             ]
         ];
+
+        $validationMode = $this->getConfigData('validation_mode');
+        if (! is_null($validationMode)) {
+            $validationMode = ($validationMode === '-1') ? $this->dataHelper->getCommonConfigData('validation_mode') : $validationMode;
+
+            if (! is_null($validationMode)) {
+                $data['transactionOptions']['cardOptions']['manualValidation'] = ($validationMode === '1') ? 'YES' : 'NO';
+            }
+        }
 
         // Set shipping info.
         if (($shippingAddress = $quote->getShippingAddress()) && is_object($shippingAddress)) {
@@ -451,9 +456,6 @@ class Standard extends Payzen
         $captureDelay = is_numeric($this->getConfigData('capture_delay')) ? $this->getConfigData('capture_delay') :
             $this->dataHelper->getCommonConfigData('capture_delay');
 
-        $validationMode = ($this->getConfigData('validation_mode') !== '-1') ? $this->getConfigData('validation_mode') :
-            $this->dataHelper->getCommonConfigData('validation_mode');
-
         // Activate 3DS?
         $strongAuth = 'AUTO';
         $threedsMinAmount = $this->dataHelper->getCommonConfigData('threeds_min_amount');
@@ -485,7 +487,6 @@ class Standard extends Payzen
             'transactionOptions' => [
                 'cardOptions' => [
                     'captureDelay' => $captureDelay,
-                    'manualValidation' => $validationMode ? 'YES' : 'NO',
                     'paymentSource' => 'EC'
                 ]
             ],
@@ -497,6 +498,15 @@ class Standard extends Payzen
                 'update_order' => $this->getConfigData('rest_update_order')
             ]
         ];
+
+        $validationMode = $this->getConfigData('validation_mode');
+        if (! is_null($validationMode)) {
+            $validationMode = ($validationMode === '-1') ? $this->dataHelper->getCommonConfigData('validation_mode') : $validationMode;
+
+            if (! is_null($validationMode)) {
+                $data['transactionOptions']['cardOptions']['manualValidation'] = ($validationMode === '1') ? 'YES' : 'NO';
+            }
+        }
 
         // Set shipping info.
         if (($shippingAddress = $order->getShippingAddress()) && is_object($shippingAddress)) {
