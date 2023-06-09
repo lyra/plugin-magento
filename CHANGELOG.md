@@ -1,8 +1,13 @@
+2.7.1, 2023-06-09:
+- [embedded] Bug fix: Fix error related to form token update after a failed payment attempt.
+- [embedded] Bug fix: Fix error related to validation mode.
+- Minor code fixes.
+
 2.7.0, 2023-02-03:
 - [embedded] Added possibility to update order status on each payment attempt.
 - [embedded] Improve order and payment processing.
 - Added field for online module documentation.
-- Minor code fixes
+- Minor code fixes.
 
 2.6.5, 2023-01-23:
 - Bug fix: Fix payment in iframe mode when JavaScript minification is enabled in Magento.

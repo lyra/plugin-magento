@@ -150,8 +150,8 @@ define(
             }
         };
 
-        var PLACE_ORDER= true;
-        var IS_VALID = false;
+        var PLACE_ORDER = true;  // An order can be placed (created).
+        var IS_VALID = false;    // The embedded payment form is valid.
 
         return Component.extend({
             defaults: {
@@ -255,6 +255,24 @@ define(
                 return true;
             },
 
+            checkPayload: function() {
+                var me = this;
+
+                var newPayload = me.getPayload();
+                if (me.payload && (me.payload === newPayload)) {
+                    // Unchanged payload, do not refresh.
+                   return;
+                }
+
+                if (!quote.paymentMethod() || !quote.paymentMethod().hasOwnProperty('method') || quote.paymentMethod().method !== 'payzen_standard') {
+                    // Not our payment method, do not refresh.
+                    return;
+                }
+
+                me.payload = newPayload;
+                me.refreshToken();
+            },
+
             initRestEvents: function(elts) { // To be called after kr-embedded div is added to DOM.
                 if (!elts || !elts.length) {
                     return;
@@ -268,6 +286,16 @@ define(
                     getTotalsAction([]);
                 });
 
+                // Update embedded payment token if billing address has changed.
+                quote.billingAddress.subscribe(function (address) {
+                    if (address == null) {
+                       // Address has not been saved yet.'
+                       return;
+                    }
+
+                    me.checkPayload();
+                });
+
                 // Update embedded payment token if quote amount has changed.
                 quote.totals.subscribe(function (totals) {
                     if (totals == null) {
@@ -275,19 +303,7 @@ define(
                        return;
                     }
 
-                    var newPayload = me.getPayload();
-                    if (me.payload && (me.payload === newPayload)) {
-                        // Unchanged payload, do not refresh.
-                        return;
-                    }
-
-                    if (!quote.paymentMethod() || !quote.paymentMethod().hasOwnProperty('method') || quote.paymentMethod().method !== 'payzen_standard') {
-                        // Not our payment method, do not refresh.
-                        return;
-                    }
-
-                    me.payload = newPayload;
-                    me.refreshToken();
+                    me.checkPayload();
                 });
 
                 require(['krypton'], function(KR) {
@@ -328,6 +344,7 @@ define(
                         me.placeOrder();
                     }
                 } else {
+                    // It's a payment retry, an order has already been placed.
                     if ($('.kr-popin-button').length == 0) {
                         fullScreenLoader.startLoader();
                         me.isPlaceOrderActionAllowed(false);
@@ -350,6 +367,7 @@ define(
 
             refreshToken: function() {
                 var me = this;
+                fullScreenLoader.startLoader();
 
                 storage.post(
                     url.build('payzen/payment_rest/token?payzen_action=refresh_token&form_key=' + $.mage.cookies.get('form_key'))
@@ -360,13 +378,16 @@ define(
                             language: me.getLanguage()
                         }).then(
                             function(v) {
-                                return;
+                                // Cart has changed, a new order will be placed.
+                                PLACE_ORDER = true;
                             }
                         );
                     } else {
                         // Should not happen, this case is managed by failure callback.
                         console.log('Empty form token returned by refresh.');
                     }
+
+                    fullScreenLoader.stopLoader();
                 })
             },
 
@@ -522,6 +543,7 @@ define(
                     $.when(
                         me.setToken()
                     ).then(function() {
+                        // A new payment attempt may occur: disable the possibility of placing a new order.
                         PLACE_ORDER = false;
                     }).fail(function(response) {
                         // In case of error, switch to redirection mode.
