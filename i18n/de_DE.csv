@@ -292,6 +292,7 @@
 "Authentication Type","Authentifizierungsart"
 "Fraud Control Result:","Fraud Control-Ergebnis:"
 "Advanced Risk Assessment Result:","Erweiterte Risikoeinschätzung Ergebnis:"
+"Impossible to make online refund for order #%1$s: password is not configured. Let %2$s do offline refund.","Impossible to make online refund for order #%1$s: password is not configured. Let %2$s do offline refund."
 "You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.","Sie sind nicht online zu dieser Aktion autorisiert. Bitte vergessen Sie nicht, die Zahlung in PayZen Back Office zu aktualisieren."
 "Chargebacks cannot be refunded.","Chargebacks cannot be refunded."
 "Refund error","Fehler bei der Rückzahlung"

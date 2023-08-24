@@ -291,6 +291,7 @@
 "3DS Certificate","3DS Certificate"
 "Fraud Control Result:","Fraud Control Result:"
 "Advanced Risk Assessment Result:","Advanced Risk Assessment Result:"
+"Impossible to make online refund for order #%1$s: password is not configured. Let %2$s do offline refund.","Impossible to make online refund for order #%1$s: password is not configured. Let %2$s do offline refund."
 "You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.","You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office."
 "Chargebacks cannot be refunded.","Chargebacks cannot be refunded."
 "Refund error","Refund error"

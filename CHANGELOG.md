@@ -1,3 +1,9 @@
+2.7.2, 2023-08-24:
+- Added compatibility with PHP 8.2.x versions.
+- Improve management of refunds from Magento backend.
+- Update list of supported payment means.
+- Update list of supported currencies.
+
 2.7.1, 2023-06-09:
 - [embedded] Bug fix: Fix error related to form token update after a failed payment attempt.
 - [embedded] Bug fix: Fix error related to validation mode.

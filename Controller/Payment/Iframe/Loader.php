@@ -17,6 +17,21 @@ class Loader extends \Magento\Framework\App\Action\Action
     protected $resultPageFactory;
 
     /**
+     * @var\Lyranetwork\Payzen\Helper\Data
+     */
+    protected $dataHelper;
+
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    protected $orderFactory;
+
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    protected $quoteRepository;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Sales\Model\OrderFactory $orderFactory

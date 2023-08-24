@@ -290,6 +290,7 @@
 "3DS Certificate","Certificado 3DS"
 "Fraud Control Result:","Resultado del control de fraude:"
 "Advanced Risk Assessment Result:","Resultado de la evaluación de riesgos avanzada:"
+"Impossible to make online refund for order #%1$s: password is not configured. Let %2$s do offline refund.","Imposible realizar el reembolso en línea del pedido n.º %1$s: la contraseña no está configurada. Permita que %2$s realice un reembolso fuera de línea."
 "You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.","No está autorizado para realizar esta acción en línea. No olvide actualizar el pago en el Back Office PayZen."
 "Chargebacks cannot be refunded.","No se puede reembolsar una transacción no pagada."
 "Refund error","Error de reembolso"

@@ -11,10 +11,10 @@
  */
 namespace Lyranetwork\Payzen\Helper;
 
-use Lyranetwork\Payzen\Model\Api\Refund\Processor as RefundProcessor;
 use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
+use Lyranetwork\Payzen\Model\Api\Refund\WsException as WsException;
 
-class Refund implements RefundProcessor
+class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
 {
     /**
      * @var \Lyranetwork\Payzen\Helper\Data
@@ -37,6 +37,11 @@ class Refund implements RefundProcessor
     protected $orderFactory;
 
     /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
+    protected $messageManager;
+
+    /**
      * @var \Magento\Sales\Model\Order\payment
      */
     protected $payment;
@@ -46,17 +51,20 @@ class Refund implements RefundProcessor
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
     public function __construct(
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
-        \Magento\Sales\Model\OrderFactory $orderFactory
+        \Magento\Sales\Model\OrderFactory $orderFactory,
+        \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->dataHelper = $dataHelper;
         $this->paymentHelper = $paymentHelper;
         $this->restHelper = $restHelper;
         $this->orderFactory = $orderFactory;
+        $this->messageManager = $messageManager;
     }
 
     public function setPayment($payment)
@@ -71,7 +79,13 @@ class Refund implements RefundProcessor
      */
     public function doOnError($errorCode, $message)
     {
-        $this->log("Refund payment error with code {$errorCode}: {$message}.", \Psr\Log\LogLevel::ERROR);
+        if ($errorCode === 'PSP_100') {
+            // Merchant has not subscribed to REST WS option, let Magento refund payment offline.
+            $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
+            $this->messageManager->addWarningMessage($notice);
+        } else {
+            $this->messageManager->addWarningMessage($message);
+        }
     }
 
     /**
@@ -143,7 +157,7 @@ class Refund implements RefundProcessor
      */
     public function doOnFailure($errorCode, $message)
     {
-        $this->doOnError($errorCode, $message);
+        throw new WsException($message, $errorCode);
     }
 
     /**
