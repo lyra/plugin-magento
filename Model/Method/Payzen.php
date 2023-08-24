@@ -1060,12 +1060,12 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 $commentText .= '; ' . $comment->getComment();
             }
 
-           $payzenOrderInfo = new PayzenOrderInfo();
-           $payzenOrderInfo->setOrderRemoteId($order->getIncrementId());
-           $payzenOrderInfo->setOrderId($order->getIncrementId());
-           $payzenOrderInfo->setOrderCurrencyIsoCode($order->getOrderCurrencyCode());
-           $payzenOrderInfo->setOrderCurrencySign($order->getOrderCurrencyCode());
-           $payzenOrderInfo->setOrderUserInfo($commentText);
+            $payzenOrderInfo = new PayzenOrderInfo();
+            $payzenOrderInfo->setOrderRemoteId($order->getIncrementId());
+            $payzenOrderInfo->setOrderId($order->getIncrementId());
+            $payzenOrderInfo->setOrderCurrencyIsoCode($order->getOrderCurrencyCode());
+            $payzenOrderInfo->setOrderCurrencySign($order->getOrderCurrencyCode());
+            $payzenOrderInfo->setOrderUserInfo($commentText);
 
             $refundApi = new PayzenRefund(
                 $this->refundHelper->setPayment($payment),
@@ -1079,21 +1079,14 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $order->setPayment($payment);
             $refundApi->refund($payzenOrderInfo, $amount);
         } catch (\Exception $e) {
-            if ($e->getCode() === 'PSP_100') {
-                // Merchant does not subscribe to REST WS option, refund payment offline.
-                $notice = __('You are not authorized to do this action online. Please, do not forget to update payment in PayZen Back Office.');
-                $this->messageManager->addWarningMessage($notice);
-                // Magento will do an offline refund.
+            $message = ($e->getCode() !== 'PSP_083') ? __('Refund error') . ': '  : '';
+            if ($e->getCode() <= -1) { // Manage cUrl errors.
+                $message .= __('Please consult the PayZen logs for more details.');
             } else {
-                $message = __('Refund error') . ': ';
-                if ($e->getCode() <= -1) { // Manage cUrl errors.
-                    $message .= __('Please consult the PayZen logs for more details.');
-                } else {
-                    $message .= $e->getMessage();
-                }
-
-                throw new \Exception($message);
+                $message .= $e->getMessage();
             }
+
+            throw new \Exception($message);
         }
 
         $order->save();
