@@ -8,19 +8,31 @@
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
-
-<!-- ko if: ($parent.getEntryMode() == 5) --><!-- Popin mode is enabled. -->
-<div id="payzen_rest_form" class="kr-embedded payzen-standard-cc-block payzen-standard-id-block" kr-popin>
-    <div class="kr-pan"></div>
-    <div class="kr-expiry"></div>
-    <div class="kr-security-code"></div>
-
-    <button type="button" class="kr-payment-button"></button>
-    <div class="kr-form-error"></div>
+<!-- ko if: ($parent.getEntryMode() == 5 && $parent.getRestPopinMode() != 1) --><!-- Smartform is enabled. -->
+<div id="payzen_rest_form">
+    <div class="kr-smart-form" kr-single-payment-button></div>
 </div>
 <!--/ko-->
 
-<!-- ko if: ($parent.getEntryMode() == 4) --><!-- Embedded mode is enabled. -->
+<!-- ko if: (($parent.getEntryMode() == 5 || $parent.getEntryMode() == 6 || $parent.getEntryMode() == 7) && $parent.getRestPopinMode() == 1) --><!-- Smartform is enabled in popin mode. -->
+<div id="payzen_rest_form">
+    <div class="kr-smart-form" kr-single-payment-button kr-popin></div>
+</div>
+<!--/ko-->
+
+<!-- ko if: ($parent.getEntryMode() == 6 && $parent.getRestPopinMode() != 1) --><!-- Smartform extended is enabled. -->
+<div id="payzen_rest_form">
+    <div class="kr-smart-form" kr-single-payment-button kr-card-form-expanded></div>
+</div>
+<!--/ko-->
+
+<!-- ko if: ($parent.getEntryMode() == 7 && $parent.getRestPopinMode() != 1) --><!-- Smartform extended without logos is enabled. -->
+<div id="payzen_rest_form">
+    <div class="kr-smart-form" kr-single-payment-button kr-card-form-expanded kr-no-card-logo-header></div>
+</div>
+<!--/ko-->
+
+<!-- ko if: ($parent.getEntryMode() == 4 && $parent.getRestPopinMode() != 1) --><!-- Embedded mode is enabled. -->
 <div id="payzen_rest_form" class="kr-embedded payzen-standard-cc-block payzen-standard-id-block">
     <div class="kr-pan"></div>
     <div class="kr-expiry"></div>
@@ -30,6 +42,17 @@
         <button type="button" class="kr-payment-button"></button>
     </div>
 
+    <div class="kr-form-error"></div>
+</div>
+<!--/ko-->
+
+<!-- ko if: ($parent.getEntryMode() == 4 && $parent.getRestPopinMode() == 1) --><!-- Embedded in popin mode is enabled. -->
+<div id="payzen_rest_form" class="kr-embedded payzen-standard-cc-block payzen-standard-id-block" kr-popin>
+    <div class="kr-pan"></div>
+    <div class="kr-expiry"></div>
+    <div class="kr-security-code"></div>
+
+    <button type="button" class="kr-payment-button"></button>
     <div class="kr-form-error"></div>
 </div>
 <!--/ko-->

@@ -12,7 +12,7 @@
 
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="payzen_oney" translate="label comment" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label><![CDATA[PAYMENT IN 3 OR 4 TIMES ONEY]]></label>
+        <label><![CDATA[ONEY PAYMENT]]></label>
         <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Fieldset\Dependant</frontend_model>
         <attribute type="expanded">0</attribute>
         <attribute type="feature">oney</attribute>
@@ -108,7 +108,7 @@
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Oney\OneyPaymentOptions</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Oney\OneyPaymentOptions</backend_model>
                 <config_path>payment/payzen_oney/oney_payment_options</config_path>
-                <comment><![CDATA[Click on Add button to configure one or more payment options.<br /><b>Label: </b>The option label to display on the frontend (the %c and %r patterns will be respectively replaced by payments count and option rate).<br /><b>Code: </b>The option code as defined in your Oney contract.<br /><b>Min. amount: </b>Minimum amount to enable the payment option.<br /><b>Max. amount: </b>Maximum amount to enable the payment option.<br /><b>Count: </b>Total number of payments.<br /><b>Rate: </b>The interest rate in percentage.]]></comment>
+                <comment><![CDATA[Click on Add button to configure one or more payment options.<br /><b>Label: </b>The option label to display on the frontend (the %c and %r patterns will be respectively replaced by payments count and option rate).<br /><b>Code: </b>The option code as defined in your Oney contract.<br /><b>Means of payment: </b>Choose the means of payment you want to propose.<br /><b>Min. amount: </b>Minimum amount to enable the payment option.<br /><b>Max. amount: </b>Maximum amount to enable the payment option.<br /><b>Count: </b>Total number of payments.<br /><b>Rate: </b>The interest rate in percentage.]]></comment>
             </field>
         </group>
     </group>

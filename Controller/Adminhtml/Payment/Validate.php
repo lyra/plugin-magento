@@ -85,7 +85,6 @@ class Validate extends \Magento\Backend\App\Action implements \Magento\Framework
 
             $payment = $order->getPayment();
             $payment->getMethodInstance()->validatePayment($payment);
-
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
         } catch (\Exception $e) {

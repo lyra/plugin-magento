@@ -1,3 +1,10 @@
+2.8.0, 2023-09-15:
+- [embedded] Smartform integration.
+- [oney] Added 10x 12x Oney and Paylater means of payment.
+- [embedded] Bug fix: Fix form token update issue in Magento 2.4.5 and higher.
+- Added possibility to capture order on invoice creation in Magento Back Office.
+- Bug fix: Fix PHP error related to passing null parameter to str_replace function.
+
 2.7.2, 2023-08-24:
 - Added compatibility with PHP 8.2.x versions.
 - Improve management of refunds from Magento backend.

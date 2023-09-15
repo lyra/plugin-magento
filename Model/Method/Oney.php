@@ -121,13 +121,13 @@ class Oney extends Payzen
 
     protected function setExtraFields($order)
     {
-        // Override with Oney payment card.
-        $this->payzenRequest->set('payment_cards', 'ONEY_3X_4X');
-
         $info = $this->getInfoInstance();
 
-        // Set Oney payment option.
+        // Get Oney payment option.
         $option = @unserialize($info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::ONEY_OPTION));
+
+        // Override with Oney option payment mean.
+        $this->payzenRequest->set('payment_cards', $option['card_type']);
         $this->payzenRequest->set('payment_option_code', $option['code']);
     }
 

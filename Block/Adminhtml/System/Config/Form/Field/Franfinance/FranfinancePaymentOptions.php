@@ -25,7 +25,7 @@ class FranfinancePaymentOptions extends \Lyranetwork\Payzen\Block\Adminhtml\Syst
             'label',
             [
                 'label' => __('Label '),
-                'style' => 'width: 220px;',
+                'style' => 'width: 220px;'
             ]
         );
         $this->addColumn(

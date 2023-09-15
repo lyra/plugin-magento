@@ -929,4 +929,13 @@ class Payment
                 return $firstStatus;
         }
     }
+
+    public function getTransaction($type, $paymentId, $orderId)
+    {
+        return $this->transactionRepository->getByTransactionType(
+            $type,
+            $paymentId,
+            $orderId
+        );
+    }
 }

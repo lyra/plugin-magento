@@ -203,8 +203,8 @@ class Standard extends Payzen
             $cards = array_keys($allCards);
         }
 
-        // Remove Oney card from payment means list.
-        $cards = array_diff($cards, ['ONEY_3X_4X']);
+        // Remove Oney cards from payment means list.
+        $cards = array_diff($cards, ['ONEY_3X_4X', 'ONEY_10x_12X', 'ONEY_PAYLATER']);
 
         $availCards = [];
         foreach ($allCards as $code => $label) {
@@ -316,8 +316,25 @@ class Standard extends Payzen
             return false;
         }
 
-        $restModes = [Data::MODE_EMBEDDED, Data::MODE_POPIN];
+        $restModes = [Data::MODE_EMBEDDED, Data::MODE_SMARTFORM, Data::MODE_SMARTFORM_EXT_WITH_LOGOS, Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS];
+
         return in_array($this->getEntryMode(), $restModes);
+    }
+
+    /**
+     * Check if Smartform mode is choosen.
+     *
+     * @return bool
+     */
+    public function isSmartform()
+    {
+        if ($this->dataHelper->isBackend()) {
+            return false;
+        }
+
+        $smartformModes = [Data::MODE_SMARTFORM, Data::MODE_SMARTFORM_EXT_WITH_LOGOS, Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS];
+
+        return in_array($this->getEntryMode(), $smartformModes);
     }
 
     /**
@@ -328,6 +345,31 @@ class Standard extends Payzen
     public function getEntryMode()
     {
         return $this->getConfigData('card_info_mode');
+    }
+
+    /**
+     * Return popin selection mode.
+     *
+     * @return int
+     */
+    public function getRestPopinMode()
+    {
+        return $this->getConfigData('rest_popin_mode');
+    }
+
+    public function getCompactMode()
+    {
+        return $this->getConfigData('rest_compact');
+    }
+
+    public function getGroupThreshold()
+    {
+        return $this->getConfigData('rest_group_threshold');
+    }
+
+    public function getDisplayTitle()
+    {
+        return $this->getConfigData('display_title');
     }
 
     protected function getRestApiFormTokenData($quote)
@@ -428,6 +470,11 @@ class Standard extends Payzen
 
         if ($this->isOneClickActive() && $customer) {
             $data['formAction'] = 'CUSTOMER_WALLET';
+        }
+
+        if ($this->isSmartform()) {
+            // Filter payment means when creating payment token.
+            $data['paymentMethods'] = $this->getPaymentMeansForSmartform($amount);
         }
 
         return json_encode($data);
@@ -532,6 +579,11 @@ class Standard extends Payzen
 
         if ($this->isOneClickActive() && $customer) {
             $data['formAction'] = 'CUSTOMER_WALLET';
+        }
+
+        if ($this->isSmartform()) {
+            // Filter payment means when creating the payment token.
+            $data['paymentMethods'] = $this->getPaymentMeansForSmartform($amount);
         }
 
         return json_encode($data);
@@ -663,5 +715,34 @@ class Standard extends Payzen
     public function isOneClickActive()
     {
         return $this->getConfigData('oneclick_active');
+    }
+
+    private function getPaymentMeansForSmartform($amount)
+    {
+        $paymentCards = $this->getConfigData('payment_cards');
+
+        // Get standard payments means.
+        if ($paymentCards != "") {
+            $stdPaymentMeans = explode(';', $paymentCards);
+        } else {
+            return array();
+        }
+
+        // Get other payment means that are embedded.
+        $otherEmbeddedPaymentMeans = array();
+        $otherMethod = $this->dataHelper->getMethodInstance(Data::METHOD_OTHER);
+        if ($otherMethod->getConfigData('active') === '1') {
+            $otherPaymentMeans = $this->dataHelper->unserialize($otherMethod->getConfigData('other_payment_means'));
+            foreach ($otherPaymentMeans as $key => $option) {
+                if (isset($option['embedded_mode']) && ($option['embedded_mode'] === '1')
+                    && ! (! empty($option['minimum']) && $option['minimum'] != 0 && $amount < $option['minimum'])
+                    && ! (! empty($option['maximum']) && $option['maximum'] != 0 && $amount > $option['maximum'])) {
+                    array_push($otherEmbeddedPaymentMeans, $option['means']);
+                }
+            }
+        }
+
+        // Merge standard and other payment means.
+        return array_merge($stdPaymentMeans, $otherEmbeddedPaymentMeans);
     }
 }

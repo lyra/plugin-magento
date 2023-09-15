@@ -216,7 +216,7 @@ class Rest
         }
 
         // On some servers, / can be escaped.
-        $krAnswer = str_replace('\/', '/', $data['kr-answer']);
+        $krAnswer = str_replace('\/', '/', $data['kr-answer'] ? $data['kr-answer'] : '');
 
         $hash = hash_hmac('sha256', $krAnswer, $key);
 

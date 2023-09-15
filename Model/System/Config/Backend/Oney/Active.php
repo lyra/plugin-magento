@@ -66,7 +66,7 @@ class Active extends \Magento\Framework\App\Config\Value
     public function afterCommitCallback()
     {
         if (! empty($this->messages)) {
-            $this->messages[] = __('Payment in 3 or 4 times Oney cannot be used.');
+            $this->messages[] = __('Oney payment cannot be used.');
 
             throw new \Magento\Framework\Exception\LocalizedException(__(implode("\n", $this->messages)));
         }

@@ -181,7 +181,6 @@ abstract class ConfigFieldArray extends \Magento\Config\Block\System\Config\Form
         return $script;
     }
 
-
     /**
      * Render HTML block.
      *

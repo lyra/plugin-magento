@@ -9,6 +9,8 @@
  */
 namespace Lyranetwork\Payzen\Model\Method;
 
+use Lyranetwork\Payzen\Helper\Data;
+
 class Other extends Payzen
 {
     protected $_code = \Lyranetwork\Payzen\Helper\Data::METHOD_OTHER;
@@ -38,6 +40,10 @@ class Other extends Payzen
         // Add cart data.
         if ($option['cart_data'] === '1') {
             $this->checkoutHelper->setCartData($order, $this->payzenRequest, true);
+        }
+
+        if ($option['embedded_mode'] === '1') {
+            $this->payzenRequest->set('embedded_mode', $option['embedded_mode']);
         }
     }
 
@@ -91,6 +97,8 @@ class Other extends Payzen
     public function getAvailableMeans($quote = null)
     {
         $configMeans = $this->dataHelper->unserialize($this->getConfigData('other_payment_means'));
+        $standardMethod = $this->dataHelper->getMethodInstance(Data::METHOD_STANDARD);
+        $dataEntryMode = $standardMethod->getConfigData('card_info_mode');
 
         $amount = $quote ? $quote->getBaseGrandTotal() : null;
         $country = $quote ? $quote->getBillingAddress()->getCountryId() : null;
@@ -107,7 +115,9 @@ class Other extends Payzen
                     continue;
                 }
 
-                if ((! $amount || ! $value['minimum'] || $amount > $value['minimum'])
+                if ((! isset($value['embedded_mode']) || $value['embedded_mode'] === '0'
+                    || ($dataEntryMode !== '5' && $dataEntryMode !== '6' && $dataEntryMode !== '7' && $value['embedded_mode'] === '1'))
+                    && (! $amount || ! $value['minimum'] || $amount > $value['minimum'])
                     && (! $amount || ! $value['maximum'] || $amount < $value['maximum'])) {
                     // Means will be available.
                     $means[$code] = $value;

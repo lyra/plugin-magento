@@ -58,6 +58,10 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
         $config['payment'][$this->method->getCode()]['language'] = $this->method->getPaymentLanguage();
         $config['payment'][$this->method->getCode()]['updateOrder'] = $this->method->getConfigData('rest_update_order');
         $config['payment'][$this->method->getCode()]['restReturnUrl'] = $this->dataHelper->getRestReturnUrl();
+        $config['payment'][$this->method->getCode()]['restPopin'] = $this->method->getRestPopinMode();
+        $config['payment'][$this->method->getCode()]['compactMode'] = $this->method->getCompactMode();
+        $config['payment'][$this->method->getCode()]['group_threshold'] = $this->method->getGroupThreshold();
+        $config['payment'][$this->method->getCode()]['display_title'] = $this->method->getDisplayTitle();
 
         return $config;
     }

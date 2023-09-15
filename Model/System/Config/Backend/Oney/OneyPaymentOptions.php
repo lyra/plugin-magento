@@ -47,7 +47,6 @@ class OneyPaymentOptions extends ConfigArraySerialized
             $i = 0;
             foreach ($values as $value) {
                 $i++;
-
                 if (empty($value)) {
                     continue;
                 }
@@ -68,7 +67,9 @@ class OneyPaymentOptions extends ConfigArraySerialized
                     $this->checkAmount($value['maximum'], 'Max. amount', $i);
                 }
 
-                $this->checkMandatoryDecimal($value['count'], 'Count', $i);
+                if (isset($value['count'])) {
+                    $this->checkMandatoryDecimal($value['count'], 'Count', $i);
+                }
 
                 if (isset($value['rate'])) {
                     $this->checkRate($value['rate'], 'Rate', $i);
