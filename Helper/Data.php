@@ -31,7 +31,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const MODE_LOCAL_TYPE = 2;
     const MODE_IFRAME = 3;
     const MODE_EMBEDDED = 4;
-    const MODE_POPIN = 5;
+    const MODE_SMARTFORM = 5;
+    const MODE_SMARTFORM_EXT_WITH_LOGOS = 6;
+    const MODE_SMARTFORM_EXT_WITHOUT_LOGOS = 7;
 
     /**
      * @var array a global var to easily enable/disable features
@@ -620,7 +622,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return'REST';
 
             case '5':
-                return 'POPIN';
+                return 'SMARTFROM';
+
+            case '6':
+                return 'SMARTFORM_EXT_WITH_LOGOS';
+
+            case '7':
+                return 'MODE_SMARTFORM_EXT_WITHOUT_LOGOS';
 
             default:
                 return 'REDIRECT';

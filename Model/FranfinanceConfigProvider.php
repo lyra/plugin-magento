@@ -54,7 +54,7 @@ class FranfinanceConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigPr
 
             $search = array('%c');
             $replace = array($c);
-            $label = str_replace($search, $replace, $option['label']); // Label to display on payment page.
+            $label = str_replace($search, $replace, $option['label'] ? $option['label'] : ''); // Label to display on payment page.
 
             $options[] = [
                 'key' => $key,

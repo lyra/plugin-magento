@@ -62,7 +62,11 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
                     'checkoutRedirectUrl' => $this->getCheckoutRedirectUrl(),
                     'moduleLogoUrl' => $this->getModuleLogoUrl(),
                     'availableCcTypes' => $this->getAvailableCcTypes(),
-                    'entryMode' => $this->getEntryMode()
+                    'entryMode' => $this->getEntryMode(),
+                    'popinMode' => $this->getRestPopinMode(),
+                    'compactMode' => $this->getCompactMode(),
+                    'groupThreshold' => $this->getGroupThreshold(),
+                    'displayTitle' => $this->getDisplayTitle(),
                 ]
             ]
         ];
@@ -116,6 +120,42 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
         }
 
         return $this->method->getEntryMode();
+    }
+
+    protected function getRestPopinMode()
+    {
+        if (! method_exists($this->method, 'getRestPopinMode')) {
+            return null;
+        }
+
+        return $this->method->getRestPopinMode();
+    }
+
+    protected function getCompactMode()
+    {
+        if (! method_exists($this->method, 'getCompactMode')) {
+            return null;
+        }
+
+        return $this->method->getCompactMode();
+    }
+
+    protected function getGroupThreshold()
+    {
+        if (! method_exists($this->method, 'getGroupThreshold')) {
+            return null;
+        }
+
+        return $this->method->getGroupThreshold();
+    }
+
+    protected function getDisplayTitle()
+    {
+        if (! method_exists($this->method, 'getDisplayTitle')) {
+            return null;
+        }
+
+        return $this->method->getDisplayTitle();
     }
 
     protected function getCcTypeImageSrc($card)

@@ -82,7 +82,7 @@ class Head extends \Magento\Framework\View\Element\Template
     public function getTheme()
     {
         $theme = $this->method->getConfigData('rest_theme');
-        return $theme ? $theme : 'material';
+        return $theme ? $theme : 'neon';
     }
 
     public function getPlaceholder($name)

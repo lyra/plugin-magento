@@ -9,6 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Controller\Payment\Rest;
 
+use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 use Magento\Framework\DataObject;
 
 class Token extends \Magento\Framework\App\Action\Action
@@ -51,6 +52,7 @@ class Token extends \Magento\Framework\App\Action\Action
     const REFRESH_TOKEN = 'refresh_token';
     const SET_TOKEN = 'set_token';
     const RESTORE_CART = 'restore_cart';
+    const GET_TOKEN_AMOUNT_IN_CENTS = 'get_token_amount_in_cents';
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
@@ -141,6 +143,23 @@ class Token extends \Magento\Framework\App\Action\Action
                 }
 
                 return;
+
+            case self::GET_TOKEN_AMOUNT_IN_CENTS:
+                // Create token from order data.
+                $amount = $this->getRequest()->getParam('amount');
+                $currencyCode = $this->getRequest()->getParam('currency');
+
+                $currency = $currencyCode ? PayzenApi::findCurrencyByAlphaCode($currencyCode) : null;
+                if ($amount && $currency) {
+                    $amountInCents = $currency->convertAmountToInteger($amount);
+
+                    $data = new DataObject();
+                    $data->setData('amountincents', $amountInCents);
+
+                    return $this->resultJsonFactory->create()->setData($data->getData());
+                }
+
+                break;
 
             default;
                $token = null;

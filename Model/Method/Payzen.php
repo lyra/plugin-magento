@@ -291,7 +291,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         // Sanitize phone number before sending it to the gateway.
-        $telephone = str_replace([' ', '.', '-'], '', $order->getBillingAddress()->getTelephone());
+        $telephone = str_replace([' ', '.', '-'], '', $order->getBillingAddress()->getTelephone() ? $order->getBillingAddress()->getTelephone() : '');
 
         $this->payzenRequest->set('threeds_mpi', $threedsMpi);
 
@@ -318,7 +318,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->payzenRequest->set('ship_to_street2', $address->getStreetLine(2));
             $this->payzenRequest->set('ship_to_state', $address->getRegionCode());
             $this->payzenRequest->set('ship_to_country', $address->getCountryId());
-            $this->payzenRequest->set('ship_to_phone_num', str_replace([' ', '.', '-'], '', $address->getTelephone()));
+            $this->payzenRequest->set('ship_to_phone_num', str_replace([' ', '.', '-'], '', $address->getTelephone() ? $address->getTelephone() : ''));
             $this->payzenRequest->set('ship_to_zip', $address->getPostcode());
         }
 
@@ -712,6 +712,11 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function validatePayment(\Magento\Payment\Model\InfoInterface $payment)
     {
+        return $this->payzenValidatePayment($payment);
+    }
+
+    protected function payzenValidatePayment($payment, $createInvoice = true)
+    {
         // Clear all messages in session.
         $this->messageManager->getMessages(true);
 
@@ -809,7 +814,9 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             // Try to create invoice.
-            $this->paymentHelper->createInvoice($order);
+            if ($createInvoice) {
+                $this->paymentHelper->createInvoice($order);
+            }
 
             $this->dataHelper->log("Saving validated order #{$order->getIncrementId()}.");
             $order->save();
@@ -1144,5 +1151,55 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     public function getCurrentCustomer()
     {
         return $this->dataHelper->getCurrentCustomer($this->customerSession);
+    }
+
+    /**
+     * Check capture availability.
+     *
+     * @return bool
+     */
+    public function canCapture()
+    {
+        if (! parent::canCapture()) {
+            return false;
+        }
+
+        $payment = $this->getInfoInstance();
+
+        $authTrans = $this->paymentHelper->getTransaction(
+            \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH,
+            $payment->getId(),
+            $payment->getOrder()->getId()
+        );
+
+        if (! $authTrans || $authTrans->getIsClosed()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Capture payment.
+     *
+     * @param \Magento\Framework\DataObject|\Magento\Payment\Model\InfoInterface|Payment $payment
+     * @param float $amount
+     * @return $this
+     */
+    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
+        // Check if order capture on invoice is enabled.
+        if (! $this->dataHelper->getCommonConfigData('invoice_capture')) {
+            return;
+        }
+
+        if ($amount <= 0) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Invalid amount for capture.'));
+        }
+
+        $order = $payment->getOrder();
+        $this->dataHelper->log("Capture payment called for #{$order->getIncrementId()}.");
+
+        return $this->payzenValidatePayment($payment, false);
     }
 }

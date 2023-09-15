@@ -220,10 +220,8 @@ define(
                     || false;
             },
 
-            manageError: function (e) {
-                var me = this;
-
-                if (! PLACE_ORDER) {
+            restoreCart: function() {
+                if (!PLACE_ORDER) {
                     storage.post(
                         url.build('payzen/payment_rest/token?payzen_action=restore_cart&form_key=' + $.mage.cookies.get('form_key'))
                     ).done(function(response) {
@@ -232,6 +230,12 @@ define(
                         console.log('Cart could not be restored.');
                     });
                 }
+            },
+
+            manageError: function (e) {
+                var me = this;
+
+                me.restoreCart();
 
                 fullScreenLoader.stopLoader();
                 me.isPlaceOrderActionAllowed(true);
@@ -260,8 +264,13 @@ define(
 
                 var newPayload = me.getPayload();
                 if (me.payload && (me.payload === newPayload)) {
-                    // Unchanged payload, do not refresh.
-                   return;
+                    // Check if form token amount is up to date.
+                    var totals = quote.getTotals()();
+                    if (totals) {
+                        me.checkTokenAmount(totals['grand_total'], totals['base_currency_code'], KR_RAW_DNA.amount);
+                    }
+
+                    return;
                 }
 
                 if (!quote.paymentMethod() || !quote.paymentMethod().hasOwnProperty('method') || quote.paymentMethod().method !== 'payzen_standard') {
@@ -307,9 +316,18 @@ define(
                 });
 
                 require(['krypton'], function(KR) {
+                    if (me.getCompactMode() === "1") {
+                        KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
+                    }
+
+                    if (!me.getGroupThreshold() && !isNaN(me.getGroupThreshold())) {
+                        KR.setFormConfig({ smartForm: { groupingThreshold: me.getGroupThreshold() }});
+                    }
+
                     KR.setFormConfig({
                         formToken: me.getRestFormToken(),
-                        language: me.getLanguage()
+                        language: me.getLanguage(),
+                        form: { smartform: { singlePaymentButton: { visibility: false }}}
                     }).then(
                         function(v) {
                             KR = v.KR;
@@ -318,9 +336,28 @@ define(
                             });
 
                             KR.onError(function(e) {
-                               return me.manageError(e);
-                          });
-                    })
+                                return me.manageError(e);
+                            });
+
+                            KR.onPopinClosed(function(e) {
+                                me.restoreCart();
+                            });
+
+                            KR.onFormReady(() => {
+                                if (me.getRestPopinMode() === "1") {
+                                    var element = $(".kr-smart-button");
+                                    if (element.length > 0) {
+                                        element.hide();
+                                    } else {
+                                        element = $(".kr-smart-form-modal-button");
+                                        if (element.length > 0) {
+                                            element.hide();
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    )
                 });
             },
 
@@ -328,7 +365,7 @@ define(
                 var me = this;
 
                 if (PLACE_ORDER) {
-                     if ((me.getEntryMode() == 4) && me.getRestFormToken() && !IS_VALID) {
+                     if ((me.getEntryMode() === "4" && me.getRestPopinMode() === "0") && me.getRestFormToken() && !IS_VALID) {
                         // Embedded mode.
                         $('#payzen_rest_form .kr-form-error').html('');
 
@@ -356,12 +393,29 @@ define(
 
             submitEmbeddedForm: function () {
                 var me = this;
-                if ($('.kr-popin-button').length > 0) {
-                     fullScreenLoader.stopLoader();
-                     me.isPlaceOrderActionAllowed(true);
-                     KR.openPopin();
+                var isSmartform = $('.kr-smart-form');
+                var smartformModalButton = $('.kr-smart-form-modal-button');
+
+                // If popin mode.
+                if (me.getRestPopinMode() === "1") {
+                    fullScreenLoader.stopLoader();
+                    me.isPlaceOrderActionAllowed(true);
+
+                    if (smartformModalButton.length === 0 && isSmartform.length > 0) {
+                        var element = jQuery('.kr-smart-button');
+                        var paymentMethod = element.attr('kr-payment-method');
+                        KR.openPaymentMethod(paymentMethod);
+                    } else {
+                        KR.openPopin();
+                    }
                 } else {
-                     KR.submit();
+                    if (isSmartform.length > 0 || smartformModalButton.length > 0) { // Smartform mode.
+                        fullScreenLoader.stopLoader();
+                        me.isPlaceOrderActionAllowed(true);
+                        KR.openSelectedPaymentMethod();
+                    } else { // Embedded mode.
+                        KR.submit();
+                    }
                 }
             },
 
@@ -373,13 +427,36 @@ define(
                     url.build('payzen/payment_rest/token?payzen_action=refresh_token&form_key=' + $.mage.cookies.get('form_key'))
                 ).done(function(response) {
                     if (response.token) {
+                        if (me.getCompactMode() === "1") {
+                            KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
+                        }
+
+                        if (!me.getGroupThreshold() && !isNaN(me.getGroupThreshold())) {
+                            KR.setFormConfig({ smartForm: { groupingThreshold: me.getGroupThreshold() }});
+                        }
+
                         KR.setFormConfig({
                             formToken: response.token,
-                            language: me.getLanguage()
+                            language: me.getLanguage(),
+                            form: { smartform: { singlePaymentButton: { visibility: false }}}
                         }).then(
                             function(v) {
                                 // Cart has changed, a new order will be placed.
                                 PLACE_ORDER = true;
+
+                                KR.onFormReady(() => {
+                                    if (me.getRestPopinMode() === "1") {
+                                        var element = $(".kr-smart-button");
+                                        if (element.length > 0) {
+                                            element.hide();
+                                        } else {
+                                            element = $(".kr-smart-form-modal-button");
+                                            if (element.length > 0) {
+                                                element.hide();
+                                            }
+                                        }
+                                    }
+                                });
                             }
                         );
                     } else {
@@ -398,14 +475,37 @@ define(
                     url.build('payzen/payment_rest/token?payzen_action=set_token&form_key=' + $.mage.cookies.get('form_key'))
                 ).done(function(response) {
                     if (response.token) {
+                        if (me.getCompactMode() === "1") {
+                            KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
+                        }
+
+                        if (!me.getGroupThreshold() && !isNaN(me.getGroupThreshold())) {
+                            KR.setFormConfig({ smartForm: { groupingThreshold: me.getGroupThreshold() }});
+                        }
+
                         KR.setFormConfig({
                             formToken: response.token,
-                            language: me.getLanguage()
+                            language: me.getLanguage(),
+                            form: { smartform: { singlePaymentButton: { visibility: false }}}
                         }).then(
                             function(v) {
                                 let KR = v.KR;
                                 KR.onFocus(function(e) {
                                     $('#payzen_rest_form .kr-form-error').html('');
+                                });
+
+                                KR.onFormReady(() => {
+                                    if (me.getRestPopinMode() === "1") {
+                                        var element = $(".kr-smart-button");
+                                        if (element.length > 0) {
+                                            element.hide();
+                                        } else {
+                                            element = $(".kr-smart-form-modal-button");
+                                            if (element.length > 0) {
+                                                element.hide();
+                                            }
+                                        }
+                                    }
                                 });
 
                                 KR.onError(function(e) {
@@ -478,6 +578,19 @@ define(
                 });
             },
 
+            checkTokenAmount: function(amount, currency, krAmount) {
+                var me = this;
+
+                storage.post(
+                    url.build('payzen/payment_rest/token?payzen_action=get_token_amount_in_cents' + '&amount=' + amount + '&currency=' + currency + '&form_key=' + $.mage.cookies.get('form_key'))
+                ).done(function(response) {
+                    if (response.amountincents && krAmount && response.amountincents !== krAmount) {
+                        // Refresh token since the amount in the embedded form is not up to date.
+                        me.refreshToken();
+                    }
+                });
+            },
+
             getPayload: function() {
                 var me = this;
 
@@ -533,7 +646,7 @@ define(
             afterPlaceOrder: function() {
                 var me = this;
 
-                if (((me.getEntryMode() == 4) || (me.getEntryMode() == 5)) && me.getRestFormToken()) {
+                if (((me.getEntryMode() == 4) || (me.getEntryMode() == 5) || (me.getEntryMode() == 6) || (me.getEntryMode() == 7)) && me.getRestFormToken()) {
                     // Embedded or popin mode.
                     $('#payzen_rest_form .kr-form-error').html('');
 

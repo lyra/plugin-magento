@@ -38,7 +38,17 @@ class CardInfoMode implements \Magento\Framework\Option\ArrayInterface
 
             $options[] = [
                 'value' => '5',
-                'label' => __('Embedded payment fields in a pop-in (REST API)')
+                'label' => __('Embedded Smartform on merchant site (REST API)')
+            ];
+
+            $options[] = [
+                'value' => '6',
+                'label' => __('Embedded Smartform extended on merchant site with logos (REST API)')
+            ];
+
+            $options[] = [
+                'value' => '7',
+                'label' => __('Embedded Smartform extended on merchant site without logos (REST API)')
             ];
         }
 

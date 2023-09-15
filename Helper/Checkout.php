@@ -315,8 +315,9 @@ class Checkout
         $payzenRequest->set('cust_status', 'PRIVATE');
         $payzenRequest->set('ship_to_status', 'PRIVATE');
 
-        // If this is Oney 3x/4x.
-        $useOney = $payzenRequest->get('payment_cards') === 'ONEY_3X_4X';
+        // If this is Oney.
+        $oneyMeans = ['ONEY_3X_4X', 'ONEY_10X_12X', 'ONEY_PAYLATER'];
+        $useOney = in_array($payzenRequest->get('payment_cards'), $oneyMeans);
 
         $notAllowedCharsRegex = '#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ -]#ui';
 
@@ -348,7 +349,7 @@ class Checkout
                     $name = $order->getShippingDescription();
 
                     if ($carrierName) {
-                        $name = str_replace($carrierName . ' - ', '', $name);
+                        $name = str_replace($carrierName . ' - ', '', $name ? $name : '');
                     }
 
                     if (strpos($name, '<')) {
@@ -425,7 +426,7 @@ class Checkout
         $addressType = ($address->getAddressType() === 'billing') ? 'billing address' : 'delivery address';
 
         // Sainitize phone number before applying the regex.
-        $telephone = str_replace([' ', '.', '-'], '', $address->getTelephone());
+        $telephone = str_replace([' ', '.', '-'], '', $address->getTelephone() ? $address->getTelephone() : '');
 
         $this->checkFieldValidity($address->getLastname(), $nameRegex, 'Last Name', $addressType);
         $this->checkFieldValidity($address->getFirstname(), $nameRegex, 'First Name', $addressType);

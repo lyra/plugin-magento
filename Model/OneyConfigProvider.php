@@ -64,14 +64,18 @@ class OneyConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvider
 
         $options = [];
         foreach ($this->method->getAvailableOptions($amount) as $key => $option) {
-            // Option will be available.
-            $c = is_numeric($option['count']) ? $option['count'] : 1;
-            $r = is_numeric($option['rate']) ? $option['rate'] : 0;
+            if ($option['card_type'] === 'ONEY_PAYLATER') {
+                $label = "Pay Later Oney";
+            } else {
+                // Option will be available.
+                $c = is_numeric($option['count']) ? $option['count'] : 1;
+                $r = is_numeric($option['rate']) ? $option['rate'] : 0;
 
-            // Get final option description.
-            $search = array('%c', '%r');
-            $replace = array($c, $r . ' %');
-            $label = str_replace($search, $replace, $option['label']); // Label to display on payment page.
+                // Get final option description.
+                $search = array('%c', '%r');
+                $replace = array($c, $r . ' %');
+                $label = str_replace($search, $replace, $option['label'] ? $option['label'] : ''); // Label to display on payment page.
+            }
 
             $options[] = [
                 'key' => $key,

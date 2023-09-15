@@ -96,6 +96,22 @@ define(
                 return window.checkoutConfig.payment[this.item.method].entryMode;
             },
 
+            getRestPopinMode: function() {
+                return window.checkoutConfig.payment[this.item.method].popinMode;
+            },
+
+            getCompactMode: function() {
+                return window.checkoutConfig.payment[this.item.method].compactMode;
+            },
+
+            getGroupThreshold: function() {
+                return window.checkoutConfig.payment[this.item.method].groupThreshold;
+            },
+
+            getDisplayTitle: function() {
+                return window.checkoutConfig.payment[this.item.method].displayTitle;
+            },
+
             afterPlaceOrder: function() {
                 // Order placed with payment_pending status, redirect to gateway.
                 $.mage.redirect(this.getCheckoutRedirectUrl());

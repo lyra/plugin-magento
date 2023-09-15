@@ -19,8 +19,8 @@ class RestTheme extends \Magento\Framework\DataObject implements \Magento\Framew
                 'label' => 'Classic'
             ],
             [
-                'value' => 'material',
-                'label' => 'Material'
+                'value' => 'neon',
+                'label' => 'Neon'
             ]
         ];
 
