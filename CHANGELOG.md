@@ -1,3 +1,9 @@
+2.8.1, 2023-10-23:
+- [embedded] Bug fix: Fix payment means filter issue with Smartform modes.
+- [embedded] Bug fix: Fix error related to payment form validation on placing order.
+- [oney] Added possibility to refund Oney payments from Magento Back Office via WS.
+- Create credit memo on transaction total refund from gateway Back Office.
+
 2.8.0, 2023-09-15:
 - [embedded] Smartform integration.
 - [oney] Added 10x 12x Oney and Paylater means of payment.

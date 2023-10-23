@@ -391,10 +391,6 @@ class Standard extends Payzen
             return false;
         }
 
-        // Check if capture_delay is overriden in standard submodule.
-        $captureDelay = is_numeric($this->getConfigData('capture_delay')) ? $this->getConfigData('capture_delay') :
-            $this->dataHelper->getCommonConfigData('capture_delay');
-
         // Activate 3DS?
         $strongAuth = 'AUTO';
         $threedsMinAmount = $this->dataHelper->getCommonConfigData('threeds_min_amount');
@@ -424,7 +420,6 @@ class Standard extends Payzen
             ],
             'transactionOptions' => [
                 'cardOptions' => [
-                    'captureDelay' => $captureDelay,
                     'paymentSource' => 'EC'
                 ]
             ],
@@ -436,6 +431,15 @@ class Standard extends Payzen
                 'quote_id' => $quote->getId()
             ]
         ];
+
+        // Check if capture_delay is overriden in standard submodule.
+        $captureDelay = is_numeric($this->getConfigData('capture_delay')) ? $this->getConfigData('capture_delay') :
+            $this->dataHelper->getCommonConfigData('capture_delay');
+
+        // In case of Smartform, only payment means supporting capture delay will be shown.
+        if (is_numeric($captureDelay)) {
+            $data['transactionOptions']['cardOptions']['capture_delay'] = $captureDelay;
+        }
 
         $validationMode = $this->getConfigData('validation_mode');
         if (! is_null($validationMode)) {
@@ -723,7 +727,7 @@ class Standard extends Payzen
 
         // Get standard payments means.
         if ($paymentCards != "") {
-            $stdPaymentMeans = explode(';', $paymentCards);
+            $stdPaymentMeans = explode(',', $paymentCards);
         } else {
             return array();
         }
