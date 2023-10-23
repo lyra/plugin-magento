@@ -17,8 +17,6 @@ class Oney extends Payzen
 
     protected $_canUseInternal = false;
 
-    protected $_canRefund = false;
-    protected $_canRefundInvoicePartial = false;
     protected $needsCartData = true;
     protected $needsShippingMethodData = true;
 

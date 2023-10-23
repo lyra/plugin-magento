@@ -381,6 +381,10 @@ define(
                         me.placeOrder();
                     }
                 } else {
+                    if (! me.validate() || ! additionalValidators.validate() || me.isPlaceOrderActionAllowed() === false) {
+                        return;
+                    }
+
                     // It's a payment retry, an order has already been placed.
                     if ($('.kr-popin-button').length == 0) {
                         fullScreenLoader.startLoader();

@@ -44,6 +44,18 @@ class CheckProcessor
      */
     protected $payzenResponseFactory;
 
+
+    /**
+     * @var \Magento\Sales\Model\Order\CreditmemoFactory
+     */
+    protected $creditmemoFactory;
+
+
+    /**
+     * @var \Magento\Sales\Model\Service\CreditmemoService
+     */
+    protected $creditmemoService;
+
     /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Store\Model\App\Emulation $emulation
@@ -51,6 +63,8 @@ class CheckProcessor
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
+     * @param \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory
+     * @param \Magento\Sales\Model\Service\CreditmemoService $creditmemoService
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -58,7 +72,9 @@ class CheckProcessor
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Magento\Sales\Model\OrderFactory $orderFactory,
-        \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
+        \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory,
+        \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory,
+        \Magento\Sales\Model\Service\CreditmemoService $creditmemoService
     ) {
         $this->storeManager = $storeManager;
         $this->emulation = $emulation;
@@ -66,6 +82,8 @@ class CheckProcessor
         $this->paymentHelper = $paymentHelper;
         $this->orderFactory = $orderFactory;
         $this->payzenResponseFactory = $payzenResponseFactory;
+        $this->creditmemoFactory = $creditmemoFactory;
+        $this->creditmemoService = $creditmemoService;
     }
 
     public function execute(
@@ -133,15 +151,6 @@ class CheckProcessor
                 $this->dataHelper->log("Order #{$order->getIncrementId()} is confirmed.");
 
                 if ($response->get('operation_type') === 'CREDIT') {
-                    // This is a refund: create credit memo?
-                    $expiry = '';
-                    if ($response->get('expiry_month') && $response->get('expiry_year')) {
-                        $expiry = str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' .
-                             $response->get('expiry_year');
-                    }
-
-                    $transactionId = $response->get('trans_id') . '-' . $response->get('sequence_number');
-
                     // Save paid amount.
                     $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
                     $amount = round(
@@ -149,6 +158,31 @@ class CheckProcessor
                         $currency->getDecimals()
                     );
 
+                    $orderAmount = round(
+                        $order->getGrandTotal(),
+                        $currency->getDecimals()
+                    );
+
+                    if ($amount === $orderAmount) { // Total refund: we can create a credit memo in Magento.
+                        try {
+                            $creditMemo = $this->creditmemoFactory->createByOrder($order);
+                            $this->creditmemoService->refund($creditMemo, true);
+                            $this->dataHelper->log("Credit memo successfully created for order #{$order->getIncrementId()}.");
+                        } catch (\Exception $e) {
+                            $this->dataHelper->log(
+                                "Error while creating credit memo for order #{$order->getIncrementId()}: {$e->getMessage()}.",
+                                 \Psr\Log\LogLevel::ERROR
+                           );
+                        }
+                    }
+
+                    $expiry = '';
+                    if ($response->get('expiry_month') && $response->get('expiry_year')) {
+                        $expiry = str_pad($response->get('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' .
+                             $response->get('expiry_year');
+                    }
+
+                    $transactionId = $response->get('trans_id') . '-' . $response->get('sequence_number');
                     $amountDetail = $amount . ' ' . $currency->getAlpha3();
 
                     if ($response->get('effective_currency') &&
