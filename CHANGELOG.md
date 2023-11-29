@@ -1,3 +1,9 @@
+2.8.2, 2023-11-29:
+- Handle refund of a split payment.
+- Improve refund error messages.
+- Update list of supported payment means.
+- Update list of supported currencies.
+
 2.8.1, 2023-10-23:
 - [embedded] Bug fix: Fix payment means filter issue with Smartform modes.
 - [embedded] Bug fix: Fix error related to payment form validation on placing order.
