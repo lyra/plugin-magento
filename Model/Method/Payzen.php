@@ -1070,6 +1070,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $payzenOrderInfo = new PayzenOrderInfo();
             $payzenOrderInfo->setOrderRemoteId($order->getIncrementId());
             $payzenOrderInfo->setOrderId($order->getIncrementId());
+            $payzenOrderInfo->setOrderReference($order->getIncrementId());
             $payzenOrderInfo->setOrderCurrencyIsoCode($order->getOrderCurrencyCode());
             $payzenOrderInfo->setOrderCurrencySign($order->getOrderCurrencyCode());
             $payzenOrderInfo->setOrderUserInfo($commentText);
@@ -1086,14 +1087,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $order->setPayment($payment);
             $refundApi->refund($payzenOrderInfo, $amount);
         } catch (\Exception $e) {
-            $message = ($e->getCode() !== 'PSP_083') ? __('Refund error') . ': '  : '';
-            if ($e->getCode() <= -1) { // Manage cUrl errors.
-                $message .= __('Please consult the PayZen logs for more details.');
-            } else {
-                $message .= $e->getMessage();
-            }
-
-            throw new \Exception($message);
+            throw new \Exception($e->getMessage());
         }
 
         $order->save();

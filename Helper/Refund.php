@@ -47,10 +47,16 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
     protected $payment;
 
     /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory
+     */
+    protected $collectionFactory;
+
+    /**
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $collectionFactory
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
     public function __construct(
@@ -58,12 +64,14 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Sales\Model\OrderFactory $orderFactory,
+        \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $collectionFactory,
         \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->dataHelper = $dataHelper;
         $this->paymentHelper = $paymentHelper;
         $this->restHelper = $restHelper;
         $this->orderFactory = $orderFactory;
+        $this->collectionFactory = $collectionFactory;
         $this->messageManager = $messageManager;
     }
 
@@ -102,7 +110,86 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
             $this->createRefundTransaction($this->payment, $operationResponse);
         } elseif ($operationType == 'cancel') { // Cancellation.
             $order->cancel();
+        } elseif ($operationType == 'frac_update') { // Split payment.
+            $currency = PayzenApi::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
+
+            $transRefundAmount = 0;
+            $transRefundedAmount = 0;
+            if ($currency) {
+                if (isset($operationResponse['amount']) && $operationResponse['amount']) {
+                    $transRefundAmount = round($currency->convertAmountToFloat($operationResponse['amount']), $currency->getDecimals());
+                }
+
+                if (isset($operationResponse['refundedAmount']) && $operationResponse['refundedAmount']) {
+                    $transRefundedAmount = round($currency->convertAmountToFloat($operationResponse['refundedAmount']), $currency->getDecimals());
+                }
+            }
+
+            $orderRefundedAmount = ($order->getTotalRefunded()) ? $order->getTotalRefunded() : 0;
+            if ($transRefundedAmount > $orderRefundedAmount) {
+                // The amount refund situation is not up to date.
+                $refundTransactions = $this->getOrderRefundTransactions($orderId);
+                $boRefundedTransactions = $operationResponse['refundTransactions'];
+                $leftOutTransactions = [];
+                $leftOutTransactionsAmount = [];
+                $totalLeftOutAmount = 0;
+
+                // Check the left out transactions and create them.
+                foreach ($boRefundedTransactions as $key => $trans) {
+                    if ($trans['uuid'] && ! array_key_exists($trans['uuid'], $refundTransactions)) {
+                        $leftOutTransactions[$trans['uuid']] = $trans;
+                        $transAmount = round($currency->convertAmountToFloat($trans['amount']), $currency->getDecimals());
+                        $leftOutTransactionsAmount[$trans['uuid']] = $transAmount;
+                        $totalLeftOutAmount += $transAmount;
+                    }
+                }
+
+                if (! empty($leftOutTransactionsAmount)) {
+                    if ($transRefundAmount == $totalLeftOutAmount) {
+                        // One or more missing transactions in Magento, let the refund go through and create necessary refund transaction.
+                        foreach ($leftOutTransactionsAmount as $key => $trans) {
+                            $transactionInfo = $leftOutTransactions[$key];
+                            $this->createRefundTransaction($this->payment, $transactionInfo);
+                        }
+                    } else {
+                        if (($trsUuid = array_search($transRefundAmount, $leftOutTransactionsAmount)) !== false) {
+                            // The refund amount equals one of the unregistered transactions, let the refund go through and create necessary refund transaction.
+                            $transactionInfo = $leftOutTransactions[$trsUuid];
+                            $this->createRefundTransaction($this->payment, $transactionInfo);
+                        } else {
+                            // The amount of refund requested doesn't correspond to any refund transaction in merchant BO.
+                            throw new \Exception(__('The requested refund amount does not correspond to any refund transaction in the PayZen Back Office.'));
+                        }
+                    }
+                } else {
+                    // All transactions are created in Magento, it's just the order info that is not up to date, the merchant should do an offline refund just like a normal refund.
+                    throw new \Exception(__('Refund of split payment is already done in PayZen Back Office. Please, consider making an offline refund in Magento.'));
+                }
+            } else {
+                // Order already up to date, it's a new request of refund.
+                throw new \Exception(sprintf(__('Refund of split payment is not supported. Please, consider making necessary changes in %1$s Back Office.'), 'PayZen'));
+            }
         }
+    }
+
+    private function getOrderRefundTransactions($orderId)
+    {
+        $collection = $this->collectionFactory->create();
+        $collection->addOrderIdFilter($orderId);
+        $collection->load();
+        $refundTransactionsUuid = [];
+        if ($collection && count($collection) != 0) {
+            foreach ($collection as $item) {
+                if ($item->getTxnType() == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND) {
+                    $additionalInfo = $item->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+                    if ($additionalInfo && isset($additionalInfo['Transaction UUID'])) {
+                        $refundTransactionsUuid[$additionalInfo['Transaction UUID']] = $additionalInfo;
+                    }
+                }
+            }
+        }
+
+        return $refundTransactionsUuid;
     }
 
     private function createRefundTransaction($payment, $refundResponse)
@@ -114,8 +201,7 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
 
         $expiry = '';
         if ($response['vads_expiry_month'] && $response['vads_expiry_year']) {
-            $expiry = str_pad($response['vads_expiry_month'], 2, '0', STR_PAD_LEFT) . ' / ' .
-                $response['vads_expiry_year'];
+            $expiry = str_pad($response['vads_expiry_month'], 2, '0', STR_PAD_LEFT) . ' / ' . $response['vads_expiry_year'];
         }
 
         // Save paid amount.
