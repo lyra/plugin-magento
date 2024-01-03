@@ -20,7 +20,8 @@ class SessionChecker
      * Array
      */
     const PAYMENT_RETURN_PATHS = [
-        'payzen/payment/response'
+        'payzen/payment/response',
+        'admin/sales/order/view'
     ];
 
     /**

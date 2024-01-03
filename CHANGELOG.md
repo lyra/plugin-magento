@@ -1,3 +1,8 @@
+2.8.3, 2024-01-03:
+- Set return mode to POST by default.
+- [technical] Improve features management by plugin variant.
+- [embedded] Improve form token refresh.
+
 2.8.2, 2023-11-29:
 - Handle refund of a split payment.
 - Improve refund error messages.
@@ -5,13 +10,13 @@
 - Update list of supported currencies.
 
 2.8.1, 2023-10-23:
-- [embedded] Bug fix: Fix payment means filter issue with Smartform modes.
+- [smartform] Bug fix: Fix payment means filter issue with Smartform modes.
 - [embedded] Bug fix: Fix error related to payment form validation on placing order.
 - [oney] Added possibility to refund Oney payments from Magento Back Office via WS.
 - Create credit memo on transaction total refund from gateway Back Office.
 
 2.8.0, 2023-09-15:
-- [embedded] Smartform integration.
+- [smartform] Smartform integration.
 - [oney] Added 10x 12x Oney and Paylater means of payment.
 - [embedded] Bug fix: Fix form token update issue in Magento 2.4.5 and higher.
 - Added possibility to capture order on invoice creation in Magento Back Office.

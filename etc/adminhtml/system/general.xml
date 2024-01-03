@@ -375,11 +375,19 @@
                 </depends>
             </field>
 
-             <field id="ship_options" translate="label comment" sortOrder="184" showInDefault="1" showInWebsite="0" showInStore="1">
+            <field id="ship_options" translate="label comment" sortOrder="184" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label><![CDATA[Shipping options]]></label>
                 <comment><![CDATA[Define the PayZen information about all shipping methods.<br /><b>Method title: </b>The label of the shipping method.<br /><b>Type: </b>The delivery type of shipping method.<br /><b>Rapidity: </b>Select whether the delivery is STANDARD or EXPRESS.<br /><b>Delay: </b>Select the delivery delay if rapidity is &laquo; Priority &raquo;.<br /><b>Entries marked with * are newly added and must be configured.</b>]]></comment>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ShipOptions</frontend_model>
                 <config_path>payzen/general/ship_options</config_path>
+                <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized</backend_model>
+            </field>
+
+            <field id="customer_data" translate="label comment" sortOrder="185" showInDefault="1" showInWebsite="0" showInStore="1">
+                <label><![CDATA[Customer data]]></label>
+                <comment><![CDATA[Match each customer data with the corresponding field in Magento.<br /><b>CPF/CNPJ: </b>Custom field where CPF/CNPJ is saved on shop.<br /><b>Address number: </b>Custom field where address number is saved on shop.<br /><b>Neighborhood: </b>Custom field where address neighborhood is saved on shop.]]></comment>
+                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\CustomerData</frontend_model>
+                <config_path>payzen/general/customer_data</config_path>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized</backend_model>
             </field>
         </group>

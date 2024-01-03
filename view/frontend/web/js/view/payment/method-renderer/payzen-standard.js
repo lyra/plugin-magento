@@ -152,6 +152,7 @@ define(
 
         var PLACE_ORDER = true;  // An order can be placed (created).
         var IS_VALID = false;    // The embedded payment form is valid.
+        var CAN_REFRESH_TOKEN = true; // Token can be refreshed.
 
         return Component.extend({
             defaults: {
@@ -260,6 +261,10 @@ define(
             },
 
             checkPayload: function() {
+                if (! CAN_REFRESH_TOKEN) {
+                    return;
+                }
+
                 var me = this;
 
                 var newPayload = me.getPayload();
@@ -425,6 +430,7 @@ define(
 
             refreshToken: function() {
                 var me = this;
+                CAN_REFRESH_TOKEN = false;
                 fullScreenLoader.startLoader();
 
                 storage.post(
@@ -447,6 +453,7 @@ define(
                             function(v) {
                                 // Cart has changed, a new order will be placed.
                                 PLACE_ORDER = true;
+                                CAN_REFRESH_TOKEN = true;
 
                                 KR.onFormReady(() => {
                                     if (me.getRestPopinMode() === "1") {

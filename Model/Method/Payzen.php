@@ -69,7 +69,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
     protected $urlBuilder;
 
     /**
-     * @var \Magento\Framework\App\Response\Http $
+     * @var \Magento\Framework\App\Response\Http
      */
     protected $redirect;
 
@@ -320,6 +320,19 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->payzenRequest->set('ship_to_country', $address->getCountryId());
             $this->payzenRequest->set('ship_to_phone_num', str_replace([' ', '.', '-'], '', $address->getTelephone() ? $address->getTelephone() : ''));
             $this->payzenRequest->set('ship_to_zip', $address->getPostcode());
+        }
+
+        $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
+        if ($features['brazil']) {
+            $this->payzenRequest->set('cust_national_id', $this->getCustomerData($order, 'cpf'));
+            $this->payzenRequest->set('cust_address_number', $this->getCustomerData($order, 'street'));
+            $this->payzenRequest->set('cust_district', $this->getCustomerData($order, 'district'));
+
+            if (is_object($address)) {
+                $this->payzenRequest->set('ship_to_user_info', $this->getCustomerData($order, 'cpf'), false);
+                $this->payzenRequest->set('ship_to_address_number', $this->getCustomerData($order, 'street'), false);
+                $this->payzenRequest->set('ship_to_district', $this->getCustomerData($order, 'district'), false);
+            }
         }
 
         // Set method-specific parameters.
@@ -1195,5 +1208,53 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $this->dataHelper->log("Capture payment called for #{$order->getIncrementId()}.");
 
         return $this->payzenValidatePayment($payment, false);
+    }
+
+    public function getCustomerData($order, $field, $billing = true)
+    {
+        $customerData = $this->dataHelper->unserialize($this->dataHelper->getCommonConfigData('customer_data'));
+        if (is_array($customerData) && ! empty($customerData)) {
+            switch ($field) {
+                case "cpf":
+                    $cpf = (key_exists('cpf', $customerData)) ? $customerData['cpf']['field'] : '';
+                    if (! empty($cpf) && str_starts_with($cpf, 'customer_')) {
+                        return (! empty($order->getData($cpf))) ? $this->dataHelper->formatCpfCpnj($order->getData($cpf)) : '';
+                    } elseif (! empty($cpf) && str_starts_with($cpf, 'address_')) {
+                        return $this->getOrderAddressAttribute($order, $cpf, true, $billing);
+                    }
+
+                    return '';
+                case "district":
+                case "street":
+                    $district = (key_exists($field, $customerData)) ? $customerData[$field]['field'] : '';
+                    if (! empty($district) && str_starts_with($district, 'customer_')) {
+                        return (! empty($order->getData($district))) ? $order->getData($district) : '';
+                    } elseif (! empty($district) && str_starts_with($district, 'address_')) {
+                        return $this->getOrderAddressAttribute($order, $district, false, $billing);
+                    }
+
+                    return ($field == 'district') ? '-' : '0';
+                default:
+                    return '';
+            }
+        }
+
+        return '';
+    }
+
+    public function getOrderAddressAttribute($order, $field, $cpf = false, $billing = true)
+    {
+        $fieldCode = substr_replace($field, "", strpos($field, 'address_'), strlen('address_'));
+        if ($billing === true) {
+            if ($order->getBillingAddress()->getData($fieldCode)) {
+                return ($cpf === true) ? $this->dataHelper->formatCpfCpnj($order->getBillingAddress()->getData($fieldCode)) : $order->getBillingAddress()->getData($fieldCode);
+            }
+        } else {
+            if ($order->getShippingAddress()->getData($fieldCode)) {
+                return ($cpf === true) ? $this->dataHelper->formatCpfCpnj($order->getShippingAddress()->getData($fieldCode)) : $order->getShippingAddress()->getData($fieldCode);
+            }
+        }
+
+        return '';
     }
 }
