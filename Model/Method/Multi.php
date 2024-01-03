@@ -119,7 +119,7 @@ class Multi extends Payzen
         // Set payment_src to MOTO for backend payments.
         if ($this->dataHelper->isBackend()) {
             $this->payzenRequest->set('payment_src', 'MOTO');
-            $this->payzenRequest->set('return_mode', 'GET'); // Temporary workaround, TODO
+            $this->payzenRequest->addExtInfo('admin_user_id', $this->authSession->getUser()->getId());
         }
 
         $info = $this->getInfoInstance();
