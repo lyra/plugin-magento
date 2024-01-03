@@ -44,6 +44,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'restrictmulti' => false,
         'shatwo' => true,
         'embedded' => true,
+        'smartform' => true,
         'support' => true,
 
         'multi' => true,
@@ -54,7 +55,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'sepa' => true,
         'paypal' => true,
         'franfinance' => true,
-        'other' => true
+        'other' => true,
+
+        'brazil' => false
     ];
 
     /**
@@ -676,5 +679,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $cmsVersion = $this->productMetadata->getVersion();
 
         return $cmsParam . '/' . $cmsVersion . '/' . PayzenApi::shortPhpVersion();
+    }
+
+    public function formatCpfCpnj($cpf_cnpj)
+    {
+        $cpf_cnpj = preg_replace('/[^0-9]/is', '', $cpf_cnpj);
+
+        if (strlen(preg_replace("/\D/", '', $cpf_cnpj)) === 11) {
+            $response = preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cpf_cnpj);
+        } else {
+            $response = preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cpf_cnpj);
+        }
+
+        return $response;
     }
 }

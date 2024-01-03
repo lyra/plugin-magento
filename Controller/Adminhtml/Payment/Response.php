@@ -29,10 +29,18 @@ class Response extends \Magento\Backend\App\Action
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
+        \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor,
+        \Magento\User\Model\User $user,
+        \Magento\Backend\Model\Auth\Session $authSession
     ) {
         $this->responseProcessor = $responseProcessor;
         $this->dataHelper = $responseProcessor->getDataHelper();
+
+        $adminUserId = isset($_POST['vads_ext_info_admin_user_id']) ? $_POST['vads_ext_info_admin_user_id'] : false;
+        if ($adminUserId && ! $authSession->getUser()) {
+            $user->load($adminUserId);
+            $authSession->setUser($user);
+        }
 
         parent::__construct($context);
     }
