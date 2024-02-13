@@ -9,8 +9,8 @@
  */
 namespace Lyranetwork\Payzen\Controller\Processor;
 
+use \Lyranetwork\Payzen\Helper\Payment as PayzenPaymentHelper;
 use \Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
-use Lyranetwork\Payzen\Model\ResponseException;
 
 class CheckProcessor
 {
@@ -60,7 +60,7 @@ class CheckProcessor
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Store\Model\App\Emulation $emulation
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
-     * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
+     * @param PayzenPaymentHelper $paymentHelper
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
      * @param \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory
@@ -70,7 +70,7 @@ class CheckProcessor
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Store\Model\App\Emulation $emulation,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
-        \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
+        PayzenPaymentHelper $paymentHelper,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory,
         \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory,
@@ -275,7 +275,8 @@ class CheckProcessor
                 \Psr\Log\LogLevel::ERROR
             );
 
-            throw new ResponseException($response->getOutputforGateway('auth_fail'));
+            header(PayzenPaymentHelper::HEADER_ERROR_500);
+            die($response->getOutputforGateway('auth_fail'));
         }
 
         return [
@@ -290,7 +291,8 @@ class CheckProcessor
         $orderId = key_exists('vads_order_id', $params) ? $params['vads_order_id'] : null;
         if (! $orderId) {
             $this->dataHelper->log('Order ID is empty. Content: ' . json_encode($params), \Psr\Log\LogLevel::ERROR);
-            throw new ResponseException('<span style="display:none">KO-Invalid IPN request received.'."\n".'</span>');
+            header(PayzenPaymentHelper::HEADER_ERROR_500);
+            die('<span style="display:none">KO-Invalid IPN request received.'."\n".'</span>');
         }
 
         // Loading order.
@@ -299,7 +301,8 @@ class CheckProcessor
 
         if (! $order->getId()) {
             $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
-            throw new ResponseException('<span style="display:none">KO-Order not found.' . "\n" . '</span>');
+            header(PayzenPaymentHelper::HEADER_ERROR_500);
+            die('<span style="display:none">KO-Order not found.' . "\n" . '</span>');
         }
 
         return $order;

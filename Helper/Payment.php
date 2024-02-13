@@ -54,6 +54,8 @@ class Payment
 
     const BRAND_USER_CHOICE = 'payzen_brand_user_choice';
 
+    const HEADER_ERROR_500 = 'HTTP/1.1 500 Internal Server Error';
+
     const SUCCESS = 1;
     const FAILURE = 2;
     const CANCEL = 3;
