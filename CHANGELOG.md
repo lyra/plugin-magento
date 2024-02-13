@@ -1,3 +1,6 @@
+2.8.4, 2024-02-13:
+- Improve IPN errors management.
+
 2.8.3, 2024-01-03:
 - Set return mode to POST by default.
 - [technical] Improve features management by plugin variant.
