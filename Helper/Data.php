@@ -91,7 +91,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $appState;
 
     /**
-     * @var \Zend\Http\PhpEnvironment\RemoteAddress
+     * @var \Laminas\Http\PhpEnvironment\RemoteAddress
      */
     protected $remoteAddress;
 
@@ -138,7 +138,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\Filesystem $filesystem
      * @param \Lyranetwork\Payzen\Model\Logger\Payzen
      * @param \Magento\Framework\App\State $appState
-     * @param \Zend\Http\PhpEnvironment\RemoteAddress $remoteAddress
+     * @param \Laminas\Http\PhpEnvironment\RemoteAddress $remoteAddress
      * @param \Magento\Framework\Filesystem\Io\File $file
      * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Payment\Helper\Data $paymentHelper
@@ -155,7 +155,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Filesystem $filesystem,
         \Lyranetwork\Payzen\Model\Logger\Payzen $logger,
         \Magento\Framework\App\State $appState,
-        \Zend\Http\PhpEnvironment\RemoteAddress $remoteAddress,
+        \Laminas\Http\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\Filesystem\Io\File $file,
         \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Payment\Helper\Data $paymentHelper,
