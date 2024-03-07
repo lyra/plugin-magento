@@ -1,3 +1,6 @@
+2.8.5, 2024-03-07:
+- Bug fix: Fix errors related to the deprecation of the Framework Zend.
+
 2.8.4, 2024-02-13:
 - Improve IPN errors management.
 
