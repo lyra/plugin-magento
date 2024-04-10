@@ -1,3 +1,7 @@
+2.8.6, 2024-04-10:
+- [embedded] Take into account the notification URL on payment abandoned by buyer.
+- [smartform] Bug fix: Fix error related to display Smartform in a popin.
+
 2.8.5, 2024-03-07:
 - Bug fix: Fix errors related to the deprecation of the Framework Zend.
 

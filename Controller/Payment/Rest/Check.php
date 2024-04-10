@@ -118,8 +118,16 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         $orderId = (int) $response->get('order_id');
         if (! $orderId) {
             $this->dataHelper->log("Received empty Order ID.", \Psr\Log\LogLevel::ERROR);
-            header(PayzenPaymentHelper::HEADER_ERROR_500);
-            die('Order ID is empty.');
+
+            $abandonedPayment = isset($answer['orderCycle']) && ($answer['orderCycle'] === 'CLOSED') && isset($answer['orderStatus']) && ($answer['orderStatus'] === 'ABANDONED') && empty($response->getTransStatus());
+            if ($abandonedPayment) {
+                $this->dataHelper->log('Abandoned payment IPN ignored.');
+                $this->dataHelper->log('IPN URL PROCESS END.');
+                die('Abandoned payment IPN ignored.');
+            } else {
+                header(PayzenPaymentHelper::HEADER_ERROR_500);
+                die('Order ID is empty.');
+            }
         }
 
         $order = $this->orderFactory->create();

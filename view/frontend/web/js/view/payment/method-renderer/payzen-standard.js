@@ -349,17 +349,7 @@ define(
                             });
 
                             KR.onFormReady(() => {
-                                if (me.getRestPopinMode() === "1") {
-                                    var element = $(".kr-smart-button");
-                                    if (element.length > 0) {
-                                        element.hide();
-                                    } else {
-                                        element = $(".kr-smart-form-modal-button");
-                                        if (element.length > 0) {
-                                            element.hide();
-                                        }
-                                    }
-                                }
+                                me.hideSmartformPopinButton();
                             });
                         }
                     )
@@ -456,17 +446,7 @@ define(
                                 CAN_REFRESH_TOKEN = true;
 
                                 KR.onFormReady(() => {
-                                    if (me.getRestPopinMode() === "1") {
-                                        var element = $(".kr-smart-button");
-                                        if (element.length > 0) {
-                                            element.hide();
-                                        } else {
-                                            element = $(".kr-smart-form-modal-button");
-                                            if (element.length > 0) {
-                                                element.hide();
-                                            }
-                                        }
-                                    }
+                                    me.hideSmartformPopinButton();
                                 });
                             }
                         );
@@ -506,17 +486,7 @@ define(
                                 });
 
                                 KR.onFormReady(() => {
-                                    if (me.getRestPopinMode() === "1") {
-                                        var element = $(".kr-smart-button");
-                                        if (element.length > 0) {
-                                            element.hide();
-                                        } else {
-                                            element = $(".kr-smart-form-modal-button");
-                                            if (element.length > 0) {
-                                                element.hide();
-                                            }
-                                        }
-                                    }
+                                    me.hideSmartformPopinButton();
                                 });
 
                                 KR.onError(function(e) {
@@ -689,6 +659,17 @@ define(
                     }
                 } else {
                     me._super();
+                }
+            },
+
+            hideSmartformPopinButton: function() {
+                var me = this;
+
+                if (me.getRestPopinMode() === "1") {
+                    var element = $(".kr-smart-form .kr-smart-form-wrapper.kr-type-popin .kr-smart-form-modal-button");
+                    if (element.length > 0) {
+                        element.hide();
+                    }
                 }
             }
         });
