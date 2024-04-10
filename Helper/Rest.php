@@ -39,10 +39,10 @@ class Rest
             $transactions = $this->getProperty($answer, 'transactions');
 
             if (! is_array($transactions) || empty($transactions)) {
-                return [];
+                $transaction = $answer;
+            } else {
+                $transaction = $transactions[0];
             }
-
-            $transaction = $transactions[0];
         }
 
         $response = [];

@@ -269,6 +269,11 @@ class Payment
     {
         $this->dataHelper->log("Updating payment information for order #{$order->getIncrementId()}.");
 
+        if (empty($response->get('amount'))) {
+            $this->dataHelper->log("No transaction information to update payment for order #{$order->getIncrementId()}.");
+            return;
+        }
+
         // Set common payment information.
         $order->getPayment()
             ->setCcTransId($response->get('trans_id'))

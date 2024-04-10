@@ -81,6 +81,10 @@ button.kr-popin-button {
     height: 0;
 }
 
+.kr-smart-form .kr-smart-form-wrapper.kr-type-popin button.kr-smart-form-modal-button {
+    display: none !important;
+}
+
 .payzen-card {
     display: inline !important;
 }
