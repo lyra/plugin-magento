@@ -554,7 +554,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $name = strtolower($card) . '.png';
 
-        if ($this->isUploadFileImageExists('cc/' . $card)) {
+        if ($this->isUploadFileImageExists('cc/' . $name)) {
             return $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) .
                 'payzen/images/cc/' . $name;
         } else {

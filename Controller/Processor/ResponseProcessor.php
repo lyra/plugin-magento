@@ -107,20 +107,7 @@ class ResponseProcessor
                 $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has been confirmed by client return !" .
                 " This means the notification URL did not work.", \Psr\Log\LogLevel::WARNING);
 
-                // Un-cancel order items.
-                $orderItems = $order->getAllItems();
-                foreach ($orderItems as $item) {
-                    $item->setData("qty_canceled",0)->save();
-                }
-
-                // Save order and optionally create invoice.
-                $this->paymentHelper->registerOrder($order, $response);
-
-                // Un-cancel order items.
-                $orderItems = $order->getAllItems();
-                foreach ($orderItems as $item) {
-                    $item->setData("qty_canceled",0)->save();
-                }
+                $this->paymentHelper->unCancelOrder($order, $response);
 
                 // Display success page.
                 return [
