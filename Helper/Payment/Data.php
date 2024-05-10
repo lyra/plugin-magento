@@ -74,7 +74,7 @@ class Data extends \Magento\Payment\Helper\Data
             ];
         }
 
-        $payzenOtherTitle = $methods['payzen_other']['title']; // Get multi payment general title.
+        $payzenOtherTitle = $methods['payzen_other']['title']; // Get other payment means general title.
         unset($methods['payzen_other']);
 
         // Add other payment virtual methods to the list.
@@ -90,5 +90,14 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return $methods;
+    }
+
+    public function getMethodInstance($code)
+    {
+        if (strpos($code, 'payzen_other_') === 0) {
+            return parent::getMethodInstance('payzen_other');
+        }
+
+        return parent::getMethodInstance($code);
     }
 }

@@ -1084,8 +1084,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $payzenOrderInfo->setOrderRemoteId($order->getIncrementId());
             $payzenOrderInfo->setOrderId($order->getIncrementId());
             $payzenOrderInfo->setOrderReference($order->getIncrementId());
-            $payzenOrderInfo->setOrderCurrencyIsoCode($order->getOrderCurrencyCode());
-            $payzenOrderInfo->setOrderCurrencySign($order->getOrderCurrencyCode());
+            $payzenOrderInfo->setOrderCurrencyIsoCode($order->getBaseCurrencyCode());
+            $payzenOrderInfo->setOrderCurrencySign($order->getBaseCurrencyCode());
             $payzenOrderInfo->setOrderUserInfo($commentText);
 
             $refundApi = new PayzenRefund(

@@ -136,14 +136,7 @@ class CheckProcessor
             ];
 
             if ($order->isCanceled() && $response->isAcceptedPayment() && $response->getExtInfo('update_order')) {
-                // Un-cancel order items.
-                $orderItems = $order->getAllItems();
-                foreach ($orderItems as $item) {
-                    $item->setData("qty_canceled",0)->save();
-                }
-
-                // Save order and optionally create invoice.
-                $this->paymentHelper->registerOrder($order, $response);
+                $this->paymentHelper->unCancelOrder($order, $response);
 
                 // Display notification URL confirmation message.
                 return 'payment_ok';

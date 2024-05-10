@@ -1,3 +1,11 @@
+2.8.7, 2024-05-10:
+- Bug fix: Fix error 400 related to other payment means validation.
+- Bug fix: Fix order info for email template.
+- Bug fix: Fix payment means logos management.
+- Bug fix: Fix refunding order issue in case of multi-currency Magento Shop.
+- [embedded] Bug fix: Fix update order status on each payment attempt.
+- Added new transaction status REFUND_TO_RETRY.
+
 2.8.6, 2024-04-10:
 - [embedded] Take into account the notification URL on payment abandoned by buyer.
 - [smartform] Bug fix: Fix error related to display Smartform in a popin.

@@ -374,16 +374,16 @@ class Standard extends Payzen
 
     protected function getRestApiFormTokenData($quote)
     {
-        $amount = $quote->getGrandTotal();
+        $amount = $quote->getBaseGrandTotal();
 
         // Currency.
-        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
+        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
         if (! $currency) {
-            // If currency is not supported, use base currency.
-            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
+            // If currency is not supported, use order currency.
+            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
 
-            // ... and order total in base currency.
-            $amount = $quote->getBaseGrandTotal();
+            // ... and order total in order currency.
+            $amount = $quote->getGrandTotal();
         }
 
         if (! $currency) {
@@ -486,16 +486,16 @@ class Standard extends Payzen
 
     protected function getTokenDataForOrder($order)
     {
-        $amount = $order->getGrandTotal();
+        $amount = $order->getBaseGrandTotal();
 
         // Currency.
-        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getQuoteCurrencyCode());
+        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
         if (! $currency) {
-            // If currency is not supported, use base currency.
-            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
+            // If currency is not supported, use order currency.
+            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
 
-            // ... and order total in base currency.
-            $amount = $order->getBaseGrandTotal();
+            // ... and order total in order currency.
+            $amount = $order->getGrandTotal();
         }
 
         if (! $currency) {

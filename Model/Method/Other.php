@@ -60,11 +60,12 @@ class Other extends Payzen
         $info = $this->getInfoInstance();
         $payzenData = $this->extractPaymentData($data);
 
-        // Load option informations.
+        // Load option information.
         $option = $this->_getMeans($payzenData->getData('payzen_other_option'));
+        if ($option) {
+            $info->setCcType($option['means'])->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::OTHER_OPTION, serialize($option));
+        }
 
-        $info->setCcType($option['means'])
-            ->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::OTHER_OPTION, serialize($option));
         return $this;
     }
 
