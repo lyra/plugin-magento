@@ -26,6 +26,12 @@
         </arguments>
     </type>
 
+    <type name="Magento\Payment\Model\Info">
+        <arguments>
+            <argument name="paymentData" xsi:type="object">Lyranetwork\Payzen\Helper\Payment\Data</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Framework\App\Request\CsrfValidator">
         <plugin name="payzen_skip_csrf_validator" type="Lyranetwork\Payzen\Controller\Plugin\CsrfValidator" />
     </type>

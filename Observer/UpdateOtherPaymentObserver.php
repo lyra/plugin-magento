@@ -15,7 +15,7 @@ use Magento\Framework\Event\Observer;
 class UpdateOtherPaymentObserver implements ObserverInterface
 {
     /**
-     * Update payment method ID to set installments number if multi payment.
+     * Update payment method ID to set payment means if other payment means method.
      *
      * @param Observer $observer
      * @return void

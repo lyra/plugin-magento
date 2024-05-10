@@ -64,7 +64,7 @@ define(
             selectOptionPaymentMethod: function(option) {
                 var method = this.getCode() + '_' + option;
 
-                selectPaymentMethodAction(this.getOptionData(method));
+                selectPaymentMethodAction(this.getOptionData('payzen_other'));
                 checkoutData.setSelectedPaymentMethod(method);
 
                 return true;
@@ -80,6 +80,10 @@ define(
 
             getRegroupMode: function() {
                 return window.checkoutConfig.payment.payzen_other.regroupMode;
+            },
+
+            payzenOptionChecked: function() {
+                return checkoutData.getSelectedPaymentMethod();
             }
         });
     }

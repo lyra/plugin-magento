@@ -121,6 +121,21 @@ class Payment
     protected $updateCouponUsages;
 
     /**
+     * @var \Magento\Framework\Registry
+     * */
+    protected $registry;
+
+    /**
+     * @var \Magento\Quote\Model\QuoteRepository
+     */
+    protected $quoteRepository;
+
+    /**
+     * @var \Magento\Sales\Api\OrderManagementInterface
+     */
+    protected $orderManagement;
+
+    /**
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
      * @param \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface $transactionManager
@@ -133,6 +148,9 @@ class Payment
      * @param \Magento\Sales\Model\Order\Config $orderConfig
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\SalesRule\Model\Coupon\UpdateCouponUsages $updateCouponUsages
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Quote\Model\QuoteRepository $quoteRepository
+     * @param \Magento\Sales\Api\OrderManagementInterface $orderManagement
      */
     public function __construct(
         \Magento\Framework\Event\ManagerInterface $eventManager,
@@ -146,7 +164,10 @@ class Payment
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \Magento\Sales\Model\Order\Config $orderConfig,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
-        \Magento\SalesRule\Model\Coupon\UpdateCouponUsages $updateCouponUsages
+        \Magento\SalesRule\Model\Coupon\UpdateCouponUsages $updateCouponUsages,
+        \Magento\Framework\Registry $registry,
+        \Magento\Quote\Model\QuoteRepository $quoteRepository,
+        \Magento\Sales\Api\OrderManagementInterface $orderManagement
     ) {
         $this->eventManager = $eventManager;
         $this->transactionRepository = $transactionRepository;
@@ -160,6 +181,9 @@ class Payment
         $this->orderConfig = $orderConfig;
         $this->timezone = $timezone;
         $this->updateCouponUsages = $updateCouponUsages;
+        $this->registry = $registry;
+        $this->quoteRepository = $quoteRepository;
+        $this->orderManagement = $orderManagement;
     }
 
     /**
@@ -172,6 +196,9 @@ class Payment
         \Magento\Sales\Model\Order $order,
         \Lyranetwork\Payzen\Model\Api\Form\Response $response
     ) {
+        $this->registry->unregister('current_order');
+        $this->registry->register('current_order', $order);
+
         $this->dataHelper->log("Saving payment for order #{$order->getIncrementId()}.");
 
         // Update authorized amount.
@@ -828,6 +855,49 @@ class Payment
         } catch (\Exception $e) {
             $this->dataHelper->log("Error occurred while updating coupon usage for order #{$order->getIncrementId()}: {$e->getMessage()}.");
         }
+    }
+
+    /**
+     * Un-cancel order.
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Lyranetwork\Payzen\Model\Api\Form\Response $response
+     */
+    public function unCancelOrder(
+        \Magento\Sales\Model\Order $order,
+        \Lyranetwork\Payzen\Model\Api\Form\Response $response
+    ) {
+        $order = $this->orderManagement->place($order);
+
+        // Un-cancel order items.
+        foreach ($order->getAllItems() as $item) {
+            $item->setTaxCanceled(0);
+            $item->setDiscountTaxCompensationCanceled(0);
+            $item->setData("qty_canceled", 0)->save();
+        }
+
+        // Reset order attribute set when cancelled.
+        $order->setSubtotalCanceled(0);
+        $order->setBaseSubtotalCanceled(0);
+        $order->setTaxCanceled(0);
+        $order->setBaseTaxCanceled(0);
+        $order->setShippingCanceled(0);
+        $order->setBaseShippingCanceled(0);
+        $order->setDiscountCanceled(0);
+        $order->setBaseDiscountCanceled(0);
+        $order->setTotalCanceled(0);
+        $order->setBaseTotalCanceled(0);
+
+        // Save order and optionally create invoice.
+        $this->registerOrder($order, $response);
+
+        $this->eventManager->dispatch(
+            'checkout_submit_all_after',
+            [
+                'order' => $order,
+                'quote' => $this->quoteRepository->get($order->getQuoteId())
+            ]
+        );
     }
 
     /**

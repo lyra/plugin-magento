@@ -9,9 +9,9 @@
  */
 -->
 <!-- ko foreach: {data: getAvailableOptions(), as: 'option'} -->
-<div class="payment-method" data-bind="css: {'_active': ($parent.getOptionCode(option.key) == $parent.isChecked())}">
+<div class="payment-method" data-bind="css: {'_active': ($parent.getOptionCode(option.key) == $parent.payzenOptionChecked())}">
     <div class="payment-method-title field choice">
-    <input type="hidden"
+        <input type="hidden"
                  name="payment[payzen_other_option]"
                  data-bind="value: option.key" />
 
@@ -20,7 +20,7 @@
                class="radio"
                data-bind="attr: {id: $parent.getOptionCode(option.key)},
                           value: $parent.getOptionCode(option.key),
-                          checked: $parent.isChecked,
+                          checked: $parent.payzenOptionChecked(),
                           click: function() { $parent.selectOptionPaymentMethod(option.key);
                                               $parent.payzenOtherOption(option.key);
                                               return true; },
@@ -29,7 +29,7 @@
         <label data-bind="attr: {for: $parent.getOptionCode(option.key)}" class="label  payzen-card">
             <img data-bind="attr: {src: option.icon}"
                  class="payment-icon"
-                 style="height: 36px;"/>
+                 style="height: 36px;" />
 
             <span data-bind="text: option.label"></span>
         </label>
