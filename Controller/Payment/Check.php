@@ -9,6 +9,8 @@
  */
 namespace Lyranetwork\Payzen\Controller\Payment;
 
+use Lyranetwork\Payzen\Model\ResponseException;
+
 class Check extends \Magento\Framework\App\Action\Action
 {
     /**
@@ -52,8 +54,7 @@ class Check extends \Magento\Framework\App\Action\Action
 
             $case = $this->checkProcessor->execute($order, $response);
             if ($case === 'payment_ko_on_order_ok') {
-                header(\Lyranetwork\Payzen\Helper\Payment::HEADER_ERROR_500);
-                die($response->getOutputForGateway($case));
+                throw new ResponseException($response->getOutputForGateway($case));
             }
 
             return $this->renderResponse($response->getOutputForGateway($case));

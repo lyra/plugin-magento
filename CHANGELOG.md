@@ -1,3 +1,6 @@
+2.8.8, 2024-05-30:
+- Rollback using 500 http code on error for IPN calls.
+
 2.8.7, 2024-05-10:
 - Bug fix: Fix error 400 related to other payment means validation.
 - Bug fix: Fix order info for email template.
