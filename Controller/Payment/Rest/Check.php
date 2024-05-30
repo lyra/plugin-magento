@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Controller\Payment\Rest;
 
-use \Lyranetwork\Payzen\Helper\Payment as PayzenPaymentHelper;
+use \Lyranetwork\Payzen\Helper\Payment;
 use Lyranetwork\Payzen\Model\ResponseException;
 use Magento\Framework\DataObject;
 
@@ -90,15 +90,13 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         // Check the validity of the request.
         if (! $this->restHelper->checkResponseFormat($params)) {
             $this->dataHelper->log('Invalid response received. Content: ' . json_encode($params), \Psr\Log\LogLevel::ERROR);
-            header(PayzenPaymentHelper::HEADER_ERROR_500);
-            die('<span style="display:none">KO-Invalid IPN request received.'."\n".'</span>');
+            throw new ResponseException('<span style="display:none">KO-Invalid IPN request received.' . "\n" . '</span>');
         }
 
         $answer = json_decode($params['kr-answer'], true);
         if (! is_array($answer)) {
             $this->dataHelper->log('Invalid response received. Content: ' . json_encode($params), \Psr\Log\LogLevel::ERROR);
-            header(PayzenPaymentHelper::HEADER_ERROR_500);
-            die('<span style="display:none">KO-Invalid IPN request received.' . "\n" . '</span>');
+            throw new ResponseException('<span style="display:none">KO-Invalid IPN request received.' . "\n" . '</span>');
         }
 
         // Wrap payment result to use traditional order creation tunnel.
@@ -125,8 +123,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
                 $this->dataHelper->log('IPN URL PROCESS END.');
                 die('Abandoned payment IPN ignored.');
             } else {
-                header(PayzenPaymentHelper::HEADER_ERROR_500);
-                die('Order ID is empty.');
+                throw new ResponseException('Order ID is empty.');
             }
         }
 
@@ -138,8 +135,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             if ($quoteId = (int) $response->getExtInfo('quote_id')) {
                 if ($this->quoteRepository->get($quoteId)->getId()) {
                     $this->dataHelper->log("Quote not found with ID #{$quoteId}.", \Psr\Log\LogLevel::ERROR);
-                    header(PayzenPaymentHelper::HEADER_ERROR_500);
-                    die($response->getOutputForGateway('order_not_found'));
+                    throw new ResponseException($response->getOutputForGateway('order_not_found'));
                 }
 
                 $quote = $this->quoteRepository->get($quoteId);
@@ -162,13 +158,11 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
                 $order->loadByIncrementId($quote->getReservedOrderId());
                 if (! $order->getId()) {
                     $this->dataHelper->log("Order cannot be created. Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
-                    header(PayzenPaymentHelper::HEADER_ERROR_500);
-                    die($response->getOutputForGateway('ko', 'Error when trying to create order.'));
+                    throw new ResponseException($response->getOutputForGateway('ko', 'Error when trying to create order.'));
                 }
             } else {
                 $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
-                header(PayzenPaymentHelper::HEADER_ERROR_500);
-                die("Order not found with ID #{$orderId}.");
+                throw new ResponseException("Order not found with ID #{$orderId}.");
             }
         }
 
@@ -201,8 +195,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
                 \Psr\Log\LogLevel::ERROR
             );
 
-            header(PayzenPaymentHelper::HEADER_ERROR_500);
-            die($response->getOutputForGateway('auth_fail'));
+            throw new ResponseException($response->getOutputForGateway('auth_fail'));
         }
 
         return [
@@ -222,8 +215,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             $this->onepage->saveOrder();
         } catch (Exception $e) {
             $this->dataHelper->log("Order cannot be created. Quote ID: #{$quote->getId()}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
-            header(PayzenPaymentHelper::HEADER_ERROR_500);
-            die('Error when trying to create order.');
+            throw new ResponseException('Error when trying to create order.');
         }
     }
 }
