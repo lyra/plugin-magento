@@ -214,16 +214,12 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         // Set order_id.
         $this->payzenRequest->set('order_id', $order->getIncrementId());
 
-        // Amount in current order currency.
+        $online_transactions_currency = $this->dataHelper->getCommonConfigData('online_transactions_currency');
         $amount = $order->getGrandTotal();
-
-        // Set currency.
         $currency = PayzenApi::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
-        if (! $currency) {
-            // If currency is not supported, use base currency.
+        if (($online_transactions_currency == '2') || (($online_transactions_currency !== '2') && ! $currency)) {
+            // Use base currency.
             $currency = PayzenApi::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
-
-            // ... and order total in base currency
             $amount = $order->getBaseGrandTotal();
         }
 
@@ -1080,12 +1076,21 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 $commentText .= '; ' . $comment->getComment();
             }
 
+            $online_transactions_currency = $this->dataHelper->getCommonConfigData('online_transactions_currency', $storeId);
+            $amountInCurrencyCode = $payment->getCreditmemo()->getGrandTotal();
+            $currencyCode = $order->getOrderCurrencyCode();
+            $currency = PayzenApi::findCurrencyByAlphaCode($currencyCode);
+            if (($online_transactions_currency == '2') || (($online_transactions_currency !== '2') && ! $currency)) {
+                $currencyCode = $order->getBaseCurrencyCode();
+                $amountInCurrencyCode = $payment->getCreditmemo()->getBaseGrandTotal();
+            }
+
             $payzenOrderInfo = new PayzenOrderInfo();
             $payzenOrderInfo->setOrderRemoteId($order->getIncrementId());
             $payzenOrderInfo->setOrderId($order->getIncrementId());
             $payzenOrderInfo->setOrderReference($order->getIncrementId());
-            $payzenOrderInfo->setOrderCurrencyIsoCode($order->getBaseCurrencyCode());
-            $payzenOrderInfo->setOrderCurrencySign($order->getBaseCurrencyCode());
+            $payzenOrderInfo->setOrderCurrencyIsoCode($currencyCode);
+            $payzenOrderInfo->setOrderCurrencySign($currencyCode);
             $payzenOrderInfo->setOrderUserInfo($commentText);
 
             $refundApi = new PayzenRefund(
@@ -1098,7 +1103,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
             // Do online refund.
             $order->setPayment($payment);
-            $refundApi->refund($payzenOrderInfo, $amount);
+            $refundApi->refund($payzenOrderInfo, $amountInCurrencyCode);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }

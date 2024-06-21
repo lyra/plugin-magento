@@ -146,10 +146,15 @@ class Token extends \Magento\Framework\App\Action\Action
 
             case self::GET_TOKEN_AMOUNT_IN_CENTS:
                 // Create token from order data.
-                $amount = $this->getRequest()->getParam('amount');
-                $currencyCode = $this->getRequest()->getParam('currency');
-
+                $amount = $this->getRequest()->getParam('displayAmount');
+                $currencyCode = $this->getRequest()->getParam('displayCurrency');
                 $currency = $currencyCode ? PayzenApi::findCurrencyByAlphaCode($currencyCode) : null;
+                if (($this->dataHelper->getCommonConfigData('online_transactions_currency') == '2') || (($this->dataHelper->getCommonConfigData('online_transactions_currency') !== '2') && ! $currency)) {
+                    $currencyCode = $this->getRequest()->getParam('baseCurrency');
+                    $currency = $currencyCode ? PayzenApi::findCurrencyByAlphaCode($currencyCode) : null;
+                    $amount = $this->getRequest()->getParam('baseAmount');
+                }
+
                 if ($amount && $currency) {
                     $amountInCents = $currency->convertAmountToInteger($amount);
 

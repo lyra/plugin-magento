@@ -246,6 +246,7 @@ class Checkout
 
         // Used currency.
         $currency = PayzenApi::findCurrencyByNumCode($payzenRequest->get('currency'));
+        $isDisplayCurrency = ($this->dataHelper->getCommonConfigData('online_transactions_currency') == '1') ? true : false;
 
         $subtotal = 0;
 
@@ -278,7 +279,7 @@ class Checkout
                     }
                 }
 
-                $priceInCents = $currency->convertAmountToInteger($item->getPrice());
+                $priceInCents = $isDisplayCurrency ? $currency->convertAmountToInteger($item->getPrice()) : $currency->convertAmountToInteger($item->getBasePrice());
                 $qty = (int) $item->getQtyOrdered();
 
                 $payzenRequest->addProduct(
@@ -294,13 +295,14 @@ class Checkout
         }
 
         $payzenRequest->set('insurance_amount', 0); // By default, shipping insurance amount is not available in Magento.
-        $payzenRequest->set('shipping_amount', $currency->convertAmountToInteger($order->getShippingAmount()));
+        $shippingAmount = $isDisplayCurrency ? $order->getShippingAmount() : $order->getBaseShippingAmount();
+        $payzenRequest->set('shipping_amount', $currency->convertAmountToInteger($shippingAmount));
 
         // Recalculate tax_amount to avoid rounding problems.
         $taxAmount = $payzenRequest->get('amount') - $subtotal - $payzenRequest->get('shipping_amount') -
              $payzenRequest->get('insurance_amount');
         if ($taxAmount <= 0) { // When order is discounted.
-            $taxAmount = $currency->convertAmountToInteger($order->getTaxAmount());
+            $taxAmount = $isDisplayCurrency ? $currency->convertAmountToInteger($order->getTaxAmount()) : $currency->convertAmountToInteger($order->getBaseTaxAmount());
         }
 
         $payzenRequest->set('tax_amount', $taxAmount);

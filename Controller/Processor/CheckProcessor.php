@@ -152,8 +152,15 @@ class CheckProcessor
                         $currency->getDecimals()
                     );
 
+                    // Check if display currency is used for refund, otherwise use amount in base currency.
+                    if ($order->getOrderCurrencyCode() !== $currency->getAlpha3()) {
+                        $totalOrderAmount = $order->getBaseGrandTotal();
+                    } else {
+                        $totalOrderAmount = $order->getGrandTotal();
+                    }
+
                     $orderAmount = round(
-                        $order->getGrandTotal(),
+                        $totalOrderAmount,
                         $currency->getDecimals()
                     );
 
