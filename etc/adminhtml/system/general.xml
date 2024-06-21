@@ -390,6 +390,13 @@
                 <config_path>payzen/general/customer_data</config_path>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized</backend_model>
             </field>
+
+            <field id="online_transactions_currency" translate="label comment" type="select" sortOrder="186" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Online transactions currency]]></label>
+                <comment><![CDATA[Currency used for PayZen payment transactions processing. Possible values:<br /><b>Display currency: </b>The store view or display currency for buyer.<br /><b>Base currency: </b>The base currency of Magento.]]></comment>
+                <source_model>Lyranetwork\Payzen\Model\System\Config\Source\OnlineTransactionsCurrency</source_model>
+                <config_path>payzen/general/online_transactions_currency</config_path>
+            </field>
         </group>
     </group>
 </include>

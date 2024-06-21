@@ -374,16 +374,11 @@ class Standard extends Payzen
 
     protected function getRestApiFormTokenData($quote)
     {
-        $amount = $quote->getBaseGrandTotal();
-
-        // Currency.
-        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
-        if (! $currency) {
-            // If currency is not supported, use order currency.
-            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
-
-            // ... and order total in order currency.
-            $amount = $quote->getGrandTotal();
+        $amount = $quote->getGrandTotal();
+        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getQuoteCurrencyCode());
+        if (($this->dataHelper->getCommonConfigData('online_transactions_currency') == '2') || (($this->dataHelper->getCommonConfigData('online_transactions_currency') !== '2') && ! $currency)) {
+            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($quote->getBaseCurrencyCode());
+            $amount = $quote->getBaseGrandTotal();
         }
 
         if (! $currency) {
@@ -486,16 +481,11 @@ class Standard extends Payzen
 
     protected function getTokenDataForOrder($order)
     {
-        $amount = $order->getBaseGrandTotal();
-
-        // Currency.
-        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
-        if (! $currency) {
-            // If currency is not supported, use order currency.
-            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
-
-            // ... and order total in order currency.
-            $amount = $order->getGrandTotal();
+        $amount = $order->getGrandTotal();
+        $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getOrderCurrencyCode());
+        if (($this->dataHelper->getCommonConfigData('online_transactions_currency') == '2') || (($this->dataHelper->getCommonConfigData('online_transactions_currency') !== '2') && ! $currency)) {
+            $currency = \Lyranetwork\Payzen\Model\Api\Form\Api::findCurrencyByAlphaCode($order->getBaseCurrencyCode());
+            $amount = $order->getBaseGrandTotal();
         }
 
         if (! $currency) {

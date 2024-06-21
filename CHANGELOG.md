@@ -1,3 +1,6 @@
+2.9.0, 2024-06-21:
+- Added possibility to configure currency used for payment processing.
+
 2.8.8, 2024-05-30:
 - Rollback using 500 http code on error for IPN calls.
 

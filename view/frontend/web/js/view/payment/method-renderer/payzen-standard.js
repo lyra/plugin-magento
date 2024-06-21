@@ -272,7 +272,7 @@ define(
                     // Check if form token amount is up to date.
                     var totals = quote.getTotals()();
                     if (totals) {
-                        me.checkTokenAmount(totals['grand_total'], totals['base_currency_code'], KR_RAW_DNA.amount);
+                        me.checkTokenAmount(totals['grand_total'], totals['quote_currency_code'], totals['base_grand_total'], totals['base_currency_code'], KR_RAW_DNA.amount);
                     }
 
                     return;
@@ -559,11 +559,11 @@ define(
                 });
             },
 
-            checkTokenAmount: function(amount, currency, krAmount) {
+            checkTokenAmount: function(displayAmount, displayCurrency, baseAmount, baseCurrency, krAmount) {
                 var me = this;
 
                 storage.post(
-                    url.build('payzen/payment_rest/token?payzen_action=get_token_amount_in_cents' + '&amount=' + amount + '&currency=' + currency + '&form_key=' + $.mage.cookies.get('form_key'))
+                    url.build('payzen/payment_rest/token?payzen_action=get_token_amount_in_cents' + '&displayAmount=' + displayAmount + '&displayCurrency=' + displayCurrency + '&baseAmount=' + baseAmount + '&baseCurrency=' + baseCurrency + '&form_key=' + $.mage.cookies.get('form_key'))
                 ).done(function(response) {
                     if (response.amountincents && krAmount && response.amountincents !== krAmount) {
                         // Refresh token since the amount in the embedded form is not up to date.
