@@ -1,3 +1,6 @@
+2.9.1, 2024-07-01:
+- [technical] Enabled some features by plugin variant.
+
 2.9.0, 2024-06-21:
 - Added possibility to configure currency used for payment processing.
 
