@@ -1149,7 +1149,9 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected function getUserInfo()
     {
-        $commentText = 'Magento user: ' . $this->authSession->getUser()->getUsername();
+        ($this->authSession->getUser() ) ?
+          $commentText = 'Magento user: ' . $this->authSession->getUser()->getUsername() :
+          $commentText = 'Unknown user';
         $commentText .= '; IP address: ' . $this->dataHelper->getIpAddress();
 
         return $commentText;
