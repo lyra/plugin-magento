@@ -18,6 +18,7 @@
             <values>
                 <value id="payzen_rest_api" type="host">https://api.payzen.eu/api-payment/</value>
                 <value id="payzen_rest_static_ressources" type="host">https://static.payzen.eu/static/</value>
+                <value id="payzen_krypton_client" type="host">https://api.payzen.eu/static/js/krypton-client/</value>
             </values>
         </policy>
         <policy id="img-src">
@@ -31,6 +32,8 @@
         <policy id="style-src">
             <values>
                 <value id="payzen_rest_static_ressources" type="host">https://static.payzen.eu/static/</value>
+                <value id="payzen_krypton_client" type="host">https://api.payzen.eu/static/js/krypton-client/</value>
+                <value id="payzen_font" type="host">https://fonts.googleapis.com/css2?family=Roboto</value>
             </values>
         </policy>
         <policy id="font-src">
