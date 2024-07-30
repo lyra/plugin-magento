@@ -1,3 +1,7 @@
+2.9.2, 2024-07-30:
+- Bug fix: Do not override CSP module configured mode.
+- Some fixes by plugin variant.
+
 2.9.1, 2024-07-01:
 - [technical] Enabled some features by plugin variant.
 
