@@ -62,6 +62,10 @@ class Response extends \Magento\Framework\App\Action\Action
             $params = $this->getRequest()->getParams();
             $data = $this->prepareResponse($params);
 
+            if (isset($data['from_account'])) {
+                return $this->redirectToAccount($data['response']);
+            }
+
             $order = $data['order'];
             $response = $data['response'];
             $result = $this->responseProcessor->execute($order, $response);
@@ -177,6 +181,20 @@ class Response extends \Magento\Framework\App\Action\Action
         }
 
         return $resultRedirect;
+    }
+
+    protected function redirectToAccount($response)
+    {
+        // Clear all messages in session.
+        $this->messageManager->getMessages(true);
+
+        if ($response->get('identifier') || ($response->get('identifier_status') == 'CREATED')) {
+            $this->messageManager->addSuccessMessage(__('Payment means successfully added.'));
+        } else {
+            $this->messageManager->addErrorMessage(__('Unable to add payment means to your account.'));
+        }
+
+        return $this->createResult('vault/cards/listaction', ['_scope' => '1']);
     }
 
     private function createResult($path, $params)

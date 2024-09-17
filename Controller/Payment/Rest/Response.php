@@ -102,6 +102,18 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
             ]
         );
 
+        if ($response->getExtInfo('from_account')) {
+            $storeId = $response->getExtInfo('store_id');
+
+            // Check the authenticity of the request.
+            $this->checkResponseHash($params, $storeId);
+
+            return [
+                'response' => $response,
+                'from_account' => true
+            ];
+        }
+
         $orderId = (int) $response->get('order_id');
         if (! $orderId) {
             $this->dataHelper->log("Received empty Order ID.", \Psr\Log\LogLevel::ERROR);
@@ -127,16 +139,21 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         $storeId = $order->getStore()->getId();
 
         // Check the authenticity of the request.
+        $this->checkResponseHash($params, $storeId);
+
+        return [
+            'response' => $response,
+            'order' => $order
+        ];
+    }
+
+    private function checkResponseHash($params, $storeId)
+    {
         if (! $this->restHelper->checkResponseHash($params, $this->restHelper->getReturnKey($storeId))) {
             // Authentication failed.
             throw new ResponseException(
                 "{$this->dataHelper->getIpAddress()} tries to access payzen/payment_rest/response page without valid signature with parameters: " . json_encode($params)
             );
         }
-
-        return [
-            'response' => $response,
-            'order' => $order
-        ];
     }
 }

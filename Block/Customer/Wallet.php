@@ -9,7 +9,7 @@
  */
 namespace Lyranetwork\Payzen\Block\Customer;
 
-class Index extends \Magento\Framework\View\Element\Template
+class Wallet extends \Magento\Vault\Block\Customer\CreditCards
 {
     /**
      * @var \Lyranetwork\Payzen\Helper\Data
@@ -21,21 +21,27 @@ class Index extends \Magento\Framework\View\Element\Template
      */
     protected $customerSession;
 
+    protected $method;
+
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Vault\Model\CustomerTokenManagement $customerTokenManagement,
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Vault\Model\CustomerTokenManagement $customerTokenManagement,
         \Magento\Customer\Model\Session $customerSession,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
         $this->dataHelper = $dataHelper;
-        parent::__construct($context, $data);
+        parent::__construct($context, $customerTokenManagement);
+
+        $this->method = $this->dataHelper->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD);
     }
 
     /**
@@ -43,7 +49,7 @@ class Index extends \Magento\Framework\View\Element\Template
      *
      * @return array
      */
-    public function getStoredPaymentMeans()
+    public function getStoredPaymentMeans($identifier = null)
     {
         $means = [];
 
@@ -58,6 +64,11 @@ class Index extends \Magento\Framework\View\Element\Template
             'payzen_sepa_identifier' => 'payzen_sepa_iban_bic'
         ];
 
+        if ($identifier) {
+            $identifierToUnset = ($identifier == 'payzen_identifier') ? 'payzen_sepa_identifier' : 'payzen_identifier';
+            unset($aliasIds[$identifierToUnset]);
+        }
+
         foreach ($aliasIds as $aliasId => $maskedId) {
             // Check if there is a saved alias.
             if (! $customer->getCustomAttribute($aliasId)) {
@@ -69,11 +80,16 @@ class Index extends \Magento\Framework\View\Element\Template
             $card['pm'] = $maskedId;
 
             $maskedPan = $customer->getCustomAttribute($maskedId)->getValue();
-            $pos = strpos($maskedPan, '|');
-
-            if ($pos !== false) {
+            if ($pos = strpos($maskedPan, '|')) {
                 $card['brand'] = substr($maskedPan, 0, $pos);
-                $card['number'] = substr($maskedPan, $pos + 1);
+                $number = substr($maskedPan, $pos + 1);
+
+                if ($pos = strpos($number, '-')) {
+                    $card['expiry'] = substr($number, $pos + 2);
+                    $number = substr($number, 0, $pos);
+                }
+
+                $card['number'] = $number;
             } else {
                 $card['brand'] = '';
                 $card['number'] = $maskedPan;
@@ -94,6 +110,40 @@ class Index extends \Magento\Framework\View\Element\Template
     public function getCcTypeImageSrc($card)
     {
         return $this->dataHelper->getCcTypeImageSrc($card);
+    }
+
+    public function getAccountToken()
+    {
+        if (! $this->useCustomerWallet()) {
+            return null;
+        }
+
+        return $this->method->getAccountToken();
+    }
+
+    public function getLanguage()
+    {
+        return $this->method->getPaymentLanguage();
+    }
+
+    public function hideWalletElements()
+    {
+        return $this->dataHelper->onVaultTab() && ! $this->method->isRestMode();
+    }
+
+    public function hasIdentifiers()
+    {
+        return ! empty($this->getStoredPaymentMeans());
+    }
+
+    private function useCustomerWallet()
+    {
+        $customer = $this->method->getCurrentCustomer();
+        if (! $customer || ! $this->method->isOneClickActive()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

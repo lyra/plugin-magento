@@ -118,7 +118,7 @@ class Head extends \Magento\Framework\View\Element\Template
      */
     protected function _toHtml()
     {
-        if (! $this->method->isRestMode()) {
+        if (! $this->method->isRestMode() && ! $this->dataHelper->onVaultTab()) {
             return '';
         }
 

@@ -1,3 +1,7 @@
+2.10.0, 2024-09-17:
+- [embedded] Use customer wallet functionality to manage payment by alias on buyer account.
+- [alias] Improve alias validity check.
+
 2.9.2, 2024-07-30:
 - Bug fix: Do not override CSP module configured mode.
 - Some fixes by plugin variant.

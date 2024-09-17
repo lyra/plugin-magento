@@ -42,9 +42,10 @@ class Cancel extends AbstractAction
         $customerId = $this->customerSession->getCustomer()->getId();
         $attribute = $this->getRequest()->getPost('alias_attr', false);
         $maskedAttribute = $this->getRequest()->getPost('pm_attr', false);
+        $alias = $this->getRequest()->getPost('alias', false);
 
         if ($customerId && $attribute && $maskedAttribute) {
-            if ($this->paymentHelper->deleteIdentifier($customerId, $attribute, $maskedAttribute)) {
+            if ($this->paymentHelper->deleteIdentifier($customerId, $attribute, $maskedAttribute, $alias)) {
                 $this->messageManager->addSuccessMessage(__('The stored means of payment was successfully deleted.'));
             } else {
                 $this->messageManager->addErrorMessage(__('The stored means of payment could not be deleted.'));
@@ -53,7 +54,8 @@ class Cancel extends AbstractAction
 
         /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        $resultRedirect->setPath('*/*/index', ['_secure' => true]);
+        $resultRedirect->setPath('vault/cards/listaction', ['_secure' => true]);
+
         return $resultRedirect;
     }
 }
