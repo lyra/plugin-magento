@@ -292,6 +292,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $session->getStoreId();
     }
 
+    public function getCurrentStore()
+    {
+        return $this->storeManager->getStore();
+    }
+
     /**
      * Return store obeject by ID.
      *
@@ -358,6 +363,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $filePath = $this->filesystem->getDirectoryRead(DirectoryList::STATIC_VIEW)->getAbsolutePath($fileName);
         return $this->fileExists($filePath);
+    }
+
+    /**
+     * Check if image file is published to pub/static directory.
+     *
+     * @param string $fileName
+     * @return string
+     */
+    public function onVaultTab()
+    {
+        return (strpos($this->storeManager->getStore()->getCurrentUrl(), 'vault/cards/listaction') !== false);
     }
 
     /**
@@ -607,7 +623,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $standardMethod = $this->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_STANDARD);
         $sepaMethod = $this->getMethodInstance(\Lyranetwork\Payzen\Helper\Data::METHOD_SEPA);
 
-        return $standardMethod->isOneClickActive() || $sepaMethod->isOneClickActive();
+        return ($standardMethod->isAvailable() && $standardMethod->isOneClickActive()) ||
+            ($sepaMethod->isAvailable() && $sepaMethod->isOneClickActive());
     }
 
     private function convertCardDataEntryMode($code) {

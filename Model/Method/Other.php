@@ -29,20 +29,20 @@ class Other extends Payzen
         $option = @unserialize($info->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::OTHER_OPTION));
 
         // Check if capture_delay and validation_mode are overriden.
-        if (is_numeric($option['capture_delay'])) {
+        if (isset($option['capture_delay']) && is_numeric($option['capture_delay'])) {
             $this->payzenRequest->set('capture_delay', $option['capture_delay']);
         }
 
-        if ($option['validation_mode'] !== '-1') {
+        if (isset($option['validation_mode']) && ($option['validation_mode'] !== '-1')) {
             $this->payzenRequest->set('validation_mode', $option['validation_mode']);
         }
 
         // Add cart data.
-        if ($option['cart_data'] === '1') {
+        if (isset($option['cart_data']) && ($option['cart_data'] === '1')) {
             $this->checkoutHelper->setCartData($order, $this->payzenRequest, true);
         }
 
-        if ($option['embedded_mode'] === '1') {
+        if (isset($option['embedded_mode']) && ($option['embedded_mode'] === '1')) {
             $this->payzenRequest->set('embedded_mode', $option['embedded_mode']);
         }
     }

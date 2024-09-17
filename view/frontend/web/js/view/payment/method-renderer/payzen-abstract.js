@@ -118,7 +118,7 @@ define(
             },
 
             getPaymentMeansUrl: function() {
-                return url.build('payzen/customer/index');
+                return url.build('vault/cards/listaction');
             }
         });
     }

@@ -419,6 +419,8 @@
 "The payment was successful. Your order was registered successfully.","O pagamento foi realizado com sucesso. Seu pedido foi salvo com sucesso."
 "An error has occurred during the payment process.","Ocorreu um erro durante o pagamento."
 "Payment cancelled.","Pagamento cancelado."
+"Payment means successfully added.", "O meio de pagamento adicionado com sucesso."
+"Unable to add payment means to your account.", "Não é possível adicionar o meio de pagamento à sua conta."
 "Capture delay column","Prazo de captura"
 "Compact mode","Modo compacto"
 "This option allows to display the Smartform in a compact mode.","Esta opção permite exibir o Smartform em modo compacto."

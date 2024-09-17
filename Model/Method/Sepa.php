@@ -154,11 +154,11 @@ class Sepa extends Payzen
                     ' will be asked for card data registration on payment page.');
                 $this->payzenRequest->set('page_action', 'ASK_REGISTER_PAY');
             }
-
-            $this->customerSession->unsValidSepaAlias();
         } else {
             $this->payzenRequest->set('page_action', $this->getMandateMode());
         }
+
+        $this->customerSession->unsValidSepaAlias();
     }
 
     public function isOneclickAvailable()
@@ -178,6 +178,11 @@ class Sepa extends Payzen
         // Customer has not gateway identifier.
         if (! $this->getCurrentCustomer() || ! ($identifier = $this->getCurrentCustomer()->getCustomAttribute('payzen_sepa_identifier'))) {
             return false;
+        }
+
+        // Customer identifier has already checked.
+        if ($this->customerSession->getValidSepaAlias()) {
+            return true;
         }
 
         try {

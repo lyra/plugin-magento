@@ -600,6 +600,10 @@ class Payment
             return;
         }
 
+        if ($response->getExtInfo('is_customer_wallet')) {
+            return;
+        }
+
         if ($response->get('identifier') && (
             $response->get('identifier_status') === 'CREATED' /* page_action REGISTER_PAY or ASK_REGISTER_PAY */ ||
             $response->get('identifier_status') === 'UPDATED' /* page_action REGISTER_UPDATE_PAY */
@@ -676,7 +680,7 @@ class Payment
         }
     }
 
-    public function deleteIdentifier($customerId, $attribute, $maskedAttribute)
+    public function deleteIdentifier($customerId, $attribute, $maskedAttribute, $walletIdentifier = false)
     {
         $customer = $this->customerFactory->create()->load($customerId);
         $customerData = $customer->getDataModel();
@@ -688,6 +692,17 @@ class Payment
         }
 
         $identifier = $customerData->getCustomAttribute($attribute)->getValue();
+
+        if ($walletIdentifier) {
+            if ($walletIdentifier == $identifier) {
+                // Delete identifier from Magento.
+                $this->deleteIdentifierAttribute($customer, $attribute, $maskedAttribute);
+
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         try {
             if ($this->restHelper->getPrivateKey()) {

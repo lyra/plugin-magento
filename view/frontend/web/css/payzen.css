@@ -85,6 +85,14 @@ button.kr-popin-button {
     display: none !important;
 }
 
+div.kr-smart-form-list-section-name {
+    font-weight: bold !important;
+}
+
+div.payzen-hide-wallet-elements {
+    display: none !important;
+}
+
 .payzen-card {
     display: inline !important;
 }

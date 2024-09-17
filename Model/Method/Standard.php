@@ -177,7 +177,7 @@ class Standard extends Payzen
             }
         }
 
-        $this->customerSession->unsetValidAlias();
+        $this->customerSession->unsValidAlias();
     }
 
     /**
@@ -234,6 +234,11 @@ class Standard extends Payzen
         $customer = $this->getCurrentCustomer();
         if (! $customer || ! ($identifier = $customer->getCustomAttribute('payzen_identifier'))) {
             return false;
+        }
+
+        // Customer identifier has already checked.
+        if ($this->customerSession->getValidAlias()) {
+            return true;
         }
 
         try {
@@ -418,7 +423,7 @@ class Standard extends Payzen
                     'paymentSource' => 'EC'
                 ]
             ],
-            'contrib' =>  $this->dataHelper->getContribParam(),
+            'contrib' => $this->dataHelper->getContribParam(),
             'strongAuthentication' => $strongAuth,
             'currency' => $currency->getAlpha3(),
             'amount' => $currency->convertAmountToInteger($amount),
@@ -573,6 +578,7 @@ class Standard extends Payzen
 
         if ($this->isOneClickActive() && $customer) {
             $data['formAction'] = 'CUSTOMER_WALLET';
+            $data['metadata']['is_customer_wallet'] = true;
         }
 
         if ($this->isSmartform()) {
@@ -655,6 +661,88 @@ class Standard extends Payzen
             }
         } catch (\Exception $e) {
             $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);
+            return false;
+        }
+    }
+
+    protected function getAccountTokenData()
+    {
+        $customer = $this->customerSession->getCustomer();
+        $billingAddress = $customer->getDefaultBillingAddress();
+        $currency = $this->dataHelper->getCurrentStore()->getCurrentCurrencyCode();
+
+        $data = [
+            'formAction' => 'CUSTOMER_WALLET',
+            'customer' => [
+                'email' => $customer->getEmail(),
+                'reference' => $customer->getId()
+            ],
+            'contrib' => $this->dataHelper->getContribParam(),
+            'currency' => $currency,
+            'metadata' => [
+                'is_customer_wallet' => true,
+                'from_account' => true,
+                'store_id' => $this->dataHelper->getCurrentStore()->getId()
+            ]
+        ];
+ 
+        if ($billingAddress) {
+            $data['customer']['billingDetails'] = [
+                'firstName' => $billingAddress->getFirstname(),
+                'lastName' => $billingAddress->getLastname(),
+                'address' => $billingAddress->getStreetLine(1),
+                'address2' => $billingAddress->getStreetLine(2),
+                'zipCode' => $billingAddress->getPostcode(),
+                'city' => $billingAddress->getCity(),
+                'state' => $billingAddress->getRegion(),
+                'phoneNumber' => $billingAddress->getTelephone(),
+                'country' => $billingAddress->getCountryId()
+            ];
+        }
+
+        if ($this->isSmartform()) {
+            // Filter payment means when creating the payment token.
+            $data['paymentMethods'] = $this->getPaymentMeansForSmartform(null);
+        }
+
+        return json_encode($data);
+    }
+
+    public function getAccountToken()
+    {
+        $customerId = $this->customerSession->getCustomer()->getId();
+
+        $params = $this->getAccountTokenData();
+        $this->dataHelper->log("Creating form token for customer #{$customerId} with parameters: {$params}");
+
+        try {
+            // Perform our request.
+            $client = new \Lyranetwork\Payzen\Model\Api\Rest\Api(
+                $this->dataHelper->getCommonConfigData('rest_url'),
+                $this->dataHelper->getCommonConfigData('site_id'),
+                $this->restHelper->getPrivateKey()
+            );
+
+            $response = $client->post('V4/Charge/CreateToken', $params);
+
+            if ($response['status'] !== 'SUCCESS') {
+                $msg = "Error while creating payment form token for customer #{$customerId}: " . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
+
+                if (isset($response['answer']['detailedErrorMessage']) && ! empty($response['answer']['detailedErrorMessage'])) {
+                    $msg .= ' Detailed message: ' . $response['answer']['detailedErrorMessage'] . ' (' . $response['answer']['detailedErrorCode'] . ').';
+                }
+
+                $this->dataHelper->log($msg, \Psr\Log\LogLevel::WARNING);
+
+                return false;
+            } else {
+                $this->dataHelper->log("Form token created successfully for customer #{$customerId}.");
+
+                return $response['answer']['formToken'];
+            }
+        } catch (\Exception $e) {
+            $this->dataHelper->log($e->getMessage(), \Psr\Log\LogLevel::ERROR);
+
             return false;
         }
     }

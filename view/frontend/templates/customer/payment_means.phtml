@@ -8,12 +8,163 @@
  * @license   https://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
-$means = $block->getStoredPaymentMeans();
+$hasVaultTokens = ! empty($block->getPaymentTokens());
+$accountToken = $block->getAccountToken();
 
+if ($accountToken):
+    echo $block->setTemplate('Lyranetwork_Payzen::customer/rest.phtml')->toHtml();
 ?>
-<?php if (! empty($means)): ?>
+  <script>
+      function payzenManageWalletDisplay() {
+           $('div.kr-methods-list-options-item.kr-cards').addClass('payzen-hide-wallet-elements');
+           $('div.kr-smart-form-list-section-name--other').addClass('payzen-hide-wallet-elements');
+           $('div.kr-smart-form-list-section-name').addClass('payzen-hide-wallet-elements');
+           $('div.kr-smart-form-list-section-name').first().removeClass('payzen-hide-wallet-elements');
+
+           $('.kr-methods-list-options--wallet').each(function() {
+               if (! $(this).hasClass('kr-methods-list-options--extra')) {
+                   $(this).addClass('payzen-hide-wallet-elements');
+                }
+           });
+       }
+
+       require([
+           'jquery'
+       ], function($) {
+         $(function() {
+          <?php if (! $hasVaultTokens): ?>
+              $('.message.info.empty').remove();
+          <?php endif; ?>
+         });
+       });
+
+       require(['krypton'], function(KR) {
+           KR.setFormConfig({
+               formToken: "<?php echo $accountToken; ?>",
+               language: "<?php echo $block->getLanguage(); ?>"
+           }).then(
+               function(v) {
+                   KR = v.KR;
+                   KR.onFocus(function(e) {
+                       $('#payzen_rest_form .kr-form-error').html('');
+                   });
+               }
+           );
+
+           KR.smartForm.onClick(function({paymentMethod, action, formId}) {
+               $('.navigation').css('z-index', 1);
+               return true;
+           });
+
+           KR.wallet.onPaymentTokenDeleted(function(callback) {
+               jQuery.ajax({
+                   method: "POST",
+                   url: "<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>",
+                   data: {
+                       'alias': callback.token,
+                       'alias_attr': 'payzen_identifier',
+                       'pm_attr' : 'payzen_masked_pan'
+                   },
+                   success: function() {
+                       console.log("Card token deleted successfully.");
+                   }
+               });
+          });
+
+          <?php if ($block->hideWalletElements()): ?>
+            KR.onLoaded(() => {
+               payzenManageWalletDisplay();
+            })
+          <?php endif; ?>
+      });
+  </script>
+<?php else:
+    if (! empty($block->hasIdentifiers())):
+?>
+  <script>
+      require([
+          'jquery'
+      ], function($) {
+        $(function() {
+          <?php if ($hasVaultTokens): ?>
+             $('#my-orders-table').append($('#payzenstd-identifier'));
+             $('#payzen-means-list').parent().remove();
+          <?php else: ?>
+              $('.message.info.empty').remove();
+          <?php endif; ?>
+       });
+    });
+   </script>
+  <?php endif ?>
+
+  <?php
+  $means = $block->getStoredPaymentMeans('payzen_identifier');
+
+  if (! empty($means)):
+      $card = reset($means);
+  ?>
+      <div class="table-wrapper my-credit-cards">
+          <table class="data table table-credit-cards" id="payzen-means-list">
+              <caption class="table-caption"><?= $block->escapeHtml(__('Stored Payment Methods')) ?></caption>
+              <thead>
+                  <tr>
+                      <th scope="col" class="col card-number"><?= $block->escapeHtml(__('Card Number')) ?></th>
+                      <th scope="col" class="col expire"><?= $block->escapeHtml(__('Expiration Date')) ?></th>
+                      <th scope="col" class="col card-type"><?= $block->escapeHtml(__('Type')) ?></th>
+                      <th scope="col" class="col actions">&nbsp;</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr id="payzenstd-identifier">
+                      <td class="col card-number"><?php echo $block->escapeHtml($card['number']); ?></td>
+                      <td class="col card-expire"><?php echo $block->escapeHtml($card['expiry']); ?></td>
+                    <?php if ($img = $block->getCcTypeImageSrc($card['brand'])): ?>
+                      <td class="col card-type"><img alt="<?php echo $block->escapeHtml($card['brand']); ?>"
+                              style="max-height: 30px; max-width: 80px; vertical-align: middle;"
+                              src="<?php echo $block->escapeHtml($img); ?>"
+                              title="<?php echo $block->escapeHtml($card['brand']); ?>">
+                      </td>
+                    <?php else: ?>
+                      <td class="col card-type"><span><?php echo $block->escapeHtml($card['brand']); ?></span></td>
+                    <?php endif ?>
+                      <td class="col actions">
+                          <form class="form"
+                                  action="<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>"
+                                  method="post">
+                            <?php echo $block->getBlockHtml('formkey'); ?>
+                              <input name="alias_attr" value="<?php echo $block->escapeHtml($card['alias']); ?>" type="hidden">
+                              <input name="pm_attr" value="<?php echo $block->escapeHtml($card['pm']); ?>" type="hidden">
+                              <button type="submit"
+                                      class="action delete"
+                                      data-mage-init='{
+                                          "Lyranetwork_Payzen/js/customer/delete-widget": {
+                                              "type": "popup",
+                                              "modalClass": "payzen-confirm-delete",
+                                              "toggleEvent": "click",
+                                               "title": "<?php echo $block->escapeHtml(sprintf(__('Delete %s'), $card['number'])); ?>",
+                                               "content": "<?php echo $block->escapeHtml(__('Are you sure you want to delete your saved means of payment? This action is not reversible!')); ?>"
+                                           }
+                                      }'>
+                                  <span><?php echo $block->escapeHtml(__('Delete')); ?></span>
+                              </button>
+                          </form>
+                      </td>
+                </tr>
+              </tbody>
+          </table>
+      </div>
+  <?php endif ?>
+<?php endif ?>
+
+<?php
+$means = $block->getStoredPaymentMeans('payzen_sepa_identifier');
+
+if (! empty($means)):
+    $card = reset($means);
+?>
+    <br>
     <div class="table-wrapper my-credit-cards">
-        <table class="data table table-credit-cards" id="payzen-means-list">
+        <table class="data table table-credit-cards">
             <thead>
                 <tr>
                     <th scope="col" class="col"><?php echo $block->escapeHtml(__('Type')); ?></th>
@@ -22,23 +173,22 @@ $means = $block->getStoredPaymentMeans();
                 </tr>
             </thead>
             <tbody>
-              <?php foreach($means as $card): ?>
                 <tr>
                     <?php if ($img = $block->getCcTypeImageSrc($card['brand'])): ?>
-                      <td><img alt="<?php echo $block->escapeHtml($card['brand']); ?>"
-                               style="max-height: 30px; max-width: 80px; vertical-align: middle;"
-                               src="<?php echo $block->escapeHtml($img); ?>"
-                               title="<?php echo $block->escapeHtml($card['brand']); ?>">
+                      <td class="col brand"><img alt="<?php echo $block->escapeHtml($card['brand']); ?>"
+                              style="max-height: 30px; max-width: 80px; vertical-align: middle;"
+                              src="<?php echo $block->escapeHtml($img); ?>"
+                              title="<?php echo $block->escapeHtml($card['brand']); ?>">
                       </td>
-                    <?php else: ?>
-                      <td class="col"><span><?php echo $block->escapeHtml($card['brand']); ?></span></td>
-                    <?php endif ?>
-                    <td class="col"><?php echo $block->escapeHtml($card['number']); ?></td>
-                    <td class="col">
+                  <?php else: ?>
+                    <td class="col brand"><span><?php echo $block->escapeHtml($card['brand']); ?></span></td>
+                  <?php endif ?>
+                    <td class="col card-number"><?php echo $block->escapeHtml($card['number']); ?></td>
+                    <td class="col actions">
                         <form class="form"
-                              action="<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>"
-                              method="post">
-                            <?php echo $block->getBlockHtml('formkey'); ?>
+                                action="<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>"
+                                method="post">
+                           <?php echo $block->getBlockHtml('formkey'); ?>
                             <input name="alias_attr" value="<?php echo $block->escapeHtml($card['alias']); ?>" type="hidden">
                             <input name="pm_attr" value="<?php echo $block->escapeHtml($card['pm']); ?>" type="hidden">
                             <button type="submit"
@@ -57,10 +207,7 @@ $means = $block->getStoredPaymentMeans();
                        </form>
                    </td>
                 </tr>
-             <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-<?php else: ?>
-    <div class="message info empty"><span><?php echo $block->escapeHtml(__('You have no stored payment means.')); ?></span></div>
 <?php endif ?>
