@@ -274,6 +274,9 @@ class Api
         return array(
             'INITIAL',
             'WAITING_AUTHORISATION',
+            // Wording is different in Oney response
+            // @see https://payzen.io/fr-FR/payment-method/3x_4x_Oney/redirection-form/traiter-les-donnees-de-la-reponse.html
+            'WAITING_AUTHORIZATION',
             'WAITING_AUTHORISATION_TO_VALIDATE',
             'UNDER_VERIFICATION',
             'PRE_AUTHORISED',
