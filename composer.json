@@ -2,8 +2,9 @@
 	"name" : "lyranetwork/module-payzen",
 	"description" : "PayZen payment platform integration for Magento 2",
 	"require" : {
-		"php" : "~7|~8"
-	},
+		"php" : "~7.4|~8",
+      	"ext-mbstring": "*"
+    },
 	"type" : "magento2-module",
 	"version" : "2.10.0",
 	"license" : "OSL-3.0",

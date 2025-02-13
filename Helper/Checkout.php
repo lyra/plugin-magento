@@ -461,7 +461,7 @@ class Checkout
                 return;
             }
 
-            $arr = str_split($invalidChars);
+            $arr = mb_str_split($invalidChars);
             $invalidChars = '';
             foreach ($arr as $char) {
                 $invalidChars .= '<b>' . $char . '</b> ';
