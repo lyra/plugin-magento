@@ -311,7 +311,7 @@ class Standard extends Payzen
     }
 
     /**
-     * Check if embedded or popin mode is choosen.
+     * Check if embedded or Smartform mode is choosen.
      *
      * @return bool
      */
@@ -638,12 +638,16 @@ class Standard extends Payzen
 
             if ($response['status'] !== 'SUCCESS') {
                 $msg = "Error while creating payment form token for quote #{$quote->getId()}: " . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
+                $frontMsg = __("Error while processing the payment request : %1 (%2).", $response['answer']['errorMessage'], $response['answer']['errorCode'])->render();
 
                 if (isset($response['answer']['detailedErrorMessage']) && ! empty($response['answer']['detailedErrorMessage'])) {
                     $msg .= ' Detailed message: ' . $response['answer']['detailedErrorMessage'] .' (' . $response['answer']['detailedErrorCode'] . ').';
+                    $frontMsg .= __(" Detailed message: %3 (%4).", $response['answer']['detailedErrorMessage'], $response['answer']['detailedErrorCode'])->render();
                 }
 
                 $this->dataHelper->log($msg, \Psr\Log\LogLevel::WARNING);
+                $quote->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE, $frontMsg);
+
                 return false;
             } else {
                 $this->dataHelper->log("Form token created successfully for quote #{$quote->getId()}.");
@@ -685,7 +689,7 @@ class Standard extends Payzen
                 'store_id' => $this->dataHelper->getCurrentStore()->getId()
             ]
         ];
- 
+
         if ($billingAddress) {
             $data['customer']['billingDetails'] = [
                 'firstName' => $billingAddress->getFirstname(),

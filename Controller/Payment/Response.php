@@ -34,21 +34,29 @@ class Response extends \Magento\Framework\App\Action\Action
     protected $resultPageFactory;
 
     /**
+     * @var \Lyranetwork\Payzen\Helper\Payment
+     */
+    protected $paymentHelper;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Lyranetwork\Payzen\Helper\Payment $paymentHelper
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->responseProcessor = $responseProcessor;
         $this->resultPageFactory = $resultPageFactory;
         $this->dataHelper = $responseProcessor->getDataHelper();
+        $this->paymentHelper = $paymentHelper;
 
         parent::__construct($context);
     }
@@ -165,19 +173,11 @@ class Response extends \Magento\Framework\App\Action\Action
                 $this->messageManager->addWarningMessage(__('Your payment was not accepted. Please, try to re-order.'));
             }
 
-            $quote = $this->quoteRepository->get($order->getQuoteId());
-            if ($quote->getId()) {
-                $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow re-order quicker.");
-                $quote->setIsActive(true)->setReservedOrderId(null);
-                $this->quoteRepository->save($quote);
-
-                // To comply with Magento\Checkout\Model\Session::restoreQuote() method.
-                $checkout->replaceQuote($quote)->unsLastRealOrderId();
-                $this->_eventManager->dispatch('restore_quote', ['order' => $order, 'quote' => $quote]);
-            }
+            $this->paymentHelper->restoreQuoteForOrder($order);
 
             $this->dataHelper->log("Redirecting to cart page for order #{$order->getIncrementId()}.");
-            $resultRedirect = $this->createResult('checkout/cart', ['_scope' => $storeId]);
+
+            return $this->createResult('checkout/cart', ['_scope' => $storeId]);
         }
 
         return $resultRedirect;

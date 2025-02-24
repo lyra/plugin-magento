@@ -51,7 +51,7 @@ class ShopUrl extends \Magento\Framework\App\Config\Value
             $field = __($config['label'])->render();
             $group = $this->dataHelper->getGroupTitle($config['path']);
 
-            $msg = __('Invalid value for field &laquo; %1 &raquo; in section &laquo; %2 &raquo;.', $field, $group);
+            $msg = '[PayZen] ' . __('Invalid value for field &laquo; %1 &raquo; in section &laquo; %2 &raquo;.', $field, $group);
             throw new \Magento\Framework\Exception\LocalizedException($msg);
         }
 

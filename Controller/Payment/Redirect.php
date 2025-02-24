@@ -34,21 +34,29 @@ class Redirect extends \Magento\Framework\App\Action\Action
     protected $resultPageFactory;
 
     /**
+     * @var \Lyranetwork\Payzen\Helper\Payment
+     */
+    protected $paymentHelper;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Lyranetwork\Payzen\Helper\Payment $paymentHelper
     ) {
         $this->orderFactory = $orderFactory;
         $this->redirectProcessor = $redirectProcessor;
         $this->resultPageFactory = $resultPageFactory;
         $this->dataHelper = $redirectProcessor->getDataHelper();
+        $this->paymentHelper = $paymentHelper;
 
         parent::__construct($context);
     }
@@ -57,6 +65,14 @@ class Redirect extends \Magento\Framework\App\Action\Action
     {
         try {
             $order = $this->getAndCheckOrder();
+
+            if ($order->getState() != \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
+                $this->paymentHelper->restoreQuoteForOrder($order);
+
+                $this->dataHelper->log("Redirecting to cart page for order #{$order->getIncrementId()}.");
+
+                return $this->back("Order is not in initial state.");
+            }
 
             $this->redirectProcessor->execute($order);
 
@@ -98,12 +114,6 @@ class Redirect extends \Magento\Framework\App\Action\Action
         if (! $checkout->getLastSuccessQuoteId()) {
             $this->dataHelper->log("Payment attempt with a quote already processed. [Order = {$order->getIncrementId()}].");
             throw new OrderException('Order payment already processed.');
-        }
-
-        // Check if we are in iframe mode to backup order ID.
-        if ($this->getRequest()->getParam('iframe', false)) {
-            $checkout->setData('payzen_last_real_id', $lastIncrementId);
-            $this->dataHelper->log('Saving last real order ID in session: '. $lastIncrementId);
         }
 
         return $order;

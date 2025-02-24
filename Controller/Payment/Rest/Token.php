@@ -45,6 +45,11 @@ class Token extends \Magento\Framework\App\Action\Action
     protected $orderFactory;
 
     /**
+     * @var \Magento\Sales\Api\OrderRepositoryInterface
+     */
+    protected $orderRepository;
+
+    /**
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
@@ -62,6 +67,7 @@ class Token extends \Magento\Framework\App\Action\Action
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -70,7 +76,8 @@ class Token extends \Magento\Framework\App\Action\Action
         \Lyranetwork\Payzen\Model\Method\Standard $standardMethod,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Magento\Sales\Model\OrderFactory $orderFactory
+        \Magento\Sales\Model\OrderFactory $orderFactory,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
         ) {
             $this->formKeyValidator = $formKeyValidator;
             $this->dataHelper = $dataHelper;
@@ -78,6 +85,7 @@ class Token extends \Magento\Framework\App\Action\Action
             $this->quoteRepository = $quoteRepository;
             $this->resultJsonFactory = $resultJsonFactory;
             $this->orderFactory = $orderFactory;
+            $this->orderRepository = $orderRepository;
 
             parent::__construct($context);
     }
@@ -109,19 +117,25 @@ class Token extends \Magento\Framework\App\Action\Action
 
             case self::SET_TOKEN:
                 // Create token from order data.
-                $lastIncrementId = $this->dataHelper->getCheckout()->getLastRealOrderId();
+                $lastIncrementId = $checkout->getData(\Lyranetwork\Payzen\Helper\Data::LAST_REAL_ID);
+                if ($lastIncrementId) {
+                    $order = $this->orderFactory->create();
+                    $order = $order->loadByIncrementId($lastIncrementId);
+                } else {
+                    $orderId = $this->dataHelper->getCheckout()->getLastOrderId();
+                    $order = $this->orderRepository->get($orderId);
+                }
 
-                $checkout->setData('payzen_last_real_id', $lastIncrementId);
-                $this->dataHelper->log('Saving last real order ID in session: '. $lastIncrementId);
-
-                $order = $this->orderFactory->create();
-                $order->loadByIncrementId($lastIncrementId);
+                if (! $order) {
+                    $this->dataHelper->log("No order to pay.");
+                    break;
+                }
 
                 $token = $this->standardMethod->getTokenForOrder($order);
                 break;
 
             case self::RESTORE_CART:
-                $lastIncrementId = $checkout->getData('payzen_last_real_id');
+                $lastIncrementId = $checkout->getData(\Lyranetwork\Payzen\Helper\Data::LAST_REAL_ID);
                 if (! $lastIncrementId) {
                     return;
                 }
@@ -131,7 +145,7 @@ class Token extends \Magento\Framework\App\Action\Action
                 $quote = $this->quoteRepository->get($order->getQuoteId());
 
                 if ($quote->getId() && ! $quote->getIsActive() && ($this->standardMethod->getConfigData('rest_attempts') !== '0')) {
-                    $checkout->setData('payzen_last_real_id', null);
+                    $checkout->setData(\Lyranetwork\Payzen\Helper\Data::LAST_REAL_ID, null);
 
                     $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow more payment attempts.");
                     $quote->setIsActive(true)->setReservedOrderId(null);

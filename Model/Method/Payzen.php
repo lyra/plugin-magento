@@ -347,6 +347,10 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             $this->checkoutHelper->setAdditionalShippingData($order, $this->payzenRequest);
         }
 
+        $order->getPayment()
+            ->setAdditionalInformation("payzen_last_trans_id", $this->payzenRequest->get('trans_id'))
+            ->save();
+
         $paramsToLog = $this->payzenRequest->getRequestFieldsArray(true);
         $this->dataHelper->log('Payment parameters: ' . json_encode($paramsToLog));
 
@@ -940,6 +944,9 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $stateObject->setIsNotified(false);
 
         $this->dataHelper->log("Order #{$order->getIncrementId()} has been placed.");
+        $this->dataHelper->getCheckout()->setData(\Lyranetwork\Payzen\Helper\Data::LAST_REAL_ID, $order->getIncrementId());
+        $this->dataHelper->log('Saving last real order ID in session: '. $order->getIncrementId());
+
         return $this;
     }
 
@@ -1149,7 +1156,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected function getUserInfo()
     {
-        $commentText = 'Magento user: ' . $this->authSession->getUser()->getUsername();
+        $commentText = $this->authSession->getUser() ? 'Magento user: ' . $this->authSession->getUser()->getUsername() : 'Unknown user';
         $commentText .= '; IP address: ' . $this->dataHelper->getIpAddress();
 
         return $commentText;

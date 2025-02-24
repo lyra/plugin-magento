@@ -19,7 +19,7 @@ class FullcbCustgroupOptions extends \Lyranetwork\Payzen\Block\Adminhtml\System\
         \Magento\Customer\Model\GroupFactory $customerGroupFactory,
         array $data = []
     ) {
-        parent::__construct($context,$customerGroupFactory, $data);
+        parent::__construct($context, $customerGroupFactory, $data);
 
         $this->_default = ['amount_min' => '100', 'amount_max' => '1500'];
     }

@@ -40,6 +40,11 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
     protected $onepage;
 
     /**
+     * @var \Lyranetwork\Payzen\Helper\Payment
+     */
+    protected $paymentHelper;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Lyranetwork\Payzen\Controller\Processor\ResponseProcessor $responseProcessor
@@ -47,6 +52,7 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
      * @param \Magento\Quote\Api\CartManagementInterface $quoteManagement
      * @param \Magento\Checkout\Model\Type\Onepage $onepage
+     * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -55,7 +61,8 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Quote\Api\CartManagementInterface $quoteManagement,
-        \Magento\Checkout\Model\Type\Onepage $onepage
+        \Magento\Checkout\Model\Type\Onepage $onepage,
+        \Lyranetwork\Payzen\Helper\Payment $paymentHelper
     ) {
         $this->restHelper = $restHelper;
         $this->quoteManagement = $quoteManagement;
@@ -63,7 +70,7 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         $this->orderFactory = $responseProcessor->getOrderFactory();
         $this->payzenResponseFactory = $responseProcessor->getPayzenResponseFactory();
 
-        parent::__construct($context, $quoteRepository, $responseProcessor, $resultPageFactory);
+        parent::__construct($context, $quoteRepository, $responseProcessor, $resultPageFactory, $paymentHelper);
     }
 
     public function execute()

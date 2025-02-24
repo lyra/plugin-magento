@@ -51,7 +51,6 @@ class CheckProcessor
      */
     protected $creditmemoFactory;
 
-
     /**
      * @var \Magento\Sales\Model\Service\CreditmemoService
      */
@@ -120,6 +119,16 @@ class CheckProcessor
                     return 'payment_ok';
                 }
             } else {
+                if ($response->getTransStatus() === 'ABANDONED') {
+                    $orderTransId = $order->getPayment()->getAdditionalInformation("payzen_last_trans_id");
+
+                    if ($orderTransId && ($orderTransId !== $response->get('trans_id'))) {
+                        $this->dataHelper->log("Abandoned payment IPN ignored for order #{$order->getIncrementId()}. Another payment session was initiated with transaction ID #{$response->get('trans_id')}.");
+
+                        die('<span style="display:none">KO-Payment abandoned.' . "\n" . '</span>');
+                    }
+                }
+
                 $this->dataHelper->log("Payment for order #{$order->getIncrementId()} has been invalidated by notification URL.");
 
                 // Cancel order.
@@ -129,6 +138,12 @@ class CheckProcessor
                 return 'payment_ko';
             }
         } else {
+            if ($response->getTransStatus() === 'ABANDONED') {
+                $this->dataHelper->log("Abandoned payment IPN ignored for already processed order #{$order->getIncrementId()}.");
+
+                die('<span style="display:none">KO-Payment abandoned.' . "\n" . '</span>');
+            }
+
             // Payment already processed.
             $acceptedStatus = $this->dataHelper->getCommonConfigData('registered_order_status', $order->getStore()->getId());
             $successStatuses = [
