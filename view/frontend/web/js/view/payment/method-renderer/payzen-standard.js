@@ -151,6 +151,7 @@ define(
         };
 
         var PLACE_ORDER = true;  // An order can be placed (created).
+        var SHOW_ERROR = false;  // Show error message.
         var IS_VALID = false;    // The embedded payment form is valid.
         var CAN_REFRESH_TOKEN = true; // Token can be refreshed.
 
@@ -198,6 +199,10 @@ define(
                 return window.checkoutConfig.payment[this.item.method].maskedPan || null;
             },
 
+            getErrorMessage: function() {
+                return window.checkoutConfig.payment.payzen_standard.errorMessage || null;
+            },
+
             getRestFormToken: function() {
                 return window.checkoutConfig.payment.payzen_standard.restFormToken || null;
             },
@@ -222,7 +227,7 @@ define(
             },
 
             restoreCart: function() {
-                if (!PLACE_ORDER) {
+                if (SHOW_ERROR || !PLACE_ORDER) {
                     storage.post(
                         url.build('payzen/payment_rest/token?payzen_action=restore_cart&form_key=' + $.mage.cookies.get('form_key'))
                     ).done(function(response) {
@@ -241,23 +246,41 @@ define(
                 fullScreenLoader.stopLoader();
                 me.isPlaceOrderActionAllowed(true);
 
-                var msg = '';
-                if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
-                    msg = e.errorMessage;
-                    var endsWithDot = (msg.lastIndexOf('.') == (msg.length - 1) && msg.lastIndexOf('.') >= 0);
-                    msg += (endsWithDot ? '' : '.');
-                } else {
-                   msg = me.translateError(e.errorCode);
+                if (e !== null) {
+                    var msg = '';
+                    if (DFAULT_MESSAGES.indexOf(e.errorCode) > -1) {
+                        msg = e.errorMessage;
+                        var endsWithDot = (msg.lastIndexOf('.') == (msg.length - 1) && msg.lastIndexOf('.') >= 0);
+                        msg += (endsWithDot ? '' : '.');
+                    } else {
+                        msg = me.translateError(e.errorCode);
+                    }
+
+                    // Expiration errors, display a link to refresh the page.
+                    if (EXPIRY_ERRORS.indexOf(e.errorCode) >= 0) {
+                        msg += ' <a href="#" onclick="window.location.reload(); return false;">'
+                            + me.translateError('RELOAD_LINK') + '</a>';
+                    }
+
+                    $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
                 }
 
-                // Expiration errors, display a link to refresh the page.
-                if (EXPIRY_ERRORS.indexOf(e.errorCode) >= 0) {
-                    msg += ' <a href="#" onclick="window.location.reload(); return false;">'
-                        + me.translateError('RELOAD_LINK') + '</a>';
-                }
-
-                $('#payzen_rest_form .kr-form-error').html('<span style="color: red;"><span>' + msg + '</span></span>');
                 return true;
+            },
+
+            showErrorMessage: function () {
+                var me = this;
+
+                SHOW_ERROR = true;
+                me.restoreCart();
+
+                fullScreenLoader.stopLoader();
+                me.isPlaceOrderActionAllowed(true);
+  
+                var html = '<div id="payzen_oney_message" style="margin-bottom: 25px; width: 100%; background: #fae5e5; color: #e02b27; padding: 12px 0px 12px 25px; font-size: 1.3rem;">'
+                    + '<span>' + ERROR_MESSAGES[me.getLanguage()]["PSP_999"] + '</span></div>';
+
+                $('#payzen_standard_message').html(html);
             },
 
             checkPayload: function() {
@@ -376,6 +399,11 @@ define(
                         me.placeOrder();
                     }
                 } else {
+                    if (SHOW_ERROR) {
+                        SHOW_ERROR = false;
+                        return;
+                    }
+
                     if (! me.validate() || ! additionalValidators.validate() || me.isPlaceOrderActionAllowed() === false) {
                         return;
                     }
@@ -462,100 +490,107 @@ define(
             setToken: function() {
                 var me = this;
 
-                storage.post(
-                    url.build('payzen/payment_rest/token?payzen_action=set_token&form_key=' + $.mage.cookies.get('form_key'))
-                ).done(function(response) {
-                    if (response.token) {
-                        if (me.getCompactMode() === "1") {
-                            KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
-                        }
-
-                        if (!me.getGroupThreshold() && !isNaN(me.getGroupThreshold())) {
-                            KR.setFormConfig({ smartForm: { groupingThreshold: me.getGroupThreshold() }});
-                        }
-
-                        KR.setFormConfig({
-                            formToken: response.token,
-                            language: me.getLanguage(),
-                            form: { smartform: { singlePaymentButton: { visibility: false }}}
-                        }).then(
-                            function(v) {
-                                let KR = v.KR;
-                                KR.onFocus(function(e) {
-                                    $('#payzen_rest_form .kr-form-error').html('');
-                                });
-
-                                KR.onFormReady(() => {
-                                    me.hideSmartformPopinButton();
-                                });
-
-                                KR.onError(function(e) {
-                                    if (!e.metadata.hasOwnProperty('answer')) {
-                                        return me.manageError(e);
-                                    }
-
-                                    var answer = e.metadata.answer;
-                                    var data = {
-                                        'kr-answer-type': 'V4/Payment',
-                                        'kr-answer': JSON.stringify(answer.clientAnswer),
-                                        'kr-hash': answer.hash,
-                                        'kr-hash-algorithm': answer.hashAlgorithm
-                                    };
-
-                                    // Force redirection to response page if possibility of retries is exhausted.
-                                    if (answer && (answer.clientAnswer.orderStatus == "UNPAID") && (answer.clientAnswer.orderCycle == "CLOSED")) {
-                                        var form = $('<form></form>');
-                                        form.attr("method", "post");
-                                        form.attr("action", me.getRestReturnUrl());
-
-                                        $.each(data, function(key, value) {
-                                            var field = $('<input></input>');
-
-                                            field.attr("type", "hidden");
-                                            field.attr("name", key);
-                                            field.attr("value", value);
-
-                                            form.append(field);
-                                        });
-
-                                        KR.setFormConfig({ disabledForm: true }).then(
-                                            function(e) {
-                                                $(document.body).append(form);
-                                                form.submit();
-                                            }
-                                        );
-                                    } else if (me.updateOrder()) {
-                                        // Ajax call to update order status.
-                                        data['payzen_update_order'] = true;
-
-                                        $.ajax({
-                                            url: me.getRestReturnUrl(),
-                                            type: "POST",
-                                            data: data,
-                                            success: function (resp) {
-                                               return me.manageError(e);
-                                            }
-                                        });
-                                    } else {
-                                        return me.manageError(e);
-                                    }
-                                });
-
-                                KR.onSubmit(function(e) {
-                                    customerData.invalidate(['cart']);
-                                    return true;
-                                });
-
-                                me.submitEmbeddedForm();
+                return new Promise((resolve, reject) => {
+                    storage.post(
+                        url.build('payzen/payment_rest/token?payzen_action=set_token&form_key=' + $.mage.cookies.get('form_key'))
+                    ).done(function(response) {
+                        if (response.token) {
+                            if (me.getCompactMode() === "1") {
+                                KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
                             }
-                        );
-                    } else {
-                        // Should not happen, this case is managed by failure callback.
-                        console.log('Empty form token returned.');
-                    }
-                }).fail(function(response) {
-                    fullScreenLoader.stopLoader();
-                    me.isPlaceOrderActionAllowed(true);
+
+                            if (!me.getGroupThreshold() && !isNaN(me.getGroupThreshold())) {
+                                KR.setFormConfig({ smartForm: { groupingThreshold: me.getGroupThreshold() }});
+                            }
+
+                            KR.setFormConfig({
+                                formToken: response.token,
+                                language: me.getLanguage(),
+                                form: { smartform: { singlePaymentButton: { visibility: false }}}
+                            }).then(
+                                function(v) {
+                                    resolve(response);
+                                    let KR = v.KR;
+                                    KR.onFocus(function(e) {
+                                        $('#payzen_rest_form .kr-form-error').html('');
+                                    });
+
+                                    KR.onFormReady(() => {
+                                        me.hideSmartformPopinButton();
+                                    });
+
+                                    KR.onError(function(e) {
+                                        if (!e.metadata.hasOwnProperty('answer')) {
+                                            return me.manageError(e);
+                                        }
+
+                                        var answer = e.metadata.answer;
+                                        var data = {
+                                            'kr-answer-type': 'V4/Payment',
+                                            'kr-answer': JSON.stringify(answer.clientAnswer),
+                                            'kr-hash': answer.hash,
+                                            'kr-hash-algorithm': answer.hashAlgorithm
+                                        };
+    
+                                        // Force redirection to response page if possibility of retries is exhausted.
+                                        if (answer && (answer.clientAnswer.orderStatus == "UNPAID") && (answer.clientAnswer.orderCycle == "CLOSED")) {
+                                            var form = $('<form></form>');
+                                            form.attr("method", "post");
+                                            form.attr("action", me.getRestReturnUrl());
+    
+                                            $.each(data, function(key, value) {
+                                                var field = $('<input></input>');
+    
+                                                field.attr("type", "hidden");
+                                                field.attr("name", key);
+                                                field.attr("value", value);
+
+                                                form.append(field);
+                                            });
+
+                                            KR.setFormConfig({ disabledForm: true }).then(
+                                                function(e) {
+                                                    $(document.body).append(form);
+                                                    form.submit();
+                                                }
+                                            );
+                                        } else if (me.updateOrder()) {
+                                            // Ajax call to update order status.
+                                            data['payzen_update_order'] = true;
+
+                                            $.ajax({
+                                                url: me.getRestReturnUrl(),
+                                                type: "POST",
+                                                data: data,
+                                                success: function (resp) {
+                                                   return me.manageError(e);
+                                                }
+                                            });
+                                        } else {
+                                            return me.manageError(e);
+                                        }
+                                    });
+
+                                    KR.onSubmit(function(e) {
+                                        customerData.invalidate(['cart']);
+                                        return true;
+                                    });
+
+                                    me.submitEmbeddedForm();
+                                }
+                            ).catch(function () {
+                                reject()
+                            });
+                        } else {
+                            // Should not happen, this case is managed by failure callback.
+                            console.log('Empty form token returned.');
+                            reject(response)
+                        }
+                    }).fail(function(response) {
+                        fullScreenLoader.stopLoader();
+                        me.isPlaceOrderActionAllowed(true);
+                        reject(response)
+                    });
                 });
             },
 
@@ -634,14 +669,14 @@ define(
                     fullScreenLoader.startLoader();
                     me.isPlaceOrderActionAllowed(false);
 
-                    $.when(
-                        me.setToken()
-                    ).then(function() {
-                        // A new payment attempt may occur: disable the possibility of placing a new order.
-                        PLACE_ORDER = false;
-                    }).fail(function(response) {
-                        // In case of error, switch to redirection mode.
-                        me._super();
+                    (async () => {
+                        await me.setToken().then(function() {
+                            PLACE_ORDER = false;
+                        }).catch(function(e) {
+                            me.showErrorMessage()
+                        });
+                    })().catch(e => function() {
+                        me.showErrorMessage();
                     });
                 } else if (me.getEntryMode() == 3) { // Iframe mode.
                     // Iframe mode.

@@ -68,7 +68,7 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
             $field = __($config['label'])->render();
             $group = $this->dataHelper->getGroupTitle($config['path']);
 
-            $msg = __('Invalid value for field &laquo; %1 &raquo; in section &laquo; %2 &raquo;.', $field, $group)->render();
+            $msg = '[PayZen] ' . __('Invalid value for field &laquo; %1 &raquo; in section &laquo; %2 &raquo;.', $field, $group)->render();
             $msg .= ' ' . __('Too many card types are selected.')->render();
             throw new \Magento\Framework\Exception\LocalizedException(__($msg));
         }

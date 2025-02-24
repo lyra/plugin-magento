@@ -58,7 +58,7 @@ class Loader extends \Magento\Framework\App\Action\Action
         if ($this->getRequest()->getParam('mode', false) === 'cancel') {
             // Load order.
             $checkout = $this->dataHelper->getCheckout();
-            $lastIncrementId = $checkout->getData('payzen_last_real_id');
+            $lastIncrementId = $checkout->getData(\Lyranetwork\Payzen\Helper\Data::LAST_REAL_ID);
 
             $this->dataHelper->log("Payment within iframe is cancelled for order #{$lastIncrementId}.");
 
@@ -67,7 +67,7 @@ class Loader extends \Magento\Framework\App\Action\Action
 
             if ($order->getId()) {
                 $order->registerCancellation(__('Payment cancelled.'))->save();
-                $checkout->setData('payzen_last_real_id', null);
+                $checkout->setData(\Lyranetwork\Payzen\Helper\Data::LAST_REAL_ID, null);
 
                 $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow re-order quicker.");
 

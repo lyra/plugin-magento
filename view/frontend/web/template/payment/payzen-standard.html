@@ -28,90 +28,98 @@
     </div>
 
     <div class="payment-method-content">
-        <!-- ko foreach: getRegion('messages') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-        <div class="payment-method-billing-address payzen-form">
-            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-                <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
-        </div>
-
-        <div id='payzen_standard_message'></div>
-
-        <fieldset class="fieldset payment method payzen-form" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 10px;">
-            <!-- ko if: (getEntryMode() == 2) && !isOneClick() --><!-- Payment means selection on merchant site. -->
-                <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
-            <!--/ko-->
-
-            <!-- ko if: (getEntryMode() == 4 || getEntryMode() == 5 || getEntryMode() == 6 || getEntryMode() == 7) && getRestFormToken() --><!-- Embedded or Smartform mode. -->
-                <!-- ko template: { name: 'Lyranetwork_Payzen/payment/rest', data: $parent, afterRender: function(elts) { $data.initRestEvents(elts); } } --><!-- /ko -->
-            <!--/ko-->
-
-            <!-- ko if: isOneClick() && !getRestFormToken() -->
-                <ul class="payzen-identifier">
-                    <li class="payzen-standard-cc-block payzen-block">
-                        <!-- ko if: (getEntryMode() == 2) --><!-- Payment means selection on merchant site. -->
-                            <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
-                        <!--/ko-->
-
-                        <span data-bind="i18n: 'You will enter payment data after order confirmation.'"></span>
-                    </li>
-
-                    <li class="payzen-standard-cc-block payzen-block">
-                        <span data-bind="i18n: 'OR'"></span>
-                    </li>
-
-                    <li class="payzen-standard-cc-block payzen-block">
-                        <a data-bind="click: function() { payzenUseIdentifier(1); updatePaymentBlock('id'); return true; }"
-                           class="payzen-payment-link" href="javascript: void(0);">
-                            <span data-bind="i18n: 'Click here to pay with your stored means of payment.'"></span>
-                        </a>
-                    </li>
-
-                    <li class="payzen-standard-id-block payzen-block" >
-                        <span data-bind="html: $t('You will pay with your stored means of payment %s').replace('%s', '<b>' + getMaskedPan() + '</b>')"></span>
-                        <a data-bind="attr: {href: getPaymentMeansUrl()}" class="payzen-payment-link">
-                            (<span data-bind="i18n: 'manage your payment means'"></span>).
-                        </a>
-                    </li>
-
-                    <li class="payzen-standard-id-block payzen-block">
-                        <span data-bind="i18n: 'OR'"></span>
-                    </li>
-
-                    <li class="payzen-standard-id-block payzen-block">
-                        <a data-bind="click: function() { payzenUseIdentifier(0); updatePaymentBlock('cc'); return true; }"
-                           class="payzen-payment-link" href="javascript: void(0);">
-                            <span data-bind="i18n: 'Click here to pay with another means of payment.'"></span>
-                        </a>
-                    </li>
-                </ul>
-            <!--/ko-->
-        </fieldset>
-
-        <div class="checkout-agreements-block payzen-form">
-            <!-- ko foreach: $parent.getRegion('before-place-order') -->
-                <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
-        </div>
-
-        <div class="actions-toolbar payzen-form">
-            <div class="primary">
-                <button class="action primary checkout"
-                        type="submit"
-                        data-bind="click: placeOrderClick,
-                                   attr: {title: $t('Pay with PayZen')},
-                                   css: {disabled: !isPlaceOrderActionAllowed()},
-                                   enable: (getCode() == isChecked())"
-                        disabled>
-                    <span data-bind="i18n: 'Pay with PayZen'"></span>
-                </button>
+        <!-- ko if: getErrorMessage() -->
+            <div id="payzen_standard_message" style="margin-bottom: 25px; width: 100%; background: #fae5e5; color: #e02b27; padding: 12px 0px 12px 25px; font-size: 1.3rem;">
+                <span data-bind="text: getErrorMessage()"></span>
             </div>
-        </div>
+        <!--/ko-->
 
-        <!-- ko if: (getEntryMode() == 3) --><!-- Iframe mode is enabled. -->
-            <!-- ko template: { name: 'Lyranetwork_Payzen/payment/iframe', data: $parent, afterRender: function(elts) { $data.initIframeEvents(elts); } } --><!-- /ko -->
+        <!-- ko ifnot: getErrorMessage() -->
+            <div id="payzen_standard_message"></div>
+
+            <!-- ko foreach: getRegion('messages') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+            <div class="payment-method-billing-address payzen-form">
+                <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            </div>
+
+            <fieldset class="fieldset payment method payzen-form" data-bind="attr: {id: 'payment_form_' + getCode()}" style="padding-top: 10px;">
+                <!-- ko if: (getEntryMode() == 2) && !isOneClick() --><!-- Payment means selection on merchant site. -->
+                    <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
+                <!--/ko-->
+
+                <!-- ko if: (getEntryMode() == 4 || getEntryMode() == 5 || getEntryMode() == 6 || getEntryMode() == 7) && getRestFormToken() --><!-- Embedded or Smartform mode. -->
+                    <!-- ko template: { name: 'Lyranetwork_Payzen/payment/rest', data: $parent, afterRender: function(elts) { $data.initRestEvents(elts); } } --><!-- /ko -->
+                <!--/ko-->
+
+                <!-- ko if: isOneClick() && !getRestFormToken() -->
+                    <ul class="payzen-identifier">
+                        <li class="payzen-standard-cc-block payzen-block">
+                            <!-- ko if: (getEntryMode() == 2) --><!-- Payment means selection on merchant site. -->
+                                <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
+                            <!--/ko-->
+
+                            <span data-bind="i18n: 'You will enter payment data after order confirmation.'"></span>
+                        </li>
+
+                        <li class="payzen-standard-cc-block payzen-block">
+                            <span data-bind="i18n: 'OR'"></span>
+                        </li>
+
+                        <li class="payzen-standard-cc-block payzen-block">
+                            <a data-bind="click: function() { payzenUseIdentifier(1); updatePaymentBlock('id'); return true; }"
+                               class="payzen-payment-link" href="javascript: void(0);">
+                                <span data-bind="i18n: 'Click here to pay with your stored means of payment.'"></span>
+                            </a>
+                        </li>
+
+                        <li class="payzen-standard-id-block payzen-block" >
+                            <span data-bind="html: $t('You will pay with your stored means of payment %s').replace('%s', '<b>' + getMaskedPan() + '</b>')"></span>
+                            <a data-bind="attr: {href: getPaymentMeansUrl()}" class="payzen-payment-link">
+                                (<span data-bind="i18n: 'manage your payment means'"></span>).
+                            </a>
+                        </li>
+
+                        <li class="payzen-standard-id-block payzen-block">
+                            <span data-bind="i18n: 'OR'"></span>
+                        </li>
+
+                        <li class="payzen-standard-id-block payzen-block">
+                            <a data-bind="click: function() { payzenUseIdentifier(0); updatePaymentBlock('cc'); return true; }"
+                               class="payzen-payment-link" href="javascript: void(0);">
+                                <span data-bind="i18n: 'Click here to pay with another means of payment.'"></span>
+                            </a>
+                        </li>
+                    </ul>
+                <!--/ko-->
+            </fieldset>
+
+            <div class="checkout-agreements-block payzen-form">
+                <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            </div>
+
+            <div class="actions-toolbar payzen-form">
+                <div class="primary">
+                    <button class="action primary checkout"
+                            type="submit"
+                            data-bind="click: placeOrderClick,
+                                       attr: {title: $t('Pay with PayZen')},
+                                       css: {disabled: !isPlaceOrderActionAllowed()},
+                                       enable: (getCode() == isChecked())"
+                            disabled>
+                        <span data-bind="i18n: 'Pay with PayZen'"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ko if: (getEntryMode() == 3) --><!-- Iframe mode is enabled. -->
+                <!-- ko template: { name: 'Lyranetwork_Payzen/payment/iframe', data: $parent, afterRender: function(elts) { $data.initIframeEvents(elts); } } --><!-- /ko -->
+            <!--/ko-->
         <!--/ko-->
     </div>
 </div>

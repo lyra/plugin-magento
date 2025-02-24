@@ -1,3 +1,11 @@
+2.10.1, 2025-02-24:
+- Bug fix: Fix processing notification URL on payment abandoned by buyer.
+- Bug fix: Fix error related to refund processing when admin authentication information not available.
+- [embedded] Bug fix: Fix error related to retrieving order increment ID.
+- [embedded] Improve REST API errors management.
+- Update list of supported payment means.
+- Update list of supported currencies.
+
 2.10.0, 2024-09-17:
 - [embedded] Use customer wallet functionality to manage payment by alias on buyer account.
 - [alias] Improve alias validity check.
