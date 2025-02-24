@@ -1,4 +1,4 @@
-Copyright © 2016-2024 Lyra Network.
+Copyright © 2016-2025 Lyra Network.
 
 PayZen plugin for Magento 2 is licensed under the
 Open Software License version 3.0 that is bundled with

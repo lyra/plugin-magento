@@ -1028,4 +1028,19 @@ class Payment
             $orderId
         );
     }
+
+    public function restoreQuoteForOrder($order)
+    {
+        $checkout = $this->dataHelper->getCheckout();
+        $quote = $this->quoteRepository->get($order->getQuoteId());
+        if ($quote->getId()) {
+            $this->dataHelper->log("Restore cart for order #{$order->getIncrementId()} to allow re-order quicker.");
+            $quote->setIsActive(true)->setReservedOrderId(null);
+            $this->quoteRepository->save($quote);
+
+            // To comply with Magento\Checkout\Model\Session::restoreQuote() method.
+            $checkout->replaceQuote($quote)->unsLastRealOrderId();
+            $this->eventManager->dispatch('restore_quote', ['order' => $order, 'quote' => $quote]);
+        }
+    }
 }

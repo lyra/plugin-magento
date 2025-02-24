@@ -26,6 +26,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const METHOD_FULLCB = 'payzen_fullcb';
     const METHOD_FRANFINANCE = 'payzen_franfinance';
     const METHOD_OTHER = 'payzen_other';
+    const LAST_REAL_ID = 'payzen_last_real_id';
 
     const MODE_FORM = 1;
     const MODE_LOCAL_TYPE = 2;

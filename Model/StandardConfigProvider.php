@@ -53,8 +53,26 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
 
         $config['payment'][$this->method->getCode()]['maskedPan'] = $this->renderMaskedPan($maskedPan);
 
-        // For payment via REST API.
-        $config['payment'][$this->method->getCode()]['restFormToken'] = $this->getRestFormToken();
+        if ($this->method->isRestMode()) {
+            $errorMessage = null;
+            $token = $this->getRestFormToken();
+
+            $config['payment'][$this->method->getCode()]['restFormToken'] = $token;
+
+            if (! $token) {
+                $isTest = $this->dataHelper->getCommonConfigData('ctx_mode') == 'TEST';
+                $quote = $this->dataHelper->getCheckoutQuote();
+
+                if ($isTest && ($msg = $quote->getPayment()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE))) {
+                    $errorMessage = $msg . __(' Please consult the documentation for more details.');
+                } else {
+                    $errorMessage = __('Something went wrong while processing your payment request. Please try again later.');
+                }
+            }
+
+            $config['payment'][$this->method->getCode()]['errorMessage'] = $errorMessage;
+        }
+
         $config['payment'][$this->method->getCode()]['language'] = $this->method->getPaymentLanguage();
         $config['payment'][$this->method->getCode()]['updateOrder'] = $this->method->getConfigData('rest_update_order');
         $config['payment'][$this->method->getCode()]['restReturnUrl'] = $this->dataHelper->getRestReturnUrl();

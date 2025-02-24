@@ -42,7 +42,7 @@ class AddedPaymentMeans extends \Lyranetwork\Payzen\Model\System\Config\Backend\
     ) {
         $this->method = $method;
 
-        parent::__construct($context, $registry, $config, $cacheTypeList,$dataHelper, $resource, $resourceCollection, $data);
+        parent::__construct($context, $registry, $config, $cacheTypeList, $dataHelper, $resource, $resourceCollection, $data);
     }
 
     /**

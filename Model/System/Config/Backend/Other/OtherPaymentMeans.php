@@ -42,7 +42,7 @@ class OtherPaymentMeans extends ConfigArraySerialized
     ) {
         $this->method = $method;
 
-        parent::__construct($context, $registry, $config, $cacheTypeList,$dataHelper, $resource, $resourceCollection, $data);
+        parent::__construct($context, $registry, $config, $cacheTypeList, $dataHelper, $resource, $resourceCollection, $data);
     }
 
     public function beforeSave()
