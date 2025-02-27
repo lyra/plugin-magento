@@ -1,3 +1,6 @@
+2.10.2, 2025-02-27:
+- Bug fix: Fix compilation problem relative to class constructor parameters.
+
 2.10.1, 2025-02-24:
 - Bug fix: Fix processing notification URL on payment abandoned by buyer.
 - Bug fix: Fix error related to refund processing when admin authentication information not available.
