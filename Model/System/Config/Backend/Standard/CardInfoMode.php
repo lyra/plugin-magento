@@ -58,11 +58,17 @@ class CardInfoMode extends \Magento\Framework\App\Config\Value
             parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
+    public function getValue()
+    {
+        $value = parent::getValue();
+
+        return ($value == '4') ? Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS : $value;
+    }
+
     public function beforeSave()
     {
         $value = $this->getValue();
         $restModes = [
-            Data::MODE_EMBEDDED,
             Data::MODE_SMARTFORM,
             Data::MODE_SMARTFORM_EXT_WITH_LOGOS,
             Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS
@@ -106,7 +112,7 @@ class CardInfoMode extends \Magento\Framework\App\Config\Value
     protected function throwException($field)
     {
         $section = __('REST API KEYS');
-        $this->dataHelper->log("Cannot enable embedded / Smartform mode: {$field} is not configured.");
+        $this->dataHelper->log("Cannot enable embedded mode: {$field} is not configured.");
         $msg = '[PayZen] ' . __('The selected &laquo; Payment data entry mode &raquo; cannot be enabled: field &laquo; %1 &raquo; in section &laquo; %2 &raquo; is not configured.', __($field)->render(), $section->render())->render();
 
         $this->messageManager->addErrorMessage($msg);

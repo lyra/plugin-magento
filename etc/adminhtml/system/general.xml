@@ -134,7 +134,7 @@
 
             <field id="rest_descr" translate="comment" type="label" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="1">
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <comment><![CDATA[Configure this section if you are using order operations from Magento Back Office or if you are using embedded payment fields or Smartform modes.]]></comment>
+                <comment><![CDATA[Configure this section if you are using order operations from Magento Back Office or if you are using embedded payment fields modes.]]></comment>
                 <config_path>payzen/general/rest_descr</config_path>
             </field>
 
@@ -157,7 +157,7 @@
 
             <field id="rest_embedded_descr" translate="comment" type="label" sortOrder="135" showInDefault="1" showInWebsite="1" showInStore="1">
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <comment><![CDATA[Configure this section only if you are using embedded payment fields or Smartform modes.]]></comment>
+                <comment><![CDATA[Configure this section only if you are using embedded payment fields modes.]]></comment>
                 <config_path>payzen/general/rest_embedded_descr</config_path>
             </field>
 

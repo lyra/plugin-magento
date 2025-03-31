@@ -36,11 +36,6 @@ class CheckProcessor
     protected $emulation;
 
     /**
-     * @var \Magento\Sales\Model\OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
      * @var \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory
      */
     protected $payzenResponseFactory;
@@ -61,7 +56,6 @@ class CheckProcessor
      * @param \Magento\Store\Model\App\Emulation $emulation
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param  \Lyranetwork\Payzen\Helper\Payment $paymentHelper
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
      * @param \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory
      * @param \Magento\Sales\Model\Service\CreditmemoService $creditmemoService
@@ -71,7 +65,6 @@ class CheckProcessor
         \Magento\Store\Model\App\Emulation $emulation,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
          \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
-        \Magento\Sales\Model\OrderFactory $orderFactory,
         \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory,
         \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory,
         \Magento\Sales\Model\Service\CreditmemoService $creditmemoService
@@ -80,7 +73,6 @@ class CheckProcessor
         $this->emulation = $emulation;
         $this->dataHelper = $dataHelper;
         $this->paymentHelper = $paymentHelper;
-        $this->orderFactory = $orderFactory;
         $this->payzenResponseFactory = $payzenResponseFactory;
         $this->creditmemoFactory = $creditmemoFactory;
         $this->creditmemoService = $creditmemoService;
@@ -310,9 +302,7 @@ class CheckProcessor
         }
 
         // Loading order.
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($orderId);
-
+        $order = $this->dataHelper->getOrderByIncrementId($orderId);
         if (! $order->getId()) {
             $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
             throw new ResponseException('<span style="display:none">KO-Order not found.' . "\n" . '</span>');
@@ -329,11 +319,6 @@ class CheckProcessor
     public function getStoreManager()
     {
         return $this->storeManager;
-    }
-
-    public function getOrderFactory()
-    {
-        return $this->orderFactory;
     }
 
     public function getPayzenResponseFactory()

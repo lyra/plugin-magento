@@ -114,7 +114,6 @@
             <field id="card_info_mode" translate="label comment" type="select" sortOrder="241" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Payment data entry mode]]></label>
                 <comment><![CDATA[Select how the payment data will be entered. Attention, to use embedded payment fields, you must ensure that you have subscribed to this option with PayZen.]]></comment>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Standard\CardInfoMode</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Standard\CardInfoMode</backend_model>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\CardInfoMode</source_model>
                 <config_path>payment/payzen_standard/card_info_mode</config_path>
@@ -122,27 +121,27 @@
 
             <field id="rest_popin_mode" translate="label comment" type="select" sortOrder="242" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Display in a pop-in]]></label>
-                <comment><![CDATA[This option allows to display the embedded payment fields or the Smartform in a pop-in.]]></comment>
+                <comment><![CDATA[This option allows to display the embedded payment fields in a pop-in.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payment/payzen_standard/rest_popin_mode</config_path>
                 <depends>
-                    <field id="card_info_mode" separator=",">4,5,6,7</field>
+                    <field id="card_info_mode" separator=",">5,6,7</field>
                 </depends>
             </field>
 
             <field id="rest_theme" translate="label comment" type="select" sortOrder="243" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Theme]]></label>
-                <comment><![CDATA[Select a theme to use to display embedded payment fields or Smartform. For more customization, you can edit module template manually.]]></comment>
+                <comment><![CDATA[Select a theme to use to display embedded payment fields. For more customization, you can edit module template manually.]]></comment>
                 <source_model>Lyranetwork\Payzen\Model\System\Config\Source\RestTheme</source_model>
                 <config_path>payment/payzen_standard/rest_theme</config_path>
                 <depends>
-                    <field id="card_info_mode" separator=",">4,5,6,7</field>
+                    <field id="card_info_mode" separator=",">5,6,7</field>
                 </depends>
             </field>
 
             <field id="rest_compact" translate="label comment" type="select" sortOrder="244" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Compact mode]]></label>
-                <comment><![CDATA[This option allows to display the Smartform in a compact mode.]]></comment>
+                <comment><![CDATA[This option allows to display the embedded payment fields in a compact mode.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payment/payzen_standard/rest_compact</config_path>
                 <depends>
@@ -166,7 +165,7 @@
                 <config_path>payment/payzen_standard/rest_placeholders</config_path>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\Serialized\ArraySerialized\ConfigArraySerialized</backend_model>
                 <depends>
-                    <field id="card_info_mode" separator=",">4,5,6,7</field>
+                    <field id="card_info_mode" separator=",">5,6,7</field>
                 </depends>
             </field>
 
@@ -175,7 +174,7 @@
                 <comment><![CDATA[Label displayed to invite buyers to register their card data.]]></comment>
                 <config_path>payment/payzen_standard/rest_card_register_label</config_path>
                 <depends>
-                    <field id="card_info_mode" separator=",">4,5,6,7</field>
+                    <field id="card_info_mode" separator=",">5,6,7</field>
                 </depends>
             </field>
 
@@ -184,7 +183,7 @@
                 <comment><![CDATA[Maximum number of payment by cards retries after a failed payment (between 0 and 2). If blank, the gateway default value is 1.]]></comment>
                 <config_path>payment/payzen_standard/rest_attempts</config_path>
                 <depends>
-                    <field id="card_info_mode" separator=",">4,5,6,7</field>
+                    <field id="card_info_mode" separator=",">5,6,7</field>
                 </depends>
             </field>
 
@@ -194,7 +193,7 @@
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 <config_path>payment/payzen_standard/display_title</config_path>
                 <depends>
-                    <field id="card_info_mode" separator=",">4,5,6,7</field>
+                    <field id="card_info_mode" separator=",">5,6,7</field>
                 </depends>
             </field>
 
@@ -211,7 +210,7 @@
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payment/payzen_standard/rest_update_order</config_path>
                 <depends>
-                    <field id="card_info_mode" separator=",">4,5,6,7</field>
+                    <field id="card_info_mode" separator=",">5,6,7</field>
                 </depends>
             </field>
         </group>

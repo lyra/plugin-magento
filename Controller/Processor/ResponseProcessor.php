@@ -25,11 +25,6 @@ class ResponseProcessor
     protected $paymentHelper;
 
     /**
-     * @var \Magento\Sales\Model\OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
      * @var \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory
      */
     protected $payzenResponseFactory;
@@ -37,18 +32,15 @@ class ResponseProcessor
     /**
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
      */
     public function __construct(
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
-        \Magento\Sales\Model\OrderFactory $orderFactory,
         \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory $payzenResponseFactory
     ) {
         $this->dataHelper = $dataHelper;
         $this->paymentHelper = $paymentHelper;
-        $this->orderFactory = $orderFactory;
         $this->payzenResponseFactory = $payzenResponseFactory;
     }
 
@@ -179,8 +171,7 @@ class ResponseProcessor
         }
 
         // Load order.
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($orderId);
+        $order = $this->dataHelper->getOrderByIncrementId($orderId);
         if (! $order->getId()) {
             throw new ResponseException("Order not found with ID #{$orderId}.");
         }
@@ -191,11 +182,6 @@ class ResponseProcessor
     public function getDataHelper()
     {
         return $this->dataHelper;
-    }
-
-    public function getOrderFactory()
-    {
-        return $this->orderFactory;
     }
 
     public function getPayzenResponseFactory()

@@ -32,11 +32,6 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
     protected $restHelper;
 
     /**
-     * @var \Magento\Sales\Model\OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
@@ -55,7 +50,6 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      * @param \Lyranetwork\Payzen\Helper\Rest $restHelper
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $collectionFactory
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
@@ -63,14 +57,12 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
-        \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory $collectionFactory,
         \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->dataHelper = $dataHelper;
         $this->paymentHelper = $paymentHelper;
         $this->restHelper = $restHelper;
-        $this->orderFactory = $orderFactory;
         $this->collectionFactory = $collectionFactory;
         $this->messageManager = $messageManager;
     }
@@ -102,9 +94,8 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
      */
     public function doOnSuccess($operationResponse, $operationType)
     {
-        $order = $this->orderFactory->create();
         $orderId = $operationResponse['orderDetails']['orderId'];
-        $order->loadByIncrementId($orderId);
+        $order = $this->dataHelper->getOrderByIncrementId($orderId);
 
         if ($operationType == 'refund') { // Actual refund.
             $this->createRefundTransaction($this->payment, $operationResponse);

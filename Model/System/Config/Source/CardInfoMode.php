@@ -13,7 +13,7 @@ class CardInfoMode implements \Magento\Framework\Option\ArrayInterface
 {
     public function toOptionArray()
     {
-        $options = [
+        return [
             [
                 'value' => '1',
                 'label' => __('Bank data acquisition on payment gateway')
@@ -23,37 +23,17 @@ class CardInfoMode implements \Magento\Framework\Option\ArrayInterface
                 'label' => __('Card type selection on merchant site')
             ],
             [
-                'value' => '3',
-                'label' => __('Payment page integrated to checkout process (iframe mode)')
-            ]
-        ];
-
-        // Get configured features.
-        $features = \Lyranetwork\Payzen\Helper\Data::$pluginFeatures;
-        if ($features['embedded']) {
-            $options[] = [
-                'value' => '4',
+                'value' => '5',
                 'label' => __('Embedded payment fields on merchant site (REST API)')
-            ];
-
-            if ($features['smartform']) {
-                $options[] = [
-                    'value' => '5',
-                    'label' => __('Embedded Smartform on merchant site (REST API)')
-                ];
-
-                $options[] = [
-                    'value' => '6',
-                    'label' => __('Embedded Smartform extended on merchant site with logos (REST API)')
-                ];
-
-                $options[] = [
-                    'value' => '7',
-                    'label' => __('Embedded Smartform extended on merchant site without logos (REST API)')
-                ];
-            }
-        }
-
-        return $options;
+            ],
+            [
+               'value' => '6',
+               'label' => __('Embedded payment fields extended on merchant site with logos (REST API)')
+            ],
+            [
+                'value' => '7',
+                'label' => __('Embedded payment fields extended on merchant site without logos (REST API)')
+            ]
+         ];
     }
 }

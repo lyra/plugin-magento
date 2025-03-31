@@ -1,3 +1,11 @@
+2.11.0, 2025-03-31:
+- Improve order retrieving process.
+- Bug fix: Fix order identifier type casting on REST payment IPN and return to shop processing.
+- Remove the iframe payment mode.
+- Remove the payment by embedded fields legacy mode.
+- Update list of supported payment means.
+- Update list of supported currencies.
+
 2.10.2, 2025-02-27:
 - Bug fix: Fix compilation problem relative to class constructor parameters.
 

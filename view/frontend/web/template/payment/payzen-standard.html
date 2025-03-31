@@ -15,7 +15,7 @@
                name="payment[method]"
                class="radio"
                data-bind="attr: {id: getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
-        <label data-bind="attr: {for: getCode()}, hidden: getDisplayTitle() !== '1' && getRestPopinMode() !== '1' && getEntryMode() !== '1' && getEntryMode() !== '2' && getEntryMode() !== '3' && !isRadioButtonVisible()" class="label">
+        <label data-bind="attr: {for: getCode()}, hidden: getDisplayTitle() !== '1' && getRestPopinMode() !== '1' && getEntryMode() !== '1' && getEntryMode() !== '2' && !isRadioButtonVisible()" class="label">
             <!-- Standard logo. -->
             <!-- ko if: getModuleLogoUrl() -->
                 <img data-bind="attr: {src: getModuleLogoUrl()}"
@@ -51,7 +51,7 @@
                     <!-- ko template: 'Lyranetwork_Payzen/payment/cc-type' --><!-- /ko -->
                 <!--/ko-->
 
-                <!-- ko if: (getEntryMode() == 4 || getEntryMode() == 5 || getEntryMode() == 6 || getEntryMode() == 7) && getRestFormToken() --><!-- Embedded or Smartform mode. -->
+                <!-- ko if: (getEntryMode() == 5 || getEntryMode() == 6 || getEntryMode() == 7) && getRestFormToken() --><!-- Embedded mode. -->
                     <!-- ko template: { name: 'Lyranetwork_Payzen/payment/rest', data: $parent, afterRender: function(elts) { $data.initRestEvents(elts); } } --><!-- /ko -->
                 <!--/ko-->
 
@@ -116,10 +116,6 @@
                     </button>
                 </div>
             </div>
-
-            <!-- ko if: (getEntryMode() == 3) --><!-- Iframe mode is enabled. -->
-                <!-- ko template: { name: 'Lyranetwork_Payzen/payment/iframe', data: $parent, afterRender: function(elts) { $data.initIframeEvents(elts); } } --><!-- /ko -->
-            <!--/ko-->
         <!--/ko-->
     </div>
 </div>

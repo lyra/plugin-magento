@@ -29,25 +29,17 @@ class Redirect extends \Magento\Backend\App\Action
     protected $resultPageFactory;
 
     /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
-     */
-    protected $orderRepository;
-
-    /**
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Sales\Api\OrderRepositoryInterface
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         $this->redirectProcessor = $redirectProcessor;
         $this->resultPageFactory = $resultPageFactory;
-        $this->orderRepository = $orderRepository;
         $this->dataHelper = $redirectProcessor->getDataHelper();
 
         parent::__construct($context);
@@ -78,7 +70,7 @@ class Redirect extends \Magento\Backend\App\Action
 
         // Check that there is an order to pay.
         try {
-            $order = $this->orderRepository->get($id);
+            $order = $this->dataHelper->getOrderById($id);
         } catch (\Exception $e) {
             $this->dataHelper->log("No order to pay. It may be a direct access to redirection page."
                 . " [Order = {$id}].");

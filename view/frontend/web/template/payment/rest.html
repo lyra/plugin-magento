@@ -31,28 +31,3 @@
     <div class="kr-smart-form" kr-single-payment-button kr-card-form-expanded kr-no-card-logo-header></div>
 </div>
 <!--/ko-->
-
-<!-- ko if: ($parent.getEntryMode() == 4 && $parent.getRestPopinMode() != 1) --><!-- Embedded mode is enabled. -->
-<div id="payzen_rest_form" class="kr-embedded payzen-standard-cc-block payzen-standard-id-block">
-    <div class="kr-pan"></div>
-    <div class="kr-expiry"></div>
-    <div class="kr-security-code"></div>
-
-    <div style="display: none;">
-        <button type="button" class="kr-payment-button"></button>
-    </div>
-
-    <div class="kr-form-error"></div>
-</div>
-<!--/ko-->
-
-<!-- ko if: ($parent.getEntryMode() == 4 && $parent.getRestPopinMode() == 1) --><!-- Embedded in popin mode is enabled. -->
-<div id="payzen_rest_form" class="kr-embedded payzen-standard-cc-block payzen-standard-id-block" kr-popin>
-    <div class="kr-pan"></div>
-    <div class="kr-expiry"></div>
-    <div class="kr-security-code"></div>
-
-    <button type="button" class="kr-payment-button"></button>
-    <div class="kr-form-error"></div>
-</div>
-<!--/ko-->
