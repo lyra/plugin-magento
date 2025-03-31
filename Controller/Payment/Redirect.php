@@ -14,11 +14,6 @@ use Lyranetwork\Payzen\Model\OrderException;
 class Redirect extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var \Magento\Sales\Model\OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
      * @var \Lyranetwork\Payzen\Helper\Data
      */
     protected $dataHelper;
@@ -40,19 +35,16 @@ class Redirect extends \Magento\Framework\App\Action\Action
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Lyranetwork\Payzen\Helper\Payment $paymentHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Sales\Model\OrderFactory $orderFactory,
         \Lyranetwork\Payzen\Controller\Processor\RedirectProcessor $redirectProcessor,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Lyranetwork\Payzen\Helper\Payment $paymentHelper
     ) {
-        $this->orderFactory = $orderFactory;
         $this->redirectProcessor = $redirectProcessor;
         $this->resultPageFactory = $resultPageFactory;
         $this->dataHelper = $redirectProcessor->getDataHelper();
@@ -101,8 +93,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
             throw new OrderException('Order not found in session.');
         }
 
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($lastIncrementId);
+        $order = $this->dataHelper->getOrderByIncrementId($lastIncrementId);
 
         // Check that there is products in cart.
         if (! $order->getTotalDue()) {
@@ -128,21 +119,9 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $this->messageManager->getMessages(true);
         $this->dataHelper->log($msg . ' Redirecting to cart page.');
 
-        if ($this->getRequest()->getParam('iframe', false)) {
-            $result = $this->resultPageFactory->create();
-
-            $block = $result->getLayout()
-                ->createBlock(\Lyranetwork\Payzen\Block\Payment\Iframe\Response::class)
-                ->setTemplate('Lyranetwork_Payzen::payment/iframe/response.phtml')
-                ->setForwardPath('checkout/cart');
-
-            $this->getResponse()->setBody($block->toHtml());
-            return null;
-        } else {
-            $result = $this->resultRedirectFactory->create();
-            $result->setPath('checkout/cart');
-            return $result;
-        }
+        $result = $this->resultRedirectFactory->create();
+        $result->setPath('checkout/cart');
+        return $result;
     }
 
     /**
@@ -151,13 +130,8 @@ class Redirect extends \Magento\Framework\App\Action\Action
     private function forward()
     {
         $resultPage = $this->resultPageFactory->create();
-
-        if ($this->getRequest()->getParam('iframe', false)) {
-            $resultPage->addHandle('payzen_payment_iframe_redirect');
-        } else {
-            $resultPage->addHandle('payzen_payment_form_redirect');
-            $resultPage->getConfig()->getTitle()->set(__('Payment gateway redirection'));
-        }
+        $resultPage->addHandle('payzen_payment_form_redirect');
+        $resultPage->getConfig()->getTitle()->set(__('Payment gateway redirection'));
 
         return $resultPage;
     }

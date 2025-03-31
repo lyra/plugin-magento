@@ -152,7 +152,6 @@ define(
 
         var PLACE_ORDER = true;  // An order can be placed (created).
         var SHOW_ERROR = false;  // Show error message.
-        var IS_VALID = false;    // The embedded payment form is valid.
         var CAN_REFRESH_TOKEN = true; // Token can be refreshed.
 
         return Component.extend({
@@ -161,8 +160,7 @@ define(
                 payzenCcType:  window.checkoutConfig.payment.payzen_standard.availableCcTypes ?
                     window.checkoutConfig.payment.payzen_standard.availableCcTypes[0]['value'] : null,
                 payzenUseIdentifier: 1,
-                payload: null,
-                iframeDisplayed: false
+                payload: null
             },
 
             initObservable: function() {
@@ -185,10 +183,6 @@ define(
                 }
 
                 return data;
-            },
-
-            getIframeLoaderUrl: function() {
-                return window.checkoutConfig.payment[this.item.method].iframeLoaderUrl || null;
             },
 
             isOneClick: function() {
@@ -383,21 +377,7 @@ define(
                 var me = this;
 
                 if (PLACE_ORDER) {
-                     if ((me.getEntryMode() === "4" && me.getRestPopinMode() === "0") && me.getRestFormToken() && !IS_VALID) {
-                        // Embedded mode.
-                        $('#payzen_rest_form .kr-form-error').html('');
-
-                        KR.validateForm().then(function(v) {
-                            IS_VALID = true;
-                            me.placeOrder();
-                        }).catch(function(v) {
-                            IS_VALID = false;
-                            var result = v.result;
-                            return result.doOnError();
-                        });
-                    } else {
-                        me.placeOrder();
-                    }
+                    me.placeOrder();
                 } else {
                     if (SHOW_ERROR) {
                         SHOW_ERROR = false;
@@ -633,36 +613,10 @@ define(
                 return messages[code];
             },
 
-            initIframeEvents: function(elts) { // To be called after iframe loading.
-                if (!elts || !elts.length) {
-                    return;
-                }
-
-                var me = this;
-
-                quote.paymentMethod.subscribe(function(method) {
-                    if ((method.method === 'payzen_standard') || !me.iframeDisplayed) {
-                        return;
-                    }
-
-                    var iframe = $('.payment-method .payment-method-content iframe.payzen-iframe');
-                    if (iframe && iframe.length) {
-                        var cancelUrl = me.getIframeLoaderUrl() + '?mode=cancel' + '&' + Date.now();
-                        iframe.attr('src', cancelUrl);
-
-                        $('.payment-method .payment-method-content .payzen-iframe').hide();
-                        $('.payment-method .payment-method-content .payzen-form').show();
-
-                        me.isPlaceOrderActionAllowed(true);
-                        me.iframeDisplayed = false;
-                    }
-                }, null, 'change');
-            },
-
             afterPlaceOrder: function() {
                 var me = this;
 
-                if (((me.getEntryMode() == 4) || (me.getEntryMode() == 5) || (me.getEntryMode() == 6) || (me.getEntryMode() == 7)) && me.getRestFormToken()) {
+                if (((me.getEntryMode() == 5) || (me.getEntryMode() == 6) || (me.getEntryMode() == 7)) && me.getRestFormToken()) {
                     // Embedded or popin mode.
                     $('#payzen_rest_form .kr-form-error').html('');
 
@@ -678,20 +632,6 @@ define(
                     })().catch(e => function() {
                         me.showErrorMessage();
                     });
-                } else if (me.getEntryMode() == 3) { // Iframe mode.
-                    // Iframe mode.
-                    fullScreenLoader.stopLoader();
-
-                    $('.payment-method._active .payment-method-content .payzen-form').hide();
-                    $('.payment-method._active .payment-method-content .payzen-iframe').show();
-
-                    var iframe = $('.payment-method._active .payment-method-content iframe.payzen-iframe');
-                    if (iframe && iframe.length) {
-                        var redirectUrl = this.getCheckoutRedirectUrl() + '?iframe=true';
-                        iframe.attr('src', redirectUrl);
-
-                        me.iframeDisplayed = true;
-                    }
                 } else {
                     me._super();
                 }

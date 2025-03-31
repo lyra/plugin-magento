@@ -30,8 +30,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const MODE_FORM = 1;
     const MODE_LOCAL_TYPE = 2;
-    const MODE_IFRAME = 3;
-    const MODE_EMBEDDED = 4;
     const MODE_SMARTFORM = 5;
     const MODE_SMARTFORM_EXT_WITH_LOGOS = 6;
     const MODE_SMARTFORM_EXT_WITHOUT_LOGOS = 7;
@@ -44,8 +42,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'prodfaq' => true,
         'restrictmulti' => false,
         'shatwo' => true,
-        'embedded' => true,
-        'smartform' => true,
         'support' => true,
 
         'multi' => true,
@@ -127,9 +123,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $checkoutSession;
 
     /**
-     * \Magento\Backend\Model\Session\Quote
+     * @var \Magento\Backend\Model\Session\Quote
      */
     protected $backendSession;
+
+    /**
+    * @var \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+    */
+    protected $orderRepository;
+
+    /**
+    * @var \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+    */
+    protected $searchCriteriaBuilder;
 
     /**
      * @param \Lyranetwork\Payzen\Helper\Context $context
@@ -147,6 +153,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Config\Model\Config\Structure $configStructure
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Backend\Model\Session\Quote $backendSession
+     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         \Lyranetwork\Payzen\Helper\Context $context,
@@ -163,7 +171,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
         \Magento\Config\Model\Config\Structure $configStructure,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Backend\Model\Session\Quote $backendSession
+        \Magento\Backend\Model\Session\Quote $backendSession,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         parent::__construct($context);
 
@@ -181,6 +191,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->configStructure = $configStructure;
         $this->checkoutSession = $checkoutSession;
         $this->backendSession = $backendSession;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -636,18 +648,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             case '2':
                 return 'MERCHANT';
 
-            case '3':
-                return 'IFRAME';
-
-            case '4':
-                return'REST';
-
             case '5':
-                return 'SMARTFROM';
+                return 'SMARTFORM';
 
             case '6':
                 return 'SMARTFORM_EXT_WITH_LOGOS';
 
+            case '4':
             case '7':
                 return 'MODE_SMARTFORM_EXT_WITHOUT_LOGOS';
 
@@ -710,5 +717,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $response;
+    }
+
+    public function getOrderByIncrementId($incrementId)
+    {
+        $searchCriteria = $this->searchCriteriaBuilder->addFilter('increment_id', $incrementId, 'eq')->create();
+
+        $orderList = $this->orderRepository->getList($searchCriteria)->getItems();
+        if (empty($orderList)) {
+            return null;
+        }
+
+        return reset($orderList);
+    }
+
+    public function getOrderById($orderId)
+    {
+        return $this->orderRepository->get($orderId);
     }
 }

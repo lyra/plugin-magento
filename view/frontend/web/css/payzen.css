@@ -1,11 +1,3 @@
-#payzen_iframe {
-    position: relative;
-    width: 100%;
-    min-height: 530px;
-    border: 0 none;
-    margin-bottom: -5px !important;
-}
-
 .payzen-standard-cc-block {
     display: none;
 }

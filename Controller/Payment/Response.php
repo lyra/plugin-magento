@@ -199,23 +199,11 @@ class Response extends \Magento\Framework\App\Action\Action
 
     private function createResult($path, $params)
     {
-        if ($this->getRequest()->getParam('iframe', false)) {
-            $result = $this->resultPageFactory->create();
-
-            $block = $result->getLayout()
-                ->createBlock(\Lyranetwork\Payzen\Block\Payment\Iframe\Response::class)
-                ->setTemplate('Lyranetwork_Payzen::payment/iframe/response.phtml')
-                ->setForwardPath($path, $params);
-
-            $this->getResponse()->setBody($block->toHtml());
-            return null;
-        } else {
-            /**
-             * @var \Magento\Framework\Controller\Result\Redirect $result
-             */
-            $result = $this->resultRedirectFactory->create();
-            $result->setPath($path, $params);
-            return $result;
-        }
+        /**
+         * @var \Magento\Framework\Controller\Result\Redirect $result
+         */
+        $result = $this->resultRedirectFactory->create();
+        $result->setPath($path, $params);
+        return $result;
     }
 }

@@ -27,29 +27,20 @@ class Validate extends \Magento\Backend\App\Action implements \Magento\Framework
     protected $resultPageFactory;
 
     /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
-     */
-    protected $orderRepository;
-
-    /**
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Lyranetwork\Payzen\Helper\Data $dataHelper
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         $this->dataHelper = $dataHelper;
         $this->coreRegistry = $coreRegistry;
         $this->resultPageFactory = $resultPageFactory;
-        $this->orderRepository = $orderRepository;
 
         parent::__construct($context);
     }
@@ -66,7 +57,7 @@ class Validate extends \Magento\Backend\App\Action implements \Magento\Framework
         try {
             // Retrieve order to validate.
             $id = $this->getRequest()->getParam('order_id');
-            $order = $this->orderRepository->get($id);
+            $order = $this->dataHelper->getOrderById($id);
             if (! $order->getId()) {
                 $this->messageManager->addErrorMessage(__('This order no longer exists.'));
                 $resultRedirect->setPath('sales/*/');

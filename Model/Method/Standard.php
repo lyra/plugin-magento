@@ -141,22 +141,6 @@ class Standard extends Payzen
             return;
         }
 
-        if ($this->isIframeMode()) {
-            // Iframe enabled.
-            $this->payzenRequest->set('action_mode', 'IFRAME');
-
-            // Hide logos below payment fields.
-            $this->payzenRequest->set('theme_config', $this->payzenRequest->get('theme_config') . '3DS_LOGOS=false;');
-
-            // Enable automatic redirection.
-            $this->payzenRequest->set('redirect_enabled', '1');
-            $this->payzenRequest->set('redirect_success_timeout', '0');
-            $this->payzenRequest->set('redirect_error_timeout', '0');
-
-            $returnUrl = $this->payzenRequest->get('url_return');
-            $this->payzenRequest->set('url_return', $returnUrl . '?iframe=true');
-        }
-
         if ($this->isOneClickActive() && $order->getCustomerId()) {
             // 1-Click enabled and customer logged-in.
             $customer = $this->customerRepository->getById($order->getCustomerId());
@@ -283,20 +267,6 @@ class Standard extends Payzen
     }
 
     /**
-     * Return true if iframe mode is enabled.
-     *
-     * @return bool
-     */
-    public function isIframeMode()
-    {
-        if ($this->dataHelper->isBackend()) {
-            return false;
-        }
-
-        return $this->getEntryMode() == Data::MODE_IFRAME;
-    }
-
-    /**
      * Check if the local card type selection option is choosen.
      *
      * @return bool
@@ -311,7 +281,7 @@ class Standard extends Payzen
     }
 
     /**
-     * Check if embedded or Smartform mode is choosen.
+     * Check if embedded mode is choosen.
      *
      * @return bool
      */
@@ -321,25 +291,9 @@ class Standard extends Payzen
             return false;
         }
 
-        $restModes = [Data::MODE_EMBEDDED, Data::MODE_SMARTFORM, Data::MODE_SMARTFORM_EXT_WITH_LOGOS, Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS];
+        $restModes = [Data::MODE_SMARTFORM, Data::MODE_SMARTFORM_EXT_WITH_LOGOS, Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS];
 
         return in_array($this->getEntryMode(), $restModes);
-    }
-
-    /**
-     * Check if Smartform mode is choosen.
-     *
-     * @return bool
-     */
-    public function isSmartform()
-    {
-        if ($this->dataHelper->isBackend()) {
-            return false;
-        }
-
-        $smartformModes = [Data::MODE_SMARTFORM, Data::MODE_SMARTFORM_EXT_WITH_LOGOS, Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS];
-
-        return in_array($this->getEntryMode(), $smartformModes);
     }
 
     /**
@@ -349,7 +303,9 @@ class Standard extends Payzen
      */
     public function getEntryMode()
     {
-        return $this->getConfigData('card_info_mode');
+        $entryMode = $this->getConfigData('card_info_mode');
+
+        return ($entryMode == 4) ? Data::MODE_SMARTFORM_EXT_WITHOUT_LOGOS : $entryMode;
     }
 
     /**
@@ -476,7 +432,7 @@ class Standard extends Payzen
             $data['formAction'] = 'CUSTOMER_WALLET';
         }
 
-        if ($this->isSmartform()) {
+        if ($this->isRestMode()) {
             // Filter payment means when creating payment token.
             $data['paymentMethods'] = $this->getPaymentMeansForSmartform($amount);
         }
@@ -581,7 +537,7 @@ class Standard extends Payzen
             $data['metadata']['is_customer_wallet'] = true;
         }
 
-        if ($this->isSmartform()) {
+        if ($this->isRestMode()) {
             // Filter payment means when creating the payment token.
             $data['paymentMethods'] = $this->getPaymentMeansForSmartform($amount);
         }
@@ -704,7 +660,7 @@ class Standard extends Payzen
             ];
         }
 
-        if ($this->isSmartform()) {
+        if ($this->isRestMode()) {
             // Filter payment means when creating the payment token.
             $data['paymentMethods'] = $this->getPaymentMeansForSmartform(null);
         }

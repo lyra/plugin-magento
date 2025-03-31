@@ -42,7 +42,6 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
     {
         $config = parent::getConfig();
 
-        $config['payment'][$this->method->getCode()]['iframeLoaderUrl'] = $this->getIframeLoaderUrl();
         $config['payment'][$this->method->getCode()]['oneClick'] = $this->method->isOneclickAvailable();
 
         $customer = $this->method->getCurrentCustomer();
@@ -82,20 +81,6 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
         $config['payment'][$this->method->getCode()]['display_title'] = $this->method->getDisplayTitle();
 
         return $config;
-    }
-
-    /**
-     * Iframe loader URL getter.
-     *
-     * @return string
-     */
-    private function getIframeLoaderUrl()
-    {
-        $params = [
-            '_secure' => true
-        ];
-
-        return $this->urlBuilder->getUrl('payzen/payment_iframe/loader', $params);
     }
 
     private function getRestFormToken()

@@ -15,11 +15,6 @@ use Magento\Framework\DataObject;
 class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
 {
     /**
-     * @var \Magento\Sales\Model\OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
      * @var \Lyranetwork\Payzen\Model\Api\Form\ResponseFactory
      */
     protected $payzenResponseFactory;
@@ -67,7 +62,6 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         $this->restHelper = $restHelper;
         $this->quoteManagement = $quoteManagement;
         $this->onepage = $onepage;
-        $this->orderFactory = $responseProcessor->getOrderFactory();
         $this->payzenResponseFactory = $responseProcessor->getPayzenResponseFactory();
 
         parent::__construct($context, $quoteRepository, $responseProcessor, $resultPageFactory, $paymentHelper);
@@ -121,14 +115,13 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
             ];
         }
 
-        $orderId = (int) $response->get('order_id');
+        $orderId = $response->get('order_id');
         if (! $orderId) {
             $this->dataHelper->log("Received empty Order ID.", \Psr\Log\LogLevel::ERROR);
             throw new ResponseException('Order ID is empty.');
         }
 
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($orderId);
+        $order = $this->dataHelper->getOrderByIncrementId($orderId);
 
         if (! $order->getId()) {
             $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);

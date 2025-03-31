@@ -26,11 +26,6 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
     protected $storeManager;
 
     /**
-     * @var \Magento\Sales\Model\OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
      * @var \Magento\Quote\Api\CartManagementInterface
      */
     protected $quoteManagement;
@@ -79,7 +74,6 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         $this->onepage = $onepage;
         $this->dataHelper = $checkProcessor->getDataHelper();
         $this->storeManager = $checkProcessor->getStoreManager();
-        $this->orderFactory = $checkProcessor->getOrderFactory();
         $this->payzenResponseFactory = $checkProcessor->getPayzenResponseFactory();
 
         parent::__construct($context, $checkProcessor, $rawResultFactory);
@@ -113,7 +107,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             ]
         );
 
-        $orderId = (int) $response->get('order_id');
+        $orderId = $response->get('order_id');
         if (! $orderId) {
             $this->dataHelper->log("Received empty Order ID.", \Psr\Log\LogLevel::ERROR);
 
@@ -127,8 +121,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             }
         }
 
-        $order = $this->orderFactory->create();
-        $order->loadByIncrementId($orderId);
+        $order = $this->dataHelper->getOrderByIncrementId($orderId);
 
         if (! $order->getId()) {
             // Backward compatibility with older versions.
@@ -155,7 +148,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
                 );
 
                 // Load newly created order.
-                $order->loadByIncrementId($quote->getReservedOrderId());
+                $order = $this->dataHelper->getOrderByIncrementId($quote->getReservedOrderId());
                 if (! $order->getId()) {
                     $this->dataHelper->log("Order cannot be created. Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
                     throw new ResponseException($response->getOutputForGateway('ko', 'Error when trying to create order.'));
