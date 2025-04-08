@@ -1,3 +1,6 @@
+2.11.1, 2025-04-08:
+- Bug fix: Fix error related to payment form token creation when order increment ID is empty.
+
 2.11.0, 2025-03-31:
 - Improve order retrieving process.
 - Bug fix: Fix order identifier type casting on REST payment IPN and return to shop processing.
