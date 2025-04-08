@@ -709,8 +709,13 @@ class Standard extends Payzen
 
     public function getTokenForOrder($order)
     {
-        if (! $order || ! $order->getId()) {
+        if (! $order) {
             $this->dataHelper->log('Cannot create a form token. Invalid order passed.');
+            return false;
+        }
+
+        if (! $order->getIncrementId() || ! $order->getId()) {
+            $this->dataHelper->log('Cannot create a form token. IncrementId or orderId is empty.');
             return false;
         }
 
