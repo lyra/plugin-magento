@@ -122,6 +122,10 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         }
 
         $order = $this->dataHelper->getOrderByIncrementId($orderId);
+        if (! $order) {
+            $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
+            throw new ResponseException("Order not found with ID #{$orderId}.");
+        }
 
         if (! $order->getId()) {
             // Backward compatibility with older versions.

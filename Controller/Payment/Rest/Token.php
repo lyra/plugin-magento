@@ -48,6 +48,7 @@ class Token extends \Magento\Framework\App\Action\Action
     const SET_TOKEN = 'set_token';
     const RESTORE_CART = 'restore_cart';
     const GET_TOKEN_AMOUNT_IN_CENTS = 'get_token_amount_in_cents';
+    const LOG_SRC = 'log_src';
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
@@ -161,6 +162,12 @@ class Token extends \Magento\Framework\App\Action\Action
                 }
 
                 break;
+
+            case self::LOG_SRC:
+                $src = $this->getRequest()->getParam('payzen_src');
+                $this->dataHelper->log("PlaceOrderClick() function has been called from source [{$src}].");
+
+                return;
 
             default;
                $token = null;

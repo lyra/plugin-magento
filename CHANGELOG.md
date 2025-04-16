@@ -1,3 +1,7 @@
+2.11.2, 2025-04-16:
+- Bug fix: Fix error related to payment processing when order not created.
+- Bug fix: Fix error related to REST API keys validation in case of multistore.
+
 2.11.1, 2025-04-08:
 - Bug fix: Fix error related to payment form token creation when order increment ID is empty.
 
