@@ -366,19 +366,49 @@ define(
                             });
 
                             KR.onFormReady(() => {
-                                me.hideSmartformPopinButton();
+                                me.hideSmartformButton();
+
+                                KR.smartForm.onClick((data) => {
+                                    if (data.action === "methodSelected") {
+                                        return true;
+                                    }
+
+                                    if (PLACE_ORDER === true) {
+                                        me.placeOrderClick("Smartform Native Button");
+
+                                        return false;
+                                    } else if (PLACE_ORDER === false) {
+                                        let src = "Smartform Native Button | PLACE_ORDER false";
+
+                                        storage.post(
+                                            url.build('payzen/payment_rest/token?payzen_action=log_src&form_key=' + $.mage.cookies.get('form_key') + '&payzen_src=' + src)
+                                        );
+
+                                        return true;
+                                    }
+
+                                    let src = "Smartform Native Button | PLACE_ORDER undefined or null";
+                                    storage.post(
+                                        url.build('payzen/payment_rest/token?payzen_action=log_src&form_key=' + $.mage.cookies.get('form_key') + '&payzen_src=' + src)
+                                    );
+
+                                    return false;
+                                });
                             });
                         }
                     )
                 });
             },
 
-            placeOrderClick: function() {
+            placeOrderClick: function(src) {
                 var me = this;
+                storage.post(
+                    url.build('payzen/payment_rest/token?payzen_action=log_src&form_key=' + $.mage.cookies.get('form_key') + '&payzen_src=' + src)
+                );
 
-                if (PLACE_ORDER) {
+                if (PLACE_ORDER === true) {
                     me.placeOrder();
-                } else {
+                } else if (PLACE_ORDER === false) {
                     if (SHOW_ERROR) {
                         SHOW_ERROR = false;
                         return;
@@ -454,7 +484,7 @@ define(
                                 CAN_REFRESH_TOKEN = true;
 
                                 KR.onFormReady(() => {
-                                    me.hideSmartformPopinButton();
+                                    me.hideSmartformButton();
                                 });
                             }
                         );
@@ -496,7 +526,7 @@ define(
                                     });
 
                                     KR.onFormReady(() => {
-                                        me.hideSmartformPopinButton();
+                                        me.hideSmartformButton();
                                     });
 
                                     KR.onError(function(e) {
@@ -637,7 +667,7 @@ define(
                 }
             },
 
-            hideSmartformPopinButton: function() {
+            hideSmartformButton: function() {
                 var me = this;
 
                 if (me.getRestPopinMode() === "1") {
@@ -645,6 +675,11 @@ define(
                     if (element.length > 0) {
                         element.hide();
                     }
+                }
+
+                var element = $(".kr-smart-form-single-payment-button");
+                if (element && element.length > 0) {
+                    element.hide();
                 }
             }
         });
