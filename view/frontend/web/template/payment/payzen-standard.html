@@ -107,7 +107,7 @@
                 <div class="primary">
                     <button class="action primary checkout"
                             type="submit"
-                            data-bind="click: placeOrderClick,
+                            data-bind="click: placeOrderClick.bind($data,'Magento Submit Button'),
                                        attr: {title: $t('Pay with PayZen')},
                                        css: {disabled: !isPlaceOrderActionAllowed()},
                                        enable: (getCode() == isChecked())"

@@ -78,14 +78,37 @@ class CardInfoMode extends \Magento\Framework\App\Config\Value
             // Get data of general config group.
             $generalData = $this->getGroups('payzen')['groups']['payzen_general']['groups'];
 
-            $ctxMode = $generalData['payzen_platform_access']['fields']['ctx_mode']['value'];
+            if (isset($generalData['payzen_platform_access']['fields']['ctx_mode']['inherit']) && $generalData['payzen_platform_access']['fields']['ctx_mode']['inherit'] == "1"
+                && ! isset($generalData['payzen_platform_access']['fields']['ctx_mode']['value'])) {
+                $ctxMode = $this->dataHelper->getCommonConfigData('ctx_mode');
+            } else {
+                $ctxMode = isset($generalData['payzen_platform_access']['fields']['ctx_mode']['value']) ? $generalData['payzen_platform_access']['fields']['ctx_mode']['value'] : 'TEST';
+            }
+
             $key = ($ctxMode === 'PRODUCTION') ? 'prod' : 'test';
 
             $restKeys = $generalData['payzen_rest_api_keys']['fields'];
 
-            $privateKey = isset($restKeys['rest_private_key_' . $key]['value']) ? $restKeys['rest_private_key_' . $key]['value'] : '';
-            $publicKey = isset($restKeys['rest_public_key_' . $key]['value']) ? $restKeys['rest_public_key_' . $key]['value'] : '';
-            $returnKey = isset($restKeys['rest_return_key_' . $key]['value']) ? $restKeys['rest_return_key_' . $key]['value'] : '';
+            if (isset($restKeys['rest_private_key_' . $key]['inherit']) && $restKeys['rest_private_key_' . $key]['inherit'] == "1"
+                && ! isset($restKeys['rest_private_key_' . $key]['value'])) {
+                $privateKey = $this->dataHelper->getCommonConfigData('rest_private_key_' . $key);
+            } else {
+                $privateKey = isset($restKeys['rest_private_key_' . $key]['value']) ? $restKeys['rest_private_key_' . $key]['value'] : '';
+            }
+
+            if (isset($restKeys['rest_public_key_' . $key]['inherit']) && $restKeys['rest_public_key_' . $key]['inherit'] == "1"
+                && ! isset($restKeys['rest_public_key_' . $key]['value'])) {
+                $publicKey = $this->dataHelper->getCommonConfigData('rest_public_key_' . $key);
+            } else {
+                $publicKey = isset($restKeys['rest_public_key_' . $key]['value']) ? $restKeys['rest_public_key_' . $key]['value'] : '';
+            }
+
+            if (isset($restKeys['rest_return_key_' . $key]['inherit']) && $restKeys['rest_return_key_' . $key]['inherit'] == "1"
+                && ! isset($restKeys['rest_return_key_' . $key]['value'])) {
+                $returnKey = $this->dataHelper->getCommonConfigData('rest_return_key_' . $key);
+            } else {
+                $returnKey = isset($restKeys['rest_return_key_' . $key]['value']) ? $restKeys['rest_return_key_' . $key]['value'] : '';
+            }
 
             if (! $privateKey) {
                 // Client has not configured private key in module backend.

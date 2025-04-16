@@ -13,6 +13,8 @@ use Lyranetwork\Payzen\Helper\Data;
 
 class PublicKey extends \Magento\Framework\App\Config\Value
 {
+    const PAYZEN_SITE_ID_REGEX = '#[0-9]{8}#ui';
+
     /**
      * @var \Lyranetwork\Payzen\Helper\Data
      */
@@ -57,7 +59,8 @@ class PublicKey extends \Magento\Framework\App\Config\Value
 
         if (! empty($value)) {
             $valueArray = explode(":", $value);
-            if (! isset($valueArray[1]) || ($valueArray[0] !== $this->dataHelper->getCommonConfigData('site_id'))) {
+
+            if (! preg_match(self::PAYZEN_SITE_ID_REGEX, $valueArray[0]) || ! isset($valueArray[1])) {
                 $config = $this->getFieldConfig();
 
                 $field = __($config['label'])->render();
