@@ -213,7 +213,7 @@ class Payment
             ->addStatusHistoryComment($response->get('error_message') ?: $response->getMessage());
 
         // Save gateway responses.
-        $this->updatePaymentInfo($order, $response);
+        $this->updatePaymentInfo($order, $response, true);
 
         // Try to save gateway identifier if any.
         $method = $order->getPayment()->getMethodInstance();
@@ -230,11 +230,53 @@ class Payment
         $order->save();
         $this->dataHelper->log("Confirmed order #{$order->getIncrementId()} has been saved.");
 
+        $this->updateTotalPaidAmount($order, $response, true);
+
         if ($order->getSendEmail() === null /* not set */ || $order->getSendEmail() /* set to true */) {
             $this->dataHelper->log("Sending e-mail for order #{$order->getIncrementId()}.");
             $this->orderSender->send($order);
             $this->dataHelper->log("E-mail for order #{$order->getIncrementId()} has been sent.");
         }
+    }
+
+    /**
+    * @param Magento\Sales\Model\Order $order
+    * @param \Lyranetwork\Payzen\Model\Api\Form\Response $response
+    * @param boolean $registerOrder
+    */
+    public function updateTotalPaidAmount(\Magento\Sales\Model\Order $order, \Lyranetwork\Payzen\Model\Api\Form\Response $response, $registerOrder = false) {
+       $multi = ($response->get('payment_config') != null) ? (strpos($response->get('payment_config'), 'MULTI') !== false) : false;
+       $isMultiRecurrence = $response->get('occurrence_type') && in_array($response->get('occurrence_type'), ['RECURRENT_INITIAL', 'RECURRENT_INTERMEDIAIRE', 'RECURRENT_FINAL']);
+
+       if (! $multi && ! $isMultiRecurrence) {
+           return;
+       }
+
+       if ($registerOrder && ! $response->isToValidatePayment()) {
+           $currency = PayzenApi::findCurrencyByNumCode($response->get('currency'));
+           $totalPaid = round($currency->convertAmountToFloat($response->get('effective_amount')), $currency->getDecimals());
+       } else {
+           $orderTransactions = $this->dataHelper->getTransactionsList($this->convertTransactionType($response->getTransStatus()), $order->getId());
+           if (count($orderTransactions) == 0) {
+               return;
+           }
+
+           $totalPaid = 0;
+           foreach ($orderTransactions as $txn) {
+               $additionalInfo = $txn->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+               $transStatus = $additionalInfo['Transaction Status'];
+
+               if (! $transStatus || in_array($transStatus, PayzenApi::getPendingStatuses(), true)) {
+                   continue;
+               }
+
+               $amountDetail = explode(" ", $additionalInfo['Amount'])[0];
+               $totalPaid += (float) $amountDetail;
+           }
+       }
+
+       $order->setTotalPaid($totalPaid);
+       $order->save();
     }
 
     /**
@@ -290,7 +332,7 @@ class Payment
         return $stateObject;
     }
 
-    public function updatePaymentInfo(\Magento\Sales\Model\Order $order, \Lyranetwork\Payzen\Model\Api\Form\Response $response)
+    public function updatePaymentInfo(\Magento\Sales\Model\Order $order, \Lyranetwork\Payzen\Model\Api\Form\Response $response, $registerOrder = false)
     {
         $this->dataHelper->log("Updating payment information for order #{$order->getIncrementId()}.");
 
@@ -445,8 +487,8 @@ class Payment
             $option = @unserialize($order->getPayment()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::MULTI_OPTION));
 
             // Check if it's the first installment.
-            $isFirstInstallment = ((int)$response->get('sequence_number') === 1)
-                || (strpos($response->get('payment_config'), 'MULTI') !== false);
+            $multi = ($response->get('payment_config') != null) ? (strpos($response->get('payment_config'), 'MULTI') !== false) : false;
+            $isFirstInstallment = $registerOrder && $multi;
 
             if ($isFirstInstallment && (stripos($order->getPayment()->getMethod(), 'payzen_multi') === 0)
                 && is_array($option) && ! empty($option)) {
@@ -503,8 +545,11 @@ class Payment
                         'Amount' => $amountDetail,
                         'Presentation Date' => $this->timezone->formatDateTime(
                             $date,
-                            \IntlDateFormatter::MEDIUM,
-                            \IntlDateFormatter::NONE
+                            \IntlDateFormatter::SHORT,
+                            \IntlDateFormatter::SHORT,
+                            null,
+                            null,
+                            ('MM/dd/yyyy')
                         ),
                         'Transaction ID' => $transactionId,
                         'Transaction UUID' => ($i === 1) ? $response->get('trans_uuid') : '',
@@ -522,6 +567,10 @@ class Payment
             } else {
                 // Save transaction details to sales_payment_transaction.
                 $transactionId = $response->get('trans_id') . '-' . $response->get('sequence_number');
+
+                if ($response->get('effective_currency') && ($response->get('effective_currency') == $response->get('currency'))) {
+                    $totalAmount = $response->get('effective_amount'); // Use effective_amount to get recurrence amount.
+                }
 
                 $floatAmount = round($currency->convertAmountToFloat($totalAmount), $currency->getDecimals());
                 $amountDetail = $floatAmount . ' ' . $currency->getAlpha3();
@@ -546,8 +595,11 @@ class Payment
                     'Amount' => $amountDetail,
                     'Presentation Date' => $this->timezone->formatDateTime(
                         $date,
-                        \IntlDateFormatter::MEDIUM,
-                        \IntlDateFormatter::NONE
+                        \IntlDateFormatter::SHORT,
+                        \IntlDateFormatter::SHORT,
+                        null,
+                        null,
+                        ('MM/dd/yyyy')
                     ),
                     'Transaction ID' => $transactionId,
                     'Transaction UUID' => $response->get('trans_uuid'),

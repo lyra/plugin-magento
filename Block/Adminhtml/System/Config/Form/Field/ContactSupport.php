@@ -67,7 +67,7 @@ class ContactSupport extends \Magento\Config\Block\System\Config\Form\Field
         $modulesList = $this->fullModuleList->getNames();
         foreach ($modulesList as $id => $module) {
             // Do not include Magento default modules.
-            if (strpos($module, 'Magento_') === 0) {
+            if (($module != null) && strpos($module, 'Magento_') === 0) {
                 unset($modulesList[$id]);
             }
         }

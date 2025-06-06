@@ -50,7 +50,7 @@ class SessionChecker
 
         if ($this->request->getFrontName() === 'payzen') {
             foreach (self::PAYMENT_RETURN_PATHS as $path) {
-                if (strpos((string)$this->request->getPathInfo(), $path) !== false) {
+                if (($this->request->getPathInfo() != null) && (strpos((string) $this->request->getPathInfo(), $path) !== false)) {
                     return false;
                 }
             }

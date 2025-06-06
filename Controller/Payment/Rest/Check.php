@@ -94,6 +94,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         }
 
         // Wrap payment result to use traditional order creation tunnel.
+        $answer['kr-src'] = $params['kr-src'] ? $params['kr-src'] : '';
         $data = $this->restHelper->convertRestResult($answer);
 
         // Convert REST result to standard form response.
@@ -172,7 +173,8 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
         }
 
         // Case of failure or expiration when retries are enabled and Update Order option not is not enabled, do nothing before last attempt.
-        if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED') && ! $response->getExtInfo('update_order')) {
+        if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED')
+            && ! $response->getExtInfo('update_order') && ($response->get('url_check_src') !== 'MERCH_BO')) {
             $this->dataHelper->log("Payment is not accepted but buyer can try to re-order. Do not process order at this time.
                 Order ID: #{$orderId}.");
             throw new ResponseException($response->getOutputForGateway('payment_ko_bis'));
