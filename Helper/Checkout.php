@@ -339,7 +339,8 @@ class Checkout
 
             // Get carrier name.
             $carriers = $this->shippingConfig->getAllCarriers($order->getStore()->getId());
-            $carrierCode = substr($shippingMethod['code'], 0, strpos($shippingMethod['code'], '_'));
+            $shippingCode = ($shippingMethod['code'] != null) ? strpos($shippingMethod['code'], '_') : '';
+            $carrierCode = substr($shippingMethod['code'], 0, $shippingCode);
             $carrierName = $carriers[$carrierCode]->getConfigData('title');
 
             // Delivery point name.
@@ -354,8 +355,8 @@ class Checkout
                         $name = str_replace($carrierName . ' - ', '', $name ? $name : '');
                     }
 
-                    if (strpos($name, '<')) {
-                        $name = substr($name, 0, strpos($name, '<')); // Remove HTML elements.
+                    if (($name != null) && ($pos = strpos($name, '<'))) {
+                        $name = substr($name, 0, $pos); // Remove HTML elements.
                     }
 
                     // Modify address to send it to Oney server.

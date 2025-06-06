@@ -51,7 +51,7 @@ class NotifyUrl extends Label
             ->getUrl($element->getValue(), $params);
         $element->setValue($notifyUrl);
 
-        if (strpos($element->getComment(), '<img') === false) {
+        if (($element->getComment() != null) && (strpos($element->getComment(), '<img') === false)) {
             $warnImg = $this->getViewFileUrl('Lyranetwork_Payzen::images/warn.png');
             $comment = '<img src="' . $warnImg . '" style="vertical-align: middle; padding-right: 5px; height: 30px;"/>';
             $comment .= '<span style="color: red; font-weight: bold; display: inline-block; width: 88%; vertical-align: middle;">'

@@ -47,6 +47,10 @@ class Rest
 
         $response = [];
 
+        $response['vads_url_check_src'] = $this->getProperty($answer, 'kr-src');
+        $response['vads_order_cycle'] = $this->getProperty($answer, 'orderCycle');
+        $response['vads_order_status'] = $this->getProperty($answer, 'orderStatus');
+
         $response['vads_result'] = $this->getProperty($transaction, 'errorCode') ? $this->getProperty($transaction, 'errorCode') : '00';
         $response['vads_extra_result'] = $this->getProperty($transaction, 'detailedErrorCode');
 

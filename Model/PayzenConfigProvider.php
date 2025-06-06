@@ -166,7 +166,7 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
     protected function renderMaskedPan($maskedPan)
     {
         // Recover card brand if saved with masked pan and check if logo exists.
-        if (strpos($maskedPan, '|') !== false) {
+        if (($maskedPan != null) && (strpos($maskedPan, '|') !== false)) {
             $cardBrand = substr($maskedPan, 0, strpos($maskedPan, '|'));
 
             $logoSrc = $this->getCcTypeImageSrc($cardBrand);
@@ -181,6 +181,6 @@ class PayzenConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
                 '</span>' : str_replace('|',' ', $maskedPan);
         }
 
-        return $maskedPan;
+        return $maskedPan ? $maskedPan : '';
     }
 }

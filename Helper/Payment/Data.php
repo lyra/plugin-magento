@@ -94,7 +94,7 @@ class Data extends \Magento\Payment\Helper\Data
 
     public function getMethodInstance($code)
     {
-        if (strpos($code, 'payzen_other_') === 0) {
+        if (($code != null) && (strpos($code, 'payzen_other_') === 0)) {
             return parent::getMethodInstance('payzen_other');
         }
 

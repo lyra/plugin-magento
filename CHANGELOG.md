@@ -1,3 +1,9 @@
+2.11.3, 2025-06-06:
+- [multi] Bug fix: Fix management of IPN on payment in installments.
+- Bug fix: Ignore IPN on cancelling expired waiting for payment transactions.
+- Bug fix: Fix error related to refund of split payment processing.
+- Bug fix: Fix error related to refund already canceled or refunded transactions.
+
 2.11.2, 2025-04-16:
 - Bug fix: Fix error related to payment processing when order not created.
 - Bug fix: Fix error related to REST API keys validation in case of multistore.

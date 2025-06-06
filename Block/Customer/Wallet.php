@@ -80,11 +80,11 @@ class Wallet extends \Magento\Vault\Block\Customer\CreditCards
             $card['pm'] = $maskedId;
 
             $maskedPan = $customer->getCustomAttribute($maskedId)->getValue();
-            if ($pos = strpos($maskedPan, '|')) {
+            if (($maskedPan != null) && ($pos = strpos($maskedPan, '|'))) {
                 $card['brand'] = substr($maskedPan, 0, $pos);
                 $number = substr($maskedPan, $pos + 1);
 
-                if ($pos = strpos($number, '-')) {
+                if (($number != null) && ($pos = strpos($number, '-'))) {
                     $card['expiry'] = substr($number, $pos + 2);
                     $number = substr($number, 0, $pos);
                 }

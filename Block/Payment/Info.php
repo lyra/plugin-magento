@@ -143,9 +143,9 @@ class Info extends \Magento\Payment\Block\Info
         foreach ($collection as $item) {
             $html .= '<hr />';
 
-            $sequenceNumber = substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1);
+            $sequenceNumber = ($item->getTxnId() != null) ? substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1) : "";
 
-            $html .= '<b>' . __('Sequence Number') . ': </b>' . $sequenceNumber;
+            $html .= $sequenceNumber ? '<b>' . __('Sequence Number') . ': </b>' . $sequenceNumber : '';
 
             $info = $item->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
             foreach ($info as $key => $value) {
@@ -160,7 +160,7 @@ class Info extends \Magento\Payment\Block\Info
                 $html .= '<br />';
                 $html .= '<b>' . __($key) . ': </b>' . $value;
 
-                if ($backend && ($key === 'Means of payment') && isset($userChoice[$sequenceNumber])) {
+                if ($backend && ($key === 'Means of payment') && $sequenceNumber && isset($userChoice[$sequenceNumber])) {
                     if ($userChoice[$sequenceNumber] === true) {
                         $html .= ' ' . __('(card brand chosen by buyer)');
                     } elseif ($userChoice[$sequenceNumber] === false) {
