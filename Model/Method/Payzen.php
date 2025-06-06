@@ -1256,13 +1256,18 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
     public function getOrderAddressAttribute($order, $field, $cpf = false, $billing = true)
     {
-        $fieldCode = substr_replace($field, "", strpos($field, 'address_'), strlen('address_'));
+        $address = "";
+        if ($field != null) {
+            $address = strpos($field, 'address_');
+        }
+
+        $fieldCode = substr_replace($field, "", $address, strlen('address_'));
         if ($billing === true) {
-            if ($order->getBillingAddress()->getData($fieldCode)) {
+            if ($fieldCode && $order->getBillingAddress()->getData($fieldCode)) {
                 return ($cpf === true) ? $this->dataHelper->formatCpfCpnj($order->getBillingAddress()->getData($fieldCode)) : $order->getBillingAddress()->getData($fieldCode);
             }
         } else {
-            if ($order->getShippingAddress()->getData($fieldCode)) {
+            if ($fieldCode && $order->getShippingAddress()->getData($fieldCode)) {
                 return ($cpf === true) ? $this->dataHelper->formatCpfCpnj($order->getShippingAddress()->getData($fieldCode)) : $order->getShippingAddress()->getData($fieldCode);
             }
         }

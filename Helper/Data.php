@@ -13,6 +13,7 @@ use Lyranetwork\Payzen\Model\Api\Form\Api as PayzenApi;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Sales\Api\Data\TransactionInterface;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -42,7 +43,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'prodfaq' => true,
         'restrictmulti' => false,
         'shatwo' => true,
-        'support' => true,
+        'support' => false,
 
         'multi' => true,
         'gift' => true,
@@ -138,6 +139,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $searchCriteriaBuilder;
 
     /**
+    * @var Magento\Sales\Model\Order\Payment\Transaction\Repository
+    */
+    protected $transactionRepository;
+
+    /**
      * @param \Lyranetwork\Payzen\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\App\MaintenanceMode $maintenanceMode
@@ -155,6 +161,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Backend\Model\Session\Quote $backendSession
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository
      */
     public function __construct(
         \Lyranetwork\Payzen\Helper\Context $context,
@@ -173,7 +180,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Backend\Model\Session\Quote $backendSession,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository
     ) {
         parent::__construct($context);
 
@@ -193,6 +201,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->backendSession = $backendSession;
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->transactionRepository = $transactionRepository;
     }
 
     /**
@@ -734,5 +743,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getOrderById($orderId)
     {
         return $this->orderRepository->get($orderId);
+    }
+
+    public function getTransactionsList($transactionType, $orderId)
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+                             ->addFilter(TransactionInterface::ORDER_ID, $orderId, 'eq')
+                             ->addFilter(TransactionInterface::TXN_TYPE, $transactionType, 'eq')
+                             ->create();
+
+        return $this->transactionRepository->getList($searchCriteria)->getItems();
     }
 }

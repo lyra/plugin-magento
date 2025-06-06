@@ -370,37 +370,47 @@ class Api
     }
 
     /**
-     * Format a given list of e-mails separated by commas and render them as HTML links.
-     * @param string $emails
+     * Format a given list of e-mails / URLs separated by commas and render them as HTML links.
+     * @param string $links
      * @return string
      */
-    public static function formatSupportEmails($emails)
+    public static function formatSupportEmails($links, $label = "Click here")
     {
         $formatted = '';
 
-        $parts = explode(', ', $emails);
+        $parts = explode(', ', $links);
         foreach ($parts as $part) {
-            $elts = explode(':', $part);
-            if (count($elts) === 2) {
-                $label = trim($elts[0]) . ': ';
-                $email = $elts[1];
-            } elseif (count($elts) === 1) {
-                $label = '';
-                $email = $elts[0];
+            if (strpos($part, '@')) {
+                $elts = explode(':', $part);
+                if (count($elts) === 2) {
+                    $label = trim($elts[0]) . ': ';
+                    $email = $elts[1];
+                } elseif (count($elts) === 1) {
+                    $label = '';
+                    $email = $elts[0];
+                } else {
+                    throw new \InvalidArgumentException("Invalid support e-mails string passed: {$links}.");
+                }
+
+                $email = trim($email);
+
+                if (! empty($formatted)) {
+                    $formatted .= '<br />';
+                }
+
+                $formatted .= $label . '<a href="mailto:' . $email . '">' . $email . '</a>';
             } else {
-                throw new \InvalidArgumentException("Invalid support e-mails string passed: {$emails}.");
+                $link = trim($part);
+                $formatted .= '<a href="'. $link.'" target="_blank" rel="noopener noreferrer">' . $label . '</a>';
             }
-
-            $email = trim($email);
-
-            if (! empty($formatted)) {
-                $formatted .= '<br />';
-            }
-
-            $formatted .= $label . '<a href="mailto:' . $email . '">' . $email . '</a>';
         }
 
         return $formatted;
+    }
+
+    public static function getSupportComponentEmail()
+    {
+        return '###COMPONENT_EMAIL###';
     }
 
     /**

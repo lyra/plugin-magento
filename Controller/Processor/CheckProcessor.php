@@ -130,7 +130,9 @@ class CheckProcessor
                 return 'payment_ko';
             }
         } else {
-            if ($response->getTransStatus() === 'ABANDONED') {
+            if (($response->getTransStatus() === 'ABANDONED') ||
+                (($response->getTransStatus() === 'CANCELLED')
+                    && ((($response->get('order_status') === 'UNPAID') && ($response->get('order_cycle') === 'CLOSED')) || ($response->get('url_check_src') !== 'MERCH_BO')))) {
                 $this->dataHelper->log("Abandoned payment IPN ignored for already processed order #{$order->getIncrementId()}.");
 
                 die('<span style="display:none">KO-Payment abandoned.' . "\n" . '</span>');
@@ -233,6 +235,8 @@ class CheckProcessor
                 $this->dataHelper->log("Saving confirmed order #{$order->getIncrementId()}.");
                 $order->save();
                 $this->dataHelper->log("Confirmed order #{$order->getIncrementId()} has been saved.");
+
+                $this->paymentHelper->updateTotalPaidAmount($order, $response);
 
                 return 'payment_ok_already_done';
             } elseif ($order->isCanceled() && ! $response->isAcceptedPayment()) {
