@@ -1,3 +1,7 @@
+2.11.4, 2025-08-04:
+- [oney] Bug fix: Fix error related to Oney payment when customer checkout as guest.
+- Some code fixes.
+
 2.11.3, 2025-06-06:
 - [multi] Bug fix: Fix management of IPN on payment in installments.
 - Bug fix: Ignore IPN on cancelling expired waiting for payment transactions.

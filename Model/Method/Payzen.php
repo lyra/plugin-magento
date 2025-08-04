@@ -291,8 +291,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
 
         $this->payzenRequest->set('threeds_mpi', $threedsMpi);
 
-        $this->payzenRequest->set('cust_email', $order->getCustomerEmail());
-        $this->payzenRequest->set('cust_id', $order->getCustomerId());
+        $this->payzenRequest->set('cust_email', $order->getCustomerEmail() != null ? $order->getCustomerEmail() : '');
+        $this->payzenRequest->set('cust_id', $order->getCustomerId() !== null ? $order->getCustomerId() : '');
         $this->payzenRequest->set('cust_title', $order->getBillingAddress()->getPrefix() ?
             $order->getBillingAddress()->getPrefix() : null);
         $this->payzenRequest->set('cust_first_name', $order->getBillingAddress()->getFirstname());
