@@ -20,6 +20,10 @@ class Checkout
 
     const PRODUCT_REF_REGEX = '#^[a-zA-Z0-9]{1,64}$#';
 
+    const NOT_ALLOWED_CHARS_REGEX = '#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ -]#ui';
+
+    const ONEY_MEANS = ['ONEY_3X_4X', 'ONEY_10X_12X', 'ONEY_PAYLATER'];
+
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
@@ -254,33 +258,7 @@ class Checkout
         foreach ($order->getAllItems() as $item) {
             // Check to avoid sending the whole hierarchy of a configurable product.
             if (! $item->getParentItem()) {
-                $product = $item->getProduct();
-
-                $label = $item->getName();
-
-                // Concat product label with one or two of its category names to make it clearer.
-                $categoryIds = $product->getCategoryIds();
-                if (is_array($categoryIds) && ! empty($categoryIds)) {
-                    try {
-                        if (isset($categoryIds[1]) && $categoryIds[1]) {
-                            $category = $this->categoryRepository->get($categoryIds[1]);
-                            $label = $category->getName() . ' I ' . $label;
-                        }
-
-                        if ($categoryIds[0]) {
-                            $category = $this->categoryRepository->get($categoryIds[0]);
-                            $label = $category->getName() . ' I ' . $label;
-                        }
-                    } catch (NoSuchEntityException $e) {
-                        $this->dataHelper->log(
-                            "Exception while retrieving product category with code {$e->getCode()}: {$e->getMessage()}",
-                            \Psr\Log\LogLevel::WARNING
-                        );
-                    }
-                }
-
-                $priceInCents = $isDisplayCurrency ? $currency->convertAmountToInteger($item->getPrice()) : $currency->convertAmountToInteger($item->getBasePrice());
-                $qty = (int) $item->getQtyOrdered();
+                list($label, $categoryIds, $priceInCents, $qty) = $this->getItemDetails($item, $isDisplayCurrency, $currency);
 
                 $payzenRequest->addProduct(
                     preg_replace($notAllowed, ' ', $label),
@@ -311,6 +289,53 @@ class Checkout
         $payzenRequest->set('totalamount_vat', $taxAmount);
     }
 
+    public function setCartDataRest($order, &$restData)
+    {
+        $notAllowed = '#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ ]#ui';
+
+        // Used currency.
+        $currency = PayzenApi::findCurrencyByAlphaCode($restData['currency']);
+        $isDisplayCurrency = $this->dataHelper->getCommonConfigData('online_transactions_currency') == '1';
+
+        $subtotal = 0;
+
+        // Load all products in the shopping cart.
+        foreach ($order->getAllItems() as $item) {
+            // Check to avoid sending the whole hierarchy of a configurable product.
+            if (! $item->getParentItem()) {
+                list($label, $categoryIds, $priceInCents, $qty) = $this->getItemDetails($item, $isDisplayCurrency, $currency);
+
+                $productData = array(
+                    'productLabel' => preg_replace($notAllowed, ' ', $label),
+                    'productRef' => $item->getProductId(),
+                    'productQty' => $qty,
+                    'productAmount' => $priceInCents,
+                    'productType' =>  $this->toPayzenCategory($categoryIds)
+                );
+
+                $restData['customer']['shoppingCart']['cartItemInfo'][] = $productData;
+
+                $subtotal += $priceInCents * $qty;
+            }
+        }
+
+        $restData['customer']['shoppingCart']['insurance_amount'] = 0; // By default, shipping insurance amount is not available in Magento.
+        $shippingAmount = $isDisplayCurrency ? $order->getShippingAmount() : $order->getBaseShippingAmount();
+        $restData['customer']['shoppingCart']['shipping_amount'] = $currency->convertAmountToInteger($shippingAmount);
+
+        // Recalculate tax_amount to avoid rounding problems.
+        $taxAmount = $restData['amount'] - $subtotal - $restData['customer']['shoppingCart']['shipping_amount'] -
+            $restData['customer']['shoppingCart']['insurance_amount'];
+        if ($taxAmount <= 0) { // When order is discounted.
+            $taxAmount = $isDisplayCurrency ? $currency->convertAmountToInteger($order->getTaxAmount()) : $currency->convertAmountToInteger($order->getBaseTaxAmount());
+        }
+
+        $restData['customer']['shoppingCart']['tax_amount'] = $taxAmount;
+
+        // VAT amount for colombian payment means.
+        $restData['taxAmount'] = $taxAmount;
+    }
+
     public function setAdditionalShippingData($order, &$payzenRequest)
     {
         // By default, Magento customers are private.
@@ -318,10 +343,7 @@ class Checkout
         $payzenRequest->set('ship_to_status', 'PRIVATE');
 
         // If this is Oney.
-        $oneyMeans = ['ONEY_3X_4X', 'ONEY_10X_12X', 'ONEY_PAYLATER'];
-        $useOney = in_array($payzenRequest->get('payment_cards'), $oneyMeans);
-
-        $notAllowedCharsRegex = '#[^A-Z0-9ÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ -]#ui';
+        $useOney = in_array($payzenRequest->get('payment_cards'), self::ONEY_MEANS);
 
         if ($order->getIsVirtual() || ! $order->getShippingMethod()) { // There is no shipping method.
             $payzenRequest->set('ship_to_type', 'ETICKET');
@@ -349,19 +371,7 @@ class Checkout
                 case 'RELAY_POINT':
                 case 'RECLAIM_IN_STATION':
                 case 'RECLAIM_IN_SHOP':
-                    $name = $order->getShippingDescription();
-
-                    if ($carrierName) {
-                        $name = str_replace($carrierName . ' - ', '', $name ? $name : '');
-                    }
-
-                    if (($name != null) && ($pos = strpos($name, '<'))) {
-                        $name = substr($name, 0, $pos); // Remove HTML elements.
-                    }
-
-                    // Modify address to send it to Oney server.
-                    $address = $order->getShippingAddress()->getStreetLine(1);
-                    $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' . $order->getShippingAddress()->getStreetLine(2) : '';
+                    list($name, $address) = $this->getShippingAddress($order, $carrierName);
 
                     $payzenRequest->set('ship_to_street', $address);
                     $payzenRequest->set('ship_to_street2', $name);
@@ -376,7 +386,7 @@ class Checkout
                     $name .= ' ' . $order->getShippingAddress()->getCity();
 
                     // Delete not allowed chars.
-                    $payzenRequest->set('ship_to_delivery_company_name', preg_replace($notAllowedCharsRegex, ' ', $name));
+                    $payzenRequest->set('ship_to_delivery_company_name', preg_replace(self::NOT_ALLOWED_CHARS_REGEX, ' ', $name));
 
                     break;
 
@@ -389,7 +399,7 @@ class Checkout
                         $payzenRequest->set('ship_to_street2', null); // Not sent to FacilyPay Oney.
                     }
 
-                    $payzenRequest->set('ship_to_delivery_company_name', preg_replace($notAllowedCharsRegex, ' ', $carrierName));
+                    $payzenRequest->set('ship_to_delivery_company_name', preg_replace(self::NOT_ALLOWED_CHARS_REGEX, ' ', $carrierName));
 
                     break;
             }
@@ -407,6 +417,82 @@ class Checkout
 
                 $payzenRequest->set('ship_to_state', null); // Not sent to Oney.
                 $payzenRequest->set('ship_to_country', 'FR'); // Send FR even address is in DOM-TOM unless form is rejected.
+            }
+        }
+    }
+
+    public function setAdditionalShippingDataRest($order, &$restData)
+    {
+        // If this is Oney.
+        $useOney = in_array($restData['paymentMethods'], self::ONEY_MEANS);
+
+        if ($order->getIsVirtual() || ! $order->getShippingMethod()) { // There is no shipping method.
+            $restData['customer']['shippingDetails']['shippingMethod'] = 'ETICKET';
+            $restData['customer']['shippingDetails']['shippingSpeed'] = 'EXPRESS';
+        } else {
+            $shippingMethod = $this->toPayzenCarrier($order->getShippingMethod());
+
+            if (! $shippingMethod) {
+                $this->dataHelper->log(
+                    'Cannot get mapped data for the order shipping method: ' . $order->getShippingMethod(),
+                    \Psr\Log\LogLevel::WARNING
+                );
+                return;
+            }
+
+            // Get carrier name.
+            $carriers = $this->shippingConfig->getAllCarriers($order->getStore()->getId());
+            $shippingCode = ($shippingMethod['code'] != null) ? strpos($shippingMethod['code'], '_') : '';
+            $carrierCode = substr($shippingMethod['code'], 0, $shippingCode);
+            $carrierName = $carriers[$carrierCode]->getConfigData('title');
+
+            // Delivery point name.
+            $name = '';
+            switch ($shippingMethod['type']) {
+                case 'RELAY_POINT':
+                case 'RECLAIM_IN_STATION':
+                case 'RECLAIM_IN_SHOP':
+                    list($name, $address) = $this->getShippingAddress($order, $carrierName);
+
+                    $restData['customer']['shippingDetails']['address'] = $address;
+                    $restData['customer']['shippingDetails']['address2'] = $name;
+
+                    if (empty($name)) {
+                        $name = substr($order->getShippingDescription(), 0, 55);
+                    }
+
+                    // Send delivery point name, address, postcode and city in field ship_to_delivery_company_name.
+                    $name .= ' ' . $address;
+                    $name .= ' ' . $order->getShippingAddress()->getPostcode();
+                    $name .= ' ' . $order->getShippingAddress()->getCity();
+
+                    // Delete not allowed chars.
+                    $restData['customer']['shippingDetails']['deliveryCompanyName'] = preg_replace(self::NOT_ALLOWED_CHARS_REGEX, ' ', $name);
+
+                    break;
+
+                default:
+                    if ($useOney) {
+                        $address = $order->getShippingAddress()->getStreetLine(1);
+                        $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' . $order->getShippingAddress()->getStreetLine(2) : '';
+
+                        $restData['customer']['shippingDetails']['address'] = $address;
+                        $restData['customer']['shippingDetails']['address2'] = null; // Not sent to FacilyPay Oney.
+                    }
+
+                    $restData['customer']['shippingDetails']['deliveryCompanyName'] = preg_replace(self::NOT_ALLOWED_CHARS_REGEX, ' ', $carrierName);
+
+                    break;
+            }
+
+            $restData['customer']['shippingDetails']['shippingMethod'] = empty($shippingMethod['type']) ? null : $shippingMethod['type'];
+            $restData['customer']['shippingDetails']['shippingSpeed'] = empty($shippingMethod['speed']) ? null : $shippingMethod['speed'];
+
+            if ($useOney) { // Modify address to be sent to Oney.
+                $restData['customer']['billingDetails']['country'] = 'FR'; // Send FR even address is in DOM-TOM unless form is rejected.
+
+                $restData['customer']['shippingDetails']['state'] = null; // Not sent to Oney.
+                $restData['customer']['shippingDetails']['country'] = 'FR'; // Send FR even address is in DOM-TOM unless form is rejected.
             }
         }
     }
@@ -508,5 +594,68 @@ class Checkout
                 $metadata
             );
         }
+    }
+
+    /**
+     * @param $item
+     * @param bool $isDisplayCurrency
+     * @param $currency
+     * @return array
+     */
+    public function getItemDetails($item, bool $isDisplayCurrency, $currency): array
+    {
+        $product = $item->getProduct();
+
+        $label = $item->getName();
+
+        // Concat product label with one or two of its category names to make it clearer.
+        $categoryIds = $product->getCategoryIds();
+        if (is_array($categoryIds) && !empty($categoryIds)) {
+            try {
+                if (isset($categoryIds[1]) && $categoryIds[1]) {
+                    $category = $this->categoryRepository->get($categoryIds[1]);
+                    $label = $category->getName() . ' I ' . $label;
+                }
+
+                if ($categoryIds[0]) {
+                    $category = $this->categoryRepository->get($categoryIds[0]);
+                    $label = $category->getName() . ' I ' . $label;
+                }
+            } catch (NoSuchEntityException $e) {
+                $this->dataHelper->log(
+                    "Exception while retrieving product category with code {$e->getCode()}: {$e->getMessage()}",
+                    \Psr\Log\LogLevel::WARNING
+                );
+            }
+        }
+
+        $priceInCents = $isDisplayCurrency ? $currency->convertAmountToInteger($item->getPrice()) : $currency->convertAmountToInteger($item->getBasePrice());
+        $qty = (int) $item->getQtyOrdered();
+
+        return array($label, $categoryIds, $priceInCents, $qty);
+    }
+
+    /**
+     * @param $order
+     * @param $carrierName
+     * @return array
+     */
+    public function getShippingAddress($order, $carrierName): array
+    {
+        $name = $order->getShippingDescription();
+
+        if ($carrierName) {
+            $name = str_replace($carrierName . ' - ', '', $name ? $name : '');
+        }
+
+        if (($name != null) && ($pos = strpos($name, '<'))) {
+            $name = substr($name, 0, $pos); // Remove HTML elements.
+        }
+
+        // Modify address to send it to Oney server.
+        $address = $order->getShippingAddress()->getStreetLine(1);
+        $address .= $order->getShippingAddress()->getStreetLine(2) ? ' ' . $order->getShippingAddress()->getStreetLine(2) : '';
+
+        return array($name, $address);
     }
 }

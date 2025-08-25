@@ -1,3 +1,10 @@
+2.12.0, 2025-08-25:
+- Send shipping and cart data in REST payment request.
+- Fix some plugin translations.
+- Update list of supported payment means.
+- Update list of supported currencies.
+- Bug fix: Fix PHP error related to order not found check.
+
 2.11.4, 2025-08-04:
 - [oney] Bug fix: Fix error related to Oney payment when customer checkout as guest.
 - Some code fixes.

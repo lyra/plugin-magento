@@ -542,6 +542,16 @@ class Standard extends Payzen
             $data['paymentMethods'] = $this->getPaymentMeansForSmartform($amount);
         }
 
+        $sendCartDetails = $this->dataHelper->getCommonConfigData('send_cart_detail') &&
+            ($order->getTotalItemCount() <= self::CART_MAX_NB_PRODUCTS);
+
+        // Add cart data.
+        if ($sendCartDetails) {
+            $this->checkoutHelper->setCartDataRest($order, $data);
+        }
+
+        $this->checkoutHelper->setAdditionalShippingDataRest($order, $data);
+
         return json_encode($data);
     }
 

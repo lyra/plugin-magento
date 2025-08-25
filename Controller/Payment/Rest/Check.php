@@ -154,7 +154,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
 
                 // Load newly created order.
                 $order = $this->dataHelper->getOrderByIncrementId($quote->getReservedOrderId());
-                if (! $order->getId()) {
+                if (! $order || ! $order->getId()) {
                     $this->dataHelper->log("Order cannot be created. Quote ID: #{$quoteId}, reserved order ID: #{$quote->getReservedOrderId()}.", \Psr\Log\LogLevel::ERROR);
                     throw new ResponseException($response->getOutputForGateway('ko', 'Error when trying to create order.'));
                 }

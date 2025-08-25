@@ -107,7 +107,7 @@ class Token extends \Magento\Framework\App\Action\Action
                     $order = $this->dataHelper->getOrderByIncrementId($lastIncrementId);
                 } else {
                     $orderId = $this->dataHelper->getCheckout()->getLastOrderId();
-                    $order = $this->dataHelper->getOrderById($orderId);
+                    $order = $orderId ? $this->dataHelper->getOrderById($orderId) : null;
                 }
 
                 if (! $order) {

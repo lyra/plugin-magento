@@ -307,7 +307,7 @@ class CheckProcessor
 
         // Loading order.
         $order = $this->dataHelper->getOrderByIncrementId($orderId);
-        if (! $order->getId()) {
+        if (! $order) {
             $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
             throw new ResponseException('<span style="display:none">KO-Order not found.' . "\n" . '</span>');
         }

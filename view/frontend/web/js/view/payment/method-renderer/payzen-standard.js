@@ -151,8 +151,10 @@ define(
         };
 
         var PLACE_ORDER = true;  // An order can be placed (created).
+        var IS_VALID = false;
         var SHOW_ERROR = false;  // Show error message.
         var CAN_REFRESH_TOKEN = true; // Token can be refreshed.
+        var IS_CARD_EXTENDED = false;
 
         return Component.extend({
             defaults: {
@@ -366,10 +368,12 @@ define(
                             });
 
                             KR.onFormReady(() => {
+                                IS_CARD_EXTENDED = jQuery('.kr-card-header--selected').length > 0;
                                 me.hideSmartformButton();
 
                                 KR.smartForm.onClick((data) => {
                                     if (data.action === "methodSelected") {
+                                        IS_CARD_EXTENDED = IS_CARD_EXTENDED && (data.paymentMethod == 'CARDS');
                                         return true;
                                     }
 
@@ -407,7 +411,19 @@ define(
                 );
 
                 if (PLACE_ORDER === true) {
-                    me.placeOrder();
+                    if (me.getRestFormToken() && IS_CARD_EXTENDED && !IS_VALID) {
+                        // Expanded card form is selected, let's check form validity.
+                        KR.validateForm().then(function(v) {
+                            IS_VALID = true;
+                            me.placeOrder();
+                        }).catch(function(v) {
+                            IS_VALID = false;
+                            var result = v.result;
+                            return result.doOnError();
+                        });
+                    } else {
+                        me.placeOrder();
+                    }
                 } else if (PLACE_ORDER === false) {
                     if (SHOW_ERROR) {
                         SHOW_ERROR = false;
