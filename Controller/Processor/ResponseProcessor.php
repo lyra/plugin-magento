@@ -172,7 +172,7 @@ class ResponseProcessor
 
         // Load order.
         $order = $this->dataHelper->getOrderByIncrementId($orderId);
-        if (! $order->getId()) {
+        if (! $order) {
             throw new ResponseException("Order not found with ID #{$orderId}.");
         }
 

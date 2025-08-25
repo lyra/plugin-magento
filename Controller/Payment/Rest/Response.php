@@ -123,7 +123,7 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
 
         $order = $this->dataHelper->getOrderByIncrementId($orderId);
 
-        if (! $order->getId()) {
+        if (! $order || ! $order->getId()) {
             $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
             throw new ResponseException("Order not found with ID #{$orderId}.");
         }
