@@ -294,7 +294,8 @@ class Payment
     ) {
         if ($response->isToValidatePayment()) {
             $newStatus = 'payzen_to_validate';
-            $newState = \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW;
+            $newState = $this->dataHelper->getCommonConfigData('invoice_capture') ? \Magento\Sales\Model\Order::STATE_PROCESSING :
+                \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW;
         } elseif ($response->isPendingPayment()) {
             $newStatus = 'payment_review';
             $newState = \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW;
