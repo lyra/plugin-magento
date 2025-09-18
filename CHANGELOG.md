@@ -1,3 +1,7 @@
+2.12.1, 2025-09-18:
+- Bug fix: Ignore IPN on payment transaction expiration.
+- Bug fix: Fix capture order process on invoice creation in Magento Back Office.
+
 2.12.0, 2025-08-25:
 - Send shipping and cart data in REST payment request.
 - Fix some plugin translations.

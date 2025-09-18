@@ -111,13 +111,13 @@ class CheckProcessor
                     return 'payment_ok';
                 }
             } else {
-                if ($response->getTransStatus() === 'ABANDONED') {
+                if (in_array($response->getTransStatus(), \Lyranetwork\Payzen\Helper\Data::$abandonedStatuses)) {
                     $orderTransId = $order->getPayment()->getAdditionalInformation("payzen_last_trans_id");
 
                     if ($orderTransId && ($orderTransId !== $response->get('trans_id'))) {
-                        $this->dataHelper->log("Abandoned payment IPN ignored for order #{$order->getIncrementId()}. Another payment session was initiated with transaction ID #{$response->get('trans_id')}.");
+                        $this->dataHelper->log("Abandoned or expired payment IPN ignored for order #{$order->getIncrementId()}. Another payment session was initiated with transaction ID #{$response->get('trans_id')}.");
 
-                        die('<span style="display:none">KO-Payment abandoned.' . "\n" . '</span>');
+                        die('<span style="display:none">KO-Payment abandoned or expired.' . "\n" . '</span>');
                     }
                 }
 

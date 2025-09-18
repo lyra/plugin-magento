@@ -172,12 +172,18 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             $this->dataHelper->log("Cleared quote, order ID: #{$orderId}.");
         }
 
-        // Case of failure or expiration when retries are enabled and Update Order option not is not enabled, do nothing before last attempt.
+        // Case of failure or expiration when retries are enabled and Update Order option is not enabled, do nothing before last attempt.
         if (! $response->isAcceptedPayment() && ($answer['orderCycle'] !== 'CLOSED')
             && ! $response->getExtInfo('update_order') && ($response->get('url_check_src') !== 'MERCH_BO')) {
             $this->dataHelper->log("Payment is not accepted but buyer can try to re-order. Do not process order at this time.
                 Order ID: #{$orderId}.");
             throw new ResponseException($response->getOutputForGateway('payment_ko_bis'));
+        }
+
+        if (in_array($response->getTransStatus(), \Lyranetwork\Payzen\Helper\Data::$abandonedStatuses)) {
+            $this->dataHelper->log("Abandoned or Expired payment IPN ignored for order #{$order->getIncrementId()}.");
+
+            die('<span style="display:none">KO-Payment abandoned or expired.' . "\n" . '</span>');
         }
 
         // Get store id from order.

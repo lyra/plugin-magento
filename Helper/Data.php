@@ -58,6 +58,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'brazil' => false
     ];
 
+    public static $abandonedStatuses = [
+        'ABANDONED',
+        'EXPIRED'
+    ];
+
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
