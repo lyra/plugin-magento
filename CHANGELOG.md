@@ -1,3 +1,8 @@
+2.13.0, 2025-09-22:
+- Added compatibility with PHP 8.4.x versions.
+- Added compatibility with Magento 2.4.8.
+- Update PHP minimum required version.
+
 2.12.1, 2025-09-18:
 - Bug fix: Ignore IPN on payment transaction expiration.
 - Bug fix: Fix capture order process on invoice creation in Magento Back Office.
@@ -268,7 +273,7 @@
 - Bug fix: Payment information in order confirmation email was not correctly translated in some multistore cases.
 
 2.4.3, 2020-01-20:
-- Bug fix: Manage formKey for compatibility with Magento 2.3.x versions
+- Bug fix: Manage formKey for compatibility with Magento 2.3.x versions.
 - Bug fix: 3DS result is not correctly saved in Magento when using embedded payment fields.
 
 2.4.2, 2019-08-08:

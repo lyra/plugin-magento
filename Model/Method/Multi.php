@@ -78,8 +78,8 @@ class Multi extends Payzen
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \Magento\Backend\Model\Auth\Session $authSession,
         \Lyranetwork\Payzen\Model\System\Config\Source\MultiPaymentCard $multiCardPayment,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->multiCardPayment = $multiCardPayment;
@@ -175,7 +175,7 @@ class Multi extends Payzen
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         if (! parent::isAvailable($quote)) {
             return false;
