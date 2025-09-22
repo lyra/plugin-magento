@@ -43,8 +43,8 @@ class PrivateKey extends \Magento\Config\Model\Config\Backend\Encrypted
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
             $this->dataHelper = $dataHelper;

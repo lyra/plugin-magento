@@ -47,8 +47,8 @@ class CardInfoMode extends \Magento\Framework\App\Config\Value
         \Lyranetwork\Payzen\Helper\Data $dataHelper,
         \Lyranetwork\Payzen\Helper\Rest $restHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
         ) {
             $this->dataHelper = $dataHelper;

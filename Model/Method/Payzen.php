@@ -170,8 +170,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Module\Dir\Reader $dirReader,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->localeResolver = $localeResolver;
@@ -1010,7 +1010,7 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         if (! parent::isAvailable($quote)) {
             return false;

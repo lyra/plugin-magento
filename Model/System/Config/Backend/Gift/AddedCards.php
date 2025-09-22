@@ -57,8 +57,8 @@ class AddedCards extends \Lyranetwork\Payzen\Model\System\Config\Backend\Seriali
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface $requestData,
         \Magento\Framework\Image\AdapterFactory $adapterFactory,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->uploaderFactory = $uploaderFactory;
