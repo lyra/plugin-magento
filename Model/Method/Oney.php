@@ -81,8 +81,8 @@ class Oney extends Payzen
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \Magento\Backend\Model\Auth\Session $authSession,
         \Lyranetwork\Payzen\Model\System\Config\Source\OneyAvailableCountry $oneyCountries,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->oneyCountries = $oneyCountries;
@@ -204,7 +204,7 @@ class Oney extends Payzen
      * @param  Mage_Sales_Model_Quote|null $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         $checkResult = parent::isAvailable($quote);
 
