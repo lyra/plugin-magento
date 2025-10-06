@@ -154,7 +154,6 @@ define(
         var IS_VALID = false;
         var SHOW_ERROR = false;  // Show error message.
         var CAN_REFRESH_TOKEN = true; // Token can be refreshed.
-        var IS_CARD_EXTENDED = false;
 
         return Component.extend({
             defaults: {
@@ -368,12 +367,10 @@ define(
                             });
 
                             KR.onFormReady(() => {
-                                IS_CARD_EXTENDED = jQuery('.kr-card-header--selected').length > 0;
                                 me.hideSmartformButton();
 
                                 KR.smartForm.onClick((data) => {
                                     if (data.action === "methodSelected") {
-                                        IS_CARD_EXTENDED = IS_CARD_EXTENDED && (data.paymentMethod == 'CARDS');
                                         return true;
                                     }
 
@@ -411,6 +408,7 @@ define(
                 );
 
                 if (PLACE_ORDER === true) {
+                    let IS_CARD_EXTENDED = KR.$store.getters.cardsFormExpanded && (KR.$store.state.smartForm.selectedMethod == 'CARDS');
                     if (me.getRestFormToken() && IS_CARD_EXTENDED && !IS_VALID) {
                         // Expanded card form is selected, let's check form validity.
                         KR.validateForm().then(function(v) {
