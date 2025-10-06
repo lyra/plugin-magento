@@ -1,3 +1,6 @@
+2.13.1, 2025-10-06:
+- Bug fix: Fix credit card embedded form validation when payment data are invalid.
+
 2.13.0, 2025-09-22:
 - Added compatibility with PHP 8.4.x versions.
 - Added compatibility with Magento 2.4.8.
