@@ -1,3 +1,7 @@
+2.13.2, 2025-10-16:
+- Bug fix: Fix JS error when placing order with payment in redirection.
+- Bug fix: Fix shopping cart parameters with REST payment.
+
 2.13.1, 2025-10-06:
 - Bug fix: Fix credit card embedded form validation when payment data are invalid.
 

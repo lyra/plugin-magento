@@ -319,18 +319,22 @@ class Checkout
             }
         }
 
-        $restData['customer']['shoppingCart']['insurance_amount'] = 0; // By default, shipping insurance amount is not available in Magento.
         $shippingAmount = $isDisplayCurrency ? $order->getShippingAmount() : $order->getBaseShippingAmount();
-        $restData['customer']['shoppingCart']['shipping_amount'] = $currency->convertAmountToInteger($shippingAmount);
-
-        // Recalculate tax_amount to avoid rounding problems.
-        $taxAmount = $restData['amount'] - $subtotal - $restData['customer']['shoppingCart']['shipping_amount'] -
-            $restData['customer']['shoppingCart']['insurance_amount'];
-        if ($taxAmount <= 0) { // When order is discounted.
-            $taxAmount = $isDisplayCurrency ? $currency->convertAmountToInteger($order->getTaxAmount()) : $currency->convertAmountToInteger($order->getBaseTaxAmount());
+        $shippingAmount = ! empty($shippingAmount) ? $currency->convertAmountToInteger($shippingAmount) : 0;
+        if ($shippingAmount > 0) {
+            $restData['customer']['shoppingCart']['shippingAmount'] = $shippingAmount;
         }
 
-        $restData['customer']['shoppingCart']['tax_amount'] = $taxAmount;
+        // Recalculate tax_amount to avoid rounding problems.
+        $taxAmount = $restData['amount'] - $subtotal - $shippingAmount;
+        if ($taxAmount <= 0) { // When order is discounted.
+            $taxAmount = $isDisplayCurrency ? $order->getTaxAmount() : $order->getBaseTaxAmount();
+            $taxAmount = ! empty($taxAmount) ? $currency->convertAmountToInteger($taxAmount) : 0;
+        }
+
+        if ($taxAmount > 0) {
+            $restData['customer']['shoppingCart']['taxAmount'] = $taxAmount;
+        }
 
         // VAT amount for colombian payment means.
         $restData['taxAmount'] = $taxAmount;
