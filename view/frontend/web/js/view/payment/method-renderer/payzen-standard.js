@@ -408,8 +408,8 @@ define(
                 );
 
                 if (PLACE_ORDER === true) {
-                    let IS_CARD_EXTENDED = KR.$store.getters.cardsFormExpanded && (KR.$store.state.smartForm.selectedMethod == 'CARDS');
-                    if (me.getRestFormToken() && IS_CARD_EXTENDED && !IS_VALID) {
+                    let validateForm = me.getRestFormToken() && KR.$store.getters.cardsFormExpanded && (KR.$store.state.smartForm.selectedMethod == 'CARDS');
+                    if (validateForm && !IS_VALID) {
                         // Expanded card form is selected, let's check form validity.
                         KR.validateForm().then(function(v) {
                             IS_VALID = true;
