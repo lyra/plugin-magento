@@ -16,85 +16,77 @@ if ($accountToken):
 ?>
   <script>
       function payzenManageWalletDisplay() {
-           $('div.kr-methods-list-options-item.kr-cards').addClass('payzen-hide-wallet-elements');
-           $('div.kr-smart-form-list-section-name--other').addClass('payzen-hide-wallet-elements');
-           $('div.kr-smart-form-list-section-name').addClass('payzen-hide-wallet-elements');
-           $('div.kr-smart-form-list-section-name').first().removeClass('payzen-hide-wallet-elements');
+          $('div.kr-methods-list-options-item.kr-cards').addClass('payzen-hide-wallet-elements');
+          $('div.kr-smart-form-list-section-name--other').addClass('payzen-hide-wallet-elements');
+          $('div.kr-smart-form-list-section-name').addClass('payzen-hide-wallet-elements');
+          $('div.kr-smart-form-list-section-name').first().removeClass('payzen-hide-wallet-elements');
 
-           $('.kr-methods-list-options--wallet').each(function() {
-               if (! $(this).hasClass('kr-methods-list-options--extra')) {
-                   $(this).addClass('payzen-hide-wallet-elements');
-                }
-           });
-       }
+          $('.kr-methods-list-options--wallet').each(function() {
+              if (! $(this).hasClass('kr-methods-list-options--extra')) {
+                  $(this).addClass('payzen-hide-wallet-elements');
+              }
+          });
+      }
 
-       require([
-           'jquery'
-       ], function($) {
-         $(function() {
+      $(document).ready(function() {
           <?php if (! $hasVaultTokens): ?>
               $('.message.info.empty').remove();
           <?php endif; ?>
-         });
-       });
+      });
 
-       require(['krypton'], function(KR) {
-           KR.setFormConfig({
-               formToken: "<?php echo $accountToken; ?>",
-               language: "<?php echo $block->getLanguage(); ?>"
-           }).then(
-               function(v) {
-                   KR = v.KR;
-                   KR.onFocus(function(e) {
-                       $('#payzen_rest_form .kr-form-error').html('');
-                   });
-               }
-           );
+      if (typeof (KR) != 'undefined') {
+          KR.setFormConfig({
+              formToken: "<?php echo $accountToken; ?>",
+              language: "<?php echo $block->getLanguage(); ?>"
+          }).then(
+              function(v) {
+                  KR = v.KR;
+                  KR.onFocus(function(e) {
+                      $('#payzen_rest_form .kr-form-error').html('');
+                  });
+              }
+          );
 
-           KR.smartForm.onClick(function({paymentMethod, action, formId}) {
-               $('.navigation').css('z-index', 1);
-               return true;
-           });
+          KR.smartForm.onClick(function({paymentMethod, action, formId}) {
+              $('.navigation').css('z-index', 1);
+              return true;
+          });
 
-           KR.wallet.onPaymentTokenDeleted(function(callback) {
-               jQuery.ajax({
-                   method: "POST",
-                   url: "<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>",
-                   data: {
-                       'alias': callback.token,
-                       'alias_attr': 'payzen_identifier',
-                       'pm_attr' : 'payzen_masked_pan'
-                   },
-                   success: function() {
-                       console.log("Card token deleted successfully.");
-                   }
-               });
+          KR.wallet.onPaymentTokenDeleted(function(callback) {
+              jQuery.ajax({
+                  method: "POST",
+                  url: "<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>",
+                  data: {
+                      'alias': callback.token,
+                      'alias_attr': 'payzen_identifier',
+                      'pm_attr' : 'payzen_masked_pan'
+                  },
+                  success: function() {
+                      console.log("Card token deleted successfully.");
+                  }
+              });
           });
 
           <?php if ($block->hideWalletElements()): ?>
             KR.onLoaded(() => {
-               payzenManageWalletDisplay();
+              payzenManageWalletDisplay();
             })
           <?php endif; ?>
-      });
+      }
   </script>
 <?php else:
     if (! empty($block->hasIdentifiers())):
 ?>
   <script>
-      require([
-          'jquery'
-      ], function($) {
-        $(function() {
+      $(document).ready(function() {
           <?php if ($hasVaultTokens): ?>
-             $('#my-orders-table').append($('#payzenstd-identifier'));
-             $('#payzen-means-list').parent().remove();
+            $('#my-orders-table').append($('#payzenstd-identifier'));
+            $('#payzen-means-list').parent().remove();
           <?php else: ?>
-              $('.message.info.empty').remove();
+            $('.message.info.empty').remove();
           <?php endif; ?>
-       });
-    });
-   </script>
+      });
+  </script>
   <?php endif ?>
 
   <?php
@@ -176,9 +168,9 @@ if (! empty($means)):
                 <tr>
                     <?php if ($img = $block->getCcTypeImageSrc($card['brand'])): ?>
                       <td class="col brand"><img alt="<?php echo $block->escapeHtml($card['brand']); ?>"
-                              style="max-height: 30px; max-width: 80px; vertical-align: middle;"
-                              src="<?php echo $block->escapeHtml($img); ?>"
-                              title="<?php echo $block->escapeHtml($card['brand']); ?>">
+                          style="max-height: 30px; max-width: 80px; vertical-align: middle;"
+                          src="<?php echo $block->escapeHtml($img); ?>"
+                          title="<?php echo $block->escapeHtml($card['brand']); ?>">
                       </td>
                   <?php else: ?>
                     <td class="col brand"><span><?php echo $block->escapeHtml($card['brand']); ?></span></td>
@@ -186,8 +178,8 @@ if (! empty($means)):
                     <td class="col card-number"><?php echo $block->escapeHtml($card['number']); ?></td>
                     <td class="col actions">
                         <form class="form"
-                                action="<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>"
-                                method="post">
+                              action="<?php echo $block->escapeUrl($block->getUrl('payzen/customer/cancel')); ?>"
+                              method="post">
                            <?php echo $block->getBlockHtml('formkey'); ?>
                             <input name="alias_attr" value="<?php echo $block->escapeHtml($card['alias']); ?>" type="hidden">
                             <input name="pm_attr" value="<?php echo $block->escapeHtml($card['pm']); ?>" type="hidden">

@@ -34,6 +34,10 @@ In order to deactivate the module: php bin/magento module:disable --clear-static
 - Expand PayZen payment method to enter your gateway credentials.
 - Refresh invalidated Magento cache after config saved.
 
+## Hyvä Compatibility
+
+To enable payments by embedded fields in Magento 2 with Hyvä Checkout, you need to install our [Payzen Hyvä checkout](https://github.com/lyra/plugin-magento-hyva/releases/tag/v1.0.0) compatibility plugin. Please refer to the plugin's README.md file for detailed installation instructions.
+
 ## License
 
 Each PayZen payment module source file included in this distribution is licensed under the Open Software License (OSL 3.0).
