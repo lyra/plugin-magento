@@ -86,7 +86,7 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
     private function getRestFormToken()
     {
         // Do not create payment token until arriving to checkout page.
-        if ($this->urlBuilder->getCurrentUrl() != $this->urlBuilder->getUrl('checkout', ['_secure' => true])) {
+        if (! strpos($this->urlBuilder->getCurrentUrl(), 'checkout')) {
             return false;
         }
 

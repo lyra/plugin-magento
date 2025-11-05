@@ -1,3 +1,6 @@
+2.14.0, 2025-11-05:
+- Added payment by embedded fields compatibility with Hyvä modules.
+
 2.13.2, 2025-10-16:
 - Bug fix: Fix JS error when placing order with payment in redirection.
 - Bug fix: Fix shopping cart parameters with REST payment.

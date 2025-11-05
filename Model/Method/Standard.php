@@ -214,6 +214,10 @@ class Standard extends Payzen
             return false;
         }
 
+        if ($this->isRestMode()) {
+            return false;
+        }
+
         // Customer has not gateway identifier.
         $customer = $this->getCurrentCustomer();
         if (! $customer || ! ($identifier = $customer->getCustomAttribute('payzen_identifier'))) {
@@ -357,6 +361,7 @@ class Standard extends Payzen
         $billingAddress = $quote->getBillingAddress();
 
         $data = [
+            'orderId' => $quote->getId(),
             'customer' => [
                 'email' => $quote->getCustomerEmail() ? $quote->getCustomerEmail() : $billingAddress->getEmail(),
                 'reference' => $quote->getCustomer()->getId(),
