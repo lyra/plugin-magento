@@ -54,6 +54,8 @@ class Payment
 
     const BRAND_USER_CHOICE = 'payzen_brand_user_choice';
 
+    const WALLET = 'payzen_wallet';
+
     const SUCCESS = 1;
     const FAILURE = 2;
     const CANCEL = 3;
@@ -403,6 +405,10 @@ class Payment
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE, $userChoice);
         }
 
+        if ($response->get('wallet')) {
+            $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::WALLET, $response->get('wallet') != null);
+        }
+
         // Save risk control result if any.
         $riskControl = $response->getRiskControl();
         if (! empty($riskControl)) {
@@ -423,6 +429,7 @@ class Payment
             $transactions = $data->{'transactions'};
 
             $userChoice = [];
+            $wallet = [];
 
             // Save transaction details to sales_payment_transaction.
             foreach ($transactions as $trs) {
@@ -446,7 +453,7 @@ class Payment
                     'Transaction UUID' => $trs->{'trans_uuid'},
                     'Extra Transaction ID' => property_exists($trs, 'ext_trans_id') && isset($trs->{'ext_trans_id'}) ? $trs->{'ext_trans_id'} : '',
                     'Transaction Status' => $trs->{'trans_status'},
-                    'Means of payment' => $trs->{'card_brand'},
+                    'Means of payment' => isset($trs->{'wallet'}) && $trs->{'wallet'} != null ? $trs->{'wallet'} : $trs->{'card_brand'},
                     'Card Number' => $trs->{'card_number'},
                     'Expiration Date' => $expiry
                 ];
@@ -458,9 +465,14 @@ class Payment
                 if (isset($trs->{'brand_management'}) && ($brandInfo = $trs->{'brand_management'})) {
                     $userChoice[$trs->{'sequence_number'}] = (isset($brandInfo->userChoice) && $brandInfo->userChoice);
                 }
+
+                if (isset($trs->{'wallet'})) {
+                    $wallet[$trs->{'sequence_number'}] = $trs->{'wallet'} != null;
+                }
             }
 
             $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE, $userChoice);
+            $order->getPayment()->setAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::WALLET, $wallet);
         } else {
             // Save payment infos to sales_flat_order_payment.
             $order->getPayment()
@@ -555,7 +567,7 @@ class Payment
                         'Transaction ID' => $transactionId,
                         'Transaction UUID' => ($i === 1) ? $response->get('trans_uuid') : '',
                         'Transaction Status' => ($i === 1) ? $response->getTransStatus() : $this->getNextTransStatus($response->getTransStatus()),
-                        'Means of payment' => $response->get('card_brand'),
+                        'Means of payment' => $response->get('wallet') != null ? $response->get('wallet') : $response->get('card_brand'),
                         'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
                         '3DS Authentication' => $threedsStatus,
@@ -605,7 +617,7 @@ class Payment
                     'Transaction ID' => $transactionId,
                     'Transaction UUID' => $response->get('trans_uuid'),
                     'Transaction Status' => $response->getTransStatus(),
-                    'Means of payment' => $response->get('card_brand'),
+                    'Means of payment' => $response->get('wallet') != null ? $response->get('wallet') : $response->get('card_brand'),
                     'Card Number' => $response->get('card_number'),
                     'Expiration Date' => $expiry,
                     '3DS Authentication' => $threedsStatus,

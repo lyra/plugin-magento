@@ -15,7 +15,7 @@
         <payzen>
             <general>
                 <support_email><![CDATA[https://payzen.io/fr-FR/support/]]></support_email>
-                <plugin_version>2.14.0</plugin_version>
+                <plugin_version>2.15.0</plugin_version>
                 <gateway_version>V2</gateway_version>
                 <cms_identifier>Magento_2.x</cms_identifier>
                 <enable_logs>1</enable_logs>

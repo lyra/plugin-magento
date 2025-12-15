@@ -1,3 +1,10 @@
+2.15.0, 2025-12-15:
+- Added partial payment with embedded fields.
+- [oney] Oney integration with embedded fields.
+- Display the wallet used for payment if any in order details.
+- Update list of supported payment means.
+- Update list of supported currencies.
+
 2.14.0, 2025-11-05:
 - Added payment by embedded fields compatibility with Hyvä modules.
 

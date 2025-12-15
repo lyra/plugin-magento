@@ -213,7 +213,7 @@ class CheckProcessor
                         'Transaction ID' => $transactionId,
                         'Transaction UUID' => $response->get('trans_uuid'),
                         'Transaction Status' => $response->get('trans_status'),
-                        'Means of payment' => $response->get('card_brand'),
+                        'Means of payment' => $response->get('wallet') != null ? $response->get('wallet') : $response->get('card_brand'),
                         'Card Number' => $response->get('card_number'),
                         'Expiration Date' => $expiry,
                         '3DS Certificate' => ''
