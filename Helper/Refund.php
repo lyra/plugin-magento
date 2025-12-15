@@ -219,7 +219,7 @@ class Refund implements \Lyranetwork\Payzen\Model\Api\Refund\Processor
             'Transaction ID' => $transactionId,
             'Transaction UUID' => $response['vads_trans_uuid'],
             'Transaction Status' => $response['vads_trans_status'],
-            'Means of payment' => $response['vads_card_brand'],
+            'Means of payment' => $response['vads_wallet'] ? $response['vads_wallet'] : $response['vads_card_brand'],
             'Card Number' => $response['vads_card_number'],
             'Expiration Date' => $expiry
         ];

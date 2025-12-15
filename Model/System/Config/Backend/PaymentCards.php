@@ -59,8 +59,12 @@ class PaymentCards extends \Magento\Framework\App\Config\Value
             $this->setValue([]);
         }
 
-        // Remove Oney cards from payment means list.
-        $this->setValue(array_diff($this->getValue(), ['ONEY_3X_4X', 'ONEY_10x_12X', 'ONEY_PAYLATER']));
+        // Remove Oney cards from payment means list in redirection mode.
+        $restModes = ['SMARTFORM', 'SMARTFORM_EXT_WITH_LOGOS', 'MODE_SMARTFORM_EXT_WITHOUT_LOGOS'];
+
+        if (! in_array($this->dataHelper->getCardDataEntryMode(), $restModes)) {
+            $this->setValue(array_diff($this->getValue(), ['ONEY_3X_4X', 'ONEY_10X_12X', 'ONEY_PAYLATER']));
+        }
 
         if (strlen(implode(';', $this->getValue())) > 127) {
             $config = $this->getFieldConfig();

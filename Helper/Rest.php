@@ -33,15 +33,27 @@ class Rest
             return [];
         }
 
+        $transactions = $this->getProperty($answer, 'transactions');
+        $multiPaymentMean = false;
+
         if ($isTransaction) {
             $transaction = $answer;
         } else {
-            $transactions = $this->getProperty($answer, 'transactions');
-
             if (! is_array($transactions) || empty($transactions)) {
                 $transaction = $answer;
             } else {
                 $transaction = $transactions[0];
+
+                $transactionsFiltered = array_filter($transactions, function($trs) {
+                    $successStatuses = array_merge(PayzenApi::getSuccessStatuses(), PayzenApi::getPendingStatuses());
+
+                    return $trs['operationType'] === 'DEBIT' && in_array($trs['detailedStatus'], $successStatuses);
+                });
+
+                if (count($transactionsFiltered) > 1) {
+                    $multiPaymentMean = isset($transactionsFiltered[0]['transactionDetails']['cardDetails']['sequenceType'])
+                        && $transactionsFiltered[0]['transactionDetails']['cardDetails']['sequenceType'] == 'MULTI_PAYMENT_MEAN';
+                }
             }
         }
 
@@ -51,19 +63,6 @@ class Rest
         $response['vads_order_cycle'] = $this->getProperty($answer, 'orderCycle');
         $response['vads_order_status'] = $this->getProperty($answer, 'orderStatus');
 
-        $response['vads_result'] = $this->getProperty($transaction, 'errorCode') ? $this->getProperty($transaction, 'errorCode') : '00';
-        $response['vads_extra_result'] = $this->getProperty($transaction, 'detailedErrorCode');
-
-        if ($errorMessage = $this->getErrorMessage($transaction)) {
-            $response['vads_error_message'] = $errorMessage;
-        }
-
-        $response['vads_trans_status'] = $this->getProperty($transaction, 'detailedStatus');
-        $response['vads_trans_uuid'] = $this->getProperty($transaction, 'uuid');
-        $response['vads_operation_type'] = $this->getProperty($transaction, 'operationType');
-        $response['vads_effective_creation_date'] = $this->getProperty($transaction, 'creationDate');
-        $response['vads_payment_config'] = 'SINGLE'; // Only single payments are possible via REST API at this time.
-
         if (($customer = $this->getProperty($answer, 'customer'))) {
             $response['vads_cust_email'] = $this->getProperty($customer, 'email');
 
@@ -72,26 +71,61 @@ class Rest
             }
         }
 
-        $response['vads_amount'] = $this->getProperty($transaction, 'amount');
-        $response['vads_currency'] = PayzenApi::getCurrencyNumCode($this->getProperty($transaction, 'currency'));
-
-        if ($paymentToken = $this->getProperty($transaction, 'paymentMethodToken')) {
-            $response['vads_identifier'] = $paymentToken;
-            $response['vads_identifier_status'] = 'CREATED';
-        }
-
         if ($orderDetails = $this->getProperty($answer, 'orderDetails')) {
             $response['vads_order_id'] = $this->getProperty($orderDetails, 'orderId');
         }
 
+        $response = $this->convertRestTransaction($response, $transaction);
+
+        if ($multiPaymentMean) {
+            $payment_seq = array(
+                'trans_id' => $response['vads_trans_id'],
+                'transactions' => array()
+            );
+
+            foreach ($transactions as $trs) {
+                $payment_seq['transactions'][] = self::convertRestTransaction(array(), $trs, '');
+            }
+
+            $response['vads_card_brand'] = 'MULTI';
+            $response['vads_payment_seq'] = json_encode($payment_seq);
+            $response['vads_amount'] = self::getProperty($orderDetails, 'orderTotalAmount');
+            $response['vads_authorized_amount'] = self::getProperty($orderDetails, 'orderTotalAmount');
+        }
+
+        return $response;
+    }
+
+    private function convertRestTransaction($response, $transaction, $prefix = 'vads_') {
+        $response[$prefix . 'result'] = $this->getProperty($transaction, 'errorCode') ? $this->getProperty($transaction, 'errorCode') : '00';
+        $response[$prefix . 'extra_result'] = $this->getProperty($transaction, 'detailedErrorCode');
+
+        if ($errorMessage = $this->getErrorMessage($transaction)) {
+            $response[$prefix . 'error_message'] = $errorMessage;
+        }
+
+        $response[$prefix . 'trans_status'] = $this->getProperty($transaction, 'detailedStatus');
+        $response[$prefix . 'trans_uuid'] = $this->getProperty($transaction, 'uuid');
+        $response[$prefix . 'operation_type'] = $this->getProperty($transaction, 'operationType');
+        $response[$prefix . 'effective_creation_date'] = $this->getProperty($transaction, 'creationDate');
+        $response[$prefix . 'payment_config'] = 'SINGLE'; // Only single payments are possible via REST API at this time.
+
+        $response[$prefix . 'amount'] = $this->getProperty($transaction, 'amount');
+        $response[$prefix . 'currency'] = PayzenApi::getCurrencyNumCode($this->getProperty($transaction, 'currency'));
+
+        if ($paymentToken = $this->getProperty($transaction, 'paymentMethodToken')) {
+            $response[$prefix . 'identifier'] = $paymentToken;
+            $response[$prefix . 'identifier_status'] = 'CREATED';
+        }
+
         if (($metadata = $this->getProperty($transaction, 'metadata')) && is_array($metadata)) {
             foreach ($metadata as $key => $value) {
-                $response['vads_ext_info_' . $key] = $value;
+                $response[$prefix . 'ext_info_' . $key] = $value;
             }
         }
 
         if ($transactionDetails = $this->getProperty($transaction, 'transactionDetails')) {
-            $response['vads_sequence_number'] = $this->getProperty($transactionDetails, 'sequenceNumber');
+            $response[$prefix . 'sequence_number'] = $this->getProperty($transactionDetails, 'sequenceNumber');
 
             // Workarround to adapt to REST API behavior.
             $effectiveAmount = $this->getProperty($transactionDetails, 'effectiveAmount');
@@ -99,66 +133,67 @@ class Rest
 
             if ($effectiveAmount && $effectiveCurrency) {
                 // Invert only if there is currency conversion.
-                if ($effectiveCurrency !== $response['vads_currency']) {
-                    $response['vads_effective_amount'] = $response['vads_amount'];
-                    $response['vads_effective_currency'] = $response['vads_currency'];
-                    $response['vads_amount'] = $effectiveAmount;
-                    $response['vads_currency'] = $effectiveCurrency;
+                if ($effectiveCurrency !== $response[$prefix . 'currency']) {
+                    $response[$prefix . 'effective_amount'] = $response[$prefix . 'amount'];
+                    $response[$prefix . 'effective_currency'] = $response[$prefix . 'currency'];
+                    $response[$prefix . 'amount'] = $effectiveAmount;
+                    $response[$prefix . 'currency'] = $effectiveCurrency;
                 } else {
-                    $response['vads_effective_amount'] = $effectiveAmount;
-                    $response['vads_effective_currency'] = $effectiveCurrency;
+                    $response[$prefix . 'effective_amount'] = $effectiveAmount;
+                    $response[$prefix . 'effective_currency'] = $effectiveCurrency;
                 }
             }
 
-            $response['vads_warranty_result'] = $this->getProperty($transactionDetails, 'liabilityShift');
+            $response[$prefix . 'warranty_result'] = $this->getProperty($transactionDetails, 'liabilityShift');
+            $response[$prefix . 'wallet'] = $this->getProperty($transactionDetails, 'wallet');
 
             if ($cardDetails = $this->getProperty($transactionDetails, 'cardDetails')) {
-                $response['vads_trans_id'] = $this->getProperty($cardDetails, 'legacyTransId'); // Deprecated.
-                $response['vads_presentation_date'] = $this->getProperty($cardDetails, 'expectedCaptureDate');
+                $response[$prefix . 'trans_id'] = $this->getProperty($cardDetails, 'legacyTransId'); // Deprecated.
+                $response[$prefix . 'presentation_date'] = $this->getProperty($cardDetails, 'expectedCaptureDate');
 
-                $response['vads_card_brand'] = $this->getProperty($cardDetails, 'effectiveBrand');
-                $response['vads_card_number'] = $this->getProperty($cardDetails, 'pan');
-                $response['vads_expiry_month'] = $this->getProperty($cardDetails, 'expiryMonth');
-                $response['vads_expiry_year'] = $this->getProperty($cardDetails, 'expiryYear');
+                $response[$prefix . 'card_brand'] = $this->getProperty($cardDetails, 'effectiveBrand');
+                $response[$prefix . 'card_number'] = $this->getProperty($cardDetails, 'pan');
+                $response[$prefix . 'expiry_month'] = $this->getProperty($cardDetails, 'expiryMonth');
+                $response[$prefix . 'expiry_year'] = $this->getProperty($cardDetails, 'expiryYear');
 
-                $response['vads_payment_option_code'] = $this->getProperty($cardDetails, 'installmentNumber');
+                $response[$prefix . 'payment_option_code'] = $this->getProperty($cardDetails, 'installmentNumber');
 
 
                 if ($authorizationResponse = $this->getProperty($cardDetails, 'authorizationResponse')) {
-                    $response['vads_auth_result'] = $this->getProperty($authorizationResponse, 'authorizationResult');
-                    $response['vads_authorized_amount'] = $this->getProperty($authorizationResponse, 'amount');
+                    $response[$prefix . 'auth_result'] = $this->getProperty($authorizationResponse, 'authorizationResult');
+                    $response[$prefix . 'authorized_amount'] = $this->getProperty($authorizationResponse, 'amount');
                 }
 
                 if (($authenticationResponse = self::getProperty($cardDetails, 'authenticationResponse'))
                     && ($value = self::getProperty($authenticationResponse, 'value'))) {
-                    $response['vads_threeds_status'] = self::getProperty($value, 'status');
-                    $response['vads_threeds_auth_type'] = self::getProperty($value, 'authenticationType');
+                    $response[$prefix . 'threeds_status'] = self::getProperty($value, 'status');
+                    $response[$prefix . 'threeds_auth_type'] = self::getProperty($value, 'authenticationType');
                     if ($authenticationValue = self::getProperty($value, 'authenticationValue')) {
-                        $response['vads_threeds_cavv'] = self::getProperty($authenticationValue, 'value');
+                        $response[$prefix . 'threeds_cavv'] = self::getProperty($authenticationValue, 'value');
                     }
                 } elseif (($threeDSResponse = self::getProperty($cardDetails, 'threeDSResponse'))
                     && ($authenticationResultData = self::getProperty($threeDSResponse, 'authenticationResultData'))) {
-                    $response['vads_threeds_cavv'] = self::getProperty($authenticationResultData, 'cavv');
-                    $response['vads_threeds_status'] = self::getProperty($authenticationResultData, 'status');
-                    $response['vads_threeds_auth_type'] = self::getProperty($authenticationResultData, 'threeds_auth_type');
+                    $response[$prefix . 'threeds_cavv'] = self::getProperty($authenticationResultData, 'cavv');
+                    $response[$prefix . 'threeds_status'] = self::getProperty($authenticationResultData, 'status');
+                    $response[$prefix . 'threeds_auth_type'] = self::getProperty($authenticationResultData, 'threeds_auth_type');
                 }
             }
 
             if ($fraudManagement = $this->getProperty($transactionDetails, 'fraudManagement')) {
                 if ($riskControl = $this->getProperty($fraudManagement, 'riskControl')) {
-                    $response['vads_risk_control'] = '';
+                    $response[$prefix . 'risk_control'] = '';
 
                     foreach ($riskControl as $value) {
                         if (! isset($value['name']) || ! isset($value['result'])) {
                             continue;
                         }
 
-                        $response['vads_risk_control'] .= "{$value['name']}={$value['result']};";
+                        $response[$prefix . 'risk_control'] .= "{$value['name']}={$value['result']};";
                     }
                 }
 
                 if ($riskAssessments = $this->getProperty($fraudManagement, 'riskAssessments')) {
-                    $response['vads_risk_assessment_result'] = $this->getProperty($riskAssessments, 'results');
+                    $response[$prefix . 'risk_assessment_result'] = $this->getProperty($riskAssessments, 'results');
                 }
             }
         }

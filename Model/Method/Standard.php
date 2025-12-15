@@ -188,7 +188,7 @@ class Standard extends Payzen
         }
 
         // Remove Oney cards from payment means list.
-        $cards = array_diff($cards, ['ONEY_3X_4X', 'ONEY_10x_12X', 'ONEY_PAYLATER']);
+        $cards = array_diff($cards, ['ONEY_3X_4X', 'ONEY_10X_12X', 'ONEY_PAYLATER']);
 
         $availCards = [];
         foreach ($allCards as $code => $label) {
@@ -364,7 +364,7 @@ class Standard extends Payzen
             'orderId' => $quote->getId(),
             'customer' => [
                 'email' => $quote->getCustomerEmail() ? $quote->getCustomerEmail() : $billingAddress->getEmail(),
-                'reference' => $quote->getCustomer()->getId(),
+                'reference' => $quote->getCustomer()->getId() ? $quote->getCustomer()->getId() : '',
                 'billingDetails' => [
                     'language' => strtoupper($this->getPaymentLanguage()),
                     'title' => $billingAddress->getPrefix() ? $billingAddress->getPrefix() : null,
@@ -376,7 +376,8 @@ class Standard extends Payzen
                     'state' => $billingAddress->getRegion(),
                     'phoneNumber' => $billingAddress->getTelephone(),
                     'cellPhoneNumber' => $billingAddress->getTelephone(),
-                    'country' => $billingAddress->getCountryId()
+                    'country' => $billingAddress->getCountryId(),
+                    'category' => 'PRIVATE'
                 ]
             ],
             'transactionOptions' => [
@@ -422,7 +423,8 @@ class Standard extends Payzen
                 'city' => $shippingAddress->getCity(),
                 'state' => $shippingAddress->getRegion(),
                 'phoneNumber' => $shippingAddress->getTelephone(),
-                'country' => $shippingAddress->getCountryId()
+                'country' => $shippingAddress->getCountryId(),
+                'category' => 'PRIVATE'
             );
         }
 
@@ -476,7 +478,7 @@ class Standard extends Payzen
             'orderId' => $order->getIncrementId(),
             'customer' => [
                 'email' => $order->getCustomerEmail() ? $order->getCustomerEmail() : $billingAddress->getEmail(),
-                'reference' => $order->getCustomerId(),
+                'reference' => $order->getCustomerId() ? $order->getCustomerId() : '',
                 'billingDetails' => [
                     'language' => strtoupper($this->getPaymentLanguage()),
                     'title' => $billingAddress->getPrefix() ? $billingAddress->getPrefix() : null,
@@ -488,7 +490,8 @@ class Standard extends Payzen
                     'state' => $billingAddress->getRegion(),
                     'phoneNumber' => $billingAddress->getTelephone(),
                     'cellPhoneNumber' => $billingAddress->getTelephone(),
-                    'country' => $billingAddress->getCountryId()
+                    'country' => $billingAddress->getCountryId(),
+                    'category' => 'PRIVATE'
                 ]
             ],
             'transactionOptions' => [
@@ -526,7 +529,8 @@ class Standard extends Payzen
                 'city' => $shippingAddress->getCity(),
                 'state' => $shippingAddress->getRegion(),
                 'phoneNumber' => $shippingAddress->getTelephone(),
-                'country' => $shippingAddress->getCountryId()
+                'country' => $shippingAddress->getCountryId(),
+                'category' => 'PRIVATE'
             );
         }
 

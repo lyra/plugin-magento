@@ -102,13 +102,21 @@ class Info extends \Magento\Payment\Block\Info
         $html = '';
         $payment = $this->getInfo();
 
-        $html .= '<b>' . __('Means of payment') . ': </b>' . $payment->getCcType();
+        $collection = $this->trsCollectionFactory->create();
+        $collection->addPaymentIdFilter($payment);
+        $collection->load();
+
+        $info = $collection->getFirstItem()->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+
+        $cardBrand = $info['Means of payment'] ?? $payment->getCcType();
+        $html .= '<b>' . __('Means of payment') . ': </b>' . $cardBrand;
 
         if ($backend) {
             $userChoice = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE);
-            if ($userChoice === true) {
+            $wallet = $payment->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::WALLET);
+            if ($userChoice === true && ! $wallet) {
                 $html .= ' ' . __('(card brand chosen by buyer)');
-            } elseif ($userChoice === false) {
+            } elseif ($userChoice === false && ! $wallet) {
                 $html .= ' ' . __('(default card brand used)');
             }
 
@@ -137,17 +145,22 @@ class Info extends \Magento\Payment\Block\Info
         $collection->load();
 
         $userChoice = $this->getInfo()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::BRAND_USER_CHOICE);
+        $wallet = $this->getInfo()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::WALLET);
 
         $html = '';
 
         foreach ($collection as $item) {
+            $info = $item->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
+            if (! is_array($info) || empty($info)) {
+                continue;
+            }
+
             $html .= '<hr />';
 
             $sequenceNumber = ($item->getTxnId() != null) ? substr($item->getTxnId(), strpos($item->getTxnId(), '-') + 1) : "";
 
             $html .= $sequenceNumber ? '<b>' . __('Sequence Number') . ': </b>' . $sequenceNumber : '';
 
-            $info = $item->getAdditionalInformation(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS);
             foreach ($info as $key => $value) {
                 if (! $backend && in_array($key, ['Card Number', 'Expiration Date'])) {
                     continue;
@@ -161,9 +174,10 @@ class Info extends \Magento\Payment\Block\Info
                 $html .= '<b>' . __($key) . ': </b>' . $value;
 
                 if ($backend && ($key === 'Means of payment') && $sequenceNumber && isset($userChoice[$sequenceNumber])) {
-                    if ($userChoice[$sequenceNumber] === true) {
+                    $useWallet = isset($wallet[$sequenceNumber]) && $wallet[$sequenceNumber];
+                    if ($userChoice[$sequenceNumber] === true && ! $useWallet) {
                         $html .= ' ' . __('(card brand chosen by buyer)');
-                    } elseif ($userChoice[$sequenceNumber] === false) {
+                    } elseif ($userChoice[$sequenceNumber] === false  && ! $useWallet) {
                         $html .= ' ' . __('(default card brand used)');
                     }
                 }
