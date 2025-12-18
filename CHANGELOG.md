@@ -1,3 +1,6 @@
+2.15.1, 2025-12-18:
+- Bug fix: Fix embedded payment form behavior when invalid amount.
+
 2.15.0, 2025-12-15:
 - Added partial payment with embedded fields.
 - [oney] Oney integration with embedded fields.

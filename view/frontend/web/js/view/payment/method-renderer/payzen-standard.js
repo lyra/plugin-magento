@@ -283,21 +283,25 @@ define(
                     return;
                 }
 
+                if ($('#payzen_standard').length == 0) {
+                    return;
+                }
+
+                if (!quote.paymentMethod() || !quote.paymentMethod().hasOwnProperty('method') || quote.paymentMethod().method !== 'payzen_standard') {
+                    // Not our payment method, do not refresh.
+                    return;
+                }
+
                 var me = this;
 
                 var newPayload = me.getPayload();
                 if (me.payload && (me.payload === newPayload)) {
                     // Check if form token amount is up to date.
                     var totals = quote.getTotals()();
-                    if (totals) {
+                    if (totals && (totals['base_grand_total'] != 0) && (typeof(KR_RAW_DNA) !== 'undefined')) {
                         me.checkTokenAmount(totals['grand_total'], totals['quote_currency_code'], totals['base_grand_total'], totals['base_currency_code'], KR_RAW_DNA.amount);
                     }
 
-                    return;
-                }
-
-                if (!quote.paymentMethod() || !quote.paymentMethod().hasOwnProperty('method') || quote.paymentMethod().method !== 'payzen_standard') {
-                    // Not our payment method, do not refresh.
                     return;
                 }
 
@@ -339,6 +343,12 @@ define(
                 });
 
                 require(['krypton'], function(KR) {
+                    if (me.getRestFormToken() == null) {
+                        return;
+                    }
+
+                    $('#payzen_standard_message').html('').hide();
+
                     if (me.getCompactMode() === "1") {
                         KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
                     }
@@ -479,6 +489,9 @@ define(
                     url.build('payzen/payment_rest/token?payzen_action=refresh_token&form_key=' + $.mage.cookies.get('form_key'))
                 ).done(function(response) {
                     if (response.token) {
+                        $('#payzen_standard_message').html('').hide();
+                        window.checkoutConfig.payment.payzen_standard.restFormToken = response.token;
+
                         if (me.getCompactMode() === "1") {
                             KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
                         }
@@ -508,7 +521,10 @@ define(
                     }
 
                     fullScreenLoader.stopLoader();
-                })
+                }).fail(function(response) {
+                    fullScreenLoader.stopLoader();
+                    me.isPlaceOrderActionAllowed(true);
+                });
             },
 
             setToken: function() {
