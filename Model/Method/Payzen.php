@@ -1019,6 +1019,8 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
         $amount = $quote ? $quote->getBaseGrandTotal() : null;
         if (! $amount) {
             return true;
+        } elseif ($amount <= 0) {
+            return false;
         }
 
         $configOptions = $this->dataHelper->unserialize($this->getConfigData('custgroup_amount_restriction'));

@@ -52,7 +52,8 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
 
         $config['payment'][$this->method->getCode()]['maskedPan'] = $this->renderMaskedPan($maskedPan);
 
-        if ($this->method->isRestMode()) {
+        $quote = $this->dataHelper->getCheckoutQuote();
+        if ($this->method->isAvailable($quote) && $this->method->isRestMode()) {
             $errorMessage = null;
             $token = $this->getRestFormToken();
 
@@ -60,7 +61,6 @@ class StandardConfigProvider extends \Lyranetwork\Payzen\Model\PayzenConfigProvi
 
             if (! $token) {
                 $isTest = $this->dataHelper->getCommonConfigData('ctx_mode') == 'TEST';
-                $quote = $this->dataHelper->getCheckoutQuote();
 
                 if ($isTest && ($msg = $quote->getPayment()->getAdditionalInformation(\Lyranetwork\Payzen\Helper\Payment::REST_ERROR_MESSAGE))) {
                     $errorMessage = $msg . __(' Please consult the documentation for more details.');
