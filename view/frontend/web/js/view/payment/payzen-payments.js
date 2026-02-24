@@ -29,10 +29,6 @@ define(
                 component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-gift'
             },
             {
-                type: 'payzen_choozeo',
-                component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-choozeo'
-            },
-            {
                 type: 'payzen_oney',
                 component: 'Lyranetwork_Payzen/js/view/payment/method-renderer/payzen-oney'
             },

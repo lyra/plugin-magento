@@ -6,7 +6,6 @@ Namely, it enables the following payment methods:
 * PayZen - Standard payment
 * [mutli] PayZen - Payment in installments
 * [gift] PayZen - Gift card payment
-* [choozeo] PayZen - Choozeo payment
 * [oney] PayZen - Oney payment
 * [fullcb] PayZen - Full CB payment
 * [franfinance] PayZen - Franfinance payment
