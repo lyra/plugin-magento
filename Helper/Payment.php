@@ -23,9 +23,6 @@ class Payment
     // Key to save choosen multi option.
     const MULTI_OPTION = 'payzen_multi_option';
 
-    // Key to save choosen Choozeo option.
-    const CHOOZEO_OPTION = 'payzen_choozeo_option';
-
     // Key to save choosen Oney option.
     const ONEY_OPTION = 'payzen_oney_option';
 
@@ -753,7 +750,7 @@ class Payment
 
         if (! $customerData->getCustomAttribute($attribute)) {
             $this->dataHelper->log("Customer {$customer->getEmail()} doesn't have a saved {$attribute} attribute.");
-            return false;
+            return $walletIdentifier;
         }
 
         $identifier = $customerData->getCustomAttribute($attribute)->getValue();
@@ -762,11 +759,9 @@ class Payment
             if ($walletIdentifier == $identifier) {
                 // Delete identifier from Magento.
                 $this->deleteIdentifierAttribute($customer, $attribute, $maskedAttribute);
-
-                return true;
-            } else {
-                return false;
             }
+
+            return true;
         }
 
         try {

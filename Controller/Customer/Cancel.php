@@ -43,13 +43,18 @@ class Cancel extends AbstractAction
         $attribute = $this->getRequest()->getPost('alias_attr', false);
         $maskedAttribute = $this->getRequest()->getPost('pm_attr', false);
         $alias = $this->getRequest()->getPost('alias', false);
+        $walletIdentifier = $this->getRequest()->getPost('wallet_id', false);
 
         if ($customerId && $attribute && $maskedAttribute) {
-            if ($this->paymentHelper->deleteIdentifier($customerId, $attribute, $maskedAttribute, $alias)) {
+            if ($this->paymentHelper->deleteIdentifier($customerId, $attribute, $maskedAttribute, $alias, $walletIdentifier)) {
                 $this->messageManager->addSuccessMessage(__('The stored means of payment was successfully deleted.'));
             } else {
                 $this->messageManager->addErrorMessage(__('The stored means of payment could not be deleted.'));
             }
+        }
+
+        if ($walletIdentifier) {
+            return;
         }
 
         /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */

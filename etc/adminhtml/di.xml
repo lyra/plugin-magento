@@ -11,18 +11,6 @@
 -->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Lyranetwork\Payzen\Controller\Adminhtml\System\Config\Reset">
-        <arguments>
-            <argument name="cache" xsi:type="object">Magento\Framework\App\Cache\Type\Config</argument>
-        </arguments>
-    </type>
-
-    <type name="Lyranetwork\Payzen\Controller\Adminhtml\System\Config\Support">
-        <arguments>
-            <argument name="cache" xsi:type="object">Magento\Framework\App\Cache\Type\Config</argument>
-        </arguments>
-    </type>
-
     <type name="Magento\Sales\Model\AdminOrder\Create">
         <arguments>
             <argument name="emailSender" xsi:type="object">Lyranetwork\Payzen\Model\AdminOrder\EmailSender</argument>

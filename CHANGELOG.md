@@ -1,3 +1,10 @@
+2.16.0, 2026-02-24:
+- Bug fix: Fix display of customer wallet.
+- [technical] Clean Choozeo payment submodule code.
+- Remove contact support component.
+- Remove the possibility to configure URLs for payment page, REST API server and JS client server.
+- Remove the possibility to reset plugin configuration data.
+
 2.15.1, 2025-12-18:
 - Bug fix: Fix embedded payment form behavior when invalid amount.
 

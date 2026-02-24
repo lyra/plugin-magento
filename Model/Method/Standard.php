@@ -400,7 +400,7 @@ class Standard extends Payzen
 
         // In case of Smartform, only payment means supporting capture delay will be shown.
         if (is_numeric($captureDelay)) {
-            $data['transactionOptions']['cardOptions']['capture_delay'] = $captureDelay;
+            $data['transactionOptions']['cardOptions']['captureDelay'] = $captureDelay;
         }
 
         $validationMode = $this->getConfigData('validation_mode');

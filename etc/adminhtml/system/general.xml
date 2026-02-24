@@ -38,34 +38,14 @@
                 <config_path>payzen/general/plugin_version</config_path>
             </field>
 
-            <field id="gateway_version" translate="label" type="label" sortOrder="114" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Gateway version]]></label>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
-                <config_path>payzen/general/gateway_version</config_path>
-            </field>
-
-            <field id="reset_module" translate="label button_label comment" sortOrder="115" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label><![CDATA[Reset the module]]></label>
-                <comment><![CDATA[Click this button to reset the module settings.]]></comment>
-                <button_label>Reset </button_label>
-                <button_url><![CDATA[payzen/system_config/reset]]></button_url>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\InitButton</frontend_model>
-            </field>
-
-            <field id="enable_logs" translate="label" type="select" sortOrder="116" showInDefault="1" showInWebsite="0" showInStore="0">
+            <field id="enable_logs" translate="label" type="select" sortOrder="114" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label><![CDATA[Logs ]]></label>
                 <comment><![CDATA[Enable / disable module logs.]]></comment>
                 <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
                 <config_path>payzen/general/enable_logs</config_path>
             </field>
 
-            <field id="contact_support" translate="label button_label comment" sortOrder="117" showInDefault="1" showInWebsite="1" showInStore="1">
-                <button_label>Contact support</button_label>
-                <button_url><![CDATA[payzen/system_config/support]]></button_url>
-                <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\ContactSupport</frontend_model>
-            </field>
-
-            <field id="plugin_doc" translate="label" type="label" sortOrder="118" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="plugin_doc" translate="label" type="label" sortOrder="115" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label><![CDATA[Click to view the module configuration documentation]]></label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\PluginDoc</frontend_model>
                 <config_path>payzen/general/plugin_doc</config_path>
@@ -119,12 +99,6 @@
                 <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
                 <config_path>payzen/general/notify_url</config_path>
             </field>
-
-            <field id="gateway_url" translate="label comment" type="text" sortOrder="127" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Payment page URL]]></label>
-                <comment><![CDATA[Link to the payment page.]]></comment>
-                <config_path>payzen/general/gateway_url</config_path>
-            </field>
         </group>
 
         <group id="payzen_rest_api_keys" translate="label comment" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -150,38 +124,33 @@
                 <config_path>payzen/general/rest_private_key_prod</config_path>
             </field>
 
-            <field id="rest_url" translate="label comment" type="text" sortOrder="134" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>REST API server URL</label>
-                <config_path>payzen/general/rest_url</config_path>
-            </field>
-
-            <field id="rest_embedded_descr" translate="comment" type="label" sortOrder="135" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_embedded_descr" translate="comment" type="label" sortOrder="134" showInDefault="1" showInWebsite="1" showInStore="1">
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Label</frontend_model>
                 <comment><![CDATA[Configure this section only if you are using embedded payment fields modes.]]></comment>
                 <config_path>payzen/general/rest_embedded_descr</config_path>
             </field>
 
-            <field id="rest_public_key_test" translate="label" type="text" sortOrder="136" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_public_key_test" translate="label" type="text" sortOrder="135" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Public test key</label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\PublicKey</backend_model>
                 <config_path>payzen/general/rest_public_key_test</config_path>
             </field>
 
-            <field id="rest_public_key_prod" translate="label" type="text" sortOrder="137" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_public_key_prod" translate="label" type="text" sortOrder="136" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Public production key</label>
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\Sensitive</frontend_model>
                 <backend_model>Lyranetwork\Payzen\Model\System\Config\Backend\PublicKey</backend_model>
                 <config_path>payzen/general/rest_public_key_prod</config_path>
             </field>
 
-            <field id="rest_return_key_test" translate="label" type="obscure" sortOrder="138" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_return_key_test" translate="label" type="obscure" sortOrder="137" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>HMAC-SHA-256 test key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <config_path>payzen/general/rest_return_key_test</config_path>
             </field>
 
-            <field id="rest_return_key_prod" translate="label" type="obscure" sortOrder="139" showInDefault="1" showInWebsite="1" showInStore="1">
+            <field id="rest_return_key_prod" translate="label" type="obscure" sortOrder="138" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>HMAC-SHA-256 production key</label>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <config_path>payzen/general/rest_return_key_prod</config_path>
@@ -192,11 +161,6 @@
                 <frontend_model>Lyranetwork\Payzen\Block\Adminhtml\System\Config\Form\Field\NotifyUrl</frontend_model>
                 <comment><![CDATA[URL to copy into your PayZen Back Office > Settings > Notification rules.<br />In multistore mode, notification URL is the same for all the stores.]]></comment>
                 <config_path>payzen/general/rest_notify_url</config_path>
-            </field>
-
-            <field id="static_url" translate="label comment" type="text" sortOrder="1311" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>JavaScript client URL</label>
-                <config_path>payzen/general/static_url</config_path>
             </field>
         </group>
 

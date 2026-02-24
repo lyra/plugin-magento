@@ -18,7 +18,6 @@ class Redirect extends \Magento\Backend\Block\Widget\Form\Container
     {
         parent::_construct();
 
-        $this->buttonList->remove('reset');
         $this->buttonList->remove('save');
         $this->buttonList->update('back', 'id', 'back_payzen_redirect_button');
         $this->buttonList->update('back', 'onclick', 'setLocation(\'' . $this->getBackUrl() . '\')');

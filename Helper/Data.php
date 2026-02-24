@@ -19,7 +19,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const METHOD_STANDARD = 'payzen_standard';
     const METHOD_MULTI = 'payzen_multi';
-    const METHOD_CHOOZEO = 'payzen_choozeo';
     const METHOD_SEPA = 'payzen_sepa';
     const METHOD_GIFT = 'payzen_gift';
     const METHOD_ONEY = 'payzen_oney';
@@ -43,16 +42,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'prodfaq' => true,
         'restrictmulti' => false,
         'shatwo' => true,
-        'support' => false,
 
         'multi' => true,
         'gift' => true,
-        'choozeo' => false,
         'oney' => true,
         'fullcb' => true,
         'sepa' => true,
         'paypal' => true,
-        'franfinance' => true,
+        'franfinance' => false,
         'other' => true,
 
         'brazil' => false
