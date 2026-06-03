@@ -49,7 +49,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         'fullcb' => true,
         'sepa' => true,
         'paypal' => true,
-        'franfinance' => false,
+        'franfinance' => true,
         'other' => true,
 
         'brazil' => false
@@ -755,5 +755,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                              ->create();
 
         return $this->transactionRepository->getList($searchCriteria)->getItems();
+    }
+
+    public function getOrderByQuoteId($quoteId)
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter('quote_id', $quoteId)
+            ->create();
+
+        $items = $this->orderRepository->getList($searchCriteria)->getItems();
+
+        return ! empty($items) ? reset($items) : null;
     }
 }
