@@ -122,10 +122,16 @@ class Response extends \Lyranetwork\Payzen\Controller\Payment\Response
         }
 
         $order = $this->dataHelper->getOrderByIncrementId($orderId);
-
         if (! $order || ! $order->getId()) {
             $this->dataHelper->log("Order not found with ID #{$orderId}.", \Psr\Log\LogLevel::ERROR);
-            throw new ResponseException("Order not found with ID #{$orderId}.");
+            if ($quoteId = $response->getExtInfo("quote_id")) {
+                $this->dataHelper->log("Searching order by quote ID #{$quoteId}.");
+                $order = $this->dataHelper->getOrderByQuoteId($quoteId);
+            }
+
+            if (! $quoteId || ! $order) {
+                throw new ResponseException("Order not found with ID #{$orderId} and quote ID #{$quoteId}.");
+            }
         }
 
         // Disable quote.
