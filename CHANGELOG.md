@@ -1,3 +1,6 @@
+2.16.1, 2026-06-03:
+- Bug fix: Fix IPN processing when payment with embedded fields has been made with quote information.
+
 2.16.0, 2026-02-24:
 - Bug fix: Fix display of customer wallet.
 - [technical] Clean Choozeo payment submodule code.

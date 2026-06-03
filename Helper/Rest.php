@@ -331,4 +331,35 @@ class Rest
             }
         }
     }
+
+    public function updateTransactionOrderId($transUuid, $orderId)
+    {
+        $params = [
+            'uuid' => $transUuid,
+            'orderId' => $orderId
+        ];
+
+        // Perform our request.
+        $client = new \Lyranetwork\Payzen\Model\Api\Rest\Api(
+            $this->dataHelper->getCommonConfigData('rest_url'),
+            $this->dataHelper->getCommonConfigData('site_id'),
+            $this->getPrivateKey()
+        );
+
+        $this->dataHelper->log("Calling /Transaction/UpdateDetails WebService to update order ID to {$orderId} for transaction with uuid {$transUuid}.");
+
+        $response = $client->post('V4/Transaction/UpdateDetails', json_encode($params));
+
+        if ($response['status'] !== 'SUCCESS') {
+            $msg = "Error while updating order id for transaction with uuid {$transUuid}: " . $response['answer']['errorMessage'] . ' (' . $response['answer']['errorCode'] . ').';
+
+            if (! empty($response['answer']['detailedErrorMessage'])) {
+                $msg .= ' Detailed message: ' . $response['answer']['detailedErrorMessage'] .' (' . $response['answer']['detailedErrorCode'] . ').';
+            }
+
+            $this->dataHelper->log($msg, \Psr\Log\LogLevel::WARNING);
+        } else {
+            $this->dataHelper->log("Transaction order ID #{$orderId} successfully updated.");
+        }
+    }
 }
