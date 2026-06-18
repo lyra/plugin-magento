@@ -149,7 +149,9 @@ class Api
         if (! in_array($info['http_code'], array(200, 401), true)) {
             $error = curl_error($curl);
             $errno = curl_errno($curl);
-            curl_close($curl);
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($curl);
+            }
 
             $msg = "Call to URL $url failed with unexpected status: {$info['http_code']}";
 
@@ -170,7 +172,9 @@ class Api
         if (! is_array($response)) {
             $error = curl_error($curl);
             $errno = curl_errno($curl);
-            curl_close($curl);
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($curl);
+            }
 
             $msg = "Call to URL $url returned an unexpected response, raw response: $raw_response";
 
@@ -183,7 +187,9 @@ class Api
             throw new \Exception($msg, '-1');
         }
 
-        curl_close($curl);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($curl);
+        }
 
         return $response;
     }
