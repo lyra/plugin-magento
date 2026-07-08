@@ -1,3 +1,13 @@
+2.16.2, 2026-07-08:
+- Bug fix: Fix IPN processing on payment abandonment.
+- Bug fix: Prevent "Invalid file name" error when saving payment configuration when backend logo media folder is missing.
+- Bug fix: Fix error related to undefined function str_starts_with with PHP 7.x versions.
+- Improve transaction type mapping.
+- Update all domains payment means.
+- Update all domains supported currencies.
+- Added compatibility with PHP 8.5.x versions.
+- Add new transaction status CAPTURE_PENDING.
+
 2.16.1, 2026-06-03:
 - Bug fix: Fix IPN processing when payment with embedded fields has been made with quote information.
 

@@ -1230,9 +1230,9 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
             switch ($field) {
                 case "cpf":
                     $cpf = (key_exists('cpf', $customerData)) ? $customerData['cpf']['field'] : '';
-                    if (! empty($cpf) && str_starts_with($cpf, 'customer_')) {
+                    if (! empty($cpf) && strpos($cpf, 'customer_') === 0) {
                         return (! empty($order->getData($cpf))) ? $this->dataHelper->formatCpfCpnj($order->getData($cpf)) : '';
-                    } elseif (! empty($cpf) && str_starts_with($cpf, 'address_')) {
+                    } elseif (! empty($cpf) && strpos($cpf, 'address_') === 0) {
                         return $this->getOrderAddressAttribute($order, $cpf, true, $billing);
                     }
 
@@ -1240,9 +1240,9 @@ abstract class Payzen extends \Magento\Payment\Model\Method\AbstractMethod
                 case "district":
                 case "street":
                     $district = (key_exists($field, $customerData)) ? $customerData[$field]['field'] : '';
-                    if (! empty($district) && str_starts_with($district, 'customer_')) {
+                    if (! empty($district) && strpos($district, 'customer_') === 0) {
                         return (! empty($order->getData($district))) ? $order->getData($district) : '';
-                    } elseif (! empty($district) && str_starts_with($district, 'address_')) {
+                    } elseif (! empty($district) && strpos($district, 'address_') === 0) {
                         return $this->getOrderAddressAttribute($order, $district, false, $billing);
                     }
 

@@ -1036,34 +1036,15 @@ class Payment
      */
     public function convertTransactionType($payzenType)
     {
-        $type = false;
-
-        switch ($payzenType) {
-            case 'UNDER_VERIFICATION':
-            case 'INITIAL':
-            case 'WAITING_AUTHORISATION_TO_VALIDATE':
-            case 'WAITING_AUTHORISATION':
-            case 'AUTHORISED_TO_VALIDATE':
-            case 'AUTHORISED':
-            case 'CAPTURE_FAILED':
-                $type = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH;
-                break;
-
-            case 'CAPTURED':
-                $type = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
-                break;
-
-            case 'REFUSED':
-            case 'EXPIRED':
-            case 'CANCELLED':
-            case 'NOT_CREATED':
-            case 'ABANDONED':
-            default:
-                $type = \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID;
-                break;
+        if ($payzenType == 'CAPTURED') {
+            return \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
         }
 
-        return $type;
+        if (PayzenApi::isAcceptedPayment($payzenType)) {
+            return \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH;
+        }
+
+        return \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID;
     }
 
     public function getNextTransStatus($firstStatus)
