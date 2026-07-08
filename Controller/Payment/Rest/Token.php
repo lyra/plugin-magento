@@ -169,7 +169,7 @@ class Token extends \Magento\Framework\App\Action\Action
 
                 return;
 
-            default;
+            default:
                $token = null;
                break;
         }

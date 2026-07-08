@@ -191,7 +191,7 @@ class Check extends \Lyranetwork\Payzen\Controller\Payment\Check
             throw new ResponseException($response->getOutputForGateway('payment_ko_bis'));
         }
 
-        if (in_array($response->getTransStatus(), \Lyranetwork\Payzen\Helper\Data::$abandonedStatuses)) {
+        if (in_array($response->getTransStatus(), \Lyranetwork\Payzen\Helper\Data::$abandonedStatuses) || $response->get('order_status') === 'ABANDONED') {
             $this->dataHelper->log("Abandoned or Expired payment IPN ignored for order #{$order->getIncrementId()}.");
 
             die('<span style="display:none">KO-Payment abandoned or expired.' . "\n" . '</span>');
